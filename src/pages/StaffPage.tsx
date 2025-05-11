@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -21,6 +22,7 @@ import AddCustomerForm from '@/components/AddCustomerForm';
 import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import { PieChart } from 'lucide-react';
+import { useStaffNotifications } from '@/hooks/useStaffNotifications';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -29,6 +31,9 @@ const StaffPage = () => {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('queue');
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
+  
+  // Enable staff notifications
+  useStaffNotifications();
   
   // Filter to only show active appointments (not completed or cancelled)
   const activeAppointments = appointments.filter(

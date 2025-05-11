@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts"
 import { withAuth, corsHeaders, AuthContext } from "../_shared/auth.ts"
@@ -27,6 +26,14 @@ const UpdateAppointmentSchema = z.object({
   end_time: z.string().datetime().optional(),
 })
 
+// Schema for sending reminders
+const SendReminderSchema = z.object({
+  appointment_id: z.string().uuid(),
+  message: z.string(),
+  type: z.enum(['sms', 'email', 'app']),
+  send_time: z.string().datetime().optional() // If not provided, send immediately
+})
+
 // Type for appointment responses
 type AppointmentResponse = {
   id: string;
@@ -52,6 +59,82 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
   const { user, supabase } = ctx
   
   try {
+    // Send reminder (POST /appointments/reminder)
+    if (method === 'POST' && url.pathname.endsWith('/reminder')) {
+      // Extract and validate the request body
+      const body = await req.json()
+      const validation = SendReminderSchema.safeParse(body)
+      
+      if (!validation.success) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Invalid request data', 
+            details: validation.error.format() 
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      const reminderData = validation.data
+      
+      // Get the appointment details to make sure it exists
+      const { data: appointment, error: fetchError } = await supabase
+        .from('appointments')
+        .select('id, customer_id')
+        .eq('id', reminderData.appointment_id)
+        .single()
+      
+      if (fetchError || !appointment) {
+        return new Response(
+          JSON.stringify({ error: 'Appointment not found', details: fetchError?.message }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      // Check authorization - only staff/admin or the appointment owner can send reminders
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+      
+      const userRole = userRoles && userRoles.length > 0 ? userRoles[0].role : 'customer'
+      
+      if (userRole !== 'staff' && userRole !== 'admin' && appointment.customer_id !== user.id) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized to send reminders for this appointment' }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      // Log the reminder (in a real app, this would send an SMS/email)
+      const { data: reminderLog, error: logError } = await supabase
+        .from('appointment_reminders')
+        .insert({
+          appointment_id: reminderData.appointment_id,
+          message: reminderData.message,
+          type: reminderData.type,
+          scheduled_for: reminderData.send_time || new Date().toISOString(),
+          sent_by: user.id
+        })
+        .select()
+      
+      if (logError) {
+        console.error('Error logging reminder:', logError)
+        return new Response(
+          JSON.stringify({ error: 'Failed to send reminder', details: logError.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      // For now, we just log that we would send the reminder
+      console.log(`Would send ${reminderData.type} reminder to appointment ${reminderData.appointment_id}: ${reminderData.message}`)
+      
+      return new Response(
+        JSON.stringify({ success: true, reminder: reminderLog }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+    
     // Create new appointment (POST /appointments)
     if (method === 'POST') {
       // Extract and validate the request body

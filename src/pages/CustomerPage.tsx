@@ -8,6 +8,7 @@ import CheckInCard from '@/components/customer/CheckInCard';
 import AppointmentStatusCard from '@/components/customer/AppointmentStatusCard';
 import WaitTimesCard from '@/components/customer/WaitTimesCard';
 import AppointmentConfirmationDialog from '@/components/customer/AppointmentConfirmationDialog';
+import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
 
 const CustomerPage = () => {
   const { user, role } = useAuth();
@@ -38,6 +39,9 @@ const CustomerPage = () => {
           </div>
           
           <div className="space-y-6">
+            <div className="transition-all hover:translate-y-[-2px] duration-300">
+              <QueuePositionTracker />
+            </div>
             <div className="transition-all hover:translate-y-[-2px] duration-300">
               <CheckInCard />
             </div>

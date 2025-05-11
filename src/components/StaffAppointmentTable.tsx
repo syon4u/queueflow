@@ -1,182 +1,171 @@
-
-import React from 'react';
-import { format } from 'date-fns';
-import { PhoneCall, Check, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Appointment } from '@/hooks/use-appointments';
+import { SendReminderDialog } from './staff/SendReminderDialog';
+import { Bell } from 'lucide-react';
 
 interface StaffAppointmentTableProps {
   appointments: Appointment[];
-  onStatusChange: () => void;
+  onStatusChange?: () => void;
 }
 
-const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
-  appointments,
-  onStatusChange,
+const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({ 
+  appointments, 
+  onStatusChange 
 }) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
-
-  const getStatusBadgeClass = (status: AppointmentStatus) => {
-    switch (status) {
-      case 'scheduled':
-        return 'bg-blue-100 text-blue-800';
-      case 'checked_in':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'in_progress':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-gray-100 text-gray-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      case 'no_show':
-        return 'bg-purple-100 text-purple-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatTime = (dateString: string) => {
-    return format(new Date(dateString), 'h:mm a');
-  };
-
-  const updateAppointmentStatus = async (id: string, status: AppointmentStatus) => {
+  const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
+  const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  
+  const updateAppointmentStatus = async (id: string, status: string) => {
+    setIsLoading(prev => ({ ...prev, [id]: true }));
     try {
-      const updateData: Record<string, any> = { status };
-      
-      // Set appropriate timestamps based on status
-      if (status === 'in_progress') {
-        updateData.start_time = new Date().toISOString();
-      } else if (status === 'completed') {
-        updateData.end_time = new Date().toISOString();
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        throw error;
       }
-      
-      const { error } = await supabase.functions.invoke('appointments', {
-        method: 'PATCH',
-        body: { ...updateData, id }
+
+      toast({
+        title: t('common.success'),
+        description: t('appointments.statusUpdated'),
       });
 
-      if (error) throw error;
-      
-      toast({
-        title: 'Appointment updated',
-        description: `Status changed to ${status}`,
-      });
-      
-      onStatusChange();
+      onStatusChange?.();
     } catch (error) {
-      console.error('Error updating appointment:', error);
+      console.error('Error updating appointment status:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to update appointment status',
+        title: t('common.error'),
+        description: t('appointments.statusUpdateError'),
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(prev => ({ ...prev, [id]: false }));
     }
   };
-
-  const getWaitTime = (appointment: Appointment) => {
-    if (!appointment.check_in_time) return 'Not checked in';
-    
-    const checkInTime = new Date(appointment.check_in_time);
-    const now = new Date();
-    const waitTimeInMinutes = Math.floor((now.getTime() - checkInTime.getTime()) / (1000 * 60));
-    
-    return `${waitTimeInMinutes} min`;
+  
+  const handleOpenReminderDialog = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setReminderDialogOpen(true);
   };
 
+  if (!appointments.length) {
+    return (
+      <div className="text-center p-8 text-muted-foreground">
+        <p>No active appointments found</p>
+      </div>
+    );
+  }
+
   return (
-    <Table>
-      <TableCaption>Active appointments</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>Customer</TableHead>
-          <TableHead>Service</TableHead>
-          <TableHead>Wait Time</TableHead>
-          <TableHead>Scheduled</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {appointments.length === 0 ? (
+    <>
+      <Table>
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={7} className="text-center py-4">
-              No appointments found
-            </TableCell>
+            <TableHead>{t('appointments.scheduledTime')}</TableHead>
+            <TableHead>{t('appointments.status')}</TableHead>
+            <TableHead>{t('appointments.service')}</TableHead>
+            <TableHead className="hidden md:table-cell">{t('appointments.customer')}</TableHead>
+            <TableHead>{t('common.actions')}</TableHead>
           </TableRow>
-        ) : (
-          appointments.map((appointment) => (
+        </TableHeader>
+        <TableBody>
+          {appointments.map((appointment) => (
             <TableRow key={appointment.id}>
-              <TableCell className="font-medium">{appointment.id.slice(0, 8)}</TableCell>
-              <TableCell>{appointment.customer_id.slice(0, 8)}</TableCell>
-              <TableCell>{appointment.service_id.slice(0, 8)}</TableCell>
-              <TableCell>{getWaitTime(appointment)}</TableCell>
-              <TableCell>{formatTime(appointment.scheduled_time)}</TableCell>
               <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(appointment.status)}`}>
-                  {appointment.status}
-                </span>
+                {format(new Date(appointment.scheduled_time), 'PPp')}
               </TableCell>
               <TableCell>
-                <div className="flex space-x-2">
-                  {appointment.status === 'scheduled' && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => updateAppointmentStatus(appointment.id, 'checked_in')}
-                    >
-                      <PhoneCall className="mr-1 h-4 w-4" /> Call
-                    </Button>
-                  )}
-                  
-                  {appointment.status === 'checked_in' && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => updateAppointmentStatus(appointment.id, 'in_progress')}
-                    >
-                      <Check className="mr-1 h-4 w-4" /> Serve
-                    </Button>
-                  )}
-                  
-                  {appointment.status === 'in_progress' && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => updateAppointmentStatus(appointment.id, 'completed')}
-                    >
-                      <Check className="mr-1 h-4 w-4" /> Complete
-                    </Button>
-                  )}
-                  
-                  {(appointment.status === 'scheduled' || appointment.status === 'checked_in') && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => updateAppointmentStatus(appointment.id, 'cancelled')}
-                    >
-                      <X className="mr-1 h-4 w-4" /> Cancel
-                    </Button>
-                  )}
+                <Badge variant={getStatusVariant(appointment.status)}>
+                  {t(`appointments.status.${appointment.status}`)}
+                </Badge>
+              </TableCell>
+              <TableCell>{appointment.service_id}</TableCell>
+              <TableCell className="hidden md:table-cell">{appointment.customer_id}</TableCell>
+              <TableCell>
+                <div className="flex items-center space-x-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => updateAppointmentStatus(appointment.id, 'checked_in')}
+                    disabled={isLoading[appointment.id] || appointment.status !== 'scheduled'}
+                    title={t('appointments.checkIn')}
+                  >
+                    {isLoading[appointment.id] ? t('common.loading') : t('appointments.checkIn')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => updateAppointmentStatus(appointment.id, 'in_progress')}
+                    disabled={isLoading[appointment.id] || appointment.status !== 'checked_in'}
+                    title={t('appointments.startService')}
+                  >
+                    {isLoading[appointment.id] ? t('common.loading') : t('appointments.startService')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => updateAppointmentStatus(appointment.id, 'completed')}
+                    disabled={isLoading[appointment.id] || appointment.status !== 'in_progress'}
+                    title={t('appointments.complete')}
+                  >
+                    {isLoading[appointment.id] ? t('common.loading') : t('appointments.complete')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => updateAppointmentStatus(appointment.id, 'cancelled')}
+                    disabled={isLoading[appointment.id] || appointment.status === 'cancelled'}
+                    title={t('appointments.cancel')}
+                  >
+                    {isLoading[appointment.id] ? t('common.loading') : t('appointments.cancel')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleOpenReminderDialog(appointment)}
+                    title={t('appointments.sendReminder')}
+                  >
+                    <Bell className="h-4 w-4" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+          ))}
+        </TableBody>
+      </Table>
+
+      <SendReminderDialog
+        open={reminderDialogOpen}
+        onOpenChange={setReminderDialogOpen}
+        appointment={selectedAppointment}
+      />
+    </>
   );
+};
+
+// Helper function to determine badge variant based on status
+const getStatusVariant = (status: string): "default" | "secondary" | "outline" | "destructive" => {
+  switch (status) {
+    case 'checked_in': return 'secondary';
+    case 'in_progress': return 'default';
+    case 'completed': return 'outline';
+    case 'cancelled': 
+    case 'no_show': 
+      return 'destructive';
+    default: return 'outline';
+  }
 };
 
 export default StaffAppointmentTable;
