@@ -37,6 +37,10 @@ export default defineConfig(({ mode }) => ({
             purpose: 'any maskable'
           }
         ]
+      },
+      workbox: {
+        // Increase the maximum file size that can be precached to 3 MB (3 * 1024 * 1024)
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024
       }
     })
   ].filter(Boolean),
@@ -45,4 +49,16 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // Splitting the bundle into smaller chunks to improve loading performance
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-tabs'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000, // Increasing the warning limit to 1000kb
+  }
 }));
