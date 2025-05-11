@@ -104,10 +104,10 @@ const QueueSchedulingDialog: React.FC<QueueSchedulingDialogProps> = ({
         end_date: format(scheduleEvent.end_date, 'yyyy-MM-dd')
       };
 
-      // Insert into database
+      // Insert into database - Using a raw query since we can't use the typed client yet
       const { error } = await supabase
         .from('queue_schedule')
-        .insert(formattedEvent);
+        .insert(formattedEvent as any); // Type assertion needed until Supabase types are updated
 
       if (error) throw error;
 

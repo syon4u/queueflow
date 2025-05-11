@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Activity, Clock, XCircle } from 'lucide-react';
@@ -24,11 +25,12 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
     if (!user) return;
     
     try {
+      // We need to use any type here until Supabase types are updated
       const { data, error } = await supabase
         .from('staff')
         .select('status, return_time')
         .eq('id', user.id)
-        .single();
+        .single() as any;
       
       if (error) throw error;
       
@@ -52,9 +54,14 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
     if (!user) return;
     
     try {
+      // Using any type until Supabase types are updated
       const { error } = await supabase
         .from('staff')
-        .update({ status: newStatus, return_time: null, handover_staff_id: null })
+        .update({ 
+          status: newStatus, 
+          return_time: null, 
+          handover_staff_id: null 
+        } as any)
         .eq('id', user.id);
       
       if (error) throw error;

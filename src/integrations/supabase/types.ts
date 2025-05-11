@@ -127,6 +127,7 @@ export type Database = {
           id: string
           name: string
           phone: string | null
+          queue_status: string | null
           updated_at: string
         }
         Insert: {
@@ -136,6 +137,7 @@ export type Database = {
           id?: string
           name: string
           phone?: string | null
+          queue_status?: string | null
           updated_at?: string
         }
         Update: {
@@ -145,9 +147,57 @@ export type Database = {
           id?: string
           name?: string
           phone?: string | null
+          queue_status?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      queue_schedule: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          end_date: string
+          event_type: string
+          id: string
+          location_id: string
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_date: string
+          event_type: string
+          id?: string
+          location_id: string
+          start_date: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_date?: string
+          event_type?: string
+          id?: string
+          location_id?: string
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_schedule_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_wait_times: {
         Row: {
@@ -229,39 +279,93 @@ export type Database = {
         Row: {
           created_at: string
           first_name: string
+          handover_staff_id: string | null
           id: string
           last_name: string
           location_id: string | null
           phone: string | null
+          return_time: string | null
           role: Database["public"]["Enums"]["user_role"]
+          status: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           first_name: string
+          handover_staff_id?: string | null
           id: string
           last_name: string
           location_id?: string | null
           phone?: string | null
+          return_time?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          status?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           first_name?: string
+          handover_staff_id?: string | null
           id?: string
           last_name?: string
           location_id?: string | null
           phone?: string | null
+          return_time?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          status?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "staff_handover_staff_id_fkey"
+            columns: ["handover_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "staff_location_id_fkey"
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          staff_id: string
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          staff_id: string
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          staff_id?: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_notifications_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]

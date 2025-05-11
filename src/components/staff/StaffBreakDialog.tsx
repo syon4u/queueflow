@@ -80,15 +80,22 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
           if (staffError) throw staffError;
           
           // Get staff at the same location who are active
+          // We need to use any type here until Supabase types are updated
           const { data, error } = await supabase
             .from('staff')
-            .select('id, first_name, last_name, status')
+            .select('id, first_name, last_name')
             .eq('location_id', currentStaff.location_id)
             .neq('id', user.id)
-            .eq('status', 'active');
+            .eq('status', 'active') as any;
           
           if (error) throw error;
-          setAvailableStaff(data || []);
+          
+          // Filter to ensure we have valid staff members
+          const validStaff = (data || []).filter(
+            (s: any) => s.id && s.first_name && s.last_name
+          );
+          
+          setAvailableStaff(validStaff as StaffMember[]);
         } catch (error) {
           console.error('Error fetching available staff:', error);
         }
@@ -108,21 +115,22 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
       const returnTime = new Date();
       returnTime.setMinutes(returnTime.getMinutes() + duration);
 
-      // Update staff status and set return time
+      // Update staff status and set return time using raw query
+      // We need to use any type here until Supabase types are updated
       const { error: statusError } = await supabase
         .from('staff')
         .update({
           status: 'break',
           return_time: returnTime.toISOString(),
           handover_staff_id: handoverStaffId || null
-        })
+        } as any)
         .eq('id', user.id);
 
       if (statusError) throw statusError;
 
       // If handover selected, notify that staff
       if (handoverStaffId) {
-        // Insert notification for handover staff
+        // Insert notification for handover staff using raw query
         const { error: notifyError } = await supabase
           .from('staff_notifications')
           .insert({
@@ -133,7 +141,7 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
               duration 
             }),
             status: 'unread'
-          });
+          } as any);
 
         if (notifyError) throw notifyError;
       }

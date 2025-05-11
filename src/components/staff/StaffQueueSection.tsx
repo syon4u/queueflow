@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -6,10 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueue } from '@/context/QueueContext';
 import { useAuth } from '@/context/AuthContext';
 import QueueSchedulingDialog from './QueueSchedulingDialog';
-
-interface StaffQueueSectionProps {
-  
-}
+import { supabase } from '@/integrations/supabase/client';
 
 const StaffQueueSection: React.FC = () => {
   const { toast } = useToast();
@@ -19,13 +17,32 @@ const StaffQueueSection: React.FC = () => {
   const [showSchedulingDialog, setShowSchedulingDialog] = useState(false);
   
   const handleQueueStatusChange = async (newStatus: 'open' | 'closed') => {
-    // Optimistically update the UI
-    setQueueStatus(newStatus);
+    if (!locationId) return;
     
-    toast({
-      title: t('staff.queueStatusUpdated'),
-      description: t('staff.queueIsNow', { status: t(`staff.queue${newStatus === 'open' ? 'Open' : 'Closed'}`) })
-    });
+    try {
+      // Update the location's queue status in the database
+      const { error } = await supabase
+        .from('locations')
+        .update({ queue_status: newStatus })
+        .eq('id', locationId);
+        
+      if (error) throw error;
+      
+      // Update the UI
+      setQueueStatus(newStatus);
+      
+      toast({
+        title: t('staff.queueStatusUpdated'),
+        description: t('staff.queueIsNow', { status: t(`staff.queue${newStatus === 'open' ? 'Open' : 'Closed'}`) })
+      });
+    } catch (error) {
+      console.error('Error updating queue status:', error);
+      toast({
+        variant: 'destructive',
+        title: t('common.error'),
+        description: t('staff.queueStatusUpdateError')
+      });
+    }
   };
   
   return (
