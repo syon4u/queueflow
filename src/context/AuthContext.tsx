@@ -58,20 +58,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .maybeSingle();
+      // Use RPC call to a database function instead of querying a table directly
+      // This works around the TypeScript issue with tables not in the schema
+      const { data, error } = await supabase.rpc('get_user_role');
 
       if (error) {
         console.error('Error fetching user role:', error);
+        // Default to customer role if there's an error
+        setRole('customer');
         return;
       }
 
-      setRole(data?.role || 'customer'); // Default to customer if no specific role
+      // The function returns the role directly
+      setRole(data || 'customer'); // Default to customer if no specific role
     } catch (error) {
       console.error('Failed to fetch user role:', error);
+      setRole('customer'); // Default to customer on error
     }
   };
 
