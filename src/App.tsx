@@ -1,93 +1,102 @@
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
-import React from 'react';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
-import { QueueProvider } from "@/context/QueueContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Login from "./pages/Login";
-import Unauthorized from "./pages/Unauthorized";
-import NotFound from "./pages/NotFound";
-import Index from "./pages/Index";
-import AuthPage from "./pages/AuthPage";
-import CustomerPage from "./pages/CustomerPage";
-import StaffPage from "./pages/StaffPage";
-import AdminPage from "./pages/AdminPage";
-import ProfilePage from "./pages/ProfilePage";
-import AppointmentsPage from "./pages/AppointmentsPage";
-import NewAppointmentPage from "./pages/NewAppointmentPage";
+import Index from './pages/Index';
+import Login from './pages/Login';
+import StaffPage from './pages/StaffPage';
+import AdminPage from './pages/AdminPage';
+import CustomerPage from './pages/CustomerPage';
+import ProfilePage from './pages/ProfilePage';
+import AppointmentsPage from './pages/AppointmentsPage';
+import NewAppointmentPage from './pages/NewAppointmentPage';
+import Unauthorized from './pages/Unauthorized';
+import NotFound from './pages/NotFound';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
+import PerformanceReportPage from './pages/PerformanceReportPage';
 
-// Create a new QueryClient instance
-const queryClient = new QueryClient();
+function App() {
+  const { i18n } = useTranslation();
 
-const App = () => {
+  useEffect(() => {
+    // Set default language based on browser settings or a default value
+    const storedLanguage = localStorage.getItem('i18nextLng') || navigator.language || 'en';
+    i18n.changeLanguage(storedLanguage);
+  }, [i18n]);
+  
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
+    <div className="App">
+      <Toaster />
+      <AuthProvider>
         <BrowserRouter>
-          <TooltipProvider>
-            <AuthProvider>
-              <QueueProvider>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/unauthorized" element={<Unauthorized />} />
-                  <Route path="/" element={<Index />} />
-                  <Route path="/customer" element={<CustomerPage />} />
-                  <Route
-                    path="/staff"
-                    element={
-                      <ProtectedRoute>
-                        <StaffPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute roles={['admin']}>
-                        <AdminPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <ProfilePage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/appointments"
-                    element={
-                      <ProtectedRoute>
-                        <AppointmentsPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/new-appointment"
-                    element={
-                      <ProtectedRoute>
-                        <NewAppointmentPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </QueueProvider>
-            </AuthProvider>
-          </TooltipProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route 
+              path="/staff" 
+              element={
+                <ProtectedRoute requiredRoles={['staff', 'admin']}>
+                  <StaffPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/performance" 
+              element={
+                <ProtectedRoute requiredRoles={['staff', 'admin']}>
+                  <PerformanceReportPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <AdminPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/customer" 
+              element={
+                <ProtectedRoute requiredRoles={['customer']}>
+                  <CustomerPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/appointments" 
+              element={
+                <ProtectedRoute>
+                  <AppointmentsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/appointments/new" 
+              element={
+                <ProtectedRoute requiredRoles={['customer']}>
+                  <NewAppointmentPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+      </AuthProvider>
+    </div>
   );
-};
+}
 
 export default App;

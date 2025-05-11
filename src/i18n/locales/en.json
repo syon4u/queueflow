@@ -28,7 +28,35 @@
     "activeAppointments": "Active Appointments",
     "loggedInAs": "Logged in as:",
     "role": "Role:",
-    "refreshAppointments": "Refresh Appointments"
+    "refreshAppointments": "Refresh Appointments",
+    "queueManagement": "Queue",
+    "appointments": "Appointments",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "settingsDescription": "Configure your personal preferences and notification settings.",
+    "managementDescription": "Manage appointments and customer flow"
+  },
+  "performance": {
+    "dashboardTitle": "Performance Analytics",
+    "dashboardDescription": "Monitor performance metrics and analyze trends",
+    "reports": "Performance",
+    "staffPerformance": "Staff Performance",
+    "serviceMetrics": "Service Metrics",
+    "locationMetrics": "Location Metrics",
+    "comingSoon": "This feature is coming soon!",
+    "timePeriodsTitle": "Time Period",
+    "exportReport": "Export Report",
+    "staffMetrics": {
+      "title": "Staff Performance",
+      "appointments": "Appointments",
+      "avgService": "Avg. Service Time",
+      "noShows": "No-Shows"
+    },
+    "serviceMetrics": {
+      "title": "Service Performance",
+      "appointments": "Appointments",
+      "avgWait": "Avg. Wait Time"
+    }
   },
   "admin": {
     "dashboard": "Admin Dashboard",

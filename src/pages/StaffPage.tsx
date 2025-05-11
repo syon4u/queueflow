@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -21,6 +20,7 @@ import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
 import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
+import { PieChart } from 'lucide-react';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -53,8 +53,18 @@ const StaffPage = () => {
       
       <main className="container mx-auto px-4 py-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">{t('staff.dashboard')}</h1>
-          <p className="text-gray-600">{t('staff.managementDescription')}</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{t('staff.dashboard')}</h1>
+              <p className="text-gray-600">{t('staff.managementDescription')}</p>
+            </div>
+            <Button asChild variant="outline" className="flex items-center gap-2">
+              <Link to="/performance">
+                <PieChart className="h-4 w-4" />
+                {t('performance.reports')}
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <StaffStatusSection onStatusChange={handleStatusChange} />

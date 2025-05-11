@@ -22,5 +22,90 @@
     "add": "Añadir",
     "yes": "Sí",
     "no": "No"
+  },
+  "staff": {
+    "dashboard": "Panel de Personal",
+    "activeAppointments": "Citas Activas",
+    "loggedInAs": "Conectado como:",
+    "role": "Rol:",
+    "refreshAppointments": "Actualizar Citas",
+    "queueManagement": "Cola",
+    "appointments": "Citas",
+    "statistics": "Estadísticas",
+    "settings": "Configuración",
+    "settingsDescription": "Configura tus preferencias personales y notificaciones.",
+    "managementDescription": "Gestionar citas y flujo de clientes"
+  },
+  "performance": {
+    "dashboardTitle": "Análisis de Rendimiento",
+    "dashboardDescription": "Monitorear métricas de rendimiento y analizar tendencias",
+    "reports": "Rendimiento",
+    "staffPerformance": "Rendimiento del Personal",
+    "serviceMetrics": "Métricas de Servicio",
+    "locationMetrics": "Métricas de Ubicación",
+    "comingSoon": "¡Esta función estará disponible próximamente!",
+    "timePeriodsTitle": "Período de Tiempo",
+    "exportReport": "Exportar Informe",
+    "staffMetrics": {
+      "title": "Rendimiento del Personal",
+      "appointments": "Citas",
+      "avgService": "Tiempo Promedio de Servicio",
+      "noShows": "No Presentados"
+    },
+    "serviceMetrics": {
+      "title": "Rendimiento de Servicios",
+      "appointments": "Citas",
+      "avgWait": "Tiempo Promedio de Espera"
+    }
+  },
+  "admin": {
+    "dashboard": "Panel de Administrador",
+    "manageData": "Gestionar Datos",
+    "addNew": "Añadir Nuevo"
+  },
+  "customer": {
+    "queue": {
+      "name": "Nombre",
+      "phone": "Número Telefónico",
+      "notes": "Notas",
+      "notesPlaceholder": "Requisitos especiales o información adicional",
+      "priority": "Nivel de Prioridad",
+      "regular": "Regular",
+      "priorityCustomer": "Prioritario",
+      "addToQueue": "Añadir a la Cola",
+      "nameRequired": "El nombre del cliente es obligatorio",
+      "optional": "Opcional"
+    },
+    "waitingList": "Lista de Espera",
+    "noCustomersWaiting": "No hay clientes esperando",
+    "addCustomersToStart": "Agrega clientes a la cola para comenzar",
+    "joinedAt": "Se unió a las",
+    "estWait": "Espera est.:"
+  },
+  "queueControls": {
+    "nowServing": "Atendiendo Ahora",
+    "noCustomerBeingServed": "No hay cliente siendo atendido",
+    "callNextCustomer": "Llamar al siguiente cliente en la cola",
+    "callNext": "Llamar Siguiente Cliente",
+    "noShow": "No se Presentó",
+    "markServed": "Marcar como Atendido"
+  },
+  "queueHeader": {
+    "managing": "Gestionando",
+    "customers": "clientes",
+    "customer": "cliente",
+    "waiting": "en espera",
+    "resetQueue": "Reiniciar Cola",
+    "resetQueueWarning": "Esto eliminará todos los clientes de la cola. Esta acción no se puede deshacer."
+  },
+  "notFound": {
+    "title": "Página No Encontrada",
+    "description": "Lo sentimos, no pudimos encontrar la página que buscas.",
+    "backToHome": "Volver al inicio"
+  },
+  "unauthorized": {
+    "title": "No Autorizado",
+    "description": "No tienes permiso para acceder a esta página.",
+    "backToHome": "Volver al inicio"
   }
 }
