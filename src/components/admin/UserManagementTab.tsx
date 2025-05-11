@@ -20,7 +20,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Shield, User, UserCheck } from 'lucide-react';
+import { AlertCircle, Shield, User, UserCheck } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface UserData {
   id: string;
@@ -119,9 +120,14 @@ export const UserManagementTab = () => {
   }
 
   if (error) {
-    return <div className="p-4 border border-destructive bg-destructive/10 rounded-md">
-      <p>Error loading users: {error.message}</p>
-    </div>;
+    return (
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Error loading users: {error instanceof Error ? error.message : 'Unknown error'}
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   return (
