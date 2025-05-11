@@ -55,7 +55,7 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [breakType, setBreakType] = useState('short');
   const [customDuration, setCustomDuration] = useState(15);
-  const [handoverStaffId, setHandoverStaffId] = useState('');
+  const [handoverStaffId, setHandoverStaffId] = useState('none'); // Changed from empty string to 'none'
   const [availableStaff, setAvailableStaff] = useState<StaffMember[]>([]);
 
   // Get duration based on break type
@@ -122,14 +122,14 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
         .update({
           status: 'break',
           return_time: returnTime.toISOString(),
-          handover_staff_id: handoverStaffId || null
+          handover_staff_id: handoverStaffId !== 'none' ? handoverStaffId : null // Changed from empty string check to 'none' check
         } as any)
         .eq('id', user.id);
 
       if (statusError) throw statusError;
 
       // If handover selected, notify that staff
-      if (handoverStaffId) {
+      if (handoverStaffId && handoverStaffId !== 'none') { // Changed from empty string check to 'none' check
         // Insert notification for handover staff using raw query
         const { error: notifyError } = await supabase
           .from('staff_notifications')
@@ -225,7 +225,7 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
                 <SelectValue placeholder={t('staff.selectHandover')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">{t('staff.noHandover')}</SelectItem>
+                <SelectItem value="none">{t('staff.noHandover')}</SelectItem> {/* Changed from empty string to 'none' */}
                 {availableStaff.map((staff) => (
                   <SelectItem key={staff.id} value={staff.id}>
                     {staff.first_name} {staff.last_name}
@@ -238,7 +238,7 @@ const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
             </p>
           </div>
           
-          {handoverStaffId && availableStaff.length > 0 && (
+          {handoverStaffId && handoverStaffId !== 'none' && availableStaff.length > 0 && ( // Changed from empty string check to 'none' check
             <div className="flex items-center p-3 bg-muted/50 rounded-md">
               <HoverCard>
                 <HoverCardTrigger asChild>
