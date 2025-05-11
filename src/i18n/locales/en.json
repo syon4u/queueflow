@@ -19,13 +19,23 @@
     "searchPlaceholder": "Search by name, email or phone",
     "noResults": "No customers found",
     "name": "Name",
+    "namePlaceholder": "Your full name",
     "contact": "Contact",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Your phone number",
+    "email": "Email",
+    "emailPlaceholder": "Your email address",
     "searchError": "Error searching for customers",
     "historyError": "Error loading customer history",
-    "noAppointmentHistory": "No appointment history found"
+    "noAppointmentHistory": "No appointment history found",
+    "createNew": "Create New",
+    "searchResults": "Found {{count}} customer(s)",
+    "searchInstructions": "Search for existing customers or create a new one"
   },
   "appointments": {
     "newAppointment": "New Appointment",
+    "scheduleDescription": "Fill out the form to schedule a new appointment",
+    "schedule": "Schedule Appointment",
     "steps": {
       "title": "Schedule an Appointment",
       "description": "Follow the steps below to schedule your appointment"
@@ -49,7 +59,13 @@
     "statusUpdated": "Appointment status updated",
     "statusUpdateError": "Failed to update appointment status",
     "reasonForVisit": "Reason for visit",
-    "customer": "Customer"
+    "reasonPlaceholder": "Enter the reason for your visit",
+    "notes": "Notes",
+    "notesPlaceholder": "Any special requests or notes for your appointment",
+    "customer": "Customer",
+    "createError": "Failed to schedule appointment",
+    "selectDate": "Please select a date",
+    "selectDateAndCustomer": "Please select a date and customer"
   },
   "queue": {
     "title": "Queue Management",

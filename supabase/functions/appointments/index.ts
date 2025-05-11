@@ -3,12 +3,25 @@ import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts"
 import { withAuth, corsHeaders, AuthContext } from "../_shared/auth.ts"
 import { Database } from "../_shared/types.ts"
 
-// Schema for joining queue (creating appointment)
-const CreateAppointmentSchema = z.object({
+// Schema for creating appointment for new customer
+const CreateNewCustomerAppointmentSchema = z.object({
   service_id: z.string().uuid(),
   location_id: z.string().uuid(),
   scheduled_time: z.string().datetime(),
   notes: z.string().optional(),
+  reason_for_visit: z.string().optional(),
+  customer_name: z.string(),
+  phone_number: z.string(),
+})
+
+// Schema for creating appointment for existing customer
+const CreateExistingCustomerAppointmentSchema = z.object({
+  service_id: z.string().uuid(),
+  location_id: z.string().uuid(),
+  scheduled_time: z.string().datetime(),
+  notes: z.string().optional(),
+  reason_for_visit: z.string().optional(),
+  customer_id: z.string().uuid(),
 })
 
 // Schema for updating appointment status
@@ -137,48 +150,121 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
     
     // Create new appointment (POST /appointments)
     if (method === 'POST') {
-      // Extract and validate the request body
+      // Extract the request body
       const body = await req.json()
-      const validation = CreateAppointmentSchema.safeParse(body)
       
-      if (!validation.success) {
+      // Check if this is for a new or existing customer
+      if ('customer_id' in body) {
+        // Existing customer
+        const validation = CreateExistingCustomerAppointmentSchema.safeParse(body)
+        
+        if (!validation.success) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Invalid request data', 
+              details: validation.error.format() 
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          )
+        }
+        
+        const appointmentData = validation.data
+        
+        // Insert the appointment with existing customer ID
+        const { data: appointment, error } = await supabase
+          .from('appointments')
+          .insert({
+            customer_id: appointmentData.customer_id,
+            service_id: appointmentData.service_id,
+            location_id: appointmentData.location_id,
+            scheduled_time: appointmentData.scheduled_time,
+            reason_for_visit: appointmentData.reason_for_visit,
+            notes: appointmentData.notes,
+            status: 'scheduled'
+          })
+          .select()
+          .single()
+        
+        if (error) {
+          console.error('Error creating appointment:', error)
+          return new Response(
+            JSON.stringify({ error: 'Failed to create appointment', details: error.message }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          )
+        }
+        
         return new Response(
-          JSON.stringify({ 
-            error: 'Invalid request data', 
-            details: validation.error.format() 
-          }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify(appointment),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      } else {
+        // New customer
+        const validation = CreateNewCustomerAppointmentSchema.safeParse(body)
+        
+        if (!validation.success) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Invalid request data', 
+              details: validation.error.format() 
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          )
+        }
+        
+        const appointmentData = validation.data
+        
+        // Parse the name into first and last name
+        const nameParts = appointmentData.customer_name.trim().split(' ')
+        const firstName = nameParts[0]
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName
+        
+        // First create a customer record
+        const { data: customer, error: customerError } = await supabase
+          .from('customers')
+          .insert({
+            first_name: firstName,
+            last_name: lastName,
+            phone: appointmentData.phone_number,
+          })
+          .select()
+          .single()
+        
+        if (customerError) {
+          console.error('Error creating customer:', customerError)
+          return new Response(
+            JSON.stringify({ error: 'Failed to create customer', details: customerError.message }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          )
+        }
+        
+        // Insert the appointment with the new customer ID
+        const { data: appointment, error } = await supabase
+          .from('appointments')
+          .insert({
+            customer_id: customer.id,
+            service_id: appointmentData.service_id,
+            location_id: appointmentData.location_id,
+            scheduled_time: appointmentData.scheduled_time,
+            reason_for_visit: appointmentData.reason_for_visit,
+            notes: appointmentData.notes,
+            status: 'scheduled'
+          })
+          .select()
+          .single()
+        
+        if (error) {
+          console.error('Error creating appointment:', error)
+          return new Response(
+            JSON.stringify({ error: 'Failed to create appointment', details: error.message }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          )
+        }
+        
+        return new Response(
+          JSON.stringify(appointment),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         )
       }
-      
-      const appointmentData = validation.data
-      
-      // Insert the new appointment with customer ID from authenticated user
-      const { data: appointment, error } = await supabase
-        .from('appointments')
-        .insert({
-          customer_id: user.id,
-          service_id: appointmentData.service_id,
-          location_id: appointmentData.location_id,
-          scheduled_time: appointmentData.scheduled_time,
-          notes: appointmentData.notes,
-          status: 'scheduled'
-        })
-        .select()
-        .single()
-      
-      if (error) {
-        console.error('Error creating appointment:', error)
-        return new Response(
-          JSON.stringify({ error: 'Failed to create appointment', details: error.message }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
-      }
-      
-      return new Response(
-        JSON.stringify(appointment),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
     }
     
     // List user's appointments (GET /appointments)

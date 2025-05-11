@@ -19,13 +19,23 @@
     "searchPlaceholder": "Buscar por nombre, correo o teléfono",
     "noResults": "No se encontraron clientes",
     "name": "Nombre",
+    "namePlaceholder": "Tu nombre completo",
     "contact": "Contacto",
+    "phone": "Número de Teléfono",
+    "phonePlaceholder": "Tu número de teléfono",
+    "email": "Correo Electrónico",
+    "emailPlaceholder": "Tu dirección de correo electrónico",
     "searchError": "Error al buscar clientes",
     "historyError": "Error al cargar el historial del cliente",
-    "noAppointmentHistory": "No se encontró historial de citas"
+    "noAppointmentHistory": "No se encontró historial de citas",
+    "createNew": "Crear Nuevo",
+    "searchResults": "Se encontraron {{count}} cliente(s)",
+    "searchInstructions": "Busca clientes existentes o crea uno nuevo"
   },
   "appointments": {
     "newAppointment": "Nueva Cita",
+    "scheduleDescription": "Completa el formulario para programar una nueva cita",
+    "schedule": "Programar Cita",
     "steps": {
       "title": "Programar una Cita",
       "description": "Sigue los pasos a continuación para programar tu cita"
@@ -49,7 +59,13 @@
     "statusUpdated": "Estado de la cita actualizado",
     "statusUpdateError": "Error al actualizar el estado de la cita",
     "reasonForVisit": "Motivo de la visita",
-    "customer": "Cliente"
+    "reasonPlaceholder": "Ingresa el motivo de tu visita",
+    "notes": "Notas",
+    "notesPlaceholder": "Cualquier solicitud especial o notas para tu cita",
+    "customer": "Cliente",
+    "createError": "Error al programar la cita",
+    "selectDate": "Por favor selecciona una fecha",
+    "selectDateAndCustomer": "Por favor selecciona una fecha y un cliente"
   },
   "queue": {
     "title": "Gestión de Cola",
