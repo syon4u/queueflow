@@ -24,7 +24,7 @@ export const UserRoleSelector = ({
       defaultValue={currentRole || 'customer'}
       onValueChange={(value) => onRoleChange(userId, value)}
     >
-      <SelectTrigger className="w-32">
+      <SelectTrigger className="w-[130px]">
         <SelectValue placeholder="Select role" />
       </SelectTrigger>
       <SelectContent>

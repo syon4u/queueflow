@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User } from 'lucide-react';
+import { User, Shield } from 'lucide-react';
 import { UserData } from '@/hooks/admin/use-user-management';
 import { UserRoleSelector } from './UserRoleSelector';
 import {
@@ -18,8 +18,20 @@ interface UsersTableProps {
 }
 
 export const UsersTable = ({ users, onRoleChange }: UsersTableProps) => {
+  // Function to get badge color based on role
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-purple-100 text-purple-700';
+      case 'staff':
+        return 'bg-blue-100 text-blue-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
   return (
-    <div className="border rounded-md">
+    <div className="border rounded-md overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
@@ -32,7 +44,7 @@ export const UsersTable = ({ users, onRoleChange }: UsersTableProps) => {
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8">
+              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                 No users found
               </TableCell>
             </TableRow>
@@ -40,11 +52,15 @@ export const UsersTable = ({ users, onRoleChange }: UsersTableProps) => {
             users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
-                  <User className="h-5 w-5 text-muted-foreground" />
+                  {user.role === 'admin' ? (
+                    <Shield className="h-5 w-5 text-purple-500" />
+                  ) : (
+                    <User className="h-5 w-5 text-muted-foreground" />
+                  )}
                 </TableCell>
-                <TableCell>{user.email}</TableCell>
+                <TableCell className="font-medium">{user.email}</TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
                     {user.role || 'customer'}
                   </span>
                 </TableCell>
