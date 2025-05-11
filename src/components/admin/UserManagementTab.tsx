@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Shield, Users } from 'lucide-react';
+import { Shield, Users, Plus } from 'lucide-react';
 import { useUserManagement } from '@/hooks/admin/use-user-management';
 import { UsersTable } from './users/UsersTable';
 import { UserSearchBox } from './users/UserSearchBox';
 import { LoadingSpinner } from './users/LoadingSpinner';
 import { ErrorAlert } from './users/ErrorAlert';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export const UserManagementTab = () => {
   const {
@@ -15,7 +16,8 @@ export const UserManagementTab = () => {
     error,
     searchQuery,
     setSearchQuery,
-    handleRoleChange
+    handleRoleChange,
+    addTemporaryData
   } = useUserManagement();
 
   if (isLoading) {
@@ -40,9 +42,20 @@ export const UserManagementTab = () => {
                 Assign and manage user roles and permissions
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Shield className="h-4 w-4" />
-              <span className="text-sm">{users.length} users</span>
+            <div className="flex items-center gap-2">
+              <div className="text-muted-foreground flex items-center">
+                <Shield className="h-4 w-4 mr-1" />
+                <span className="text-sm">{users.length} users</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={addTemporaryData}
+                className="ml-4"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Test Data
+              </Button>
             </div>
           </div>
         </CardHeader>

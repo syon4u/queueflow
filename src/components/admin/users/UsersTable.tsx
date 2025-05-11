@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User, Shield } from 'lucide-react';
+import { User, Shield, Calendar, Clock } from 'lucide-react';
 import { UserData } from '@/hooks/admin/use-user-management';
 import { UserRoleSelector } from './UserRoleSelector';
 import {
@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { format } from 'date-fns';
 
 interface UsersTableProps {
   users: UserData[];
@@ -30,6 +31,16 @@ export const UsersTable = ({ users, onRoleChange }: UsersTableProps) => {
     }
   };
 
+  // Format date to a more readable format
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      return format(new Date(dateString), 'MMM d, yyyy');
+    } catch (e) {
+      return 'Invalid date';
+    }
+  };
+
   return (
     <div className="border rounded-md overflow-hidden">
       <Table>
@@ -38,13 +49,15 @@ export const UsersTable = ({ users, onRoleChange }: UsersTableProps) => {
             <TableHead className="w-[40px]"></TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Current Role</TableHead>
+            <TableHead className="hidden md:table-cell">Created</TableHead>
+            <TableHead className="hidden md:table-cell">Last Sign In</TableHead>
             <TableHead>Change Role</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 No users found
               </TableCell>
             </TableRow>
@@ -63,6 +76,18 @@ export const UsersTable = ({ users, onRoleChange }: UsersTableProps) => {
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
                     {user.role || 'customer'}
                   </span>
+                </TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+                  <div className="flex items-center">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    {formatDate(user.created_at)}
+                  </div>
+                </TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+                  <div className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {formatDate(user.last_sign_in_at)}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <UserRoleSelector 
