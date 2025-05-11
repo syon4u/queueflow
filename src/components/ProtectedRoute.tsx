@@ -6,10 +6,10 @@ import { toast } from '@/components/ui/use-toast';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  roles?: string[];
+  requiredRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles }) => {
   const { user, isLoading, role } = useAuth();
   const location = useLocation();
 
@@ -17,8 +17,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
   useEffect(() => {
     console.log("Protected Route - Current user:", user?.email);
     console.log("Protected Route - Current role:", role);
-    console.log("Protected Route - Required roles:", roles);
-  }, [user, role, roles]);
+    console.log("Protected Route - Required roles:", requiredRoles);
+  }, [user, role, requiredRoles]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
