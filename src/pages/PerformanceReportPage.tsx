@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import StaffHeader from '@/components/staff/StaffHeader';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
-import { Unauthorized } from '@/pages/Unauthorized';
+import Unauthorized from '@/pages/Unauthorized';
 
 const PerformanceReportPage = () => {
   const { t } = useTranslation();
