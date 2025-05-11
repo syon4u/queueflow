@@ -60,10 +60,12 @@ export const UserManagementTab = () => {
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string, role: string }) => {
       // First check if the user has a role record
-      const { data: existingRole } = await supabase
+      const { data: existingRole, error: checkError } = await supabase
         .from('user_roles')
         .select('*')
         .eq('user_id', userId);
+      
+      if (checkError) throw checkError;
       
       if (existingRole && existingRole.length > 0) {
         // Update existing role
