@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { LocationsTab } from '@/components/admin/LocationsTab';
 import { ServicesTab } from '@/components/admin/ServicesTab';
-import { StaffTab } from '@/components/admin/StaffTab';
 import { StatsTab } from '@/components/admin/StatsTab';
 import { QueueManagementTab } from '@/components/admin/QueueManagementTab';
 import { SystemSettingsTab } from '@/components/admin/SystemSettingsTab';
@@ -27,7 +26,7 @@ const AdminPage = () => {
     const queryParams = new URLSearchParams(location.search);
     const tabParam = queryParams.get('tab');
     
-    if (tabParam && ['dashboard', 'staff', 'locations', 'services', 'queue', 'stats', 'users', 'settings'].includes(tabParam)) {
+    if (tabParam && ['dashboard', 'users', 'locations', 'services', 'queue', 'stats', 'settings'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [location.search]);
@@ -46,14 +45,13 @@ const AdminPage = () => {
         </div>
 
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} value={activeTab} className="w-full">
-          <TabsList className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-8'} mb-6`}>
+          <TabsList className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-7'} mb-6`}>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="staff">Staff</TabsTrigger>
+            <TabsTrigger value="users">Users & Staff</TabsTrigger>
             <TabsTrigger value="locations">Locations</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="queue">Queue</TabsTrigger>
             <TabsTrigger value="stats">Analytics</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
@@ -62,8 +60,8 @@ const AdminPage = () => {
               <TabsContent value="dashboard">
                 <DashboardTab />
               </TabsContent>
-              <TabsContent value="staff">
-                <StaffTab />
+              <TabsContent value="users">
+                <UserManagementTab />
               </TabsContent>
               <TabsContent value="locations">
                 <LocationsTab />
@@ -78,9 +76,6 @@ const AdminPage = () => {
               </TabsContent>
               <TabsContent value="stats">
                 <StatsTab />
-              </TabsContent>
-              <TabsContent value="users">
-                <UserManagementTab />
               </TabsContent>
               <TabsContent value="settings">
                 <SystemSettingsTab />

@@ -20,7 +20,15 @@ import { AuthProvider } from './context/AuthContext';
 import PerformanceReportPage from './pages/PerformanceReportPage';
 
 // Create a new QueryClient instance
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 30000,
+    },
+  }
+});
 
 function App() {
   const { i18n } = useTranslation();
@@ -43,7 +51,7 @@ function App() {
               <Route 
                 path="/staff" 
                 element={
-                  <ProtectedRoute requiredRoles={['staff', 'admin']}>
+                  <ProtectedRoute pageType="staff">
                     <StaffPage />
                   </ProtectedRoute>
                 } 
@@ -51,7 +59,7 @@ function App() {
               <Route 
                 path="/performance" 
                 element={
-                  <ProtectedRoute requiredRoles={['staff', 'admin']}>
+                  <ProtectedRoute pageType="staff">
                     <PerformanceReportPage />
                   </ProtectedRoute>
                 } 
@@ -59,7 +67,7 @@ function App() {
               <Route 
                 path="/admin" 
                 element={
-                  <ProtectedRoute requiredRoles={['admin']}>
+                  <ProtectedRoute pageType="admin">
                     <AdminPage />
                   </ProtectedRoute>
                 } 
@@ -67,7 +75,7 @@ function App() {
               <Route 
                 path="/customer" 
                 element={
-                  <ProtectedRoute requiredRoles={['customer']}>
+                  <ProtectedRoute pageType="customer">
                     <CustomerPage />
                   </ProtectedRoute>
                 } 
@@ -75,7 +83,7 @@ function App() {
               <Route 
                 path="/profile" 
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute pageType="customer">
                     <ProfilePage />
                   </ProtectedRoute>
                 } 
@@ -83,7 +91,7 @@ function App() {
               <Route 
                 path="/appointments" 
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute pageType="customer">
                     <AppointmentsPage />
                   </ProtectedRoute>
                 } 
@@ -91,7 +99,7 @@ function App() {
               <Route 
                 path="/appointments/new" 
                 element={
-                  <ProtectedRoute requiredRoles={['customer']}>
+                  <ProtectedRoute pageType="customer">
                     <NewAppointmentPage />
                   </ProtectedRoute>
                 } 

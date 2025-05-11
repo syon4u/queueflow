@@ -11,6 +11,10 @@ export interface UserData {
   role: string;
   created_at?: string;
   last_sign_in_at?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  location_id?: string;
 }
 
 // Define a type for user roles that matches the Supabase enum
@@ -23,20 +27,20 @@ export const useUserManagement = () => {
   // Fetch all users with their roles
   const { 
     data: users = [], 
-    isLoading, 
-    error 
+    isLoading: isLoadingUsers, 
+    error: usersError 
   } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       try {
-        // First get all users from auth (this is a mock since we can't access auth.users directly)
-        const { data: authUsers, error: authError } = await supabase
-          .from('temp_staff') // Using temp_staff for demo purposes
-          .select('id, first_name, last_name');
+        // Get all auth users via staff list
+        const { data: staffData, error: staffError } = await supabase
+          .from('temp_staff')
+          .select('id, first_name, last_name, phone, location_id, role, created_at');
         
-        if (authError) throw authError;
+        if (staffError) throw staffError;
         
-        // Then get all user_roles entries
+        // Get all user_roles entries
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('*');
@@ -44,23 +48,29 @@ export const useUserManagement = () => {
         if (rolesError) throw rolesError;
         
         // Create a unified list with user details and their roles
-        const mockUsers: UserData[] = authUsers.map(user => {
-          const roleRecord = userRoles?.find(r => r.user_id === user.id);
+        const mergedUsers: UserData[] = staffData.map(staff => {
+          const roleRecord = userRoles?.find(r => r.user_id === staff.id);
           return {
-            id: user.id,
-            email: `${user.first_name.toLowerCase()}.${user.last_name.toLowerCase()}@example.com`,
-            role: roleRecord?.role || 'customer',
-            created_at: new Date().toISOString(),
+            id: staff.id,
+            email: `${staff.first_name.toLowerCase()}.${staff.last_name.toLowerCase()}@example.com`,
+            role: roleRecord?.role || staff.role || 'customer',
+            first_name: staff.first_name,
+            last_name: staff.last_name,
+            phone: staff.phone,
+            location_id: staff.location_id,
+            created_at: staff.created_at,
             last_sign_in_at: new Date().toISOString()
           };
         });
         
         // Add some more mock users for testing
-        mockUsers.push(
+        mergedUsers.push(
           {
             id: 'mock-admin-1',
             email: 'admin@example.com',
             role: 'admin',
+            first_name: 'Admin',
+            last_name: 'User',
             created_at: new Date().toISOString(),
             last_sign_in_at: new Date().toISOString()
           },
@@ -68,6 +78,8 @@ export const useUserManagement = () => {
             id: 'mock-staff-1',
             email: 'staff@example.com',
             role: 'staff',
+            first_name: 'Staff',
+            last_name: 'Member',
             created_at: new Date().toISOString(),
             last_sign_in_at: new Date().toISOString()
           },
@@ -75,18 +87,42 @@ export const useUserManagement = () => {
             id: 'mock-customer-1',
             email: 'customer@example.com',
             role: 'customer',
+            first_name: 'Regular',
+            last_name: 'Customer',
             created_at: new Date().toISOString(),
             last_sign_in_at: new Date().toISOString()
           }
         );
         
-        return mockUsers;
+        return mergedUsers;
       } catch (error) {
         console.error('Error in user management:', error);
         throw error;
       }
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+  });
+  
+  // Fetch staff members specifically
+  const { 
+    data: staffMembers = [], 
+    isLoading: isLoadingStaff,
+    error: staffError
+  } = useQuery({
+    queryKey: ['staff'],
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase
+          .from('staff')
+          .select('*, locations(name)');
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching staff:', error);
+        return [];
+      }
+    }
   });
 
   // Update user role
@@ -117,10 +153,24 @@ export const useUserManagement = () => {
         if (error) throw error;
       }
       
+      // Also update in staff table if the user exists there
+      const { data: staffUser } = await supabase
+        .from('temp_staff')
+        .select('id')
+        .eq('id', userId);
+        
+      if (staffUser && staffUser.length > 0) {
+        await supabase
+          .from('temp_staff')
+          .update({ role: role as UserRole })
+          .eq('id', userId);
+      }
+      
       return { userId, role };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
       toast({
         title: 'Role updated',
         description: `User role has been updated to ${data.role}`,
@@ -182,6 +232,7 @@ export const useUserManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
       toast({
         title: 'Test data added',
         description: 'Temporary data for analytics has been created',
@@ -198,9 +249,16 @@ export const useUserManagement = () => {
   });
 
   // Filter users based on search query
-  const filteredUsers = users?.filter(user => 
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredUsers = users?.filter(user => {
+    const searchContent = [
+      user.email?.toLowerCase(),
+      user.first_name?.toLowerCase(),
+      user.last_name?.toLowerCase(),
+      user.role?.toLowerCase()
+    ].join(' ');
+    
+    return searchContent.includes(searchQuery.toLowerCase());
+  }) || [];
 
   const handleRoleChange = (userId: string, role: string) => {
     updateRoleMutation.mutate({ userId, role });
@@ -210,6 +268,9 @@ export const useUserManagement = () => {
     addTemporaryDataMutation.mutate();
   };
 
+  const isLoading = isLoadingUsers || isLoadingStaff;
+  const error = usersError || staffError;
+
   return {
     users: filteredUsers,
     isLoading,
@@ -217,6 +278,7 @@ export const useUserManagement = () => {
     searchQuery,
     setSearchQuery,
     handleRoleChange,
-    addTemporaryData
+    addTemporaryData,
+    staffMembers
   };
 };
