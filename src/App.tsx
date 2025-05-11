@@ -10,6 +10,10 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
+import AuthPage from "./pages/AuthPage";
+import CustomerPage from "./pages/CustomerPage";
+import StaffPage from "./pages/StaffPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +26,7 @@ const App = () => (
           <Sonner />
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route
               path="/"
@@ -31,7 +36,23 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/customer" element={<CustomerPage />} />
+            <Route
+              path="/staff"
+              element={
+                <ProtectedRoute roles={['staff', 'admin']}>
+                  <StaffPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute roles={['admin']}>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
