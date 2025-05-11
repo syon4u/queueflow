@@ -1,11 +1,13 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import StaffPage from '@/pages/StaffPage';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useAppointments } from '@/hooks/use-appointments';
 
+// Mock the appointment table component
 vi.mock('@/components/StaffAppointmentTable', () => ({
   default: ({ appointments, onStatusChange }: any) => (
     <div>
@@ -17,17 +19,9 @@ vi.mock('@/components/StaffAppointmentTable', () => ({
   ),
 }));
 
+// Mock the useAppointments hook
 vi.mock('@/hooks/use-appointments', () => ({
-  useAppointments: () => ({
-    appointments: [
-      { id: '1', status: 'waiting' },
-      { id: '2', status: 'in_progress' },
-      { id: '3', status: 'completed' },
-      { id: '4', status: 'cancelled' },
-    ],
-    loading: false,
-    refreshAppointments: vi.fn(),
-  }),
+  useAppointments: vi.fn(),
 }));
 
 vi.mock('@/context/AuthContext', async () => {
@@ -57,6 +51,17 @@ describe('StaffPage', () => {
   });
 
   it('should filter active appointments correctly', () => {
+    vi.mocked(useAppointments).mockReturnValue({
+      appointments: [
+        { id: '1', status: 'waiting' },
+        { id: '2', status: 'in_progress' },
+        { id: '3', status: 'completed' },
+        { id: '4', status: 'cancelled' },
+      ],
+      loading: false,
+      refreshAppointments: vi.fn(),
+    });
+
     render(
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>

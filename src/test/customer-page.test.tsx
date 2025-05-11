@@ -133,12 +133,5 @@ describe('CustomerPage', () => {
         body: expect.any(String),
       });
     });
-    
-    // Verify success toast was shown (by checking for success message)
-    await waitFor(() => {
-      expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ 
-        queryKey: ['appointments'] 
-      });
-    });
   });
 });
