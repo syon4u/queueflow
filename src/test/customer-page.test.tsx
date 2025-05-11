@@ -1,8 +1,6 @@
-
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import * as testingLibrary from '@testing-library/react';
-const { screen, fireEvent, waitFor } = testingLibrary;
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import CustomerPage from '../pages/CustomerPage';
 import { useAuth } from '../context/AuthContext';
 import { QueueProvider } from '../context/QueueContext';

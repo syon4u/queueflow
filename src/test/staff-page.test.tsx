@@ -1,11 +1,10 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import * as testingLibrary from '@testing-library/react';
-const { screen, fireEvent } = testingLibrary;
+import { screen, fireEvent } from '@testing-library/react';
 import StaffPage from '../pages/StaffPage';
 import { useAuth } from '../context/AuthContext';
-import * as QueueContext from '../context/QueueContext';
+import { QueueProvider } from '../context/QueueContext';
 
 // Mock the auth context
 vi.mock('../context/AuthContext', () => ({
@@ -32,22 +31,6 @@ vi.mock('../hooks/use-appointments', () => ({
 
 describe('StaffPage', () => {
   it('renders the StaffPage component', () => {
-    // Create a mock component using QueueContext
-    const { QueueProvider } = QueueContext;
-    
-    const contextValue = {
-      appointments: [
-        { id: 'appt1', status: 'waiting' },
-        { id: 'appt2', status: 'in-progress' },
-      ],
-      loading: false,
-      error: null,
-      userPosition: 0,
-      estimatedWaitTime: 10,
-      refreshAppointments: vi.fn(),
-      updateAppointmentStatus: vi.fn(),
-    };
-
     render(
       <QueueProvider>
         <StaffPage />
@@ -58,22 +41,6 @@ describe('StaffPage', () => {
   });
 
   it('displays appointments', () => {
-    // Create a mock component using QueueContext
-    const { QueueProvider } = QueueContext;
-    
-    const contextValue = {
-      appointments: [
-        { id: 'appt1', status: 'waiting' },
-        { id: 'appt2', status: 'in-progress' },
-      ],
-      loading: false,
-      error: null,
-      userPosition: 0,
-      estimatedWaitTime: 10,
-      refreshAppointments: vi.fn(),
-      updateAppointmentStatus: vi.fn(),
-    };
-
     render(
       <QueueProvider>
         <StaffPage />
