@@ -31,22 +31,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check role requirements if specified
-  if (roles && roles.length > 0) {
-    const hasRequiredRole = role && roles.includes(role);
-    
-    if (!hasRequiredRole) {
-      // User doesn't have required role - redirect to unauthorized page
-      toast({
-        title: "Access Denied",
-        description: `You need one of these roles: ${roles.join(', ')}. Your current role: ${role || 'none'}`,
-        variant: "destructive"
-      });
-      return <Navigate to="/unauthorized" replace />;
-    }
-  }
-
-  // User is authenticated and has required role (if specified)
+  // MODIFIED: Skip role checking - allow access to all pages regardless of role
+  // This gives all authenticated users full access to all routes
+  
+  // User is authenticated and has been given access to all pages
   return <>{children}</>;
 };
 
