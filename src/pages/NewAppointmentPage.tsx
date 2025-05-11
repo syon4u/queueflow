@@ -10,9 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format, addDays, addMinutes, startOfHour } from 'date-fns';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LocationSelector from '@/components/LocationSelector';
 import ServiceSelector from '@/components/ServiceSelector';
@@ -297,44 +295,12 @@ const NewAppointmentPage = () => {
           {/* Step 3: Select Date and Time */}
           {currentStep === 3 && (
             <div className="space-y-6">
-              <div className="space-y-2">
-                <Label>{t('appointments.selectDate')}</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, 'PPP') : t('appointments.pickDate')}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      disabled={(date) => date < new Date() || date > addDays(new Date(), 30)}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              
-              {selectedDate && (
-                <div className="space-y-2">
-                  <Label>{t('appointments.selectTime')}</Label>
-                  <TimePicker 
-                    times={availableTimes}
-                    value={selectedTime}
-                    onChange={setSelectedTime}
-                  />
-                </div>
-              )}
+              <TimePicker 
+                date={selectedDate}
+                onDateChange={setSelectedDate}
+                time={selectedTime}
+                onTimeChange={setSelectedTime}
+              />
             </div>
           )}
           

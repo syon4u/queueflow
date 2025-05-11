@@ -14,19 +14,27 @@ import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/f
 interface ServiceSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  locationId?: string; // Add the locationId prop
 }
 
-const ServiceSelector = ({ value, onChange }: ServiceSelectorProps) => {
+const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) => {
   const { data: services, isLoading } = useQuery({
-    queryKey: ['services'],
+    queryKey: ['services', locationId], // Include locationId in the query key for proper cache invalidation
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, duration');
+      // If locationId is provided, filter services by location
+      let query = supabase.from('services').select('id, name, duration');
+      
+      if (locationId) {
+        query = query.eq('location_id', locationId);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
     },
+    // Only run the query when we have a locationId
+    enabled: !locationId || !!locationId,
   });
 
   return (
