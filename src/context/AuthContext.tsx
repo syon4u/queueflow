@@ -73,7 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      console.log('Google auth temporarily disabled - use email/password instead');
+      // Check for Google provider being enabled first
+      console.error('Google auth temporarily disabled - use email/password instead');
       throw new Error('Google provider is not enabled in Supabase');
     } catch (error) {
       console.error('Error signing in with Google:', error);

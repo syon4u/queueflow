@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -52,8 +51,6 @@ const Login = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      // Temporarily use signInWithEmail instead of Google OAuth
-      // This will display an error message explaining that Google auth is disabled
       await signInWithGoogle();
     } catch (error) {
       console.error('Login failed:', error);
