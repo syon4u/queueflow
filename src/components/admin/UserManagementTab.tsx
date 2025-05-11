@@ -1,10 +1,11 @@
 
 import React from 'react';
-import { Shield, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Shield } from 'lucide-react';
 import { useUserManagement } from '@/hooks/admin/use-user-management';
 import { UsersTable } from './users/UsersTable';
 import { UserSearchBox } from './users/UserSearchBox';
+import { LoadingSpinner } from './users/LoadingSpinner';
+import { ErrorAlert } from './users/ErrorAlert';
 
 export const UserManagementTab = () => {
   const {
@@ -17,20 +18,11 @@ export const UserManagementTab = () => {
   } = useUserManagement();
 
   if (isLoading) {
-    return <div className="flex justify-center p-8">
-      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-    </div>;
+    return <LoadingSpinner />;
   }
 
   if (error) {
-    return (
-      <Alert variant="destructive" className="mb-6">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Error loading users: {error instanceof Error ? error.message : 'Unknown error'}
-        </AlertDescription>
-      </Alert>
-    );
+    return <ErrorAlert error={error} />;
   }
 
   return (
