@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +20,17 @@ const AdminPage = () => {
   const { user, role } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const isMobile = useIsMobile();
+  const location = useLocation();
+  
+  // Handle tab switching from URL query parameter
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const tabParam = queryParams.get('tab');
+    
+    if (tabParam && ['dashboard', 'staff', 'locations', 'services', 'queue', 'stats', 'users', 'settings'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
   
   return (
     <div className="min-h-screen bg-gray-50">

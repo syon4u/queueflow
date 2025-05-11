@@ -3,14 +3,51 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, Calendar, Building2, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
 
 export const DashboardTab: React.FC = () => {
+  const navigate = useNavigate();
+  
   // Mock data for dashboard overview
   const stats = {
     staffCount: 12,
     locationsCount: 3,
     appointmentsToday: 24,
     servicesOffered: 8,
+  };
+  
+  // Handler functions for quick access buttons
+  const handleViewSchedule = () => {
+    navigate('/admin?tab=queue');
+    toast({
+      title: "Schedule View",
+      description: "Navigating to queue management",
+    });
+  };
+  
+  const handleManageStaff = () => {
+    navigate('/admin?tab=staff');
+    toast({
+      title: "Staff Management",
+      description: "Navigating to staff management",
+    });
+  };
+  
+  const handleAddLocation = () => {
+    navigate('/admin?tab=locations');
+    toast({
+      title: "Location Management",
+      description: "Navigating to location management",
+    });
+  };
+  
+  const handleAddService = () => {
+    navigate('/admin?tab=services');
+    toast({
+      title: "Service Management",
+      description: "Navigating to service management",
+    });
   };
 
   return (
@@ -91,19 +128,35 @@ export const DashboardTab: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" className="h-24 flex flex-col justify-center">
+              <Button 
+                variant="outline" 
+                className="h-24 flex flex-col justify-center"
+                onClick={handleViewSchedule}
+              >
                 <Calendar className="h-8 w-8 mb-1" />
                 <span>View Schedule</span>
               </Button>
-              <Button variant="outline" className="h-24 flex flex-col justify-center">
+              <Button 
+                variant="outline" 
+                className="h-24 flex flex-col justify-center"
+                onClick={handleManageStaff}
+              >
                 <Users className="h-8 w-8 mb-1" />
                 <span>Manage Staff</span>
               </Button>
-              <Button variant="outline" className="h-24 flex flex-col justify-center">
+              <Button 
+                variant="outline" 
+                className="h-24 flex flex-col justify-center"
+                onClick={handleAddLocation}
+              >
                 <Building2 className="h-8 w-8 mb-1" />
                 <span>Add Location</span>
               </Button>
-              <Button variant="outline" className="h-24 flex flex-col justify-center">
+              <Button 
+                variant="outline" 
+                className="h-24 flex flex-col justify-center"
+                onClick={handleAddService}
+              >
                 <FileText className="h-8 w-8 mb-1" />
                 <span>Add Service</span>
               </Button>
