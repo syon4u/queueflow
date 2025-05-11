@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,8 +11,15 @@ type AuthContextType = {
   isLoading: boolean;
   role: string | null;
   signInWithGoogle: () => Promise<void>;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string) => Promise<void>;
+  // Updated return types to match the actual implementation
+  signInWithEmail: (email: string, password: string) => Promise<{
+    user: User | null;
+    session: Session | null;
+  } | undefined>;
+  signUpWithEmail: (email: string, password: string) => Promise<{
+    user: User | null;
+    session: Session | null;
+  } | undefined>;
   signOut: () => Promise<void>;
 };
 
