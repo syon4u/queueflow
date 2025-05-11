@@ -115,18 +115,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      // Check for Google provider being enabled first
-      console.error('Google auth temporarily disabled - use email/password instead');
-      throw new Error('Google provider is not enabled in Supabase');
-    } catch (error) {
+      // Start with Google OAuth flow
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/auth/callback'
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Google OAuth is still disabled, but keep the function intact for when it's enabled
+      console.error('Google auth might not be enabled yet in Supabase');
+    } catch (error: any) {
       console.error('Error signing in with Google:', error);
-      throw error;
+      throw new Error(error.message || 'Google sign-in is not enabled. Please use email/password instead.');
     }
   };
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -134,7 +145,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         throw error;
       }
-    } catch (error) {
+      
+      // Navigate to home after successful login
+      navigate('/');
+      return data;
+    } catch (error: any) {
       console.error('Error signing in with email:', error);
       throw error;
     }
@@ -142,15 +157,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: window.location.origin + '/auth/callback'
+        }
       });
       
       if (error) {
         throw error;
       }
-    } catch (error) {
+      
+      return data;
+    } catch (error: any) {
       console.error('Error signing up with email:', error);
       throw error;
     }
@@ -158,14 +178,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) {
         throw error;
       }
+      setUser(null);
+      setSession(null);
+      setRole(null);
       navigate('/login');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing out:', error);
-      throw error;
+      toast({
+        variant: "destructive",
+        title: "Sign out failed",
+        description: error.message || "There was an error signing out.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 

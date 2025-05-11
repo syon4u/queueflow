@@ -256,11 +256,48 @@ const Index = () => {
                         <div className="bg-gray-900 h-8 flex justify-center items-center">
                           <div className="w-1/3 h-5 bg-black rounded-full"></div>
                         </div>
-                        <img 
-                          src="https://cdn.lovable.dev/images/QueueFlow-app-screen.png" 
-                          alt="QueueFlow app interface" 
-                          className="w-full h-full object-cover"
-                        />
+                        {/* Updated app image */}
+                        <div className="w-full h-full bg-gradient-to-b from-blue-50 to-white">
+                          {/* App mockup content */}
+                          <div className="p-3">
+                            <div className="flex justify-between items-center mb-4">
+                              <div className="text-blue-600 font-bold text-lg">QueueFlow</div>
+                              <div className="bg-blue-600 text-white rounded-full h-8 w-8 flex items-center justify-center">
+                                <span className="font-medium text-sm">JD</span>
+                              </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-sm p-4 mb-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="font-medium">Current Position</div>
+                                <div className="text-blue-600 font-bold">3</div>
+                              </div>
+                              <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
+                                <div className="h-full bg-blue-600 rounded-full" style={{ width: '65%' }}></div>
+                              </div>
+                              <div className="text-sm text-gray-500">Est. wait time: 12 min</div>
+                            </div>
+                            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-3">
+                              <div className="text-sm font-medium text-blue-600 mb-1">Appointment Details</div>
+                              <div className="text-sm text-gray-700 mb-2">Dental Checkup - Dr. Smith</div>
+                              <div className="flex items-center text-xs text-gray-500">
+                                <Clock className="w-3 h-3 mr-1" />
+                                <span>Today, 2:30 PM</span>
+                              </div>
+                            </div>
+                            <div className="text-sm font-medium mb-2">Upcoming Services</div>
+                            <div className="space-y-2">
+                              {[1, 2, 3].map((i) => (
+                                <div key={i} className="bg-white rounded-lg shadow-sm p-3 flex items-center justify-between">
+                                  <div>
+                                    <div className="font-medium text-sm">Service #{i}</div>
+                                    <div className="text-xs text-gray-500">Tomorrow</div>
+                                  </div>
+                                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     

@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +21,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Spinner } from '@/components/ui/spinner';
+import { Loader, Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -31,8 +34,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const Login = () => {
   const { user, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -51,6 +57,7 @@ const Login = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      setIsSubmitting(true);
       await signInWithGoogle();
     } catch (error) {
       console.error('Login failed:', error);
@@ -59,13 +66,20 @@ const Login = () => {
         title: t("auth.loginFailed"),
         description: "Google authentication is temporarily disabled. Please use email/password instead.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
+      setIsSubmitting(true);
       if (activeTab === 'login') {
         await signInWithEmail(data.email, data.password);
+        toast({
+          title: t("auth.loginSuccess"),
+          description: t("auth.welcome"),
+        });
       } else {
         await signUpWithEmail(data.email, data.password);
         toast({
@@ -73,33 +87,43 @@ const Login = () => {
           description: t("auth.checkEmail"),
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`${activeTab === 'login' ? 'Login' : 'Registration'} failed:`, error);
       toast({
         variant: "destructive",
         title: activeTab === 'login' ? t("auth.loginFailed") : t("auth.registrationFailed"),
-        description: activeTab === 'login' ? t("auth.loginFailedDesc") : t("auth.registrationFailedDesc"),
+        description: error.message || (activeTab === 'login' ? t("auth.loginFailedDesc") : t("auth.registrationFailedDesc")),
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">{t("auth.welcome")}</CardTitle>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-blue-50 p-4">
+      <Card className="w-full max-w-md border-none shadow-lg shadow-blue-500/5">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl font-bold">
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {activeTab === 'login' ? t("auth.welcomeBack") : t("auth.createAccount")}
+            </span>
+          </CardTitle>
           <CardDescription>
-            {t("auth.continueWith")}
+            {activeTab === 'login' ? t("auth.loginToContinue") : t("auth.registerToContinue")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as 'login' | 'register')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
-              <TabsTrigger value="register">{t("auth.register")}</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="login" className="rounded-l-md">{t("auth.login")}</TabsTrigger>
+              <TabsTrigger value="register" className="rounded-r-md">{t("auth.register")}</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="login" className="space-y-4 mt-4">
+            <TabsContent value="login" className="space-y-4 mt-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
@@ -107,9 +131,12 @@ const Login = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("auth.email")}</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          {t("auth.email")}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="email@example.com" type="email" {...field} />
+                          <Input placeholder="email@example.com" type="email" {...field} className="border-gray-300" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -120,15 +147,41 @@ const Login = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("auth.password")}</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Lock className="h-4 w-4 text-muted-foreground" />
+                          {t("auth.password")}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="••••••••" type="password" {...field} />
+                          <div className="relative">
+                            <Input 
+                              placeholder="••••••••" 
+                              type={showPassword ? "text" : "password"} 
+                              {...field} 
+                              className="pr-10 border-gray-300" 
+                            />
+                            <button 
+                              type="button" 
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                              onClick={togglePasswordVisibility}
+                            >
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full">{t("auth.login")}</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <Spinner className="mr-2 h-4 w-4" />
+                    ) : null}
+                    {t("auth.login")}
+                  </Button>
                 </form>
               </Form>
               
@@ -147,6 +200,7 @@ const Login = () => {
                 onClick={handleGoogleSignIn}
                 className="w-full flex items-center justify-center gap-2"
                 variant="outline"
+                disabled={isSubmitting}
               >
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -158,7 +212,7 @@ const Login = () => {
               </Button>
             </TabsContent>
             
-            <TabsContent value="register" className="space-y-4 mt-4">
+            <TabsContent value="register" className="space-y-4 mt-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
@@ -166,9 +220,12 @@ const Login = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("auth.email")}</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          {t("auth.email")}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="email@example.com" type="email" {...field} />
+                          <Input placeholder="email@example.com" type="email" {...field} className="border-gray-300" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -179,9 +236,26 @@ const Login = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("auth.password")}</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Lock className="h-4 w-4 text-muted-foreground" />
+                          {t("auth.password")}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="••••••••" type="password" {...field} />
+                          <div className="relative">
+                            <Input 
+                              placeholder="••••••••" 
+                              type={showPassword ? "text" : "password"} 
+                              {...field} 
+                              className="pr-10 border-gray-300" 
+                            />
+                            <button 
+                              type="button" 
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                              onClick={togglePasswordVisibility}
+                            >
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormDescription>
                           {t("auth.passwordRequirements")}
@@ -190,7 +264,16 @@ const Login = () => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full">{t("auth.register")}</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <Spinner className="mr-2 h-4 w-4" />
+                    ) : null}
+                    {t("auth.register")}
+                  </Button>
                 </form>
               </Form>
               
@@ -209,6 +292,7 @@ const Login = () => {
                 onClick={handleGoogleSignIn}
                 className="w-full flex items-center justify-center gap-2"
                 variant="outline"
+                disabled={isSubmitting}
               >
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -221,6 +305,9 @@ const Login = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
+        <CardFooter className="flex justify-center text-xs text-gray-500">
+          <p>{t("auth.termsText")}</p>
+        </CardFooter>
       </Card>
     </div>
   );
