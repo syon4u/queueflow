@@ -2,7 +2,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays } from 'date-fns';
-import { StaffMetric, ServiceMetric, DailyMetric } from '@/supabase/functions/_shared/queries';
+
+// Define the types that we were trying to import
+export interface StaffMetric {
+  staff_id: string;
+  staff_name: string;
+  appointments_served: number;
+  average_service_time: number;
+  no_shows: number;
+}
+
+export interface ServiceMetric {
+  service_id: string;
+  service_name: string;
+  appointments_count: number;
+  average_wait_time: number;
+}
+
+export interface DailyMetric {
+  date: string;
+  appointments: number;
+  wait_time: number;
+}
 
 interface MetricsParams {
   startDate: string;
