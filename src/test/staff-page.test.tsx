@@ -33,7 +33,7 @@ vi.mock('../hooks/use-appointments', () => ({
 describe('StaffPage', () => {
   it('renders the StaffPage component', () => {
     // Create a mock provider to pass to the component
-    const Provider = QueueContext.default?.Provider || QueueContext.QueueProvider;
+    const Provider = QueueContext.QueueProvider;
     
     const contextValue = {
       appointments: [
@@ -59,7 +59,7 @@ describe('StaffPage', () => {
 
   it('displays appointments', () => {
     // Create a mock provider to pass to the component
-    const Provider = QueueContext.default?.Provider || QueueContext.QueueProvider;
+    const Provider = QueueContext.QueueProvider;
     
     const contextValue = {
       appointments: [
