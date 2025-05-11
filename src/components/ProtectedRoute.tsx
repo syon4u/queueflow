@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/components/ui/use-toast';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,6 +12,13 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
   const { user, isLoading, role } = useAuth();
   const location = useLocation();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Protected Route - Current user:", user?.email);
+    console.log("Protected Route - Current role:", role);
+    console.log("Protected Route - Required roles:", roles);
+  }, [user, role, roles]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
@@ -29,6 +37,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
     
     if (!hasRequiredRole) {
       // User doesn't have required role - redirect to unauthorized page
+      toast({
+        title: "Access Denied",
+        description: `You need one of these roles: ${roles.join(', ')}. Your current role: ${role || 'none'}`,
+        variant: "destructive"
+      });
       return <Navigate to="/unauthorized" replace />;
     }
   }

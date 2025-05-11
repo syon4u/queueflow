@@ -61,10 +61,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = async (userId: string) => {
     try {
-      // Automatically set syon's email to admin role
-      if (user?.email === 'syon4u@gmail.com') {
+      // Check for specific email addresses that should be admin
+      if (user?.email === 'syon4u@gmail.com' || 
+          user?.email?.toLowerCase().includes('syon') ||
+          user?.email?.toLowerCase().includes('garrick')) {
         setRole('admin');
-        console.log('Syon detected - setting admin role');
+        console.log('Admin user detected - setting admin role');
         return;
       }
 
