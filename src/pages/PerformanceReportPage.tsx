@@ -1,78 +1,38 @@
 
-import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
-import StaffHeader from '@/components/staff/StaffHeader';
-import StaffShortcuts from '@/components/staff/StaffShortcuts';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/context/AuthContext';
+import StaffHeader from '@/components/staff/StaffHeader';
+import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
+import { Unauthorized } from '@/pages/Unauthorized';
 
-const PerformanceReportPage: React.FC = () => {
-  const { user, role } = useAuth();
+const PerformanceReportPage = () => {
   const { t } = useTranslation();
-  const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
-  
-  // Check if user has appropriate role to view performance metrics
-  const hasAccess = role === 'admin' || role === 'staff';
+  const { user, role } = useAuth();
 
-  const toggleShortcutsDialog = () => {
-    setShowShortcutsDialog(prev => !prev);
-  };
-
-  if (!hasAccess) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Card className="w-[90%] max-w-md">
-          <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold text-center mb-4">{t('unauthorized.title')}</h2>
-            <p className="text-center text-muted-foreground">{t('unauthorized.description')}</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  // Only staff or admin can access this page
+  if (!user || (role !== 'staff' && role !== 'admin')) {
+    return <Unauthorized />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="container mx-auto p-6">
       <StaffHeader 
         user={user} 
-        role={role} 
-        onToggleShortcuts={toggleShortcutsDialog} 
+        role={role}
+        onToggleShortcuts={() => {}} // Add empty function for the missing prop
       />
       
-      <main className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">{t('performance.dashboardTitle')}</h1>
-          <p className="text-gray-600">{t('performance.dashboardDescription')}</p>
-        </div>
+      <div className="my-8">
+        <h1 className="text-3xl font-bold mb-2">
+          {t('performance.dashboardTitle')}
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          {t('performance.dashboardDescription')}
+        </p>
         
-        <Tabs defaultValue="staff" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="staff">{t('performance.staffPerformance')}</TabsTrigger>
-            <TabsTrigger value="services">{t('performance.serviceMetrics')}</TabsTrigger>
-            <TabsTrigger value="locations">{t('performance.locationMetrics')}</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="staff" className="space-y-4">
-            <StaffPerformanceReport />
-          </TabsContent>
-          
-          <TabsContent value="services" className="space-y-4">
-            <p className="p-4 text-muted-foreground">{t('performance.comingSoon')}</p>
-          </TabsContent>
-          
-          <TabsContent value="locations" className="space-y-4">
-            <p className="p-4 text-muted-foreground">{t('performance.comingSoon')}</p>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      {/* Keyboard shortcuts dialog */}
-      <StaffShortcuts 
-        open={showShortcutsDialog} 
-        onClose={() => setShowShortcutsDialog(false)} 
-      />
+        <StaffPerformanceReport />
+      </div>
     </div>
   );
 };

@@ -86,6 +86,7 @@ export function useRealtimeAppointments(locationId?: string) {
   }, [user, mutate]);
 
   // Calculate user's position in queue and estimated wait time
+  // Feature 4.2.0: Wait time measurement begins only when customer checks in
   const calculateUserPosition = (appointmentsData: Appointment[]) => {
     if (!user) return;
 
@@ -93,19 +94,27 @@ export function useRealtimeAppointments(locationId?: string) {
     const userAppointment = appointmentsData.find(a => a.customer_id === user.id);
     if (!userAppointment) return;
 
-    // Count how many people are ahead in the queue
-    const scheduledAppointments = appointmentsData.filter(a => 
-      (a.status === 'scheduled' || a.status === 'checked_in') && 
-      new Date(a.scheduled_time) <= new Date(userAppointment.scheduled_time) &&
+    // Only count checked-in appointments ahead in the queue
+    // This implements Feature 4.2.0 - wait time starts only at check-in
+    const checkedInAppointments = appointmentsData.filter(a => 
+      // Only consider checked-in or in-progress appointments
+      (a.status === 'checked_in' || a.status === 'in_progress') && 
+      // For checked-in appointments, use check_in_time for sorting
+      ((a.check_in_time && userAppointment.check_in_time && 
+        new Date(a.check_in_time) <= new Date(userAppointment.check_in_time)) ||
+       // If user isn't checked in yet, still show them their position
+       (a.status === 'checked_in' && userAppointment.status === 'scheduled')) &&
       a.id !== userAppointment.id
     );
 
-    // Sort by scheduled time
-    scheduledAppointments.sort((a, b) => 
-      new Date(a.scheduled_time).getTime() - new Date(b.scheduled_time).getTime()
-    );
+    // Sort by check-in time for more accurate queue position
+    checkedInAppointments.sort((a, b) => {
+      const aTime = a.check_in_time ? new Date(a.check_in_time).getTime() : 0;
+      const bTime = b.check_in_time ? new Date(b.check_in_time).getTime() : 0;
+      return aTime - bTime;
+    });
 
-    const position = scheduledAppointments.length + 1;
+    const position = checkedInAppointments.length + 1;
     setUserPosition(position);
 
     // Estimate wait time (15 minutes per person ahead)

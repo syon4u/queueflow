@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus } from 'lucide-react';
+import { Search, UserPlus, History } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
+import CustomerHistoryDialog from '@/components/staff/CustomerHistoryDialog';
 
 export type Customer = {
   id: string;
@@ -19,12 +20,19 @@ export type Customer = {
 type CustomerSearchBoxProps = {
   onSelectCustomer: (customer: Customer) => void;
   onCreateNew: () => void;
+  showHistory?: boolean; // Add option to show history button
 };
 
-const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ onSelectCustomer, onCreateNew }) => {
+const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ 
+  onSelectCustomer, 
+  onCreateNew,
+  showHistory = false // Default to false if not provided
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Customer[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -37,7 +45,7 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ onSelectCustomer,
       const { data, error } = await supabase
         .from('customers')
         .select('id, first_name, last_name, phone, email')
-        .or(`phone.ilike.%${searchTerm}%, email.ilike.%${searchTerm}%`)
+        .or(`phone.ilike.%${searchTerm}%, email.ilike.%${searchTerm}%, first_name.ilike.%${searchTerm}%, last_name.ilike.%${searchTerm}%`)
         .order('last_name', { ascending: true });
       
       if (error) throw error;
@@ -58,6 +66,11 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ onSelectCustomer,
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const handleViewHistory = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setShowHistoryDialog(true);
   };
 
   return (
@@ -87,17 +100,32 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ onSelectCustomer,
           </div>
           <div className="divide-y">
             {searchResults.map((customer) => (
-              <button
+              <div 
                 key={customer.id}
-                className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors"
-                onClick={() => onSelectCustomer(customer)}
+                className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
               >
-                <div className="font-medium">{customer.first_name} {customer.last_name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {customer.phone && <div>{customer.phone}</div>}
-                  {customer.email && <div>{customer.email}</div>}
-                </div>
-              </button>
+                <button
+                  className="text-left flex-1"
+                  onClick={() => onSelectCustomer(customer)}
+                >
+                  <div className="font-medium">{customer.first_name} {customer.last_name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {customer.phone && <div>{customer.phone}</div>}
+                    {customer.email && <div>{customer.email}</div>}
+                  </div>
+                </button>
+                
+                {showHistory && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleViewHistory(customer)}
+                  >
+                    <History className="h-4 w-4 mr-1" />
+                    {t('customer.viewHistory')}
+                  </Button>
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -112,6 +140,13 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ onSelectCustomer,
           {t('customer.createNew')}
         </Button>
       </div>
+      
+      {/* Customer History Dialog */}
+      <CustomerHistoryDialog
+        customer={selectedCustomer}
+        open={showHistoryDialog}
+        onOpenChange={setShowHistoryDialog}
+      />
     </div>
   );
 };

@@ -6,6 +6,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translations
 import enTranslation from './locales/en.json';
 import esTranslation from './locales/es.json';
+import htTranslation from './locales/ht.json';
+import ptTranslation from './locales/pt.json';
 
 i18n
   // Detect user language
@@ -20,6 +22,12 @@ i18n
       },
       es: {
         translation: esTranslation
+      },
+      ht: {
+        translation: htTranslation
+      },
+      pt: {
+        translation: ptTranslation
       }
     },
     fallbackLng: 'en',

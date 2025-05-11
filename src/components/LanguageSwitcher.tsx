@@ -13,9 +13,8 @@ import { Globe } from 'lucide-react';
 const languages = [
   { code: 'en', name: 'English' },
   { code: 'es', name: 'Español' },
-  // Future languages to be added (from feature 4.3.0)
-  // { code: 'ht', name: 'Kreyòl Ayisyen' },
-  // { code: 'pt', name: 'Português' }
+  { code: 'ht', name: 'Kreyòl Ayisyen' },
+  { code: 'pt', name: 'Português' }
 ];
 
 const LanguageSwitcher: React.FC = () => {
