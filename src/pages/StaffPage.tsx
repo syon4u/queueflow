@@ -1,17 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useAppointments, Appointment } from '@/hooks/use-appointments';
+import { useAppointments } from '@/hooks/use-appointments';
 import StaffAppointmentTable from '@/components/StaffAppointmentTable';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
-  const { toast } = useToast();
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const { appointments, loading } = useAppointments(undefined, refreshTrigger);
+  const { appointments, loading, refreshAppointments } = useAppointments();
   
   // Filter to only show active appointments (not completed or cancelled)
   const activeAppointments = appointments.filter(
@@ -19,8 +16,7 @@ const StaffPage = () => {
   );
   
   const handleStatusChange = () => {
-    setRefreshTrigger(prev => prev + 1);
-    // Refresh will happen automatically due to the dependency in useAppointments
+    refreshAppointments();
   };
   
   return (
