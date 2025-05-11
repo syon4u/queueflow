@@ -61,25 +61,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = async (userId: string) => {
     try {
-      // Check for specific email addresses that should be admin
+      // First check hardcoded admin emails for development convenience
       if (user?.email === 'syon4u@gmail.com' || 
           user?.email === 'syon4uu@gmail.com' || 
           user?.email?.toLowerCase().includes('syon') ||
           user?.email?.toLowerCase().includes('garrick')) {
         setRole('admin');
-        console.log('Admin user detected - setting admin role');
+        console.log('Admin user detected via hardcoded check - setting admin role');
         return;
       }
 
-      const { data, error } = await supabase.rpc('get_user_role');
+      // Try to get role from database
+      const { data, error } = await supabase.rpc('get_user_role', { user_id: userId });
 
       if (error) {
         console.error('Error fetching user role:', error);
-        setRole('customer');
+        
+        // Check for role in the user_roles table directly as fallback
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .single();
+        
+        if (roleError || !roleData) {
+          console.log('No role found in database, defaulting to customer');
+          setRole('customer');
+          return;
+        }
+        
+        console.log('Role found in database:', roleData.role);
+        setRole(roleData.role);
         return;
       }
 
       setRole(data || 'customer');
+      console.log(`Role set to ${data || 'customer'} from database`);
     } catch (error) {
       console.error('Failed to fetch user role:', error);
       setRole('customer');

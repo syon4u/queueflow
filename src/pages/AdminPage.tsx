@@ -12,6 +12,7 @@ import { StatsTab } from '@/components/admin/StatsTab';
 import { QueueManagementTab } from '@/components/admin/QueueManagementTab';
 import { SystemSettingsTab } from '@/components/admin/SystemSettingsTab';
 import { DashboardTab } from '@/components/admin/DashboardTab';
+import UserManagementTab from '@/components/admin/UserManagementTab';
 import { QueueProvider } from '@/context/QueueContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -34,13 +35,14 @@ const AdminPage = () => {
         </div>
 
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} value={activeTab} className="w-full">
-          <TabsList className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-7'} mb-6`}>
+          <TabsList className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-8'} mb-6`}>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="staff">Staff</TabsTrigger>
             <TabsTrigger value="locations">Locations</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="queue">Queue</TabsTrigger>
             <TabsTrigger value="stats">Analytics</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
@@ -65,6 +67,9 @@ const AdminPage = () => {
               </TabsContent>
               <TabsContent value="stats">
                 <StatsTab />
+              </TabsContent>
+              <TabsContent value="users">
+                <UserManagementTab />
               </TabsContent>
               <TabsContent value="settings">
                 <SystemSettingsTab />
