@@ -61,8 +61,7 @@ serve(async (req) => {
         start_time,
         end_time,
         staff_id,
-        staff:staff_id (id, first_name, last_name),
-        service:service_id (id, name)
+        staff:staff_id (id, first_name, last_name)
       `)
       .gte('scheduled_time', start_date)
       .lte('scheduled_time', end_date);
