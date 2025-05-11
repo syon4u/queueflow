@@ -51,10 +51,38 @@ jobs:
           name: build
           path: dist
           retention-days: 1
-
+  
+  lighthouse:
+    name: Lighthouse CI
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: dist
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+        
+      - name: Run Lighthouse CI
+        run: |
+          npx http-server ./dist -p 8080 &
+          sleep 5
+          lhci autorun --collect.url=http://localhost:8080 --collect.numberOfRuns=3 --assert.preset=lighthouse:no-pwa --assert.assertions.categories:performance=>=90 --assert.assertions.categories:accessibility=>=90 --assert.assertions.categories:best-practices=>=90 --assert.assertions.categories:seo=>=90
+          
   deploy:
     name: Deploy to Production
-    needs: build_and_test
+    needs: [build_and_test, lighthouse]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     
