@@ -75,9 +75,13 @@ export const StaffTab: React.FC = () => {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (data: StaffFormData) => {
+      // Generate UUID for new staff member
+      const id = crypto.randomUUID();
+      
       const { error } = await supabase
         .from('staff')
         .insert([{ 
+          id, // Add the id field here
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone || null,
