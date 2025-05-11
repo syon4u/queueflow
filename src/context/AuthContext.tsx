@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event);
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -45,13 +45,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email || 'no session');
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
         fetchUserRole(session.user.id);
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -61,6 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = async (userId: string) => {
     try {
+      console.log('Fetching role for user:', userId);
+      
       // First check hardcoded admin emails for development convenience
       if (user?.email === 'syon4u@gmail.com' || 
           user?.email === 'syon4uu@gmail.com' || 
@@ -68,10 +72,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           user?.email?.toLowerCase().includes('garrick')) {
         setRole('admin');
         console.log('Admin user detected via hardcoded check - setting admin role');
+        setIsLoading(false);
         return;
       }
 
-      // Try to get role from database
+      // Try to get role from database using the fixed function
       const { data, error } = await supabase.rpc('get_user_role', { user_id: userId });
 
       if (error) {
@@ -87,19 +92,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (roleError || !roleData) {
           console.log('No role found in database, defaulting to customer');
           setRole('customer');
+          setIsLoading(false);
           return;
         }
         
         console.log('Role found in database:', roleData.role);
         setRole(roleData.role);
+        setIsLoading(false);
         return;
       }
 
+      console.log('Role from RPC function:', data);
       setRole(data || 'customer');
       console.log(`Role set to ${data || 'customer'} from database`);
+      setIsLoading(false);
     } catch (error) {
       console.error('Failed to fetch user role:', error);
       setRole('customer');
+      setIsLoading(false);
     }
   };
 
