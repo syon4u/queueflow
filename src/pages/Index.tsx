@@ -118,127 +118,80 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-background to-muted/10">
-      {/* Navigation */}
-      <header className="fixed top-0 w-full z-50 backdrop-blur-lg bg-white/80 border-b border-border/40">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-background via-white to-blue-50/30">
+      {/* App-style header */}
+      <header className="fixed top-0 w-full z-50 backdrop-blur-lg bg-white/90 px-4 py-3 shadow-sm border-b border-gray-100">
+        <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               QueueFlow
             </h1>
           </div>
           
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <button 
-              onClick={() => scrollToSection(heroRef)}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
-              Home
-            </button>
-            <button 
-              onClick={() => scrollToSection(featuresRef)}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
-              Features
-            </button>
-            <button 
-              onClick={() => scrollToSection(howItWorksRef)}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
-              How It Works
-            </button>
-            <button 
-              onClick={() => scrollToSection(testimonialsRef)}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
-              Testimonials
-            </button>
-            <button 
-              onClick={() => scrollToSection(contactRef)}
-              className="text-gray-600 hover:text-primary transition-colors"
-            >
-              Contact
-            </button>
-            
-            {user ? (
-              <Button 
-                onClick={() => navigate('/staff')} 
-                variant="outline"
-                className="ml-4 transition-all hover:bg-primary/10"
-              >
-                Dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={() => navigate('/login')} 
-                variant="outline"
-                className="ml-4 transition-all hover:bg-primary/10"
-              >
-                Sign In
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-          </nav>
-          
-          {/* Mobile Menu Button */}
+          {/* Mobile menu button */}
           <button 
-            className="md:hidden p-2 rounded-md"
+            className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
         
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 px-6 bg-white border-t border-gray-100 shadow-lg">
-            <nav className="flex flex-col space-y-4">
+          <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-xl border-t border-gray-100 overflow-hidden animate-fade-in">
+            <nav className="container mx-auto py-4 px-6 flex flex-col space-y-3">
               <button 
                 onClick={() => scrollToSection(heroRef)}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-lg hover:bg-blue-50 flex items-center"
               >
+                <Smartphone className="mr-3 h-4 w-4" />
                 Home
               </button>
               <button 
                 onClick={() => scrollToSection(featuresRef)}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-lg hover:bg-blue-50 flex items-center"
               >
+                <CheckCircle className="mr-3 h-4 w-4" />
                 Features
               </button>
               <button 
                 onClick={() => scrollToSection(howItWorksRef)}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-lg hover:bg-blue-50 flex items-center"
               >
+                <Clock className="mr-3 h-4 w-4" />
                 How It Works
               </button>
               <button 
                 onClick={() => scrollToSection(testimonialsRef)}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-lg hover:bg-blue-50 flex items-center"
               >
+                <Star className="mr-3 h-4 w-4" />
                 Testimonials
               </button>
               <button 
                 onClick={() => scrollToSection(contactRef)}
-                className="text-gray-600 hover:text-primary transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors py-2 px-3 rounded-lg hover:bg-blue-50 flex items-center"
               >
+                <MessageSquare className="mr-3 h-4 w-4" />
                 Contact
               </button>
               
               {user ? (
                 <Button 
                   onClick={() => navigate('/staff')} 
-                  className="w-full mt-4"
+                  className="w-full mt-2"
+                  size="lg"
                 >
-                  Dashboard
+                  Open Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button 
                   onClick={() => navigate('/login')} 
-                  className="w-full mt-4"
+                  className="w-full mt-2"
+                  size="lg"
                 >
                   Sign In
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -249,63 +202,78 @@ const Index = () => {
         )}
       </header>
       
-      <main className="pt-20">
-        {/* Hero Section */}
+      <main className="pt-16">
+        {/* Hero Section - App-focused */}
         <section 
           ref={heroRef} 
-          className="relative overflow-hidden py-20 md:py-28 lg:py-32"
+          className="relative py-12 md:py-20 px-4"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-70"></div>
-          
-          {/* Animated background elements */}
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full opacity-10 animate-float"></div>
-          <div className="absolute top-60 -left-20 w-60 h-60 bg-indigo-400 rounded-full opacity-10 animate-float-delay"></div>
-          
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <div className="flex flex-col md:flex-row items-center">
-              <div className="md:w-1/2 mb-10 md:mb-0">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-6 animate-fade-in">
-                  <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                    Revolutionize
+          <div className="container mx-auto">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="md:w-1/2">
+                <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4">
+                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    Manage Your Queue
                   </span>
                   <br />
-                  Your Customer Flow
+                  From Your Pocket
                 </h1>
-                <p className="text-xl text-gray-600 mb-8 max-w-lg animate-fade-in">
-                  Eliminate long wait times, enhance customer satisfaction, and optimize your business operations with our intuitive queue management system.
+                <p className="text-lg text-gray-600 mb-8">
+                  The smart queue management app that eliminates waiting lines and transforms your customer experience.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button 
                     size="lg" 
                     onClick={() => setIsModalOpen(true)}
-                    className="font-medium shadow-md hover:shadow-lg hover:translate-y-[-2px] transition-all group"
+                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-600/30 transition-all"
                   >
-                    See It In Action
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                   <Button 
                     variant="outline" 
                     size="lg" 
-                    onClick={() => scrollToSection(howItWorksRef)}
-                    className="font-medium hover:bg-primary/10 transition-all"
+                    onClick={() => navigate('/login')}
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50"
                   >
-                    Learn How It Works
+                    Sign In
                   </Button>
                 </div>
               </div>
               
-              {/* Hero illustration */}
-              <div className="md:w-1/2 flex justify-center">
-                <div className="relative w-full max-w-lg">
-                  <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob"></div>
-                  <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob animation-delay-2000"></div>
-                  <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-blob animation-delay-4000"></div>
+              {/* App mockup illustration */}
+              <div className="md:w-1/2 flex justify-center relative">
+                <div className="relative w-full max-w-xs md:max-w-sm">
+                  {/* Decorative blobs */}
+                  <div className="absolute -z-10 top-0 -left-4 w-48 h-48 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+                  <div className="absolute -z-10 top-0 -right-4 w-48 h-48 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+                  <div className="absolute -z-10 -bottom-8 left-20 w-48 h-48 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+                  
+                  {/* Phone mockup */}
                   <div className="relative">
-                    <img 
-                      src="https://cdn.lovable.dev/images/QueueFlow-hero.png" 
-                      alt="QueueFlow platform visualization" 
-                      className="relative rounded-lg shadow-2xl"
-                    />
+                    <div className="bg-gray-900 rounded-[3rem] p-2 shadow-xl rotate-0 transform transition-all animate-float">
+                      <div className="bg-white rounded-[2.5rem] overflow-hidden h-[530px] w-[260px]">
+                        <div className="bg-gray-900 h-8 flex justify-center items-center">
+                          <div className="w-1/3 h-5 bg-black rounded-full"></div>
+                        </div>
+                        <img 
+                          src="https://cdn.lovable.dev/images/QueueFlow-app-screen.png" 
+                          alt="QueueFlow app interface" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Floating notification */}
+                    <div className="absolute -right-16 top-20 bg-white rounded-lg p-3 shadow-lg border border-gray-100 max-w-[180px] animate-float-delay">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                          <MessageSquare className="text-white w-4 h-4" />
+                        </div>
+                        <p className="font-medium text-sm">QueueFlow</p>
+                      </div>
+                      <p className="text-xs text-gray-600">Your appointment is in 5 minutes. You're next in line!</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -313,392 +281,408 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Stats Counter Section */}
-        <section id="stats-section" className="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        {/* Stats Section - App-focused */}
+        <section id="stats-section" className="py-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="flex flex-col items-center">
-                <span className="text-4xl md:text-5xl font-bold mb-2">{stats.customers.toLocaleString()}</span>
-                <span className="text-lg opacity-90">Customers Served</span>
+            <div className="grid grid-cols-2 gap-y-8 gap-x-4 md:grid-cols-4 md:gap-8 text-center">
+              <div className="px-4">
+                <span className="text-3xl md:text-4xl font-bold mb-1 block">{stats.customers.toLocaleString()}</span>
+                <span className="text-sm text-blue-100">Users Active</span>
               </div>
-              <div className="flex flex-col items-center">
-                <span className="text-4xl md:text-5xl font-bold mb-2">{stats.waitTime}%</span>
-                <span className="text-lg opacity-90">Reduced Wait Times</span>
+              <div className="px-4">
+                <span className="text-3xl md:text-4xl font-bold mb-1 block">{stats.waitTime}%</span>
+                <span className="text-sm text-blue-100">Time Saved</span>
               </div>
-              <div className="flex flex-col items-center">
-                <span className="text-4xl md:text-5xl font-bold mb-2">{stats.satisfaction}%</span>
-                <span className="text-lg opacity-90">Satisfaction Rate</span>
+              <div className="px-4">
+                <span className="text-3xl md:text-4xl font-bold mb-1 block">{stats.satisfaction}%</span>
+                <span className="text-sm text-blue-100">Satisfaction</span>
               </div>
-              <div className="flex flex-col items-center">
-                <span className="text-4xl md:text-5xl font-bold mb-2">{stats.locations}</span>
-                <span className="text-lg opacity-90">Global Locations</span>
+              <div className="px-4">
+                <span className="text-3xl md:text-4xl font-bold mb-1 block">{stats.locations}</span>
+                <span className="text-sm text-blue-100">Locations</span>
               </div>
             </div>
           </div>
         </section>
         
-        {/* Features Section */}
-        <section ref={featuresRef} className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Everything you need to transform your customer experience and streamline operations
+        {/* Features Section - App-focused */}
+        <section ref={featuresRef} className="py-16 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">Powerful App Features</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Everything you need to transform your customer experience in one simple app
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
               {/* Mobile Ticketing */}
-              <Card className="bg-white overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer border-t-4 border-primary">
-                <CardContent className="p-6">
-                  <div className="bg-primary/10 rounded-full w-14 h-14 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                    <Smartphone className="h-6 w-6 text-primary" />
+              <Card className="overflow-hidden border-none shadow-lg shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow rounded-xl">
+                <div className="h-1 bg-blue-600"></div>
+                <CardContent className="p-5">
+                  <div className="bg-blue-50 text-blue-600 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                    <Smartphone className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">Mobile Ticketing</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-lg font-semibold mb-2">Mobile Ticketing</h3>
+                  <p className="text-sm text-gray-500">
                     Allow customers to join queues remotely via their mobile devices, eliminating physical wait lines.
                   </p>
-                  <div className="mt-4 text-primary flex items-center font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    Learn more <ChevronRight className="ml-1 h-4 w-4" />
-                  </div>
                 </CardContent>
               </Card>
               
               {/* SMS Alerts */}
-              <Card className="bg-white overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer border-t-4 border-blue-500">
-                <CardContent className="p-6">
-                  <div className="bg-blue-500/10 rounded-full w-14 h-14 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
-                    <MessageSquare className="h-6 w-6 text-blue-500" />
+              <Card className="overflow-hidden border-none shadow-lg shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow rounded-xl">
+                <div className="h-1 bg-indigo-600"></div>
+                <CardContent className="p-5">
+                  <div className="bg-indigo-50 text-indigo-600 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                    <MessageSquare className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">SMS Alerts</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-lg font-semibold mb-2">SMS Alerts</h3>
+                  <p className="text-sm text-gray-500">
                     Send automated notifications to customers as their turn approaches, giving them freedom to wait anywhere.
                   </p>
-                  <div className="mt-4 text-blue-500 flex items-center font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    Learn more <ChevronRight className="ml-1 h-4 w-4" />
-                  </div>
                 </CardContent>
               </Card>
               
               {/* Real-Time Dashboards */}
-              <Card className="bg-white overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer border-t-4 border-indigo-500">
-                <CardContent className="p-6">
-                  <div className="bg-indigo-500/10 rounded-full w-14 h-14 flex items-center justify-center mb-6 group-hover:bg-indigo-500/20 transition-colors">
-                    <LayoutDashboard className="h-6 w-6 text-indigo-500" />
+              <Card className="overflow-hidden border-none shadow-lg shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow rounded-xl">
+                <div className="h-1 bg-purple-600"></div>
+                <CardContent className="p-5">
+                  <div className="bg-purple-50 text-purple-600 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                    <LayoutDashboard className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">Real-Time Dashboards</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-lg font-semibold mb-2">Dashboards</h3>
+                  <p className="text-sm text-gray-500">
                     Monitor queue status, wait times, and staff performance through intuitive real-time analytics dashboards.
                   </p>
-                  <div className="mt-4 text-indigo-500 flex items-center font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    Learn more <ChevronRight className="ml-1 h-4 w-4" />
-                  </div>
                 </CardContent>
               </Card>
               
               {/* Visitor Analytics */}
-              <Card className="bg-white overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer border-t-4 border-purple-500">
-                <CardContent className="p-6">
-                  <div className="bg-purple-500/10 rounded-full w-14 h-14 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition-colors">
-                    <ChartBar className="h-6 w-6 text-purple-500" />
+              <Card className="overflow-hidden border-none shadow-lg shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow rounded-xl">
+                <div className="h-1 bg-pink-600"></div>
+                <CardContent className="p-5">
+                  <div className="bg-pink-50 text-pink-600 rounded-xl w-12 h-12 flex items-center justify-center mb-4">
+                    <ChartBar className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">Visitor Analytics</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-lg font-semibold mb-2">Analytics</h3>
+                  <p className="text-sm text-gray-500">
                     Gain valuable insights into customer flow patterns, peak hours, and service efficiency to optimize operations.
                   </p>
-                  <div className="mt-4 text-purple-500 flex items-center font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    Learn more <ChevronRight className="ml-1 h-4 w-4" />
-                  </div>
                 </CardContent>
               </Card>
             </div>
           </div>
         </section>
         
-        {/* How It Works Section */}
-        <section ref={howItWorksRef} className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">How QueueFlow Works</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        {/* How It Works Section - App-focused */}
+        <section ref={howItWorksRef} className="py-16 px-4 bg-blue-50">
+          <div className="container mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">How QueueFlow Works</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
                 A seamless experience from check-in to service completion
               </p>
             </div>
             
-            <div className="relative">
-              {/* Connection line */}
-              <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-primary transform -translate-y-1/2 hidden md:block"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+              {/* Connection dots for desktop */}
+              <div className="absolute top-24 left-0 right-0 h-0.5 bg-blue-200 hidden md:block"></div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Step 1 */}
-                <div className="bg-white p-8 rounded-xl shadow-md relative z-10">
-                  <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mb-6 mx-auto">1</div>
-                  <h3 className="text-xl font-bold text-center mb-4">Customer Check-In</h3>
-                  <div className="text-center mb-6">
-                    <Smartphone className="mx-auto h-12 w-12 text-blue-600 mb-4" />
-                  </div>
-                  <p className="text-gray-600 text-center">
-                    Customers join the queue through their mobile device, kiosk, or with staff assistance.
-                  </p>
+              {/* Step 1 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 relative z-10">
+                <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4 shadow-md shadow-blue-500/20">1</div>
+                <h3 className="text-lg font-semibold text-center mb-3">Join the Queue</h3>
+                <div className="flex justify-center mb-4">
+                  <Smartphone className="h-10 w-10 text-blue-600" />
                 </div>
-                
-                {/* Step 2 */}
-                <div className="bg-white p-8 rounded-xl shadow-md relative z-10">
-                  <div className="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mb-6 mx-auto">2</div>
-                  <h3 className="text-xl font-bold text-center mb-4">Wait Anywhere</h3>
-                  <div className="text-center mb-6">
-                    <MessageSquare className="mx-auto h-12 w-12 text-indigo-600 mb-4" />
-                  </div>
-                  <p className="text-gray-600 text-center">
-                    SMS notifications keep customers informed of queue progress and estimated wait times.
-                  </p>
+                <p className="text-sm text-gray-600 text-center">
+                  Open the app, select your service, and join the virtual queue from anywhere.
+                </p>
+              </div>
+              
+              {/* Step 2 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 relative z-10">
+                <div className="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4 shadow-md shadow-indigo-500/20">2</div>
+                <h3 className="text-lg font-semibold text-center mb-3">Wait Anywhere</h3>
+                <div className="flex justify-center mb-4">
+                  <MessageSquare className="h-10 w-10 text-indigo-600" />
                 </div>
-                
-                {/* Step 3 */}
-                <div className="bg-white p-8 rounded-xl shadow-md relative z-10">
-                  <div className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mb-6 mx-auto">3</div>
-                  <h3 className="text-xl font-bold text-center mb-4">Service & Feedback</h3>
-                  <div className="text-center mb-6">
-                    <CheckCircle className="mx-auto h-12 w-12 text-primary mb-4" />
-                  </div>
-                  <p className="text-gray-600 text-center">
-                    Customers receive service and provide feedback, helping businesses continuously improve.
-                  </p>
+                <p className="text-sm text-gray-600 text-center">
+                  Receive real-time updates on your position and estimated wait time through push notifications.
+                </p>
+              </div>
+              
+              {/* Step 3 */}
+              <div className="bg-white rounded-xl shadow-lg p-6 relative z-10">
+                <div className="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mx-auto mb-4 shadow-md shadow-purple-500/20">3</div>
+                <h3 className="text-lg font-semibold text-center mb-3">Get Service</h3>
+                <div className="flex justify-center mb-4">
+                  <CheckCircle className="h-10 w-10 text-purple-600" />
                 </div>
+                <p className="text-sm text-gray-600 text-center">
+                  Get notified when it's your turn, receive service, and rate your experience in the app.
+                </p>
               </div>
             </div>
           </div>
         </section>
         
-        {/* Testimonials Section */}
-        <section ref={testimonialsRef} className="py-20 bg-gradient-to-tr from-blue-900 to-indigo-900 text-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Clients Say</h2>
-              <p className="text-xl opacity-90 max-w-3xl mx-auto">
-                Businesses across industries are transforming their customer experience with QueueFlow
+        {/* Testimonials Section - App-focused */}
+        <section ref={testimonialsRef} className="py-16 px-4 bg-gradient-to-b from-indigo-900 to-blue-800 text-white">
+          <div className="container mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">What Our Users Say</h2>
+              <p className="text-blue-100 max-w-2xl mx-auto">
+                Join thousands of satisfied businesses and customers
               </p>
             </div>
             
-            <div className="max-w-5xl mx-auto px-4 lg:px-0">
+            <div className="max-w-4xl mx-auto">
               <Carousel
                 className="w-full"
+                opts={{
+                  loop: true,
+                  align: "center",
+                }}
               >
                 <CarouselContent>
                   {testimonials.map((testimonial, i) => (
                     <CarouselItem key={i}>
-                      <div className="bg-white/10 backdrop-blur-lg p-8 rounded-xl border border-white/10">
-                        <div className="flex flex-col md:flex-row md:items-center gap-6">
-                          <div className="shrink-0">
-                            <img 
-                              src={testimonial.image} 
-                              alt={testimonial.name} 
-                              className="w-20 h-20 rounded-full object-cover border-2 border-white/20"
-                            />
-                          </div>
-                          <div>
-                            <div className="flex items-center mb-2">
-                              {[...Array(5)].map((_, i) => (
-                                <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                              ))}
+                      <div className="p-1">
+                        <Card className="border-none bg-white/10 backdrop-blur-md overflow-hidden shadow-lg">
+                          <CardContent className="p-6">
+                            <div className="flex flex-col md:flex-row md:items-center gap-6">
+                              <div className="shrink-0 flex justify-center">
+                                <img 
+                                  src={testimonial.image} 
+                                  alt={testimonial.name} 
+                                  className="w-16 h-16 rounded-full object-cover border-2 border-white/20"
+                                />
+                              </div>
+                              <div>
+                                <div className="flex items-center mb-2 justify-center md:justify-start">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                  ))}
+                                </div>
+                                <p className="text-sm md:text-base mb-4 text-center md:text-left">"{testimonial.content}"</p>
+                                <div className="text-center md:text-left">
+                                  <h4 className="font-semibold text-base">{testimonial.name}</h4>
+                                  <p className="text-xs text-blue-200">{testimonial.role}, {testimonial.company}</p>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-lg mb-6 italic">"{testimonial.content}"</p>
-                            <div>
-                              <h4 className="font-bold text-lg">{testimonial.name}</h4>
-                              <p className="opacity-80">{testimonial.role}, {testimonial.company}</p>
-                            </div>
-                          </div>
-                        </div>
+                          </CardContent>
+                        </Card>
                       </div>
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <div className="flex justify-center mt-8">
-                  <CarouselPrevious className="static translate-y-0 mr-4" />
-                  <CarouselNext className="static translate-y-0" />
+                <div className="flex justify-center mt-6">
+                  <CarouselPrevious className="static translate-y-0 mr-2 bg-white/10 hover:bg-white/20 border-white/10" />
+                  <CarouselNext className="static translate-y-0 bg-white/10 hover:bg-white/20 border-white/10" />
                 </div>
               </Carousel>
             </div>
           </div>
         </section>
         
-        {/* Pricing CTA Section */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl p-10 border border-blue-200 shadow-xl">
-              <div className="text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Customer Experience?</h2>
-                <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                  Get in touch for a personalized quote tailored to your business needs.
-                </p>
-                <Button 
-                  size="lg" 
-                  onClick={() => scrollToSection(contactRef)}
-                  className="font-medium px-8 shadow-md hover:shadow-lg hover:translate-y-[-2px] transition-all"
-                >
-                  Get a Quote
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+        {/* App Promo CTA */}
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto">
+            <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="flex-1">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Transform Your Business?</h2>
+                  <p className="text-gray-600 mb-6">
+                    Get started with QueueFlow today and see the difference it makes for your customers and staff.
+                  </p>
+                  <Button 
+                    size="lg" 
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white w-full md:w-auto shadow-lg shadow-blue-500/20"
+                    onClick={() => navigate('/login')}
+                  >
+                    Start Your Free Trial
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-shrink-0">
+                  <div className="bg-white rounded-2xl p-2 shadow-lg rotate-3 transform hover:rotate-0 transition-transform">
+                    <img 
+                      src="https://cdn.lovable.dev/images/QueueFlow-app-icon.png" 
+                      alt="QueueFlow app icon" 
+                      className="w-32 h-32 rounded-xl"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
         
-        {/* Contact Form Section */}
-        <section ref={contactRef} className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Get Started with QueueFlow</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Request a demo or learn more about how QueueFlow can help your business
+        {/* Contact Form Section - App-focused */}
+        <section ref={contactRef} className="py-16 px-4 bg-blue-50">
+          <div className="container mx-auto">
+            <div className="max-w-lg mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-bold mb-3">Request a Demo</h2>
+                <p className="text-gray-600 max-w-md mx-auto">
+                  See how QueueFlow can work for your specific business needs
                 </p>
               </div>
               
-              <div className="bg-white rounded-xl shadow-lg p-8 md:p-10 border border-gray-100">
-                <form onSubmit={handleDemoRequest} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="border-none shadow-lg overflow-hidden">
+                <CardContent className="p-6">
+                  <form onSubmit={handleDemoRequest} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <Input 
+                          id="name" 
+                          placeholder="Your name" 
+                          required 
+                          className="w-full"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                        <Input 
+                          id="company" 
+                          placeholder="Your company" 
+                          required 
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <label htmlFor="name" className="block mb-2 font-medium">Name</label>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                       <Input 
-                        id="name" 
-                        placeholder="Your name" 
+                        id="email" 
+                        type="email" 
+                        placeholder="your.email@company.com" 
                         required 
                         className="w-full"
                       />
                     </div>
                     <div>
-                      <label htmlFor="company" className="block mb-2 font-medium">Company</label>
-                      <Input 
-                        id="company" 
-                        placeholder="Your company" 
-                        required 
-                        className="w-full"
-                      />
+                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                      <textarea 
+                        id="message" 
+                        rows={3} 
+                        placeholder="How can we help you?" 
+                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                      ></textarea>
                     </div>
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block mb-2 font-medium">Email</label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="your.email@company.com" 
-                      required 
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="block mb-2 font-medium">Message</label>
-                    <textarea 
-                      id="message" 
-                      rows={4} 
-                      placeholder="How can we help you?" 
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    ></textarea>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    className="w-full md:w-auto px-8"
-                  >
-                    Request Demo
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Request Demo
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
       </main>
       
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+      <footer className="bg-gray-900 text-white py-10 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent inline-block">QueueFlow</h2>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">QueueFlow</h3>
+              <p className="text-sm text-gray-400 mb-4">
                 Simple and effective queue management for businesses of all sizes.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-4 uppercase text-sm tracking-wider">Product</h3>
-              <ul className="space-y-2">
-                <li><button className="text-gray-300 hover:text-white transition-colors">Features</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Solutions</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Pricing</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Demo</button></li>
+              <h4 className="font-medium mb-3 text-sm text-gray-300">App</h4>
+              <ul className="space-y-2 text-sm">
+                <li><button className="text-gray-400 hover:text-white transition-colors">Features</button></li>
+                <li><button className="text-gray-400 hover:text-white transition-colors">Pricing</button></li>
+                <li><button className="text-gray-400 hover:text-white transition-colors">Demo</button></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4 uppercase text-sm tracking-wider">Company</h3>
-              <ul className="space-y-2">
-                <li><button className="text-gray-300 hover:text-white transition-colors">About</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Blog</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Careers</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Contact</button></li>
+              <h4 className="font-medium mb-3 text-sm text-gray-300">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><button className="text-gray-400 hover:text-white transition-colors">About</button></li>
+                <li><button className="text-gray-400 hover:text-white transition-colors">Contact</button></li>
+                <li><button className="text-gray-400 hover:text-white transition-colors">Support</button></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4 uppercase text-sm tracking-wider">Legal</h3>
-              <ul className="space-y-2">
-                <li><button className="text-gray-300 hover:text-white transition-colors">Privacy</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Terms</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">Security</button></li>
-                <li><button className="text-gray-300 hover:text-white transition-colors">GDPR</button></li>
+              <h4 className="font-medium mb-3 text-sm text-gray-300">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><button className="text-gray-400 hover:text-white transition-colors">Privacy</button></li>
+                <li><button className="text-gray-400 hover:text-white transition-colors">Terms</button></li>
+                <li><button className="text-gray-400 hover:text-white transition-colors">Security</button></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
+          <div className="mt-8 pt-6 border-t border-gray-800 text-center text-gray-400 text-sm">
             &copy; {new Date().getFullYear()} QueueFlow. All rights reserved.
           </div>
         </div>
       </footer>
       
-      {/* Demo Request Modal */}
+      {/* Get Started Modal - App-focused */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
           <div 
-            className="bg-white rounded-xl shadow-lg max-w-xl w-full p-8 relative"
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1"
               onClick={() => setIsModalOpen(false)}
               aria-label="Close"
             >
-              <X />
+              <X size={20} />
             </button>
             
             {!formSubmitted ? (
               <>
-                <h2 className="text-2xl font-bold mb-6 text-center">Request a Demo</h2>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Smartphone className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h2 className="text-xl font-bold">Get Started with QueueFlow</h2>
+                  <p className="text-gray-500 text-sm mt-1">Fill out this quick form to begin your journey</p>
+                </div>
+                
                 <form onSubmit={handleDemoRequest} className="space-y-4">
                   <div>
-                    <label htmlFor="modal-name" className="block mb-2 font-medium">Name</label>
+                    <label htmlFor="modal-name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                     <Input id="modal-name" placeholder="Your name" required />
                   </div>
                   <div>
-                    <label htmlFor="modal-email" className="block mb-2 font-medium">Email</label>
+                    <label htmlFor="modal-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <Input id="modal-email" type="email" placeholder="your.email@company.com" required />
                   </div>
                   <div>
-                    <label htmlFor="modal-company" className="block mb-2 font-medium">Company</label>
+                    <label htmlFor="modal-company" className="block text-sm font-medium text-gray-700 mb-1">Company</label>
                     <Input id="modal-company" placeholder="Your company" required />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Submit Request
-                  </Button>
+                  <div className="pt-2">
+                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                      Submit Request
+                    </Button>
+                  </div>
                 </form>
               </>
             ) : (
-              <div className="text-center py-8">
-                <div className="bg-green-100 text-green-700 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8" />
+              <div className="text-center py-6">
+                <div className="bg-green-100 text-green-600 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                  <CheckCircle className="w-10 h-10" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Thank You!</h3>
+                <h3 className="text-xl font-bold mb-2">Thank You!</h3>
                 <p className="text-gray-600 mb-6">
-                  Your demo request has been submitted. Our team will contact you shortly.
+                  Your request has been submitted. Our team will contact you shortly.
                 </p>
                 <Button 
                   variant="outline" 
@@ -706,6 +690,7 @@ const Index = () => {
                     setFormSubmitted(false);
                     setIsModalOpen(false);
                   }}
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
                 >
                   Close
                 </Button>
