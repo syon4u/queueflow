@@ -1,111 +1,52 @@
 
 {
-  "app": {
-    "name": "QueueFlow",
-    "tagline": "Queue Management System"
-  },
-  "auth": {
-    "login": "Sign in to your account",
-    "continueWith": "Continue with Google",
-    "googleButton": "Continue with Google",
-    "loginFailed": "Authentication failed",
-    "loginFailedDesc": "Could not sign in with Google. Please try again."
-  },
   "common": {
-    "backToHome": "Back to Home",
     "loading": "Loading...",
-    "noData": "No data available",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "yes": "Yes",
-    "no": "No"
-  },
-  "staff": {
-    "dashboard": "Staff Dashboard",
-    "activeAppointments": "Active Appointments",
-    "loggedInAs": "Logged in as:",
-    "role": "Role:",
-    "refreshAppointments": "Refresh Appointments",
-    "queueManagement": "Queue",
-    "appointments": "Appointments",
-    "statistics": "Statistics",
-    "settings": "Settings",
-    "settingsDescription": "Configure your personal preferences and notification settings.",
-    "managementDescription": "Manage appointments and customer flow"
-  },
-  "performance": {
-    "dashboardTitle": "Performance Analytics",
-    "dashboardDescription": "Monitor performance metrics and analyze trends",
-    "reports": "Performance",
-    "staffPerformance": "Staff Performance",
-    "serviceMetrics": "Service Metrics",
-    "locationMetrics": "Location Metrics",
-    "comingSoon": "This feature is coming soon!",
-    "timePeriodsTitle": "Time Period",
-    "exportReport": "Export Report",
-    "staffMetrics": {
-      "title": "Staff Performance",
-      "appointments": "Appointments",
-      "avgService": "Avg. Service Time",
-      "noShows": "No-Shows"
-    },
-    "serviceMetrics": {
-      "title": "Service Performance",
-      "appointments": "Appointments",
-      "avgWait": "Avg. Wait Time"
-    }
-  },
-  "admin": {
-    "dashboard": "Admin Dashboard",
-    "manageData": "Manage Data",
-    "addNew": "Add New"
+    "error": "Error",
+    "success": "Success",
+    "notAvailable": "N/A",
+    "search": "Search",
+    "searching": "Searching...",
+    "select": "Select",
+    "back": "Back",
+    "actions": "Actions"
   },
   "customer": {
-    "queue": {
-      "name": "Name",
-      "phone": "Phone Number",
-      "notes": "Notes",
-      "notesPlaceholder": "Special requirements or additional information",
-      "priority": "Priority Level",
-      "regular": "Regular",
-      "priorityCustomer": "Priority",
-      "addToQueue": "Add to Queue",
-      "nameRequired": "Customer name is required",
-      "optional": "Optional"
+    "viewHistory": "View History",
+    "history": "Customer Visit History",
+    "historyDescription": "View past appointments for this customer",
+    "searchPlaceholder": "Search by name, email or phone",
+    "noResults": "No customers found",
+    "name": "Name",
+    "contact": "Contact",
+    "searchError": "Error searching for customers",
+    "historyError": "Error loading customer history",
+    "noAppointmentHistory": "No appointment history found"
+  },
+  "appointments": {
+    "newAppointment": "New Appointment",
+    "steps": {
+      "title": "Schedule an Appointment",
+      "description": "Follow the steps below to schedule your appointment"
     },
-    "waitingList": "Waiting List",
-    "noCustomersWaiting": "No customers waiting",
-    "addCustomersToStart": "Add customers to the queue to get started",
-    "joinedAt": "Joined at",
-    "estWait": "Est. wait:"
-  },
-  "queueControls": {
-    "nowServing": "Now Serving",
-    "noCustomerBeingServed": "No customer being served",
-    "callNextCustomer": "Call the next customer in queue",
-    "callNext": "Call Next Customer",
-    "noShow": "No-Show",
-    "markServed": "Mark Served"
-  },
-  "queueHeader": {
-    "managing": "Managing",
-    "customers": "customers",
-    "customer": "customer",
-    "waiting": "waiting",
-    "resetQueue": "Reset Queue",
-    "resetQueueWarning": "This will remove all customers from the queue. This action cannot be undone."
-  },
-  "notFound": {
-    "title": "Page Not Found",
-    "description": "Sorry, we couldn't find the page you're looking for.",
-    "backToHome": "Go back home"
-  },
-  "unauthorized": {
-    "title": "Unauthorized",
-    "description": "You don't have permission to access this page.",
-    "backToHome": "Go back home"
+    "scheduledTime": "Scheduled Time",
+    "date": "Date",
+    "service": "Service",
+    "status": {
+      "scheduled": "Scheduled",
+      "checked_in": "Checked In",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No Show"
+    },
+    "checkIn": "Check In",
+    "startService": "Start",
+    "complete": "Complete",
+    "cancel": "Cancel",
+    "sendReminder": "Reminder",
+    "statusUpdated": "Appointment status updated",
+    "statusUpdateError": "Failed to update appointment status",
+    "reasonForVisit": "Reason for visit"
   }
 }

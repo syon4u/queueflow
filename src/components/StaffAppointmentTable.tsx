@@ -9,7 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { SendReminderDialog } from './staff/SendReminderDialog';
-import { Bell, Info } from 'lucide-react';
+import CustomerHistoryModal from './staff/CustomerHistoryModal';
+import { Bell, History, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface StaffAppointmentTableProps {
@@ -157,6 +158,17 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
                   >
                     <Bell className="h-4 w-4" />
                   </Button>
+                  <CustomerHistoryModal 
+                    trigger={
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        title={t('customer.viewHistory')}
+                      >
+                        <History className="h-4 w-4" />
+                      </Button>
+                    }
+                  />
                 </div>
               </TableCell>
             </TableRow>
