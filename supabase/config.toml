@@ -1,1 +1,7 @@
+
 project_id = "diadwozorwkzhexhjfgb"
+[functions]
+[api]
+[db]
+[auth]
+[storage]
