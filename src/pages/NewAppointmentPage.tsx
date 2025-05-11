@@ -50,6 +50,7 @@ const NewAppointmentPage = () => {
             <LocationStep 
               locationId={selectedLocationId}
               onLocationChange={setSelectedLocationId}
+              locations={locations}
             />
           )}
           

@@ -2,7 +2,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@/components/ui/label';
-import ServiceSelector from '@/components/ServiceSelector';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Service } from '@/hooks/useAppointmentForm';
 
 interface ServiceStepProps {
@@ -12,7 +18,7 @@ interface ServiceStepProps {
   services: Service[];
 }
 
-const ServiceStep: React.FC<ServiceStepProps> = ({ serviceId, onServiceChange, locationId, services }) => {
+const ServiceStep: React.FC<ServiceStepProps> = ({ serviceId, onServiceChange, services = [] }) => {
   const { t } = useTranslation();
   
   const selectedService = services.find(s => s.id === serviceId);
@@ -20,11 +26,18 @@ const ServiceStep: React.FC<ServiceStepProps> = ({ serviceId, onServiceChange, l
   return (
     <div className="space-y-4">
       <Label>{t('appointments.selectService')}</Label>
-      <ServiceSelector 
-        value={serviceId}
-        onChange={onServiceChange}
-        locationId={locationId}
-      />
+      <Select value={serviceId} onValueChange={onServiceChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={t('appointments.selectServicePlaceholder')} />
+        </SelectTrigger>
+        <SelectContent>
+          {services.map(service => (
+            <SelectItem key={service.id} value={service.id}>
+              {service.name} ({service.duration} {t('appointments.minutes')})
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       
       {serviceId && selectedService?.description && (
         <div className="mt-4 text-sm text-muted-foreground">
