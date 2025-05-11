@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
+import { type Database } from '@/integrations/supabase/types';
 
 export interface UserData {
   id: string;
@@ -11,6 +12,9 @@ export interface UserData {
   created_at?: string;
   last_sign_in_at?: string;
 }
+
+// Define a type for user roles that matches the Supabase enum
+type UserRole = Database['public']['Enums']['user_role'];
 
 export const useUserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -137,9 +141,9 @@ export const useUserManagement = () => {
     mutationFn: async () => {
       // Add some temporary staff for analytics
       const staffData = [
-        { id: 'temp-staff-1', first_name: 'John', last_name: 'Doe', role: 'staff', location_id: null },
-        { id: 'temp-staff-2', first_name: 'Jane', last_name: 'Smith', role: 'staff', location_id: null },
-        { id: 'temp-staff-3', first_name: 'Alex', last_name: 'Johnson', role: 'staff', location_id: null }
+        { id: 'temp-staff-1', first_name: 'John', last_name: 'Doe', role: 'staff' as UserRole, location_id: null },
+        { id: 'temp-staff-2', first_name: 'Jane', last_name: 'Smith', role: 'staff' as UserRole, location_id: null },
+        { id: 'temp-staff-3', first_name: 'Alex', last_name: 'Johnson', role: 'admin' as UserRole, location_id: null }
       ];
 
       // Insert staff data if they don't exist
