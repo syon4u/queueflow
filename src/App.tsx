@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { QueueProvider } from "@/context/QueueContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -29,63 +30,65 @@ const App = () => {
         <BrowserRouter>
           <TooltipProvider>
             <AuthProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/unauthorized" element={<Unauthorized />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Index />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/customer" element={<CustomerPage />} />
-                <Route
-                  path="/staff"
-                  element={
-                    <ProtectedRoute roles={['staff', 'admin']}>
-                      <StaffPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute roles={['admin']}>
-                      <AdminPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/appointments"
-                  element={
-                    <ProtectedRoute>
-                      <AppointmentsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/new-appointment"
-                  element={
-                    <ProtectedRoute>
-                      <NewAppointmentPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <QueueProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/unauthorized" element={<Unauthorized />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/customer" element={<CustomerPage />} />
+                  <Route
+                    path="/staff"
+                    element={
+                      <ProtectedRoute roles={['staff', 'admin']}>
+                        <StaffPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute roles={['admin']}>
+                        <AdminPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <ProfilePage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/appointments"
+                    element={
+                      <ProtectedRoute>
+                        <AppointmentsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/new-appointment"
+                    element={
+                      <ProtectedRoute>
+                        <NewAppointmentPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </QueueProvider>
             </AuthProvider>
           </TooltipProvider>
         </BrowserRouter>

@@ -12,6 +12,7 @@ import { StatsTab } from '@/components/admin/StatsTab';
 import { QueueManagementTab } from '@/components/admin/QueueManagementTab';
 import { SystemSettingsTab } from '@/components/admin/SystemSettingsTab';
 import { DashboardTab } from '@/components/admin/DashboardTab';
+import { QueueProvider } from '@/context/QueueContext';
 
 const AdminPage = () => {
   const { user, role } = useAuth();
@@ -55,7 +56,9 @@ const AdminPage = () => {
               <ServicesTab />
             </TabsContent>
             <TabsContent value="queue">
-              <QueueManagementTab />
+              <QueueProvider>
+                <QueueManagementTab />
+              </QueueProvider>
             </TabsContent>
             <TabsContent value="stats">
               <StatsTab />
