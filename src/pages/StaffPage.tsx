@@ -20,6 +20,7 @@ import CustomerQueue from '@/components/CustomerQueue';
 import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
 import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
+import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -106,10 +107,7 @@ const StaffPage = () => {
               </TabsContent>
               
               <TabsContent value="stats">
-                <div className="bg-white rounded-lg">
-                  <h2 className="text-xl font-semibold mb-4">{t('staff.statistics')}</h2>
-                  <p className="text-gray-600">{t('staff.statisticsDescription')}</p>
-                </div>
+                <StaffPerformanceReport />
               </TabsContent>
               
               <TabsContent value="settings">
