@@ -25,6 +25,7 @@ export interface AppointmentFormState {
   selectedDate: Date | undefined;
   selectedTime: string;
   notes: string;
+  reasonForVisit: string;
   isSubmitting: boolean;
   currentStep: number;
 }
@@ -41,6 +42,7 @@ export const useAppointmentForm = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
+  const [reasonForVisit, setReasonForVisit] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   
   // Data state
@@ -152,6 +154,7 @@ export const useAppointmentForm = () => {
           location_id: selectedLocationId,
           scheduled_time: scheduledTime.toISOString(),
           notes: notes || null,
+          reason_for_visit: reasonForVisit || null,
           status: 'scheduled'
         });
         
@@ -221,6 +224,8 @@ export const useAppointmentForm = () => {
     setSelectedTime,
     notes,
     setNotes,
+    reasonForVisit,
+    setReasonForVisit,
     isSubmitting,
     currentStep,
     

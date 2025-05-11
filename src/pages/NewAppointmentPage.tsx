@@ -23,6 +23,8 @@ const NewAppointmentPage = () => {
     setSelectedTime,
     notes,
     setNotes,
+    reasonForVisit,
+    setReasonForVisit,
     isSubmitting,
     currentStep,
     locations,
@@ -85,6 +87,8 @@ const NewAppointmentPage = () => {
               selectedTime={selectedTime}
               notes={notes}
               onNotesChange={setNotes}
+              reasonForVisit={reasonForVisit}
+              onReasonForVisitChange={setReasonForVisit}
             />
           )}
         </CardContent>

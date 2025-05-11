@@ -9,7 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { SendReminderDialog } from './staff/SendReminderDialog';
-import { Bell } from 'lucide-react';
+import { Bell, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface StaffAppointmentTableProps {
   appointments: Appointment[];
@@ -70,7 +71,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
   }
 
   return (
-    <>
+    <TooltipProvider>
       <Table>
         <TableHeader>
           <TableRow>
@@ -92,7 +93,23 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
                   {t(`appointments.status.${appointment.status}`)}
                 </Badge>
               </TableCell>
-              <TableCell>{appointment.service_id}</TableCell>
+              <TableCell>
+                {appointment.service_id}
+                {appointment.reason_for_visit && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-5 w-5 ml-1">
+                        <Info size={14} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p className="max-w-xs break-words">
+                        <span className="font-bold">{t('appointments.reasonForVisit')}:</span> {appointment.reason_for_visit}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </TableCell>
               <TableCell className="hidden md:table-cell">{appointment.customer_id}</TableCell>
               <TableCell>
                 <div className="flex items-center space-x-1">
@@ -152,7 +169,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
         onOpenChange={setReminderDialogOpen}
         appointment={selectedAppointment}
       />
-    </>
+    </TooltipProvider>
   );
 };
 

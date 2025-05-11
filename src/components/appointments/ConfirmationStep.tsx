@@ -15,6 +15,8 @@ interface ConfirmationStepProps {
   selectedTime: string;
   notes: string;
   onNotesChange: (notes: string) => void;
+  reasonForVisit: string;
+  onReasonForVisitChange: (reason: string) => void;
 }
 
 const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
@@ -25,7 +27,9 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
   selectedDate,
   selectedTime,
   notes,
-  onNotesChange
+  onNotesChange,
+  reasonForVisit,
+  onReasonForVisitChange
 }) => {
   const { t } = useTranslation();
 
@@ -59,6 +63,17 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
           <h3 className="text-sm font-medium text-muted-foreground">{t('appointments.duration')}</h3>
           <p className="font-medium">{selectedService?.duration} {t('appointments.minutes')}</p>
         </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="reason">{t('appointments.reasonForVisit')}</Label>
+        <Textarea
+          id="reason"
+          value={reasonForVisit}
+          onChange={(e) => onReasonForVisitChange(e.target.value)}
+          placeholder={t('appointments.reasonForVisitPlaceholder')}
+          rows={2}
+        />
       </div>
       
       <div className="space-y-2">
