@@ -22,7 +22,7 @@ export interface Appointment {
   updated_at: string;
 }
 
-export function useAppointments(serviceId?: string) {
+export function useAppointments(serviceId?: string, refreshTrigger: number = 0) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [userPosition, setUserPosition] = useState<number | null>(null);
@@ -77,7 +77,7 @@ export function useAppointments(serviceId?: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, serviceId, toast]);
+  }, [user, serviceId, toast, refreshTrigger]);
 
   // Calculate user's position in queue and estimated wait time
   const calculateUserPosition = (appointmentsData: Appointment[]) => {
