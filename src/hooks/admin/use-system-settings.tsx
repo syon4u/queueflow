@@ -4,6 +4,38 @@ import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Define proper types for the settings
+type BusinessHours = {
+  start: string;
+  end: string;
+};
+
+type QueueSettings = {
+  default_wait_time: number;
+  max_queue_size: number;
+  priority_enabled: boolean;
+  auto_assignment: boolean;
+};
+
+type NotificationSettings = {
+  method: 'email' | 'sms' | 'both';
+  email_templates: boolean;
+  sms_templates: boolean;
+  wait_time_threshold: number;
+};
+
+type DisplaySettings = {
+  theme: string;
+  show_estimated_time: boolean;
+  show_queue_position: boolean;
+  custom_logo_url: string;
+};
+
+export type SystemSetting = {
+  key: string;
+  value: string | BusinessHours | QueueSettings | NotificationSettings | DisplaySettings;
+};
+
 export const useSystemSettings = () => {
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -36,7 +68,7 @@ export const useSystemSettings = () => {
           show_queue_position: true,
           custom_logo_url: ''
         }}
-      ];
+      ] as SystemSetting[];
     },
   });
 

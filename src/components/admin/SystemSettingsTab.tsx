@@ -12,11 +12,8 @@ import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { toast } from "sonner";
-import { useSystemSettings } from '@/hooks/admin/use-system-settings';
-import { Loader2, Save, Key, Mail, MessageSquare, Globe, Shield, Database, FileText } from 'lucide-react';
+import { useSystemSettings, type SystemSetting } from '@/hooks/admin/use-system-settings';
 
-// Form validation schemas
 const generalSettingsSchema = z.object({
   systemName: z.string().min(1, "System name is required"),
   businessHoursStart: z.string().min(1, "Business hours start time is required"),
@@ -46,15 +43,14 @@ const displaySettingsSchema = z.object({
   customLogoUrl: z.string().optional(),
 });
 
-export const SystemSettingsTab: React.FC = () => {
+export const SystemSettingsTab = () => {
   const [activeTab, setActiveTab] = useState("general");
   const { settings, isLoading, updateSettings, isUpdating } = useSystemSettings();
 
-  // Initialize forms with React Hook Form
   const generalForm = useForm<z.infer<typeof generalSettingsSchema>>({
     resolver: zodResolver(generalSettingsSchema),
     defaultValues: {
-      systemName: "County Service Center",
+      systemName: "County Queue Management System",
       businessHoursStart: "08:00",
       businessHoursEnd: "17:00",
       defaultLocation: "main",
@@ -92,53 +88,110 @@ export const SystemSettingsTab: React.FC = () => {
     },
   });
 
+  // Type guard functions to safely access values
+  const getBusinessHours = (setting?: SystemSetting) => {
+    if (!setting) return null;
+    if (typeof setting.value === 'object' && 'start' in setting.value && 'end' in setting.value) {
+      return setting.value as { start: string; end: string };
+    }
+    return null;
+  };
+
+  const getQueueSettings = (setting?: SystemSetting) => {
+    if (!setting) return null;
+    if (typeof setting.value === 'object' && 'default_wait_time' in setting.value) {
+      return setting.value as {
+        default_wait_time: number;
+        max_queue_size: number;
+        priority_enabled: boolean;
+        auto_assignment: boolean;
+      };
+    }
+    return null;
+  };
+
+  const getNotificationSettings = (setting?: SystemSetting) => {
+    if (!setting) return null;
+    if (typeof setting.value === 'object' && 'method' in setting.value) {
+      return setting.value as {
+        method: 'email' | 'sms' | 'both';
+        email_templates: boolean;
+        sms_templates: boolean;
+        wait_time_threshold: number;
+      };
+    }
+    return null;
+  };
+
+  const getDisplaySettings = (setting?: SystemSetting) => {
+    if (!setting) return null;
+    if (typeof setting.value === 'object' && 'theme' in setting.value) {
+      return setting.value as {
+        theme: string;
+        show_estimated_time: boolean;
+        show_queue_position: boolean;
+        custom_logo_url: string;
+      };
+    }
+    return null;
+  };
+
   // Initialize form values from database
   useEffect(() => {
     if (settings && settings.length > 0) {
       // Find general settings
-      const systemName = settings.find(s => s.key === 'system_name')?.value;
-      const businessHours = settings.find(s => s.key === 'business_hours')?.value;
-      const defaultLocation = settings.find(s => s.key === 'default_location')?.value;
-      const language = settings.find(s => s.key === 'language')?.value;
+      const systemNameSetting = settings.find(s => s.key === 'system_name');
+      const businessHoursSetting = settings.find(s => s.key === 'business_hours');
+      const defaultLocationSetting = settings.find(s => s.key === 'default_location');
+      const languageSetting = settings.find(s => s.key === 'language');
       
-      if (systemName) generalForm.setValue('systemName', systemName);
+      if (systemNameSetting && typeof systemNameSetting.value === 'string') {
+        generalForm.setValue('systemName', systemNameSetting.value);
+      }
+      
+      const businessHours = getBusinessHours(businessHoursSetting);
       if (businessHours) {
         generalForm.setValue('businessHoursStart', businessHours.start);
         generalForm.setValue('businessHoursEnd', businessHours.end);
       }
-      if (defaultLocation) generalForm.setValue('defaultLocation', defaultLocation);
-      if (language) generalForm.setValue('language', language);
+      
+      if (defaultLocationSetting && typeof defaultLocationSetting.value === 'string') {
+        generalForm.setValue('defaultLocation', defaultLocationSetting.value);
+      }
+      
+      if (languageSetting && typeof languageSetting.value === 'string') {
+        generalForm.setValue('language', languageSetting.value);
+      }
 
       // Find queue settings
-      const queueSettings = settings.find(s => s.key === 'queue_settings')?.value;
-      if (queueSettings) {
-        queueForm.setValue('defaultWaitTime', queueSettings.default_wait_time.toString());
-        queueForm.setValue('maxQueueSize', queueSettings.max_queue_size.toString());
-        queueForm.setValue('priorityEnabled', queueSettings.priority_enabled);
-        queueForm.setValue('autoAssignment', queueSettings.auto_assignment);
+      const queueSettingObj = getQueueSettings(settings.find(s => s.key === 'queue_settings'));
+      if (queueSettingObj) {
+        queueForm.setValue('defaultWaitTime', queueSettingObj.default_wait_time.toString());
+        queueForm.setValue('maxQueueSize', queueSettingObj.max_queue_size.toString());
+        queueForm.setValue('priorityEnabled', queueSettingObj.priority_enabled);
+        queueForm.setValue('autoAssignment', queueSettingObj.auto_assignment);
       }
 
       // Find notification settings
-      const notificationSettings = settings.find(s => s.key === 'notification_settings')?.value;
-      if (notificationSettings) {
-        notificationForm.setValue('notificationMethod', notificationSettings.method);
-        notificationForm.setValue('emailTemplates', notificationSettings.email_templates);
-        notificationForm.setValue('smsTemplates', notificationSettings.sms_templates);
-        notificationForm.setValue('waitTimeAlertThreshold', notificationSettings.wait_time_threshold.toString());
+      const notificationSettingObj = getNotificationSettings(settings.find(s => s.key === 'notification_settings'));
+      if (notificationSettingObj) {
+        notificationForm.setValue('notificationMethod', notificationSettingObj.method);
+        notificationForm.setValue('emailTemplates', notificationSettingObj.email_templates);
+        notificationForm.setValue('smsTemplates', notificationSettingObj.sms_templates);
+        notificationForm.setValue('waitTimeAlertThreshold', notificationSettingObj.wait_time_threshold.toString());
       }
 
       // Find display settings
-      const displaySettings = settings.find(s => s.key === 'display_settings')?.value;
-      if (displaySettings) {
-        displayForm.setValue('theme', displaySettings.theme);
-        displayForm.setValue('showEstimatedTime', displaySettings.show_estimated_time);
-        displayForm.setValue('showQueuePosition', displaySettings.show_queue_position);
-        displayForm.setValue('customLogoUrl', displaySettings.custom_logo_url || '');
+      const displaySettingObj = getDisplaySettings(settings.find(s => s.key === 'display_settings'));
+      if (displaySettingObj) {
+        displayForm.setValue('theme', displaySettingObj.theme);
+        displayForm.setValue('showEstimatedTime', displaySettingObj.show_estimated_time);
+        displayForm.setValue('showQueuePosition', displaySettingObj.show_queue_position);
+        displayForm.setValue('customLogoUrl', displaySettingObj.custom_logo_url || '');
       }
     }
   }, [settings, generalForm, queueForm, notificationForm, displayForm]);
 
-  // Form submit handlers
   const onSubmitGeneral = (data: z.infer<typeof generalSettingsSchema>) => {
     updateSettings({
       'system_name': data.systemName,
@@ -179,7 +232,7 @@ export const SystemSettingsTab: React.FC = () => {
         theme: data.theme,
         show_estimated_time: data.showEstimatedTime,
         show_queue_position: data.showQueuePosition,
-        custom_logo_url: data.customLogoUrl
+        custom_logo_url: data.customLogoUrl || ''
       }
     }, 'display');
   };
@@ -187,22 +240,26 @@ export const SystemSettingsTab: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold mb-6">System Settings</h1>
-      
+      <div>
+        <h2 className="text-2xl font-bold">System Settings</h2>
+        <p className="text-muted-foreground">
+          Configure global system preferences and parameters
+        </p>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="queue">Queue Management</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="display">Display Settings</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
@@ -269,7 +326,7 @@ export const SystemSettingsTab: React.FC = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Default Location</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a default location" />
@@ -297,7 +354,7 @@ export const SystemSettingsTab: React.FC = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>System Language</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a language" />
@@ -319,18 +376,8 @@ export const SystemSettingsTab: React.FC = () => {
                     )}
                   />
 
-                  <Button type="submit" disabled={isUpdating} className="mt-4">
-                    {isUpdating ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save General Settings
-                      </>
-                    )}
+                  <Button type="submit" disabled={isUpdating}>
+                    {isUpdating ? "Saving..." : "Save General Settings"}
                   </Button>
                 </form>
               </Form>
@@ -427,18 +474,8 @@ export const SystemSettingsTab: React.FC = () => {
                     )}
                   />
 
-                  <Button type="submit" disabled={isUpdating} className="mt-4">
-                    {isUpdating ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Queue Settings
-                      </>
-                    )}
+                  <Button type="submit" disabled={isUpdating}>
+                    {isUpdating ? "Saving..." : "Save Queue Settings"}
                   </Button>
                 </form>
               </Form>
@@ -466,7 +503,7 @@ export const SystemSettingsTab: React.FC = () => {
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
-                            value={field.value}
+                            defaultValue={field.value}
                             className="flex flex-col space-y-1"
                           >
                             <FormItem className="flex items-center space-x-3 space-y-0">
@@ -559,18 +596,8 @@ export const SystemSettingsTab: React.FC = () => {
                     )}
                   />
 
-                  <Button type="submit" disabled={isUpdating} className="mt-4">
-                    {isUpdating ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Notification Settings
-                      </>
-                    )}
+                  <Button type="submit" disabled={isUpdating}>
+                    {isUpdating ? "Saving..." : "Save Notification Settings"}
                   </Button>
                 </form>
               </Form>
@@ -595,7 +622,7 @@ export const SystemSettingsTab: React.FC = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>UI Theme</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a theme" />
@@ -605,7 +632,6 @@ export const SystemSettingsTab: React.FC = () => {
                             <SelectItem value="light">Light</SelectItem>
                             <SelectItem value="dark">Dark</SelectItem>
                             <SelectItem value="system">System Default</SelectItem>
-                            <SelectItem value="high-contrast">High Contrast</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormDescription>
@@ -675,114 +701,11 @@ export const SystemSettingsTab: React.FC = () => {
                     )}
                   />
 
-                  <Button type="submit" disabled={isUpdating} className="mt-4">
-                    {isUpdating ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Display Settings
-                      </>
-                    )}
+                  <Button type="submit" disabled={isUpdating}>
+                    {isUpdating ? "Saving..." : "Save Display Settings"}
                   </Button>
                 </form>
               </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="integrations">
-          <Card>
-            <CardHeader>
-              <CardTitle>Integration Settings</CardTitle>
-              <CardDescription>
-                Configure integrations with other systems
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="rounded-md border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <h3 className="text-lg font-medium">Calendar Integration</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Connect to external calendar services
-                        </p>
-                      </div>
-                    </div>
-                    <Switch />
-                  </div>
-                </div>
-
-                <div className="rounded-md border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <h3 className="text-lg font-medium">Email Service</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Configure email service provider
-                        </p>
-                      </div>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
-
-                <div className="rounded-md border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <h3 className="text-lg font-medium">SMS Gateway</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Configure SMS service provider
-                        </p>
-                      </div>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
-
-                <div className="rounded-md border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Database className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <h3 className="text-lg font-medium">API Access</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Enable external API access
-                        </p>
-                      </div>
-                    </div>
-                    <Switch />
-                  </div>
-                </div>
-
-                <div className="rounded-md border p-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Key className="h-5 w-5 text-muted-foreground" />
-                    <h3 className="text-lg font-medium">API Keys</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <Input type="text" placeholder="API Key" value="••••••••••••••••••••••••••" readOnly />
-                    <div className="flex space-x-2">
-                      <Button variant="outline">Generate New Key</Button>
-                      <Button variant="outline" className="text-destructive">Revoke Key</Button>
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="mt-4">
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Integration Settings
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -790,3 +713,5 @@ export const SystemSettingsTab: React.FC = () => {
     </div>
   );
 };
+
+export default SystemSettingsTab;
