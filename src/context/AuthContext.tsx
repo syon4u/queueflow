@@ -63,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Check for specific email addresses that should be admin
       if (user?.email === 'syon4u@gmail.com' || 
+          user?.email === 'syon4uu@gmail.com' || 
           user?.email?.toLowerCase().includes('syon') ||
           user?.email?.toLowerCase().includes('garrick')) {
         setRole('admin');
