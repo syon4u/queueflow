@@ -18,6 +18,7 @@ export type Database = {
           id: string
           location_id: string
           notes: string | null
+          reason_for_visit: string | null
           scheduled_time: string
           service_id: string
           staff_id: string | null
@@ -33,6 +34,7 @@ export type Database = {
           id?: string
           location_id: string
           notes?: string | null
+          reason_for_visit?: string | null
           scheduled_time: string
           service_id: string
           staff_id?: string | null
@@ -48,6 +50,7 @@ export type Database = {
           id?: string
           location_id?: string
           notes?: string | null
+          reason_for_visit?: string | null
           scheduled_time?: string
           service_id?: string
           staff_id?: string | null
@@ -272,6 +275,7 @@ export type Database = {
           id: string
           location_name: string
           notes: string | null
+          reason_for_visit: string | null
           scheduled_time: string
           service_name: string
           staff_name: string | null
@@ -287,6 +291,7 @@ export type Database = {
           id?: string
           location_name: string
           notes?: string | null
+          reason_for_visit?: string | null
           scheduled_time: string
           service_name: string
           staff_name?: string | null
@@ -302,6 +307,7 @@ export type Database = {
           id?: string
           location_name?: string
           notes?: string | null
+          reason_for_visit?: string | null
           scheduled_time?: string
           service_name?: string
           staff_name?: string | null

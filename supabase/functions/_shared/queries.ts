@@ -15,6 +15,7 @@ export interface Appointment {
   start_time: string | null;
   end_time: string | null;
   notes: string | null;
+  reason_for_visit: string | null;
   created_at: string;
   updated_at: string;
 }
