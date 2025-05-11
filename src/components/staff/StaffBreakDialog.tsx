@@ -1,0 +1,297 @@
+
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/hooks/use-toast';
+import { Clock, User } from 'lucide-react';
+import { BREAK_TYPES } from './performance/constants';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  HoverCard, 
+  HoverCardContent, 
+  HoverCardTrigger 
+} from '@/components/ui/hover-card';
+
+interface StaffMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface StaffBreakDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onBreakStatusChange: () => void;
+}
+
+const StaffBreakDialog: React.FC<StaffBreakDialogProps> = ({
+  open,
+  onOpenChange,
+  onBreakStatusChange
+}) => {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [breakType, setBreakType] = useState('short');
+  const [customDuration, setCustomDuration] = useState(15);
+  const [handoverStaffId, setHandoverStaffId] = useState('');
+  const [availableStaff, setAvailableStaff] = useState<StaffMember[]>([]);
+
+  // Get duration based on break type
+  const getDuration = () => {
+    if (breakType === 'custom') return customDuration;
+    const selectedBreak = BREAK_TYPES.find(b => b.value === breakType);
+    return selectedBreak?.duration || 15;
+  };
+
+  // Fetch available staff for handover
+  useEffect(() => {
+    if (open && user) {
+      const fetchAvailableStaff = async () => {
+        try {
+          // Get location_id for current staff
+          const { data: currentStaff, error: staffError } = await supabase
+            .from('staff')
+            .select('location_id')
+            .eq('id', user.id)
+            .single();
+
+          if (staffError) throw staffError;
+          
+          // Get staff at the same location who are active
+          const { data, error } = await supabase
+            .from('staff')
+            .select('id, first_name, last_name, status')
+            .eq('location_id', currentStaff.location_id)
+            .neq('id', user.id)
+            .eq('status', 'active');
+          
+          if (error) throw error;
+          setAvailableStaff(data || []);
+        } catch (error) {
+          console.error('Error fetching available staff:', error);
+        }
+      };
+
+      fetchAvailableStaff();
+    }
+  }, [open, user]);
+
+  // Handle taking a break
+  const handleTakeBreak = async () => {
+    if (!user) return;
+    
+    setIsSubmitting(true);
+    try {
+      const duration = getDuration();
+      const returnTime = new Date();
+      returnTime.setMinutes(returnTime.getMinutes() + duration);
+
+      // Update staff status and set return time
+      const { error: statusError } = await supabase
+        .from('staff')
+        .update({
+          status: 'break',
+          return_time: returnTime.toISOString(),
+          handover_staff_id: handoverStaffId || null
+        })
+        .eq('id', user.id);
+
+      if (statusError) throw statusError;
+
+      // If handover selected, notify that staff
+      if (handoverStaffId) {
+        // Insert notification for handover staff
+        const { error: notifyError } = await supabase
+          .from('staff_notifications')
+          .insert({
+            staff_id: handoverStaffId,
+            type: 'handover',
+            message: t('staff.handoverRequestMessage', { 
+              name: user.user_metadata?.name || user.email,
+              duration 
+            }),
+            status: 'unread'
+          });
+
+        if (notifyError) throw notifyError;
+      }
+
+      toast({
+        title: t('staff.breakStartedTitle'),
+        description: t('staff.breakStartedDescription', { duration })
+      });
+      
+      onOpenChange(false);
+      onBreakStatusChange();
+    } catch (error) {
+      console.error('Error setting break status:', error);
+      toast({
+        variant: 'destructive',
+        title: t('common.error'),
+        description: t('staff.breakErrorDescription')
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return '?';
+    return name.charAt(0).toUpperCase();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{t('staff.takeABreak')}</DialogTitle>
+          <DialogDescription>{t('staff.breakDescription')}</DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="break-type">{t('staff.breakType')}</Label>
+            <Select 
+              value={breakType} 
+              onValueChange={setBreakType}
+            >
+              <SelectTrigger id="break-type">
+                <SelectValue placeholder={t('staff.selectBreakType')} />
+              </SelectTrigger>
+              <SelectContent>
+                {BREAK_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {t(`staff.breakType_${type.value}`, { defaultValue: type.label })} ({type.duration} {t('common.minutes')})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {breakType === 'custom' && (
+            <div className="grid gap-2">
+              <Label htmlFor="duration">{t('staff.customDuration')}</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="duration"
+                  type="number"
+                  min={5}
+                  max={480}
+                  value={customDuration}
+                  onChange={(e) => setCustomDuration(parseInt(e.target.value) || 15)}
+                />
+                <span className="text-sm text-muted-foreground">{t('common.minutes')}</span>
+              </div>
+            </div>
+          )}
+          
+          <div className="grid gap-2">
+            <Label htmlFor="handover">{t('staff.handoverTo')}</Label>
+            <Select 
+              value={handoverStaffId} 
+              onValueChange={setHandoverStaffId}
+            >
+              <SelectTrigger id="handover">
+                <SelectValue placeholder={t('staff.selectHandover')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">{t('staff.noHandover')}</SelectItem>
+                {availableStaff.map((staff) => (
+                  <SelectItem key={staff.id} value={staff.id}>
+                    {staff.first_name} {staff.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              {t('staff.handoverExplanation')}
+            </p>
+          </div>
+          
+          {handoverStaffId && availableStaff.length > 0 && (
+            <div className="flex items-center p-3 bg-muted/50 rounded-md">
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
+                    <Avatar className="h-10 w-10 mr-3">
+                      <AvatarFallback>
+                        {getInitials(`${
+                          availableStaff.find(s => s.id === handoverStaffId)?.first_name || ''
+                        } ${
+                          availableStaff.find(s => s.id === handoverStaffId)?.last_name || ''
+                        }`)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="flex justify-between space-x-4">
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-semibold">
+                        {availableStaff.find(s => s.id === handoverStaffId)?.first_name}{' '}
+                        {availableStaff.find(s => s.id === handoverStaffId)?.last_name}
+                      </h4>
+                      <div className="flex items-center pt-2">
+                        <Clock className="h-4 w-4 opacity-70 mr-1" />
+                        <span className="text-xs text-muted-foreground">
+                          {t('staff.currentlyActive')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+              <div>
+                <p className="text-sm font-medium">
+                  {availableStaff.find(s => s.id === handoverStaffId)?.first_name}{' '}
+                  {availableStaff.find(s => s.id === handoverStaffId)?.last_name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('staff.willReceiveHandover')}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleTakeBreak} 
+            disabled={isSubmitting}
+            className="gap-2"
+          >
+            <Clock className="h-4 w-4" />
+            {t('staff.startBreak', { duration: getDuration() })}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default StaffBreakDialog;

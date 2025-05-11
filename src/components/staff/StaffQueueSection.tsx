@@ -1,129 +1,90 @@
-
-import React from 'react';
-import { useQueue } from '@/context/QueueContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Play, Pause, Calendar } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueue } from '@/context/QueueContext';
+import { useAuth } from '@/context/AuthContext';
+import QueueSchedulingDialog from './QueueSchedulingDialog';
+
+interface StaffQueueSectionProps {
+  
+}
 
 const StaffQueueSection: React.FC = () => {
-  const { customers, stats, callNextCustomer, markAsServed, markAsNoShow, currentCustomer } = useQueue();
+  const { toast } = useToast();
   const { t } = useTranslation();
+  const { queueStatus, setQueueStatus, locationId } = useQueue();
+  const { user } = useAuth();
+  const [showSchedulingDialog, setShowSchedulingDialog] = useState(false);
+  
+  const handleQueueStatusChange = async (newStatus: 'open' | 'closed') => {
+    // Optimistically update the UI
+    setQueueStatus(newStatus);
+    
+    toast({
+      title: t('staff.queueStatusUpdated'),
+      description: t('staff.queueIsNow', { status: t(`staff.queue${newStatus === 'open' ? 'Open' : 'Closed'}`) })
+    });
+  };
   
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t('queue.total')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalCustomers}</div>
-          </CardContent>
-        </Card>
+    <div className="bg-white rounded-lg border p-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-lg font-medium mb-1">{t('staff.queueStatus')}</h2>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className={`h-2 w-2 rounded-full ${
+              queueStatus === 'open' ? 'bg-green-500' : 'bg-red-500'
+            }`}></div>
+            {queueStatus === 'open' ? t('staff.queueOpen') : t('staff.queueClosed')}
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t('queue.waiting')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.waitingCustomers}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t('queue.served')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.servedCustomers}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t('queue.noShows')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.noShowCustomers}</div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-wrap gap-3">
+          {queueStatus !== 'open' && (
+            <Button 
+              variant="default" 
+              size="sm"
+              onClick={() => handleQueueStatusChange('open')}
+            >
+              <Play className="mr-2 h-4 w-4" />
+              {t('staff.openQueue')}
+            </Button>
+          )}
+          
+          {queueStatus !== 'closed' && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => handleQueueStatusChange('closed')}
+            >
+              <Pause className="mr-2 h-4 w-4" />
+              {t('staff.closeQueue')}
+            </Button>
+          )}
+          
+          {/* Add Advanced Scheduling Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowSchedulingDialog(true)}
+          >
+            <Calendar className="mr-2 h-4 w-4" />
+            {t('schedule.advancedScheduling')}
+          </Button>
+        </div>
       </div>
       
-      {currentCustomer && (
-        <Card className="mb-6 border-green-500 bg-green-50">
-          <CardHeader>
-            <CardTitle>{t('staff.nowServing')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <div>
-                <h3 className="text-xl font-bold">{currentCustomer.name}</h3>
-                <p className="text-sm text-gray-600">{t('queue.service')}: {currentCustomer.serviceId || 'N/A'}</p>
-                <p className="text-sm text-gray-600">
-                  {t('queue.waitTime')}: {Math.floor(
-                    (new Date().getTime() - new Date(currentCustomer.joinedAt).getTime()) / 60000
-                  )} {t('queue.minutes')}
-                </p>
-              </div>
-              
-              <div className="flex space-x-2 mt-4 sm:mt-0">
-                <Button onClick={markAsServed}>{t('queue.markAsServed')}</Button>
-                <Button variant="outline" onClick={markAsNoShow}>{t('queue.markAsNoShow')}</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Queue Scheduling Dialog */}
+      {user && locationId && (
+        <QueueSchedulingDialog
+          open={showSchedulingDialog}
+          onOpenChange={setShowSchedulingDialog}
+          locationId={locationId}
+          userId={user.id}
+        />
       )}
-      
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">{t('queue.queueManagement')}</h2>
-        <Button onClick={callNextCustomer}>{t('queue.callNext')}</Button>
-      </div>
-      
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('queue.name')}</TableHead>
-                <TableHead>{t('queue.service')}</TableHead>
-                <TableHead>{t('queue.status')}</TableHead>
-                <TableHead>{t('queue.waitTime')}</TableHead>
-                <TableHead>{t('queue.priority')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {customers.length > 0 ? (
-                customers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell className="font-medium">{customer.name}</TableCell>
-                    <TableCell>{customer.serviceId || 'N/A'}</TableCell>
-                    <TableCell>{t(`queue.status.${customer.status}`)}</TableCell>
-                    <TableCell>
-                      {Math.floor(
-                        (new Date().getTime() - new Date(customer.joinedAt).getTime()) / 60000
-                      )}{' '}
-                      {t('queue.minutes')}
-                    </TableCell>
-                    <TableCell>
-                      <span className={customer.priority === 'priority' ? 'text-red-500 font-bold' : ''}>
-                        {t(`queue.priority.${customer.priority}`)}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    {t('queue.empty')}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 };
