@@ -47,6 +47,53 @@
     "sendReminder": "Reminder",
     "statusUpdated": "Appointment status updated",
     "statusUpdateError": "Failed to update appointment status",
-    "reasonForVisit": "Reason for visit"
+    "reasonForVisit": "Reason for visit",
+    "customer": "Customer"
+  },
+  "queue": {
+    "title": "Queue Management",
+    "position": "Your position in queue",
+    "estimatedWait": "Estimated wait time",
+    "minutes": "minutes",
+    "joinQueue": "Join Queue",
+    "leaveQueue": "Leave Queue",
+    "currentlyServing": "Currently Serving",
+    "waitingCustomers": "Waiting Customers",
+    "callNext": "Call Next",
+    "addToQueue": "Add to Queue",
+    "checkIn": "Check In",
+    "manageQueue": "Manage Queue",
+    "queueClosed": "Queue is currently closed",
+    "pauseQueue": "Pause Queue",
+    "resumeQueue": "Resume Queue",
+    "emptyQueue": "No customers in the queue",
+    "serviceTime": "Average service time",
+    "totalWaiting": "Total customers waiting"
+  },
+  "staff": {
+    "dashboard": "Staff Dashboard",
+    "managementDescription": "Manage appointments and the customer queue",
+    "queueManagement": "Queue",
+    "appointments": "Appointments",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "activeAppointments": "Active Appointments",
+    "settingsDescription": "Configure your preferences and notification settings",
+    "schedule": "My Schedule",
+    "status": {
+      "available": "Available",
+      "busy": "Busy",
+      "break": "On Break",
+      "offline": "Offline"
+    },
+    "setStatus": "Update Status",
+    "statusUpdated": "Your status has been updated",
+    "viewHistory": "View Customer History",
+    "blackoutPeriod": {
+      "enable": "Enable Blackout Period",
+      "disable": "Disable Blackout Period",
+      "active": "Blackout Period Active",
+      "description": "Stop accepting new appointments until backlog clears"
+    }
   }
 }

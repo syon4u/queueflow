@@ -47,6 +47,53 @@
     "sendReminder": "Recordatorio",
     "statusUpdated": "Estado de la cita actualizado",
     "statusUpdateError": "Error al actualizar el estado de la cita",
-    "reasonForVisit": "Motivo de la visita"
+    "reasonForVisit": "Motivo de la visita",
+    "customer": "Cliente"
+  },
+  "queue": {
+    "title": "Gestión de Cola",
+    "position": "Tu posición en la cola",
+    "estimatedWait": "Tiempo de espera estimado",
+    "minutes": "minutos",
+    "joinQueue": "Unirse a la Cola",
+    "leaveQueue": "Salir de la Cola",
+    "currentlyServing": "Atendiendo Actualmente",
+    "waitingCustomers": "Clientes en Espera",
+    "callNext": "Llamar Siguiente",
+    "addToQueue": "Añadir a la Cola",
+    "checkIn": "Registrarse",
+    "manageQueue": "Administrar Cola",
+    "queueClosed": "La cola está cerrada actualmente",
+    "pauseQueue": "Pausar Cola",
+    "resumeQueue": "Reanudar Cola",
+    "emptyQueue": "No hay clientes en la cola",
+    "serviceTime": "Tiempo promedio de servicio",
+    "totalWaiting": "Total de clientes en espera"
+  },
+  "staff": {
+    "dashboard": "Panel de Personal",
+    "managementDescription": "Administrar citas y la cola de clientes",
+    "queueManagement": "Cola",
+    "appointments": "Citas",
+    "statistics": "Estadísticas",
+    "settings": "Configuración",
+    "activeAppointments": "Citas Activas",
+    "settingsDescription": "Configura tus preferencias y ajustes de notificaciones",
+    "schedule": "Mi Horario",
+    "status": {
+      "available": "Disponible",
+      "busy": "Ocupado",
+      "break": "En Descanso",
+      "offline": "Desconectado"
+    },
+    "setStatus": "Actualizar Estado",
+    "statusUpdated": "Tu estado ha sido actualizado",
+    "viewHistory": "Ver Historial del Cliente",
+    "blackoutPeriod": {
+      "enable": "Habilitar Período de Bloqueo",
+      "disable": "Deshabilitar Período de Bloqueo",
+      "active": "Período de Bloqueo Activo",
+      "description": "Dejar de aceptar nuevas citas hasta resolver la acumulación"
+    }
   }
 }

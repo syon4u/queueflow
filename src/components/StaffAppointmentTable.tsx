@@ -159,6 +159,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
                     <Bell className="h-4 w-4" />
                   </Button>
                   <CustomerHistoryModal 
+                    customerId={appointment.customer_id}
                     trigger={
                       <Button
                         size="sm"
