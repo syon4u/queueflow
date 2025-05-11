@@ -1,0 +1,26 @@
+
+{
+  "app": {
+    "name": "QueueFlow",
+    "tagline": "Sistema de Gestión de Colas"
+  },
+  "auth": {
+    "login": "Inicia sesión en tu cuenta",
+    "continueWith": "Continuar con Google",
+    "googleButton": "Continuar con Google",
+    "loginFailed": "Autenticación fallida",
+    "loginFailedDesc": "No se pudo iniciar sesión con Google. Inténtalo de nuevo."
+  },
+  "common": {
+    "backToHome": "Volver al inicio",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "yes": "Sí",
+    "no": "No"
+  }
+}
