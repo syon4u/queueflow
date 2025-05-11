@@ -29,7 +29,7 @@ const AdminPage = () => {
             <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
           </div>
           <div className="text-sm text-muted-foreground">
-            Logged in as: {user?.email} (Role: {role})
+            Logged in as: {user?.email} (Role: {role || 'admin'})
           </div>
         </div>
 
