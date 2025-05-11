@@ -12,45 +12,59 @@ const QueueStats: React.FC = () => {
     {
       label: 'Waiting',
       value: stats.waitingCustomers,
-      icon: <Users className="h-4 w-4 text-blue-500" />,
+      icon: <Users className="h-5 w-5 text-blue-500" aria-hidden="true" />,
       color: 'text-blue-700',
       bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      ariaLabel: `${stats.waitingCustomers} customers waiting`
     },
     {
       label: 'Average Wait',
       value: formatWaitTime(stats.averageWaitTime),
-      icon: <Clock className="h-4 w-4 text-yellow-500" />,
-      color: 'text-yellow-700',
-      bgColor: 'bg-yellow-50',
+      icon: <Clock className="h-5 w-5 text-amber-500" aria-hidden="true" />,
+      color: 'text-amber-700',
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200',
+      ariaLabel: `Average wait time is ${formatWaitTime(stats.averageWaitTime)}`
     },
     {
       label: 'Served',
       value: stats.servedCustomers,
-      icon: <CheckCircle className="h-4 w-4 text-green-500" />,
-      color: 'text-green-700',
-      bgColor: 'bg-green-50',
+      icon: <CheckCircle className="h-5 w-5 text-emerald-500" aria-hidden="true" />,
+      color: 'text-emerald-700',
+      bgColor: 'bg-emerald-50',
+      borderColor: 'border-emerald-200',
+      ariaLabel: `${stats.servedCustomers} customers served`
     },
     {
       label: 'No-Shows',
       value: stats.noShowCustomers,
-      icon: <XCircle className="h-4 w-4 text-red-500" />,
-      color: 'text-red-700', 
-      bgColor: 'bg-red-50',
+      icon: <XCircle className="h-5 w-5 text-rose-500" aria-hidden="true" />,
+      color: 'text-rose-700', 
+      bgColor: 'bg-rose-50',
+      borderColor: 'border-rose-200',
+      ariaLabel: `${stats.noShowCustomers} no-show customers`
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
       {statItems.map((item, index) => (
-        <Card key={index} className={`border-l-4 border-l-primary ${item.bgColor}`}>
+        <Card 
+          key={index} 
+          className={`border-l-4 transition-all hover:translate-y-[-2px] ${item.borderColor} ${item.bgColor} shadow-sm`}
+        >
           <CardContent className="p-4 flex justify-between items-center">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">{item.label}</p>
-              <p className={`text-2xl font-semibold ${item.color}`}>
+              <p className="text-sm font-medium text-muted-foreground mb-1">{item.label}</p>
+              <p 
+                className={`text-2xl font-semibold ${item.color}`}
+                aria-label={item.ariaLabel}
+              >
                 {typeof item.value === 'number' ? item.value : item.value}
               </p>
             </div>
-            <div className="bg-background rounded-full p-3">{item.icon}</div>
+            <div className="bg-white rounded-full p-3 shadow-sm">{item.icon}</div>
           </CardContent>
         </Card>
       ))}
