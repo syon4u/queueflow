@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export type Customer = {
   id: string;
@@ -47,6 +48,49 @@ export const useQueue = (): QueueContextType => {
 export const QueueProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
+  
+  // Subscribe to real-time updates for appointment status changes
+  useEffect(() => {
+    // Set up real-time subscription to queue updates
+    const channel = supabase
+      .channel('queue-updates')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'appointments' 
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          // Handle different types of updates
+          if (payload.eventType === 'INSERT') {
+            toast.info('New customer added to the queue');
+          } else if (payload.eventType === 'UPDATE') {
+            const newData = payload.new;
+            
+            // Show different toast messages depending on status change
+            if (newData.status === 'completed') {
+              toast.success('Customer has been served');
+            } else if (newData.status === 'no_show') {
+              toast.warning('Customer marked as no-show');
+            } else if (newData.status === 'serving') {
+              toast.info('Now serving customer');
+            }
+          }
+          
+          // Note: In a real implementation, you would update your state based on these changes
+          // This demo just shows toasts, but you could fetch updated data or apply updates directly
+        }
+      )
+      .subscribe();
+    
+    // Cleanup subscription when component unmounts
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   
   // Calculate and update stats
   const stats: QueueStats = React.useMemo(() => {

@@ -6,6 +6,7 @@ import QueueStats from '@/components/QueueStats';
 import CustomerQueue from '@/components/CustomerQueue';
 import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
+import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 
 const Index = () => {
   return (
@@ -17,7 +18,10 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="order-2 lg:order-1 lg:col-span-2">
-              <CustomerQueue />
+              <div className="space-y-6">
+                <CustomerQueue />
+                <EstimatedWaitTimes />
+              </div>
             </div>
             
             <div className="space-y-6 order-1 lg:order-2">
