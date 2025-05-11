@@ -14,7 +14,6 @@ import { SystemSettingsTab } from '@/components/admin/SystemSettingsTab';
 import { DashboardTab } from '@/components/admin/DashboardTab';
 import { QueueProvider } from '@/context/QueueContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Users, Settings, Database, ChartBar, Calendar, Home } from 'lucide-react';
 
 const AdminPage = () => {
   const { user, role } = useAuth();
@@ -23,48 +22,26 @@ const AdminPage = () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="bg-primary/10 p-2 rounded-md mr-3">
-              <ChartBar className="h-5 w-5 text-primary" />
-            </div>
-            <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <Button asChild variant="outline" size="sm">
-              <Link to="/"><Home className="h-4 w-4 mr-1" /> Home</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/customer">Customer</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/staff">Staff</Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/admin">Admin</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <div className="container mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">System Administration</h1>
-          <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Logged in as: {user?.email} (Role: {role || 'admin'})
+          </div>
         </div>
 
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} value={activeTab} className="w-full">
-          <TabsList className="mb-6">
+          <TabsList className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-7'} mb-6`}>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="users">Users & Roles</TabsTrigger>
+            <TabsTrigger value="staff">Staff</TabsTrigger>
             <TabsTrigger value="locations">Locations</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="queue">Queue Management</TabsTrigger>
-            <TabsTrigger value="reports">Reports & Analytics</TabsTrigger>
-            <TabsTrigger value="settings">System Settings</TabsTrigger>
+            <TabsTrigger value="queue">Queue</TabsTrigger>
+            <TabsTrigger value="stats">Analytics</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
           <Card>
@@ -72,7 +49,7 @@ const AdminPage = () => {
               <TabsContent value="dashboard">
                 <DashboardTab />
               </TabsContent>
-              <TabsContent value="users">
+              <TabsContent value="staff">
                 <StaffTab />
               </TabsContent>
               <TabsContent value="locations">
@@ -86,7 +63,7 @@ const AdminPage = () => {
                   <QueueManagementTab />
                 </QueueProvider>
               </TabsContent>
-              <TabsContent value="reports">
+              <TabsContent value="stats">
                 <StatsTab />
               </TabsContent>
               <TabsContent value="settings">
@@ -95,6 +72,15 @@ const AdminPage = () => {
             </CardContent>
           </Card>
         </Tabs>
+        
+        <div className="flex space-x-4 mt-6">
+          <Button asChild variant="outline">
+            <Link to="/">Back to Home</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/staff">Staff Dashboard</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );
