@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
@@ -100,7 +99,8 @@ export const QueueProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           if (locationError) throw locationError;
           
           if (locationData) {
-            setQueueStatus(locationData.queue_status || 'closed');
+            // Fix here: Add type assertion or optional chaining
+            setQueueStatus(locationData.queue_status as string || 'closed');
           }
         }
       } catch (error) {
@@ -114,8 +114,12 @@ export const QueueProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const queueSubscription = supabase
       .channel('queue')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'locations' }, payload => {
-        if (payload.new && payload.new.queue_status) {
-          setQueueStatus(payload.new.queue_status);
+        if (payload.new) {
+          // Fix here: Add type assertion
+          const newData = payload.new as { queue_status?: string };
+          if (newData.queue_status) {
+            setQueueStatus(newData.queue_status);
+          }
         }
       })
       .subscribe();
