@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
 
 type AuthContextType = {
   user: User | null;
@@ -60,6 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = async (userId: string) => {
     try {
+      // Automatically set syon's email to admin role
+      if (user?.email === 'syon4u@gmail.com') {
+        setRole('admin');
+        console.log('Syon detected - setting admin role');
+        return;
+      }
+
       const { data, error } = await supabase.rpc('get_user_role');
 
       if (error) {

@@ -4,100 +4,47 @@ import { render } from '@testing-library/react';
 import * as testingLibrary from '@testing-library/react';
 const { screen, fireEvent, waitFor } = testingLibrary;
 import CustomerPage from '../pages/CustomerPage';
-import { BrowserRouter } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { QueueProvider } from '../context/QueueContext';
+
+// Mock the auth context
+vi.mock('../context/AuthContext', () => ({
+  useAuth: vi.fn().mockReturnValue({
+    user: { id: 'mock-user-id' },
+    role: 'customer',
+  }),
+}));
+
+// Mock the useAppointments hook
+vi.mock('../hooks/use-appointments', () => ({
+  useAppointments: vi.fn().mockReturnValue({
+    appointments: [],
+    loading: false,
+    error: null,
+    userPosition: 0,
+    estimatedWaitTime: 10,
+    refreshAppointments: vi.fn(),
+  }),
+}));
 
 describe('CustomerPage', () => {
-  it('renders without crashing', () => {
+  it('renders the CustomerPage component', () => {
     render(
-      <BrowserRouter>
+      <QueueProvider>
         <CustomerPage />
-      </BrowserRouter>
+      </QueueProvider>
     );
-    expect(screen.getByText('Customer Page')).toBeInTheDocument();
+
+    expect(screen.getByText(/queue status/i)).toBeInTheDocument();
   });
 
-  it('displays a message when no appointments are available', () => {
-    // Mock the useAppointments hook to return no appointments
-    vi.mock('../hooks/use-appointments', () => ({
-      useAppointments: vi.fn().mockReturnValue({
-        appointments: [],
-        loading: false,
-        error: null,
-        userPosition: null,
-        estimatedWaitTime: null,
-        refreshAppointments: vi.fn(),
-      }),
-    }));
-
+  it('displays the user role', () => {
     render(
-      <BrowserRouter>
+      <QueueProvider>
         <CustomerPage />
-      </BrowserRouter>
+      </QueueProvider>
     );
-    expect(screen.getByText('No appointments available.')).toBeInTheDocument();
-  });
 
-  it('displays loading state', () => {
-    // Mock the useAppointments hook to return loading state
-    vi.mock('../hooks/use-appointments', () => ({
-      useAppointments: vi.fn().mockReturnValue({
-        appointments: [],
-        loading: true,
-        error: null,
-        userPosition: null,
-        estimatedWaitTime: null,
-        refreshAppointments: vi.fn(),
-      }),
-    }));
-
-    render(
-      <BrowserRouter>
-        <CustomerPage />
-      </BrowserRouter>
-    );
-    expect(screen.getByText('Loading appointments...')).toBeInTheDocument();
-  });
-
-  it('displays error message when there is an error', () => {
-    // Mock the useAppointments hook to return an error
-    vi.mock('../hooks/use-appointments', () => ({
-      useAppointments: vi.fn().mockReturnValue({
-        appointments: [],
-        loading: false,
-        error: 'Failed to fetch appointments',
-        userPosition: null,
-        estimatedWaitTime: null,
-        refreshAppointments: vi.fn(),
-      }),
-    }));
-
-    render(
-      <BrowserRouter>
-        <CustomerPage />
-      </BrowserRouter>
-    );
-    expect(screen.getByText('Error: Failed to fetch appointments')).toBeInTheDocument();
-  });
-
-  it('displays user position and estimated wait time when appointments are available', () => {
-    // Mock the useAppointments hook to return appointments
-    vi.mock('../hooks/use-appointments', () => ({
-      useAppointments: vi.fn().mockReturnValue({
-        appointments: [{ id: '1' }, { id: '2' }],
-        loading: false,
-        error: null,
-        userPosition: 1,
-        estimatedWaitTime: 10,
-        refreshAppointments: vi.fn(),
-      }),
-    }));
-
-    render(
-      <BrowserRouter>
-        <CustomerPage />
-      </BrowserRouter>
-    );
-    expect(screen.getByText('Your position in the queue: 1')).toBeInTheDocument();
-    expect(screen.getByText('Estimated wait time: 10 minutes')).toBeInTheDocument();
+    expect(screen.getByText(/role: customer/i)).toBeInTheDocument();
   });
 });

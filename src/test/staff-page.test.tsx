@@ -32,8 +32,8 @@ vi.mock('../hooks/use-appointments', () => ({
 
 describe('StaffPage', () => {
   it('renders the StaffPage component', () => {
-    // Create a mock provider to pass to the component
-    const Provider = QueueContext.QueueProvider;
+    // Create a mock component using QueueContext
+    const { QueueProvider } = QueueContext;
     
     const contextValue = {
       appointments: [
@@ -49,17 +49,17 @@ describe('StaffPage', () => {
     };
 
     render(
-      <Provider value={contextValue}>
+      <QueueProvider>
         <StaffPage />
-      </Provider>
+      </QueueProvider>
     );
 
     expect(screen.getByText('Staff Page')).toBeInTheDocument();
   });
 
   it('displays appointments', () => {
-    // Create a mock provider to pass to the component
-    const Provider = QueueContext.QueueProvider;
+    // Create a mock component using QueueContext
+    const { QueueProvider } = QueueContext;
     
     const contextValue = {
       appointments: [
@@ -75,9 +75,9 @@ describe('StaffPage', () => {
     };
 
     render(
-      <Provider value={contextValue}>
+      <QueueProvider>
         <StaffPage />
-      </Provider>
+      </QueueProvider>
     );
 
     expect(screen.getByText('appt1')).toBeInTheDocument();
