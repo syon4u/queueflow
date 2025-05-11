@@ -13,11 +13,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
   const { user, isLoading, role } = useAuth();
   const location = useLocation();
 
-  // Debug logging
+  // Enhanced debug logging
   useEffect(() => {
     console.log("Protected Route - Current user:", user?.email);
     console.log("Protected Route - Current role:", role);
     console.log("Protected Route - Required roles:", requiredRoles);
+    
+    // Additional debugging for role check
+    if (requiredRoles && requiredRoles.length > 0) {
+      const hasRequiredRole = requiredRoles.includes(role || '');
+      console.log("User has required role:", hasRequiredRole);
+    }
   }, [user, role, requiredRoles]);
 
   if (isLoading) {
@@ -28,6 +34,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
 
   // Not logged in - redirect to login
   if (!user) {
+    toast({
+      title: "Authentication required",
+      description: "Please log in to access this page",
+      variant: "destructive",
+    });
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -37,6 +48,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     const hasRequiredRole = requiredRoles.includes(role || '');
     
     if (!hasRequiredRole) {
+      toast({
+        title: "Access Denied",
+        description: `Your role (${role || 'customer'}) doesn't have permission to access this page`,
+        variant: "destructive",
+      });
       return <Navigate to="/unauthorized" state={{ from: location }} replace />;
     }
   }
