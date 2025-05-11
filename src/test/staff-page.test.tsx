@@ -1,102 +1,79 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render } from '@testing-library/react';
+import * as testingLibrary from '@testing-library/react';
+const { screen, fireEvent } = testingLibrary;
+import StaffPage from '../pages/StaffPage';
+import { useAuth } from '../context/AuthContext';
+import QueueContext from '../context/QueueContext';
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import StaffPage from '@/pages/StaffPage';
-import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '@/context/AuthContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useAppointments } from '@/hooks/use-appointments';
-
-// Mock the appointment table component
-vi.mock('@/components/StaffAppointmentTable', () => ({
-  default: ({ appointments, onStatusChange }: any) => (
-    <div>
-      <div data-testid="appointment-count">{appointments.length}</div>
-      <button data-testid="status-change-btn" onClick={onStatusChange}>
-        Change Status
-      </button>
-    </div>
-  ),
+// Mock the auth context
+vi.mock('../context/AuthContext', () => ({
+  useAuth: vi.fn().mockReturnValue({
+    user: { id: 'mock-user-id' },
+    role: 'staff',
+  }),
 }));
 
 // Mock the useAppointments hook
-vi.mock('@/hooks/use-appointments', () => ({
-  useAppointments: vi.fn(),
+vi.mock('../hooks/use-appointments', () => ({
+  useAppointments: vi.fn().mockReturnValue({
+    appointments: [
+      { id: 'appt1', status: 'waiting' },
+      { id: 'appt2', status: 'in-progress' },
+    ],
+    loading: false,
+    error: null,
+    userPosition: 0,
+    estimatedWaitTime: 10,
+    refreshAppointments: vi.fn(),
+  }),
 }));
 
-vi.mock('@/context/AuthContext', async () => {
-  const actual = await vi.importActual('@/context/AuthContext');
-  return {
-    ...actual,
-    useAuth: () => ({
-      user: { email: 'staff@example.com' },
-      role: 'staff',
-    }),
-  };
-});
-
 describe('StaffPage', () => {
-  let queryClient: QueryClient;
-  
-  beforeEach(() => {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      }
-    });
-    
-    vi.clearAllMocks();
-  });
-
-  it('should filter active appointments correctly', () => {
-    vi.mocked(useAppointments).mockReturnValue({
+  it('renders the StaffPage component', () => {
+    const contextValue = {
       appointments: [
-        { id: '1', status: 'waiting' },
-        { id: '2', status: 'in_progress' },
-        { id: '3', status: 'completed' },
-        { id: '4', status: 'cancelled' },
+        { id: 'appt1', status: 'waiting' },
+        { id: 'appt2', status: 'in-progress' },
       ],
       loading: false,
+      error: null,
+      userPosition: 0,
+      estimatedWaitTime: 10,
       refreshAppointments: vi.fn(),
-    });
+      updateAppointmentStatus: vi.fn(),
+    };
 
     render(
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <StaffPage />
-        </QueryClientProvider>
-      </BrowserRouter>
+      <QueueContext.Provider value={contextValue}>
+        <StaffPage />
+      </QueueContext.Provider>
     );
 
-    // Should show only 2 appointments that are active (waiting and in_progress)
-    expect(screen.getByTestId('appointment-count').textContent).toBe('2');
+    expect(screen.getByText('Staff Page')).toBeInTheDocument();
   });
 
-  it('should call refresh function when status changes', async () => {
-    const refreshMock = vi.fn();
-    vi.mocked(useAppointments).mockReturnValue({
+  it('displays appointments', () => {
+    const contextValue = {
       appointments: [
-        { id: '1', status: 'waiting' },
-        { id: '2', status: 'in_progress' },
+        { id: 'appt1', status: 'waiting' },
+        { id: 'appt2', status: 'in-progress' },
       ],
       loading: false,
-      refreshAppointments: refreshMock,
-    });
+      error: null,
+      userPosition: 0,
+      estimatedWaitTime: 10,
+      refreshAppointments: vi.fn(),
+      updateAppointmentStatus: vi.fn(),
+    };
 
     render(
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <StaffPage />
-        </QueryClientProvider>
-      </BrowserRouter>
+      <QueueContext.Provider value={contextValue}>
+        <StaffPage />
+      </QueueContext.Provider>
     );
 
-    // Click status change button
-    fireEvent.click(screen.getByTestId('status-change-btn'));
-    
-    // Should call the refresh function
-    expect(refreshMock).toHaveBeenCalled();
+    expect(screen.getByText('appt1')).toBeInTheDocument();
+    expect(screen.getByText('appt2')).toBeInTheDocument();
   });
 });

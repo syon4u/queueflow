@@ -1,6 +1,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import * as testingLibrary from '@testing-library/react';
+const { screen, waitFor } = testingLibrary;
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
