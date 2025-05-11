@@ -1,18 +1,24 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import StaffHeader from '@/components/staff/StaffHeader';
+import StaffShortcuts from '@/components/staff/StaffShortcuts';
 import { useTranslation } from 'react-i18next';
 
 const PerformanceReportPage: React.FC = () => {
   const { user, role } = useAuth();
   const { t } = useTranslation();
+  const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
   
   // Check if user has appropriate role to view performance metrics
   const hasAccess = role === 'admin' || role === 'staff';
+
+  const toggleShortcutsDialog = () => {
+    setShowShortcutsDialog(prev => !prev);
+  };
 
   if (!hasAccess) {
     return (
@@ -29,7 +35,11 @@ const PerformanceReportPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <StaffHeader user={user} role={role} />
+      <StaffHeader 
+        user={user} 
+        role={role} 
+        onToggleShortcuts={toggleShortcutsDialog} 
+      />
       
       <main className="container mx-auto px-4 py-6">
         <div className="mb-6">
@@ -57,6 +67,12 @@ const PerformanceReportPage: React.FC = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Keyboard shortcuts dialog */}
+      <StaffShortcuts 
+        open={showShortcutsDialog} 
+        onClose={() => setShowShortcutsDialog(false)} 
+      />
     </div>
   );
 };

@@ -125,6 +125,17 @@
     "title": "Perfil"
   },
   "performance": {
-    "reports": "Informes de Rendimiento"
+    "dashboardTitle": "Panel de Rendimiento",
+    "dashboardDescription": "Ver métricas de rendimiento e informes",
+    "reports": "Informes de Rendimiento",
+    "staffPerformance": "Rendimiento del Personal",
+    "serviceMetrics": "Métricas de Servicios",
+    "locationMetrics": "Métricas de Ubicaciones",
+    "exportReport": "Exportar Informe",
+    "comingSoon": "Esta función estará disponible pronto"
+  },
+  "unauthorized": {
+    "title": "Acceso No Autorizado",
+    "description": "No tienes permisos para ver esta página"
   }
 }

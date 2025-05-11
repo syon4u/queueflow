@@ -125,6 +125,17 @@
     "title": "Profile"
   },
   "performance": {
-    "reports": "Performance Reports"
+    "dashboardTitle": "Performance Dashboard",
+    "dashboardDescription": "View performance metrics and reports",
+    "reports": "Performance Reports",
+    "staffPerformance": "Staff Performance",
+    "serviceMetrics": "Service Metrics",
+    "locationMetrics": "Location Metrics",
+    "exportReport": "Export Report",
+    "comingSoon": "This feature is coming soon"
+  },
+  "unauthorized": {
+    "title": "Unauthorized Access",
+    "description": "You do not have permission to view this page"
   }
 }

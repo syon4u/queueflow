@@ -5,7 +5,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Dialog,
@@ -44,20 +43,12 @@ const BlackoutPeriodControl: React.FC<BlackoutPeriodControlProps> = ({ locationI
   
   const checkBlackoutStatus = async (locationId: string) => {
     try {
-      // First check if these columns exist in the locations table
-      const { data: locationsData, error: columnsError } = await supabase
-        .from('locations')
-        .select('id')
-        .limit(1);
-        
-      if (columnsError) {
-        console.error('Error checking locations table:', columnsError);
-        return;
-      }
-      
       // For now, we'll just simulate the blackout status
       // In a real app, these columns would need to be added to the locations table
       // We'll just use local state to simulate the functionality
+      
+      // Log what we're trying to do
+      console.log('Checking blackout status for location:', locationId);
       
       // Simulated data
       // In a real implementation, we would fetch this from the database
@@ -78,6 +69,13 @@ const BlackoutPeriodControl: React.FC<BlackoutPeriodControlProps> = ({ locationI
     try {
       // In a real app, we would update the locations table
       // For now, we'll just simulate the status change with local state
+      
+      // Log the attempted action for debugging
+      console.log('Toggling blackout period:', active ? 'Enable' : 'Disable', 'for location:', locationId);
+      if (active) {
+        console.log('Reason:', reason);
+        console.log('Estimated end time:', estimatedEndTime);
+      }
       
       setIsBlackoutActive(active);
       if (active) {
