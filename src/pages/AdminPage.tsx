@@ -9,41 +9,59 @@ import { LocationsTab } from '@/components/admin/LocationsTab';
 import { ServicesTab } from '@/components/admin/ServicesTab';
 import { StaffTab } from '@/components/admin/StaffTab';
 import { StatsTab } from '@/components/admin/StatsTab';
+import { QueueManagementTab } from '@/components/admin/QueueManagementTab';
+import { SystemSettingsTab } from '@/components/admin/SystemSettingsTab';
+import { DashboardTab } from '@/components/admin/DashboardTab';
 
 const AdminPage = () => {
   const { user, role } = useAuth();
-  const [activeTab, setActiveTab] = useState('locations');
+  const [activeTab, setActiveTab] = useState('dashboard');
   
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 bg-background">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
+        </div>
         <div className="text-sm text-muted-foreground">
           Logged in as: {user?.email} (Role: {role})
         </div>
       </div>
 
-      <Tabs defaultValue="locations" onValueChange={setActiveTab} value={activeTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-6">
+      <Tabs defaultValue="dashboard" onValueChange={setActiveTab} value={activeTab} className="w-full">
+        <TabsList className="grid grid-cols-7 mb-6">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="staff">Staff</TabsTrigger>
           <TabsTrigger value="locations">Locations</TabsTrigger>
           <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="staff">Staff</TabsTrigger>
-          <TabsTrigger value="stats">Statistics</TabsTrigger>
+          <TabsTrigger value="queue">Queue</TabsTrigger>
+          <TabsTrigger value="stats">Analytics</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
         
         <Card>
           <CardContent className="p-6">
+            <TabsContent value="dashboard">
+              <DashboardTab />
+            </TabsContent>
+            <TabsContent value="staff">
+              <StaffTab />
+            </TabsContent>
             <TabsContent value="locations">
               <LocationsTab />
             </TabsContent>
             <TabsContent value="services">
               <ServicesTab />
             </TabsContent>
-            <TabsContent value="staff">
-              <StaffTab />
+            <TabsContent value="queue">
+              <QueueManagementTab />
             </TabsContent>
             <TabsContent value="stats">
               <StatsTab />
+            </TabsContent>
+            <TabsContent value="settings">
+              <SystemSettingsTab />
             </TabsContent>
           </CardContent>
         </Card>
