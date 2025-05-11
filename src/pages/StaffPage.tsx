@@ -14,6 +14,12 @@ import StaffStatusSection from '@/components/staff/StaffStatusSection';
 import StaffQueueSection from '@/components/staff/StaffQueueSection';
 import StaffShortcuts from '@/components/staff/StaffShortcuts';
 import { QueueProvider } from '@/context/QueueContext';
+import QueueHeader from '@/components/QueueHeader';
+import QueueStats from '@/components/QueueStats';
+import CustomerQueue from '@/components/CustomerQueue';
+import QueueControls from '@/components/QueueControls';
+import AddCustomerForm from '@/components/AddCustomerForm';
+import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -64,12 +70,26 @@ const StaffPage = () => {
             <CardContent className="p-6">
               <TabsContent value="queue">
                 <QueueProvider>
-                  <StaffQueueSection />
+                  <div className="space-y-6">
+                    <QueueStats />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      <div className="lg:col-span-2">
+                        <div className="space-y-6">
+                          <CustomerQueue />
+                          <EstimatedWaitTimes />
+                        </div>
+                      </div>
+                      <div className="space-y-6">
+                        <QueueControls />
+                        <AddCustomerForm />
+                      </div>
+                    </div>
+                  </div>
                 </QueueProvider>
               </TabsContent>
               
               <TabsContent value="appointments">
-                <div className="bg-white rounded-lg p-6">
+                <div className="bg-white rounded-lg">
                   <h2 className="text-xl font-semibold mb-4">{t('staff.activeAppointments')}</h2>
                   
                   {loading ? (
@@ -86,14 +106,14 @@ const StaffPage = () => {
               </TabsContent>
               
               <TabsContent value="stats">
-                <div className="bg-white rounded-lg p-6">
+                <div className="bg-white rounded-lg">
                   <h2 className="text-xl font-semibold mb-4">{t('staff.statistics')}</h2>
                   <p className="text-gray-600">{t('staff.statisticsDescription')}</p>
                 </div>
               </TabsContent>
               
               <TabsContent value="settings">
-                <div className="bg-white rounded-lg p-6">
+                <div className="bg-white rounded-lg">
                   <h2 className="text-xl font-semibold mb-4">{t('staff.settings')}</h2>
                   <p className="text-gray-600">{t('staff.settingsDescription')}</p>
                 </div>
@@ -103,9 +123,6 @@ const StaffPage = () => {
         </Tabs>
         
         <div className="flex space-x-4 mt-6">
-          <Button asChild>
-            <Link to="/">{t('common.backToHome')}</Link>
-          </Button>
           {role === 'admin' && (
             <Button asChild variant="outline">
               <Link to="/admin">{t('admin.dashboard')}</Link>

@@ -4,11 +4,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { QueueProvider } from "@/context/QueueContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
@@ -41,7 +40,7 @@ const App = () => {
                     path="/"
                     element={
                       <ProtectedRoute>
-                        <Index />
+                        <Navigate to="/staff" replace />
                       </ProtectedRoute>
                     }
                   />
@@ -49,7 +48,7 @@ const App = () => {
                   <Route
                     path="/staff"
                     element={
-                      <ProtectedRoute roles={['staff', 'admin']}>
+                      <ProtectedRoute>
                         <StaffPage />
                       </ProtectedRoute>
                     }
