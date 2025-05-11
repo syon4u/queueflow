@@ -1,10 +1,11 @@
+
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import * as testingLibrary from '@testing-library/react';
 const { screen, fireEvent } = testingLibrary;
 import StaffPage from '../pages/StaffPage';
 import { useAuth } from '../context/AuthContext';
-import QueueContext from '../context/QueueContext';
+import * as QueueContext from '../context/QueueContext';
 
 // Mock the auth context
 vi.mock('../context/AuthContext', () => ({
@@ -45,9 +46,9 @@ describe('StaffPage', () => {
     };
 
     render(
-      <QueueContext.Provider value={contextValue}>
+      <QueueContext.default.Provider value={contextValue}>
         <StaffPage />
-      </QueueContext.Provider>
+      </QueueContext.default.Provider>
     );
 
     expect(screen.getByText('Staff Page')).toBeInTheDocument();
@@ -68,9 +69,9 @@ describe('StaffPage', () => {
     };
 
     render(
-      <QueueContext.Provider value={contextValue}>
+      <QueueContext.default.Provider value={contextValue}>
         <StaffPage />
-      </QueueContext.Provider>
+      </QueueContext.default.Provider>
     );
 
     expect(screen.getByText('appt1')).toBeInTheDocument();
