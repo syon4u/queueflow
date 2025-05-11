@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
@@ -18,6 +19,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import PerformanceReportPage from './pages/PerformanceReportPage';
 
+// Create a new QueryClient instance
+const queryClient = new QueryClient();
+
 function App() {
   const { i18n } = useTranslation();
 
@@ -30,72 +34,74 @@ function App() {
   return (
     <div className="App">
       <Toaster />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route 
-              path="/staff" 
-              element={
-                <ProtectedRoute requiredRoles={['staff', 'admin']}>
-                  <StaffPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/performance" 
-              element={
-                <ProtectedRoute requiredRoles={['staff', 'admin']}>
-                  <PerformanceReportPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requiredRoles={['admin']}>
-                  <AdminPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/customer" 
-              element={
-                <ProtectedRoute requiredRoles={['customer']}>
-                  <CustomerPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/appointments" 
-              element={
-                <ProtectedRoute>
-                  <AppointmentsPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/appointments/new" 
-              element={
-                <ProtectedRoute requiredRoles={['customer']}>
-                  <NewAppointmentPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route 
+                path="/staff" 
+                element={
+                  <ProtectedRoute requiredRoles={['staff', 'admin']}>
+                    <StaffPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/performance" 
+                element={
+                  <ProtectedRoute requiredRoles={['staff', 'admin']}>
+                    <PerformanceReportPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute requiredRoles={['admin']}>
+                    <AdminPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/customer" 
+                element={
+                  <ProtectedRoute requiredRoles={['customer']}>
+                    <CustomerPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/appointments" 
+                element={
+                  <ProtectedRoute>
+                    <AppointmentsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/appointments/new" 
+                element={
+                  <ProtectedRoute requiredRoles={['customer']}>
+                    <NewAppointmentPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
     </div>
   );
 }
