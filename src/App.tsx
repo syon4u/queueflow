@@ -15,6 +15,9 @@ import AuthPage from "./pages/AuthPage";
 import CustomerPage from "./pages/CustomerPage";
 import StaffPage from "./pages/StaffPage";
 import AdminPage from "./pages/AdminPage";
+import ProfilePage from "./pages/ProfilePage";
+import AppointmentsPage from "./pages/AppointmentsPage";
+import NewAppointmentPage from "./pages/NewAppointmentPage";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -54,6 +57,30 @@ const App = () => {
                   element={
                     <ProtectedRoute roles={['admin']}>
                       <AdminPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/appointments"
+                  element={
+                    <ProtectedRoute>
+                      <AppointmentsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/new-appointment"
+                  element={
+                    <ProtectedRoute>
+                      <NewAppointmentPage />
                     </ProtectedRoute>
                   }
                 />

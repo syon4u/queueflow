@@ -1,9 +1,13 @@
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
-import { screen, waitFor } from '@testing-library/react';
+import * as reactTesting from '@testing-library/react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+
+// Extract the needed utilities from the testing library
+const { screen, waitFor } = reactTesting as any;
 
 // Mock component to test the hook
 const AuthConsumer = () => {

@@ -1,10 +1,13 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import { screen, fireEvent } from '@testing-library/react';
+import * as reactTesting from '@testing-library/react';
 import StaffPage from '../pages/StaffPage';
 import { useAuth } from '../context/AuthContext';
 import { QueueProvider } from '../context/QueueContext';
+
+// Extract the needed utilities from the testing library
+const { screen, fireEvent } = reactTesting as any;
 
 // Mock the auth context
 vi.mock('../context/AuthContext', () => ({
