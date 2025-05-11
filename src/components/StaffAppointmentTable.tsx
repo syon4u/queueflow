@@ -63,8 +63,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
       
       const { error } = await supabase.functions.invoke('appointments', {
         method: 'PATCH',
-        body: updateData,
-        path: `/${id}`,
+        body: { ...updateData, id }
       });
 
       if (error) throw error;
