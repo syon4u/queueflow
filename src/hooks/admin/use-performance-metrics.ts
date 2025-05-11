@@ -1,7 +1,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, subDays, subWeeks, subMonths } from 'date-fns';
+import { format, subDays } from 'date-fns';
+import { StaffMetric, ServiceMetric, DailyMetric } from '@/supabase/functions/_shared/queries';
 
 interface MetricsParams {
   startDate: string;
@@ -29,7 +30,7 @@ export const useStaffMetrics = (timeRange: string, locationId?: string) => {
         });
         
         if (error) throw error;
-        return data || [];
+        return data as StaffMetric[] || [];
       } catch (error) {
         console.error('Error fetching staff metrics:', error);
         throw error;
@@ -58,7 +59,7 @@ export const useServiceMetrics = (timeRange: string, locationId?: string) => {
         });
         
         if (error) throw error;
-        return data || [];
+        return data as ServiceMetric[] || [];
       } catch (error) {
         console.error('Error fetching service metrics:', error);
         throw error;
@@ -89,7 +90,7 @@ export const useDailyMetrics = (timeRange: string, locationId?: string) => {
         if (error) throw error;
         
         // Format dates for display
-        return (data || []).map((item: any) => ({
+        return (data as DailyMetric[] || []).map((item: DailyMetric) => ({
           ...item,
           date: format(new Date(item.date), 'MMM dd')
         }));

@@ -7,8 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, Users, CheckCircle, XCircle, ArrowDownToLine } from 'lucide-react';
-import { format, subDays, startOfDay, endOfDay, subWeeks, subMonths } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useStaffMetrics, useServiceMetrics, useDailyMetrics } from '@/hooks/admin/use-performance-metrics';
 
 // Time period options for the report
 const TIME_PERIODS = [
@@ -46,100 +47,10 @@ const StaffPerformanceReport: React.FC = () => {
   const [timeRange, setTimeRange] = useState('week');
   const [staffActiveTab, setStaffActiveTab] = useState('metrics');
   
-  // Get date range based on selected time period
-  const getDateRange = () => {
-    const today = new Date();
-    const selectedPeriod = TIME_PERIODS.find(period => period.value === timeRange);
-    const days = selectedPeriod?.days || 7;
-    
-    let startDate;
-    if (timeRange === 'today') {
-      startDate = startOfDay(today);
-    } else if (timeRange === 'yesterday') {
-      startDate = startOfDay(subDays(today, 1));
-      today.setDate(today.getDate() - 1);
-    } else {
-      startDate = startOfDay(subDays(today, days));
-    }
-    
-    return {
-      start: format(startDate, 'yyyy-MM-dd'),
-      end: format(endOfDay(today), 'yyyy-MM-dd')
-    };
-  };
-
-  // Fetch staff performance metrics
-  const { data: staffMetrics, isLoading: staffLoading } = useQuery({
-    queryKey: ['staff-metrics', timeRange],
-    queryFn: async () => {
-      const { start, end } = getDateRange();
-      
-      try {
-        const { data, error } = await supabase.rpc('get_staff_metrics', {
-          start_date: start,
-          end_date: end
-        });
-        
-        if (error) throw error;
-        return data || [];
-      } catch (error) {
-        console.error('Error fetching staff metrics:', error);
-        toast({
-          title: 'Error fetching data',
-          description: 'Could not load staff metrics. Please try again.',
-          variant: 'destructive',
-        });
-        return [];
-      }
-    }
-  });
-
-  // Fetch service metrics
-  const { data: serviceMetrics, isLoading: serviceLoading } = useQuery({
-    queryKey: ['service-metrics', timeRange],
-    queryFn: async () => {
-      const { start, end } = getDateRange();
-      
-      try {
-        const { data, error } = await supabase.rpc('get_service_metrics', {
-          start_date: start,
-          end_date: end
-        });
-        
-        if (error) throw error;
-        return data || [];
-      } catch (error) {
-        console.error('Error fetching service metrics:', error);
-        return [];
-      }
-    }
-  });
-
-  // Fetch daily metrics for charts
-  const { data: dailyMetrics, isLoading: dailyLoading } = useQuery({
-    queryKey: ['daily-metrics', timeRange],
-    queryFn: async () => {
-      const { start, end } = getDateRange();
-      
-      try {
-        const { data, error } = await supabase.rpc('get_daily_metrics', {
-          start_date: start,
-          end_date: end
-        });
-        
-        if (error) throw error;
-        
-        // Format dates for chart display
-        return (data || []).map((item: any) => ({
-          ...item,
-          date: format(new Date(item.date), 'MMM dd')
-        }));
-      } catch (error) {
-        console.error('Error fetching daily metrics:', error);
-        return [];
-      }
-    }
-  });
+  // Use the custom hooks for performance metrics
+  const { data: staffMetrics, isLoading: staffLoading } = useStaffMetrics(timeRange);
+  const { data: serviceMetrics, isLoading: serviceLoading } = useServiceMetrics(timeRange);
+  const { data: dailyMetrics, isLoading: dailyLoading } = useDailyMetrics(timeRange);
 
   // Download report as CSV
   const downloadReportCSV = () => {
@@ -225,7 +136,7 @@ const StaffPerformanceReport: React.FC = () => {
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
-                  data={dailyMetrics}
+                  data={dailyMetrics || []}
                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
@@ -268,7 +179,7 @@ const StaffPerformanceReport: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {staffMetrics && staffMetrics.length > 0 ? (
+                        {Array.isArray(staffMetrics) && staffMetrics.length > 0 ? (
                           staffMetrics.map((staff: StaffMetric) => (
                             <tr key={staff.staff_id} className="border-b">
                               <td className="py-3 px-4">{staff.staff_name || 'Unknown'}</td>
@@ -290,7 +201,7 @@ const StaffPerformanceReport: React.FC = () => {
                 </TabsContent>
                 
                 <TabsContent value="chart">
-                  {staffMetrics && staffMetrics.length > 0 ? (
+                  {Array.isArray(staffMetrics) && staffMetrics.length > 0 ? (
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart
                         data={staffMetrics}
@@ -333,7 +244,7 @@ const StaffPerformanceReport: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {serviceMetrics && serviceMetrics.length > 0 ? (
+                    {Array.isArray(serviceMetrics) && serviceMetrics.length > 0 ? (
                       serviceMetrics.map((service: ServiceMetric) => (
                         <tr key={service.service_id} className="border-b">
                           <td className="py-3 px-4">{service.service_name || 'Unknown'}</td>
@@ -363,7 +274,7 @@ const StaffPerformanceReport: React.FC = () => {
                   <Users className="h-5 w-5 text-blue-500" />
                 </div>
                 <div className="text-3xl font-bold">
-                  {dailyMetrics ? 
+                  {Array.isArray(dailyMetrics) ? 
                     dailyMetrics.reduce((sum: number, day: any) => sum + day.appointments, 0) 
                     : 0
                   }
@@ -378,7 +289,7 @@ const StaffPerformanceReport: React.FC = () => {
                   <Clock className="h-5 w-5 text-amber-500" />
                 </div>
                 <div className="text-3xl font-bold">
-                  {serviceMetrics && serviceMetrics.length > 0
+                  {Array.isArray(serviceMetrics) && serviceMetrics.length > 0
                     ? (serviceMetrics.reduce((sum: number, service: any) => 
                         sum + service.average_wait_time, 0) / serviceMetrics.length).toFixed(1)
                     : "0"} <span className="text-lg font-normal">min</span>
@@ -393,7 +304,7 @@ const StaffPerformanceReport: React.FC = () => {
                   <CheckCircle className="h-5 w-5 text-emerald-500" />
                 </div>
                 <div className="text-3xl font-bold">
-                  {staffMetrics ? 
+                  {Array.isArray(staffMetrics) ? 
                     staffMetrics.reduce((sum: number, staff: any) => sum + staff.appointments_served, 0) 
                     : 0
                   }
@@ -408,7 +319,7 @@ const StaffPerformanceReport: React.FC = () => {
                   <XCircle className="h-5 w-5 text-rose-500" />
                 </div>
                 <div className="text-3xl font-bold">
-                  {staffMetrics ? 
+                  {Array.isArray(staffMetrics) ? 
                     staffMetrics.reduce((sum: number, staff: any) => sum + staff.no_shows, 0) 
                     : 0
                   }
