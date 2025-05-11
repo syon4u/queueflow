@@ -7,12 +7,13 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Mock component to test the hook
 const AuthConsumer = () => {
-  const { user, isLoading, role } = useAuth();
+  const { user, isLoading, role, signInWithEmail } = useAuth();
   return (
     <div>
       <div data-testid="loading">{isLoading.toString()}</div>
       <div data-testid="user">{user ? JSON.stringify(user) : 'null'}</div>
       <div data-testid="role">{role || 'null'}</div>
+      <button data-testid="login-button" onClick={() => signInWithEmail('test@example.com', 'password')}>Login</button>
     </div>
   );
 };
@@ -79,6 +80,32 @@ describe('AuthProvider', () => {
     // Should fetch role
     await waitFor(() => {
       expect(screen.getByTestId('role').textContent).toBe('customer');
+    });
+  });
+
+  it('should call signInWithPassword when signInWithEmail is called', async () => {
+    vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
+      data: {},
+      error: null,
+    } as any);
+
+    render(
+      <BrowserRouter>
+        <AuthProvider>
+          <AuthConsumer />
+        </AuthProvider>
+      </BrowserRouter>
+    );
+
+    // Click login button
+    screen.getByTestId('login-button').click();
+
+    // Verify signInWithPassword was called with correct params
+    await waitFor(() => {
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'password',
+      });
     });
   });
 });

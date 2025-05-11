@@ -1,5 +1,18 @@
 
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
+
+// Add the type declaration for testing-library__jest-dom
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toBeInTheDocument(): R;
+      toHaveTextContent(text: string): R;
+      toBeVisible(): R;
+      // Add more matchers as needed
+    }
+  }
+}
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
@@ -13,6 +26,8 @@ vi.mock('@/integrations/supabase/client', () => ({
       }),
       signInWithOAuth: vi.fn(),
       signOut: vi.fn(),
+      signInWithPassword: vi.fn(),
+      signUp: vi.fn(),
     },
     rpc: vi.fn(),
     functions: {
