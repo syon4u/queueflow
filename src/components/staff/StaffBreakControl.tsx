@@ -43,7 +43,7 @@ const StaffBreakControl: React.FC<StaffBreakControlProps> = ({ onStatusChange })
       const { error } = await supabase
         .from('staff')
         .update({ 
-          status: 'break',
+          status_value: 'break',
           status_notes: handoverNotes,
           break_start_time: new Date().toISOString(),
           break_end_time: new Date(Date.now() + duration * 60 * 1000).toISOString()
@@ -81,7 +81,7 @@ const StaffBreakControl: React.FC<StaffBreakControlProps> = ({ onStatusChange })
       const { error } = await supabase
         .from('staff')
         .update({ 
-          status: 'available',
+          status_value: 'available',
           status_notes: null,
           break_start_time: null,
           break_end_time: null

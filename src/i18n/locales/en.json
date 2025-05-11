@@ -9,7 +9,8 @@
     "searching": "Searching...",
     "select": "Select",
     "back": "Back",
-    "actions": "Actions"
+    "actions": "Actions",
+    "cancel": "Cancel"
   },
   "customer": {
     "viewHistory": "View History",
@@ -81,10 +82,19 @@
     "settingsDescription": "Configure your preferences and notification settings",
     "schedule": "My Schedule",
     "status": {
+      "title": "Staff Status",
+      "description": "Update your current availability status",
       "available": "Available",
       "busy": "Busy",
       "break": "On Break",
-      "offline": "Offline"
+      "offline": "Offline",
+      "takeBreak": "Take a Break",
+      "breakDescription": "Set your status to on break and add handover notes",
+      "breakDuration": "Break Duration (min)",
+      "handoverNotes": "Handover Notes",
+      "handoverPlaceholder": "Notes for colleagues while you're away",
+      "startBreak": "Start Break",
+      "endBreak": "End Break"
     },
     "setStatus": "Update Status",
     "statusUpdated": "Your status has been updated",
@@ -93,7 +103,28 @@
       "enable": "Enable Blackout Period",
       "disable": "Disable Blackout Period",
       "active": "Blackout Period Active",
-      "description": "Stop accepting new appointments until backlog clears"
-    }
+      "description": "Stop accepting new appointments until backlog clears",
+      "enabled": "Blackout period enabled",
+      "disabled": "Blackout period disabled",
+      "reason": "Reason for Blackout",
+      "reasonPlaceholder": "Why are you implementing a blackout period?",
+      "estimatedEndTime": "Estimated End Time",
+      "estimatedEnd": "Estimated end time",
+      "confirm": "Enable Blackout Period"
+    },
+    "role": "Staff Member"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "role": "Administrator"
+  },
+  "auth": {
+    "logout": "Logout"
+  },
+  "profile": {
+    "title": "Profile"
+  },
+  "performance": {
+    "reports": "Performance Reports"
   }
 }

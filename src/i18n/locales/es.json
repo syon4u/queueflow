@@ -9,7 +9,8 @@
     "searching": "Buscando...",
     "select": "Seleccionar",
     "back": "Volver",
-    "actions": "Acciones"
+    "actions": "Acciones",
+    "cancel": "Cancelar"
   },
   "customer": {
     "viewHistory": "Ver Historial",
@@ -81,10 +82,19 @@
     "settingsDescription": "Configura tus preferencias y ajustes de notificaciones",
     "schedule": "Mi Horario",
     "status": {
+      "title": "Estado del Personal",
+      "description": "Actualiza tu estado de disponibilidad actual",
       "available": "Disponible",
       "busy": "Ocupado",
       "break": "En Descanso",
-      "offline": "Desconectado"
+      "offline": "Desconectado",
+      "takeBreak": "Tomar un Descanso",
+      "breakDescription": "Establece tu estado en descanso y agrega notas de entrega",
+      "breakDuration": "Duración del Descanso (min)",
+      "handoverNotes": "Notas de Entrega",
+      "handoverPlaceholder": "Notas para colegas mientras estás ausente",
+      "startBreak": "Iniciar Descanso",
+      "endBreak": "Finalizar Descanso"
     },
     "setStatus": "Actualizar Estado",
     "statusUpdated": "Tu estado ha sido actualizado",
@@ -93,7 +103,28 @@
       "enable": "Habilitar Período de Bloqueo",
       "disable": "Deshabilitar Período de Bloqueo",
       "active": "Período de Bloqueo Activo",
-      "description": "Dejar de aceptar nuevas citas hasta resolver la acumulación"
-    }
+      "description": "Dejar de aceptar nuevas citas hasta resolver la acumulación",
+      "enabled": "Período de bloqueo habilitado",
+      "disabled": "Período de bloqueo deshabilitado",
+      "reason": "Razón del Bloqueo",
+      "reasonPlaceholder": "¿Por qué estás implementando un período de bloqueo?",
+      "estimatedEndTime": "Hora Estimada de Finalización",
+      "estimatedEnd": "Hora estimada de finalización",
+      "confirm": "Habilitar Período de Bloqueo"
+    },
+    "role": "Miembro del Personal"
+  },
+  "admin": {
+    "dashboard": "Panel de Administración",
+    "role": "Administrador"
+  },
+  "auth": {
+    "logout": "Cerrar Sesión"
+  },
+  "profile": {
+    "title": "Perfil"
+  },
+  "performance": {
+    "reports": "Informes de Rendimiento"
   }
 }

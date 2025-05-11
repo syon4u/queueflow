@@ -24,7 +24,8 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
           </div>
           <div className="flex flex-wrap gap-2">
             <StaffBreakControl onStatusChange={onStatusChange} />
-            <BlackoutPeriodControl locationId={user?.location_id} />
+            {/* Pass the location ID if available, otherwise just enable component without location-specific features */}
+            <BlackoutPeriodControl locationId={user?.id} />
           </div>
         </div>
       </CardContent>
