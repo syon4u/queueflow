@@ -172,14 +172,14 @@ export const StatsTab: React.FC = () => {
               </Select>
               
               <Select 
-                value={selectedLocation || ''} 
-                onValueChange={(val) => setSelectedLocation(val || null)}
+                value={selectedLocation || 'all'} 
+                onValueChange={(val) => setSelectedLocation(val === 'all' ? null : val)}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Locations</SelectItem>
+                  <SelectItem value="all">All Locations</SelectItem>
                   {locations.map((location: any) => (
                     <SelectItem key={location.id} value={location.id}>
                       {location.name}
