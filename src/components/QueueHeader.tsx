@@ -10,15 +10,15 @@ const QueueHeader: React.FC = () => {
   const [isResetDialogOpen, setIsResetDialogOpen] = React.useState(false);
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+        <h1 className="text-3xl sm:text-3xl font-bold text-gradient">
           QueueFlow
           <span className="text-teal-500">.</span>
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mt-1">
           Managing <span className="font-medium">{stats.totalCustomers}</span> customer{stats.totalCustomers !== 1 ? 's' : ''}
-          {stats.waitingCustomers > 0 && <span> • <span className="text-blue-600 font-medium">{stats.waitingCustomers}</span> waiting</span>}
+          {stats.waitingCustomers > 0 && <span> • <span className="text-primary font-medium">{stats.waitingCustomers}</span> waiting</span>}
         </p>
       </div>
 
@@ -28,7 +28,7 @@ const QueueHeader: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-1 border-gray-200 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 border-gray-200 hover:bg-gray-50 shadow-sm transition-colors"
               aria-label="Reset Queue"
             >
               <RefreshCcw size={14} />
@@ -38,10 +38,10 @@ const QueueHeader: React.FC = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
                 <span>Reset Queue</span>
               </DialogTitle>
-              <DialogDescription className="text-gray-500">
+              <DialogDescription className="text-muted-foreground">
                 This will remove all customers from the queue. This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
@@ -49,7 +49,7 @@ const QueueHeader: React.FC = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setIsResetDialogOpen(false)}
-                className="border-gray-200 hover:bg-gray-50"
+                className="border-gray-200 hover:bg-gray-50 shadow-sm"
               >
                 Cancel
               </Button>
@@ -59,7 +59,7 @@ const QueueHeader: React.FC = () => {
                   resetQueue();
                   setIsResetDialogOpen(false);
                 }}
-                className="bg-rose-500 hover:bg-rose-600"
+                className="shadow-sm"
               >
                 Reset Queue
               </Button>

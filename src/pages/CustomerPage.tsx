@@ -22,28 +22,36 @@ const CustomerPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Customer Portal</h1>
-            <p className="text-muted-foreground">Schedule appointments or check your status</p>
+            <h1 className="text-gradient text-3xl font-bold">Customer Portal</h1>
+            <p className="text-muted-foreground mt-1">Schedule appointments or check your status</p>
           </div>
-          <div className="text-sm text-muted-foreground">
-            Logged in as: {user?.email} (Role: {role || 'customer'})
+          <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-muted-foreground border border-border/40">
+            {user?.email} <span className="text-primary/60 font-medium ml-1">({role || 'customer'})</span>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <ScheduleAppointmentCard onAppointmentScheduled={handleAppointmentScheduled} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="transition-all hover:translate-y-[-2px] duration-300">
+            <ScheduleAppointmentCard onAppointmentScheduled={handleAppointmentScheduled} />
+          </div>
           
           <div className="space-y-6">
-            <CheckInCard />
-            <AppointmentStatusCard />
-            <WaitTimesCard />
+            <div className="transition-all hover:translate-y-[-2px] duration-300">
+              <CheckInCard />
+            </div>
+            <div className="transition-all hover:translate-y-[-2px] duration-300">
+              <AppointmentStatusCard />
+            </div>
+            <div className="transition-all hover:translate-y-[-2px] duration-300">
+              <WaitTimesCard />
+            </div>
           </div>
         </div>
         
         <div className="flex space-x-4">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="shadow-sm border-gray-200 hover:bg-gray-50 transition-colors">
             <Link to="/">Back to Home</Link>
           </Button>
         </div>

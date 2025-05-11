@@ -52,7 +52,7 @@ const QueueStats: React.FC = () => {
       {statItems.map((item, index) => (
         <Card 
           key={index} 
-          className={`border-l-4 transition-all hover:translate-y-[-2px] ${item.borderColor} ${item.bgColor} shadow-sm`}
+          className={`border-l-4 shadow-sm hover:shadow-md transition-all hover:translate-y-[-2px] ${item.borderColor} ${item.bgColor}`}
         >
           <CardContent className="p-4 flex justify-between items-center">
             <div>

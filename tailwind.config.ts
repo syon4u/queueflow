@@ -72,6 +72,12 @@ export default {
 					gray: '#f1f5f9',
 					lightBlue: '#60a5fa',
 					darkTeal: '#0f766e',
+				},
+				status: {
+					success: '#22c55e',
+					warning: '#f59e0b',
+					error: '#ef4444',
+					info: '#3b82f6',
 				}
 			},
 			borderRadius: {
@@ -109,6 +115,10 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)',
 					},
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' },
 				}
 			},
 			animation: {
@@ -116,6 +126,7 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'fade-in-up': 'fade-in-up 0.5s ease-out',
+				'float': 'float 3s ease-in-out infinite',
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -123,6 +134,10 @@ export default {
 			fontSize: {
 				'base': '1rem',
 				'lg': '1.125rem',
+			},
+			boxShadow: {
+				'card': '0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 4px -1px rgba(0, 0, 0, 0.1)',
+				'card-hover': '0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.1)',
 			}
 		}
 	},
