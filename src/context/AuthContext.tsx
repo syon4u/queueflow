@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,13 +24,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Don't call Supabase directly in callback - use setTimeout
         if (session?.user) {
           setTimeout(() => {
             fetchUserRole(session.user.id);
@@ -42,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -60,36 +56,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserRole = async (userId: string) => {
     try {
-      // Use RPC call to a database function instead of querying a table directly
       const { data, error } = await supabase.rpc('get_user_role');
 
       if (error) {
         console.error('Error fetching user role:', error);
-        // Default to customer role if there's an error
         setRole('customer');
         return;
       }
 
-      // The function returns the role directly
-      setRole(data || 'customer'); // Default to customer if no specific role
+      setRole(data || 'customer');
     } catch (error) {
       console.error('Failed to fetch user role:', error);
-      setRole('customer'); // Default to customer on error
+      setRole('customer');
     }
   };
 
   const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      
-      if (error) {
-        throw error;
-      }
+      console.log('Google auth temporarily disabled - use email/password instead');
+      throw new Error('Google provider is not enabled in Supabase');
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;

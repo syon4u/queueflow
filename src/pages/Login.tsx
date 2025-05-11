@@ -52,13 +52,15 @@ const Login = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      // Temporarily use signInWithEmail instead of Google OAuth
+      // This will display an error message explaining that Google auth is disabled
       await signInWithGoogle();
     } catch (error) {
       console.error('Login failed:', error);
       toast({
         variant: "destructive",
         title: t("auth.loginFailed"),
-        description: t("auth.loginFailedDesc"),
+        description: "Google authentication is temporarily disabled. Please use email/password instead.",
       });
     }
   };
