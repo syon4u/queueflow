@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import type { Appointment } from '@/hooks/use-appointments';
+import type { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { SendReminderDialog } from './staff/SendReminderDialog';
 import { Bell } from 'lucide-react';
 
@@ -25,7 +26,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   
-  const updateAppointmentStatus = async (id: string, status: string) => {
+  const updateAppointmentStatus = async (id: string, status: AppointmentStatus) => {
     setIsLoading(prev => ({ ...prev, [id]: true }));
     try {
       const { error } = await supabase
