@@ -30,9 +30,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // If user just signed in, redirect them to home page
+        // Redirect users after authentication events
         if (event === 'SIGNED_IN') {
-          navigate('/');
+          navigate('/');  // This will take them to the Dashboard
         } else if (event === 'SIGNED_OUT') {
           navigate('/login');
         }
