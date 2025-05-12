@@ -5,6 +5,7 @@ import * as reactTesting from '@testing-library/react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { authService } from '@/services/authService';
 
 // Extract the needed utilities from the testing library
 const { screen, waitFor } = reactTesting as any;
@@ -101,8 +102,6 @@ describe('AuthProvider', () => {
   });
 
   it('should call signInWithPassword when signInWithEmail is called', async () => {
-    const { signInWithEmail } = await import('@/services/authService');
-    
     render(
       <BrowserRouter>
         <AuthProvider>
@@ -116,7 +115,7 @@ describe('AuthProvider', () => {
 
     // Verify signInWithEmail was called with correct params
     await waitFor(() => {
-      expect(signInWithEmail).toHaveBeenCalledWith('test@example.com', 'password');
+      expect(authService.signInWithEmail).toHaveBeenCalledWith('test@example.com', 'password');
     });
   });
 });
