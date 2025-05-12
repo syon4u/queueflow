@@ -23,6 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
       if (!role) return null;
       
       try {
+        // Use type-safe table reference from the generated types
         const { data, error } = await supabase
           .from('role_permissions')
           .select('*')

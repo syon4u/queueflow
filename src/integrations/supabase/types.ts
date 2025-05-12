@@ -199,6 +199,36 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          admin_access: boolean
+          created_at: string
+          customer_access: boolean
+          id: string
+          role: string
+          staff_access: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_access?: boolean
+          created_at?: string
+          customer_access?: boolean
+          id?: string
+          role: string
+          staff_access?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_access?: boolean
+          created_at?: string
+          customer_access?: boolean
+          id?: string
+          role?: string
+          staff_access?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_wait_times: {
         Row: {
           average_wait_time: number

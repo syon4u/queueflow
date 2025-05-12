@@ -23,6 +23,7 @@ export const PermissionsManager = () => {
     queryKey: ['role-permissions'],
     queryFn: async () => {
       try {
+        // Use type-safe table reference
         const { data, error } = await supabase
           .from('role_permissions')
           .select('*');
@@ -151,7 +152,7 @@ export const PermissionsManager = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {permissions.map((permission) => (
+              {permissions.map((permission: Permission) => (
                 <TableRow key={permission.role}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
