@@ -59,6 +59,7 @@ const Login = () => {
     try {
       setIsSubmitting(true);
       await signInWithGoogle();
+      // Redirect handled in AuthContext
     } catch (error) {
       console.error('Login failed:', error);
       toast({
@@ -80,6 +81,7 @@ const Login = () => {
           title: t("auth.loginSuccess"),
           description: t("auth.welcome"),
         });
+        // Redirect now happens in the AuthContext onAuthStateChange listener
       } else {
         await signUpWithEmail(data.email, data.password);
         toast({

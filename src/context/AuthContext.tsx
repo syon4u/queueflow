@@ -29,6 +29,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Auth state changed:', event);
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // If user just signed in, redirect them to home page
+        if (event === 'SIGNED_IN') {
+          navigate('/');
+        } else if (event === 'SIGNED_OUT') {
+          navigate('/login');
+        }
       }
     );
 
@@ -46,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const signInWithGoogle = async () => {
     try {
@@ -61,8 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithEmail = async (email: string, password: string) => {
     try {
       const data = await authService.signInWithEmail(email, password);
-      // Navigate to home after successful login
-      navigate('/');
+      // No need to navigate here as onAuthStateChange will handle it
       return data;
     } catch (error: any) {
       console.error('Error signing in with email:', error);
@@ -84,9 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setIsLoading(true);
       await authService.signOut();
-      setUser(null);
-      setSession(null);
-      navigate('/login');
+      // No need to navigate here as onAuthStateChange will handle it
     } catch (error: any) {
       console.error('Error signing out:', error);
       toast({
