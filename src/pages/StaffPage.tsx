@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -24,7 +24,11 @@ import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import { PieChart } from 'lucide-react';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
 
-const StaffPage = () => {
+interface StaffPageProps {
+  supervisorView?: boolean;
+}
+
+const StaffPage: React.FC<StaffPageProps> = ({ supervisorView = false }) => {
   const { user, role } = useAuth();
   const { appointments, loading, refreshAppointments } = useAppointments();
   const { t } = useTranslation();

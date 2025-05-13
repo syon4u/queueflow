@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +20,7 @@ export const PermissionsManager = () => {
   const queryClient = useQueryClient();
   
   // Fetch role permissions
-  const { data: permissions = [], isLoading } = useQuery({
+  const { data: permissionsData = [], isLoading } = useQuery({
     queryKey: ['role-permissions'],
     queryFn: async () => {
       try {
@@ -40,10 +39,20 @@ export const PermissionsManager = () => {
             { role: 'supervisor', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: false, admin_access: false },
             { role: 'power_user', customer_access: true, staff_access: true, supervisor_access: false, power_user_access: true, admin_access: false },
             { role: 'admin', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: true, admin_access: true }
-          ];
+          ] as Permission[];
         }
         
-        return data;
+        // Ensure the returned data includes all required properties
+        const permissions = data.map(item => ({
+          role: item.role,
+          customer_access: item.customer_access,
+          staff_access: item.staff_access,
+          supervisor_access: item.supervisor_access ?? false,
+          power_user_access: item.power_user_access ?? false,
+          admin_access: item.admin_access
+        })) as Permission[];
+        
+        return permissions;
       } catch (error) {
         console.error('Error fetching permissions:', error);
         // Return default permissions if fetching fails
@@ -53,10 +62,13 @@ export const PermissionsManager = () => {
           { role: 'supervisor', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: false, admin_access: false },
           { role: 'power_user', customer_access: true, staff_access: true, supervisor_access: false, power_user_access: true, admin_access: false },
           { role: 'admin', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: true, admin_access: true }
-        ];
+        ] as Permission[];
       }
     },
   });
+
+  // Convert to array of Permission objects to fix type error
+  const permissions: Permission[] = permissionsData as Permission[];
 
   // Update permission mutation
   const updatePermissionMutation = useMutation({

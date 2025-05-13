@@ -13,6 +13,15 @@ interface ProtectedRouteProps {
   pageType?: 'customer' | 'staff' | 'supervisor' | 'power_user' | 'admin';
 }
 
+interface RolePermissions {
+  role: string;
+  customer_access: boolean;
+  staff_access: boolean;
+  supervisor_access: boolean;
+  power_user_access: boolean;
+  admin_access: boolean;
+}
+
 const staffRoles: UserRole[] = ['staff', 'supervisor', 'power_user', 'admin'];
 const supervisorRoles: UserRole[] = ['supervisor', 'admin'];
 const powerUserRoles: UserRole[] = ['power_user', 'admin'];
@@ -46,12 +55,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
               supervisor_access: supervisorRoles.includes(role as UserRole),
               power_user_access: powerUserRoles.includes(role as UserRole),
               admin_access: adminRoles.includes(role as UserRole)
-            };
+            } as RolePermissions;
           }
           throw error;
         }
         
-        return data;
+        return data as RolePermissions;
       } catch (error) {
         console.error('Error fetching permissions:', error);
         // Return default permissions based on role
@@ -62,7 +71,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
           supervisor_access: supervisorRoles.includes(role as UserRole),
           power_user_access: powerUserRoles.includes(role as UserRole),
           admin_access: adminRoles.includes(role as UserRole)
-        };
+        } as RolePermissions;
       }
     },
     enabled: !!role,
@@ -77,8 +86,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     console.log("Protected Route - Permissions:", permissions);
     
     // Additional debugging for role check
-    if (requiredRoles && requiredRoles.length > 0) {
-      const hasRequiredRole = requiredRoles.includes(role as UserRole || '');
+    if (requiredRoles && requiredRoles.length > 0 && role) {
+      const hasRequiredRole = requiredRoles.includes(role as UserRole);
       console.log("User has required role:", hasRequiredRole);
     }
   }, [user, role, requiredRoles, pageType, permissions]);
@@ -100,9 +109,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
   }
 
   // First check specific roles if provided
-  if (requiredRoles && requiredRoles.length > 0) {
+  if (requiredRoles && requiredRoles.length > 0 && role) {
     // Check if the user's role is in the required roles list
-    const hasRequiredRole = requiredRoles.includes(role as UserRole || '');
+    const hasRequiredRole = requiredRoles.includes(role as UserRole);
     
     if (!hasRequiredRole) {
       toast({
