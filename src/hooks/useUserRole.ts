@@ -2,9 +2,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { toast } from '@/hooks/use-toast';
+
+export type UserRole = 'customer' | 'staff' | 'supervisor' | 'power_user' | 'admin';
 
 export const useUserRole = (user: User | null) => {
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
@@ -50,17 +53,22 @@ export const useUserRole = (user: User | null) => {
           }
           
           console.log('Role found in database:', roleData.role);
-          setRole(roleData.role);
+          setRole(roleData.role as UserRole);
           setIsLoading(false);
           return;
         }
 
         console.log('Role from RPC function:', data);
-        setRole(data || 'customer');
+        setRole(data as UserRole || 'customer');
         console.log(`Role set to ${data || 'customer'} from database`);
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to fetch user role:', error);
+        toast({
+          title: "Error fetching user role",
+          description: "Defaulting to customer permissions",
+          variant: "destructive",
+        });
         setRole('customer');
         setIsLoading(false);
       }

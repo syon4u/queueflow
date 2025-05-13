@@ -5,12 +5,18 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { UserRole } from '@/hooks/useUserRole';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: string[];
-  pageType?: 'customer' | 'staff' | 'admin';
+  requiredRoles?: UserRole[];
+  pageType?: 'customer' | 'staff' | 'supervisor' | 'power_user' | 'admin';
 }
+
+const staffRoles: UserRole[] = ['staff', 'supervisor', 'power_user', 'admin'];
+const supervisorRoles: UserRole[] = ['supervisor', 'admin'];
+const powerUserRoles: UserRole[] = ['power_user', 'admin'];
+const adminRoles: UserRole[] = ['admin'];
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles, pageType = 'customer' }) => {
   const { user, isLoading, role } = useAuth();
@@ -36,8 +42,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
             return {
               role,
               customer_access: true, // Everyone can access customer pages by default
-              staff_access: ['staff', 'admin'].includes(role),
-              admin_access: role === 'admin'
+              staff_access: staffRoles.includes(role as UserRole),
+              supervisor_access: supervisorRoles.includes(role as UserRole),
+              power_user_access: powerUserRoles.includes(role as UserRole),
+              admin_access: adminRoles.includes(role as UserRole)
             };
           }
           throw error;
@@ -50,8 +58,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
         return {
           role,
           customer_access: true, // Everyone can access customer pages by default
-          staff_access: ['staff', 'admin'].includes(role),
-          admin_access: role === 'admin'
+          staff_access: staffRoles.includes(role as UserRole),
+          supervisor_access: supervisorRoles.includes(role as UserRole),
+          power_user_access: powerUserRoles.includes(role as UserRole),
+          admin_access: adminRoles.includes(role as UserRole)
         };
       }
     },
@@ -68,7 +78,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     
     // Additional debugging for role check
     if (requiredRoles && requiredRoles.length > 0) {
-      const hasRequiredRole = requiredRoles.includes(role || '');
+      const hasRequiredRole = requiredRoles.includes(role as UserRole || '');
       console.log("User has required role:", hasRequiredRole);
     }
   }, [user, role, requiredRoles, pageType, permissions]);
@@ -92,7 +102,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
   // First check specific roles if provided
   if (requiredRoles && requiredRoles.length > 0) {
     // Check if the user's role is in the required roles list
-    const hasRequiredRole = requiredRoles.includes(role || '');
+    const hasRequiredRole = requiredRoles.includes(role as UserRole || '');
     
     if (!hasRequiredRole) {
       toast({
@@ -110,6 +120,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     switch (pageType) {
       case 'admin':
         hasAccess = permissions.admin_access;
+        break;
+      case 'power_user':
+        hasAccess = permissions.power_user_access;
+        break;
+      case 'supervisor':
+        hasAccess = permissions.supervisor_access;
         break;
       case 'staff':
         hasAccess = permissions.staff_access;
