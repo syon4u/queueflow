@@ -39,7 +39,9 @@ export const useUserManagement = () => {
 
   // Update user role
   const updateRoleMutation = useMutation({
-    mutationFn: updateUserRole,
+    mutationFn: ({ userId, role }: { userId: string; role: string }) => {
+      return updateUserRole(userId, role);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       queryClient.invalidateQueries({ queryKey: ['staff'] });

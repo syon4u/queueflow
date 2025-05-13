@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,7 +44,7 @@ export const PermissionsManager = () => {
         }
         
         // Ensure the returned data includes all required properties
-        const permissions = data.map(item => ({
+        return data.map(item => ({
           role: item.role,
           customer_access: item.customer_access,
           staff_access: item.staff_access,
@@ -51,8 +52,6 @@ export const PermissionsManager = () => {
           power_user_access: item.power_user_access ?? false,
           admin_access: item.admin_access
         })) as Permission[];
-        
-        return permissions;
       } catch (error) {
         console.error('Error fetching permissions:', error);
         // Return default permissions if fetching fails
