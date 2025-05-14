@@ -9,6 +9,8 @@ import AppointmentStatusCard from '@/components/customer/AppointmentStatusCard';
 import WaitTimesCard from '@/components/customer/WaitTimesCard';
 import AppointmentConfirmationDialog from '@/components/customer/AppointmentConfirmationDialog';
 import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
+import { User } from 'lucide-react';
 
 const CustomerPage = () => {
   const { user, role } = useAuth();
@@ -23,6 +25,12 @@ const CustomerPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6">
+        <PageBreadcrumb 
+          items={[
+            { label: 'Customer Portal', path: '/customer', icon: <User className="h-4 w-4" /> }
+          ]} 
+        />
+        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className="text-gradient text-3xl font-bold">Customer Portal</h1>

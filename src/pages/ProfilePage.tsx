@@ -9,6 +9,8 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
+import { UserCog } from 'lucide-react';
 
 const ProfilePage = () => {
   const { user, role } = useAuth();
@@ -106,6 +108,12 @@ const ProfilePage = () => {
   
   return (
     <div className="container mx-auto p-6">
+      <PageBreadcrumb 
+        items={[
+          { label: 'Profile', path: '/profile', icon: <UserCog className="h-4 w-4" /> }
+        ]} 
+      />
+      
       <h1 className="text-3xl font-bold mb-6">{t('profile.title')}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -21,8 +22,9 @@ import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
 import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
-import { PieChart } from 'lucide-react';
+import { PieChart, Users } from 'lucide-react';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
 
 interface StaffPageProps {
   supervisorView?: boolean;
@@ -61,6 +63,12 @@ const StaffPage: React.FC<StaffPageProps> = ({ supervisorView = false }) => {
       />
       
       <main className="container mx-auto px-4 py-6">
+        <PageBreadcrumb 
+          items={[
+            { label: 'Staff Portal', path: '/staff', icon: <Users className="h-4 w-4" /> }
+          ]} 
+        />
+        
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>

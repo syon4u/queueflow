@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Calendar, Clock } from 'lucide-react';
+import { Bell, Calendar, Clock, User } from 'lucide-react';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
 
 interface Appointment {
   id: string;
@@ -122,6 +123,13 @@ const AppointmentsPage = () => {
   
   return (
     <div className="container mx-auto p-6">
+      <PageBreadcrumb 
+        items={[
+          { label: 'Customer Portal', path: '/customer', icon: <User className="h-4 w-4" /> },
+          { label: 'Appointments', path: '/appointments', icon: <Calendar className="h-4 w-4" /> }
+        ]} 
+      />
+      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{t('appointments.title')}</h1>
         <Button asChild>

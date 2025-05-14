@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
@@ -13,6 +14,8 @@ import { DashboardTab } from '@/components/admin/DashboardTab';
 import UserManagementTab from '@/components/admin/UserManagementTab';
 import { QueueProvider } from '@/context/QueueContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
+import { Settings } from 'lucide-react';
 
 interface AdminPageProps {
   limitedAccess?: boolean;
@@ -37,6 +40,12 @@ const AdminPage: React.FC<AdminPageProps> = ({ limitedAccess = false }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-6">
+        <PageBreadcrumb 
+          items={[
+            { label: 'Admin', path: '/admin', icon: <Settings className="h-4 w-4" /> }
+          ]} 
+        />
+        
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
