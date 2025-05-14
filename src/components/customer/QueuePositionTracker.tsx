@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Bell } from 'lucide-react';
 import { formatWaitTime } from '@/lib/queue';
 import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 const QueuePositionTracker: React.FC = () => {
   const { userPosition, estimatedWaitTime, appointments } = useRealtimeAppointments();
