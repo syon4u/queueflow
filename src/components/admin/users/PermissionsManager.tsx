@@ -19,6 +19,7 @@ interface Permission {
 
 export const PermissionsManager = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   // Fetch role permissions
   const { data: permissionsData = [], isLoading } = useQuery({
@@ -226,3 +227,4 @@ export const PermissionsManager = () => {
     </Card>
   );
 };
+
