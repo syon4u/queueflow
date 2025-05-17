@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -6,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
@@ -31,7 +32,7 @@ const CheckInCard = () => {
     
     try {
       // Here we would normally call an API to check in the appointment
-      const { error } = await supabase.functions.invoke('appointments', {
+      const { data: responseData, error } = await supabase.functions.invoke('appointments', {
         method: 'PATCH',
         body: JSON.stringify({ 
           appointment_code: data.appointment_code,
