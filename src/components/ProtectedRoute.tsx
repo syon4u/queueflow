@@ -60,15 +60,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
           throw error;
         }
         
-        // Ensure all required fields are present in the returned data
-        return {
-          role: data.role,
-          customer_access: data.customer_access,
-          staff_access: data.staff_access,
-          supervisor_access: data.supervisor_access ?? false,
-          power_user_access: data.power_user_access ?? false,
-          admin_access: data.admin_access
-        } as RolePermissions;
+        return data as RolePermissions;
       } catch (error) {
         console.error('Error fetching permissions:', error);
         // Return default permissions based on role

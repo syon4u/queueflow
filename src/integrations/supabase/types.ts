@@ -205,10 +205,8 @@ export type Database = {
           created_at: string
           customer_access: boolean
           id: string
-          power_user_access: boolean
           role: string
           staff_access: boolean
-          supervisor_access: boolean
           updated_at: string
         }
         Insert: {
@@ -216,10 +214,8 @@ export type Database = {
           created_at?: string
           customer_access?: boolean
           id?: string
-          power_user_access?: boolean
           role: string
           staff_access?: boolean
-          supervisor_access?: boolean
           updated_at?: string
         }
         Update: {
@@ -227,10 +223,8 @@ export type Database = {
           created_at?: string
           customer_access?: boolean
           id?: string
-          power_user_access?: boolean
           role?: string
           staff_access?: boolean
-          supervisor_access?: boolean
           updated_at?: string
         }
         Relationships: []

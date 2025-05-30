@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from '@/components/ui/use-toast';
 import { Shield, Users, Briefcase, UserCog, FileText, User } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -19,7 +18,6 @@ interface Permission {
 
 export const PermissionsManager = () => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   
   // Fetch role permissions
   const { data: permissionsData = [], isLoading } = useQuery({
@@ -45,7 +43,7 @@ export const PermissionsManager = () => {
         }
         
         // Ensure the returned data includes all required properties
-        return data.map(item => ({
+        const permissions = data.map(item => ({
           role: item.role,
           customer_access: item.customer_access,
           staff_access: item.staff_access,
@@ -53,6 +51,8 @@ export const PermissionsManager = () => {
           power_user_access: item.power_user_access ?? false,
           admin_access: item.admin_access
         })) as Permission[];
+        
+        return permissions;
       } catch (error) {
         console.error('Error fetching permissions:', error);
         // Return default permissions if fetching fails
@@ -227,4 +227,3 @@ export const PermissionsManager = () => {
     </Card>
   );
 };
-
