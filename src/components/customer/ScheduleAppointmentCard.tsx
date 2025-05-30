@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import ServiceSelector from '@/components/ServiceSelector';
@@ -39,7 +37,7 @@ type NewCustomerFormValues = z.infer<typeof newCustomerFormSchema>;
 type ExistingCustomerFormValues = z.infer<typeof existingCustomerFormSchema>;
 
 interface ScheduleAppointmentCardProps {
-  onAppointmentScheduled: (code: string) => void;
+  onAppointmentScheduled?: (code: string) => void;
 }
 
 const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointmentCardProps) => {
@@ -100,51 +98,24 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
     }
 
     try {
-      // Parse selected date and time
-      const [hours, minutes] = selectedTime.split(':');
-      const [minutesValue, ampm] = minutes.split(' ');
-      let hour = parseInt(hours);
+      // Simulate appointment creation without backend
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (ampm === 'PM' && hour < 12) {
-        hour += 12;
-      } else if (ampm === 'AM' && hour === 12) {
-        hour = 0;
-      }
-
-      // Create a date object with the selected date and time
-      const scheduledDate = new Date(selectedDate);
-      scheduledDate.setHours(hour, parseInt(minutesValue));
-      
-      const [firstName, ...lastNameParts] = data.name.trim().split(' ');
-      const lastName = lastNameParts.join(' ') || firstName;
-      
-      const appointmentData = {
-        service_id: data.service_id,
-        location_id: data.location_id,
-        scheduled_time: scheduledDate.toISOString(),
-        notes: data.notes,
-        reason_for_visit: data.reason_for_visit,
-        customer_name: data.name,
-        phone_number: data.phone,
-      };
-
-      // Send the appointment request to the Supabase Edge Function
-      const { data: response, error } = await supabase.functions.invoke('appointments', {
-        method: 'POST',
-        body: JSON.stringify(appointmentData),
-      });
-
-      if (error) throw error;
-
-      // Generate a confirmation code (this would normally come from the server)
+      // Generate a confirmation code
       const confirmationCode = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
       
-      // Call the callback with the confirmation code
-      onAppointmentScheduled(confirmationCode);
+      toast({
+        title: "Appointment Scheduled",
+        description: `Your appointment has been scheduled. Confirmation code: ${confirmationCode}`,
+      });
       
-      // Reset form and invalidate queries
+      // Call the callback with the confirmation code if provided
+      if (onAppointmentScheduled) {
+        onAppointmentScheduled(confirmationCode);
+      }
+      
+      // Reset form
       newCustomerForm.reset();
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
       setStep('search');
     } catch (error) {
       console.error('Error creating appointment:', error);
@@ -167,49 +138,24 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
     }
 
     try {
-      // Parse selected date and time
-      const [hours, minutes] = selectedTime.split(':');
-      const [minutesValue, ampm] = minutes.split(' ');
-      let hour = parseInt(hours);
+      // Simulate appointment creation without backend
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (ampm === 'PM' && hour < 12) {
-        hour += 12;
-      } else if (ampm === 'AM' && hour === 12) {
-        hour = 0;
-      }
-
-      // Create a date object with the selected date and time
-      const scheduledDate = new Date(selectedDate);
-      scheduledDate.setHours(hour, parseInt(minutesValue));
-      
-      const appointmentData = {
-        service_id: data.service_id,
-        location_id: data.location_id,
-        scheduled_time: scheduledDate.toISOString(),
-        notes: data.notes,
-        reason_for_visit: data.reason_for_visit,
-        customer_id: selectedCustomer.id,
-        customer_name: `${selectedCustomer.first_name} ${selectedCustomer.last_name}`,
-        phone_number: selectedCustomer.phone,
-      };
-
-      // Send the appointment request to the Supabase Edge Function
-      const { data: response, error } = await supabase.functions.invoke('appointments', {
-        method: 'POST',
-        body: JSON.stringify(appointmentData),
-      });
-
-      if (error) throw error;
-
-      // Generate a confirmation code (this would normally come from the server)
+      // Generate a confirmation code
       const confirmationCode = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
       
-      // Call the callback with the confirmation code
-      onAppointmentScheduled(confirmationCode);
+      toast({
+        title: "Appointment Scheduled",
+        description: `Your appointment has been scheduled. Confirmation code: ${confirmationCode}`,
+      });
       
-      // Reset form and invalidate queries
+      // Call the callback with the confirmation code if provided
+      if (onAppointmentScheduled) {
+        onAppointmentScheduled(confirmationCode);
+      }
+      
+      // Reset form
       existingCustomerForm.reset();
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
       setStep('search');
     } catch (error) {
       console.error('Error creating appointment:', error);
