@@ -32,7 +32,7 @@ const CheckInCard = () => {
     
     try {
       // Here we would normally call an API to check in the appointment
-      const { error } = await supabase.functions.invoke('appointments', {
+      const { data: responseData, error } = await supabase.functions.invoke('appointments', {
         method: 'PATCH',
         body: JSON.stringify({ 
           appointment_code: data.appointment_code,

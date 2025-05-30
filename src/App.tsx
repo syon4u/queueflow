@@ -19,6 +19,7 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import PerformanceReportPage from './pages/PerformanceReportPage';
+import { UserRole } from './hooks/useUserRole';
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -53,6 +54,8 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/login" element={<Login />} />
+              
+              {/* Staff routes */}
               <Route 
                 path="/staff" 
                 element={
@@ -69,6 +72,28 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              
+              {/* Supervisor routes */}
+              <Route 
+                path="/supervisor" 
+                element={
+                  <ProtectedRoute pageType="supervisor">
+                    <StaffPage supervisorView={true} />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Power user routes */}
+              <Route 
+                path="/power-user" 
+                element={
+                  <ProtectedRoute pageType="power_user">
+                    <AdminPage limitedAccess={true} />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Admin routes */}
               <Route 
                 path="/admin" 
                 element={
@@ -77,6 +102,8 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              
+              {/* Customer routes */}
               <Route 
                 path="/customer" 
                 element={

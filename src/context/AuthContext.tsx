@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/services/authService';
-import { useUserRole } from '@/hooks/useUserRole';
+import { useUserRole, UserRole } from '@/hooks/useUserRole';
 import { AuthContextType } from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -107,7 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     session,
     isLoading: combinedLoading,
-    role,
+    role: role as UserRole | null,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,

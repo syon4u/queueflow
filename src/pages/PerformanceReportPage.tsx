@@ -15,9 +15,10 @@ import ServiceMetricsCard from '@/components/staff/performance/ServiceMetricsCar
 import StaffPerformanceCard from '@/components/staff/performance/StaffPerformanceCard';
 import SummaryMetrics from '@/components/staff/performance/SummaryMetrics';
 import FeatureTrackingList from '@/components/admin/FeatureTrackingList';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, PieChart, Users } from 'lucide-react';
 import { useDailyMetrics, useServiceMetrics, useStaffMetrics } from '@/hooks/admin/use-performance-metrics';
 import { TIME_PERIODS } from '@/components/staff/performance/constants';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
 
 const PerformanceReportPage = () => {
   const { t } = useTranslation();
@@ -65,6 +66,13 @@ const PerformanceReportPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-6">
+        <PageBreadcrumb 
+          items={[
+            { label: 'Staff Portal', path: '/staff', icon: <Users className="h-4 w-4" /> },
+            { label: 'Performance', path: '/performance', icon: <PieChart className="h-4 w-4" /> }
+          ]} 
+        />
+        
         {/* Header */}
         <PerformanceHeader 
           timeRange={timeRange}

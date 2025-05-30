@@ -9,6 +9,8 @@ import DateTimeStep from '@/components/appointments/DateTimeStep';
 import ConfirmationStep from '@/components/appointments/ConfirmationStep';
 import AppointmentStepper from '@/components/appointments/AppointmentStepper';
 import AppointmentFormNavigation from '@/components/appointments/AppointmentFormNavigation';
+import PageBreadcrumb from '@/components/navigation/PageBreadcrumb';
+import { Calendar, User } from 'lucide-react';
 
 const NewAppointmentPage = () => {
   const { t } = useTranslation();
@@ -36,6 +38,14 @@ const NewAppointmentPage = () => {
   
   return (
     <div className="container mx-auto p-6">
+      <PageBreadcrumb 
+        items={[
+          { label: 'Customer Portal', path: '/customer', icon: <User className="h-4 w-4" /> },
+          { label: 'Appointments', path: '/appointments', icon: <Calendar className="h-4 w-4" /> },
+          { label: 'New Appointment' }
+        ]} 
+      />
+      
       <h1 className="text-3xl font-bold mb-6">{t('appointments.newAppointment')}</h1>
       
       <Card className="mb-6">

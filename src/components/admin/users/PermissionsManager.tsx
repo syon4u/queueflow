@@ -4,22 +4,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/components/ui/use-toast';
-import { Shield, Users, Briefcase, UserCog } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { Shield, Users, Briefcase, UserCog, FileText, User } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Permission {
   role: string;
   customer_access: boolean;
   staff_access: boolean;
+  supervisor_access: boolean;
+  power_user_access: boolean;
   admin_access: boolean;
 }
 
 export const PermissionsManager = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   // Fetch role permissions
-  const { data: permissions = [], isLoading } = useQuery({
+  const { data: permissionsData = [], isLoading } = useQuery({
     queryKey: ['role-permissions'],
     queryFn: async () => {
       try {
@@ -33,24 +36,39 @@ export const PermissionsManager = () => {
         // If no permissions exist yet, return default ones
         if (!data || data.length === 0) {
           return [
-            { role: 'customer', customer_access: true, staff_access: false, admin_access: false },
-            { role: 'staff', customer_access: true, staff_access: true, admin_access: false },
-            { role: 'admin', customer_access: true, staff_access: true, admin_access: true }
-          ];
+            { role: 'customer', customer_access: true, staff_access: false, supervisor_access: false, power_user_access: false, admin_access: false },
+            { role: 'staff', customer_access: true, staff_access: true, supervisor_access: false, power_user_access: false, admin_access: false },
+            { role: 'supervisor', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: false, admin_access: false },
+            { role: 'power_user', customer_access: true, staff_access: true, supervisor_access: false, power_user_access: true, admin_access: false },
+            { role: 'admin', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: true, admin_access: true }
+          ] as Permission[];
         }
         
-        return data;
+        // Ensure the returned data includes all required properties
+        return data.map(item => ({
+          role: item.role,
+          customer_access: item.customer_access,
+          staff_access: item.staff_access,
+          supervisor_access: item.supervisor_access ?? false,
+          power_user_access: item.power_user_access ?? false,
+          admin_access: item.admin_access
+        })) as Permission[];
       } catch (error) {
         console.error('Error fetching permissions:', error);
         // Return default permissions if fetching fails
         return [
-          { role: 'customer', customer_access: true, staff_access: false, admin_access: false },
-          { role: 'staff', customer_access: true, staff_access: true, admin_access: false },
-          { role: 'admin', customer_access: true, staff_access: true, admin_access: true }
-        ];
+          { role: 'customer', customer_access: true, staff_access: false, supervisor_access: false, power_user_access: false, admin_access: false },
+          { role: 'staff', customer_access: true, staff_access: true, supervisor_access: false, power_user_access: false, admin_access: false },
+          { role: 'supervisor', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: false, admin_access: false },
+          { role: 'power_user', customer_access: true, staff_access: true, supervisor_access: false, power_user_access: true, admin_access: false },
+          { role: 'admin', customer_access: true, staff_access: true, supervisor_access: true, power_user_access: true, admin_access: true }
+        ] as Permission[];
       }
     },
   });
+
+  // Convert to array of Permission objects to fix type error
+  const permissions: Permission[] = permissionsData as Permission[];
 
   // Update permission mutation
   const updatePermissionMutation = useMutation({
@@ -81,6 +99,8 @@ export const PermissionsManager = () => {
           role,
           customer_access: field === 'customer_access' ? value : true,
           staff_access: field === 'staff_access' ? value : false,
+          supervisor_access: field === 'supervisor_access' ? value : false,
+          power_user_access: field === 'power_user_access' ? value : false,
           admin_access: field === 'admin_access' ? value : false
         };
         
@@ -118,10 +138,14 @@ export const PermissionsManager = () => {
     switch (role) {
       case 'admin':
         return <Shield className="h-5 w-5 text-purple-500" />;
+      case 'power_user':
+        return <FileText className="h-5 w-5 text-indigo-500" />;
+      case 'supervisor':
+        return <UserCog className="h-5 w-5 text-amber-500" />;
       case 'staff':
-        return <Briefcase className="h-5 w-5 text-blue-500" />;
+        return <Briefcase className="h-5 w-5 text-green-500" />;
       default:
-        return <Users className="h-5 w-5 text-gray-500" />;
+        return <User className="h-5 w-5 text-blue-500" />;
     }
   };
 
@@ -142,48 +166,65 @@ export const PermissionsManager = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[120px]">Role</TableHead>
-                <TableHead>Customer Pages</TableHead>
-                <TableHead>Staff Pages</TableHead>
-                <TableHead>Admin Pages</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {permissions.map((permission: Permission) => (
-                <TableRow key={permission.role}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {getIcon(permission.role)}
-                      <span className="capitalize">{permission.role}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Checkbox 
-                      checked={permission.customer_access}
-                      onCheckedChange={(checked) => handlePermissionChange(permission.role, 'customer_access', !!checked)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Checkbox 
-                      checked={permission.staff_access}
-                      onCheckedChange={(checked) => handlePermissionChange(permission.role, 'staff_access', !!checked)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Checkbox 
-                      checked={permission.admin_access}
-                      onCheckedChange={(checked) => handlePermissionChange(permission.role, 'admin_access', !!checked)}
-                    />
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[120px]">Role</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Staff</TableHead>
+                  <TableHead>Supervisor</TableHead>
+                  <TableHead>Power User</TableHead>
+                  <TableHead>Admin</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {permissions.map((permission: Permission) => (
+                  <TableRow key={permission.role}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {getIcon(permission.role)}
+                        <span className="capitalize">{permission.role}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox 
+                        checked={permission.customer_access}
+                        onCheckedChange={(checked) => handlePermissionChange(permission.role, 'customer_access', !!checked)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox 
+                        checked={permission.staff_access}
+                        onCheckedChange={(checked) => handlePermissionChange(permission.role, 'staff_access', !!checked)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox 
+                        checked={permission.supervisor_access}
+                        onCheckedChange={(checked) => handlePermissionChange(permission.role, 'supervisor_access', !!checked)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox 
+                        checked={permission.power_user_access}
+                        onCheckedChange={(checked) => handlePermissionChange(permission.role, 'power_user_access', !!checked)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox 
+                        checked={permission.admin_access}
+                        onCheckedChange={(checked) => handlePermissionChange(permission.role, 'admin_access', !!checked)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>
   );
 };
+

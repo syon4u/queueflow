@@ -1,111 +1,121 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Bell } from 'lucide-react';
+import { Loader2, User, Clock, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { formatWaitTime } from '@/lib/queue';
-import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
-import { useToast } from '@/hooks/use-toast';
 
-const QueuePositionTracker: React.FC = () => {
-  const { userPosition, estimatedWaitTime, appointments } = useRealtimeAppointments();
-  const { toast } = useToast();
-  const [previousPosition, setPreviousPosition] = useState<number | null>(null);
-  
-  // Effect to detect position changes and notify the user
+const QueuePositionTracker = () => {
+  const { user } = useAuth();
+  const [position, setPosition] = useState<number | null>(null);
+  const [estimatedWait, setEstimatedWait] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [queueStatus, setQueueStatus] = useState<string>('closed');
+
   useEffect(() => {
-    if (userPosition === null || previousPosition === null) {
-      setPreviousPosition(userPosition);
-      return;
-    }
-    
-    // If the position has improved (number decreased)
-    if (userPosition < previousPosition) {
-      toast({
-        title: "Queue position update",
-        description: `Your position has moved up! You are now ${userPosition === 1 ? 'next' : `#${userPosition}`} in line.`,
-        duration: 5000,
-      });
+    const fetchQueuePosition = async () => {
+      if (!user?.id) return;
       
-      // If the user is next, send a more urgent notification
-      if (userPosition === 1) {
-        toast({
-          title: "You're next!",
-          description: "Please be ready, you will be called soon.",
-          variant: "default",
-          duration: 8000,
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Fetch current customer's position from queue
+        const { data: queueData, error: queueError } = await supabase.functions.invoke('queue-position', {
+          method: 'POST',
+          body: JSON.stringify({ customerId: user.id })
         });
+        
+        if (queueError) throw queueError;
+        
+        if (queueData) {
+          setPosition(queueData.position || null);
+          setEstimatedWait(queueData.estimatedWaitTime || null);
+          setQueueStatus(queueData.queueStatus || 'closed');
+        } else {
+          setPosition(null);
+          setEstimatedWait(null);
+        }
+      } catch (err) {
+        console.error('Error fetching queue position:', err);
+        setError('Unable to retrieve your position in queue');
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
     
-    setPreviousPosition(userPosition);
-  }, [userPosition, previousPosition, toast]);
-
-  // Find user's appointment for additional details
-  const userAppointment = appointments.find(appt => 
-    appt.status === 'checked_in' || appt.status === 'scheduled'
-  );
-
-  if (!userPosition || !userAppointment) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Queue Status</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center">
-          <p>You don't have any active appointments in the queue.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
+    fetchQueuePosition();
+    
+    // Set up interval to refresh position every 30 seconds
+    const interval = setInterval(fetchQueuePosition, 30000);
+    
+    return () => clearInterval(interval);
+  }, [user?.id]);
+  
+  const getStatusColor = () => {
+    if (queueStatus === 'open') {
+      return position !== null ? 'bg-green-100 text-green-800 hover:bg-green-100' : 'bg-amber-100 text-amber-800 hover:bg-amber-100';
+    }
+    return 'bg-gray-100 text-gray-800';
+  };
+  
+  const getStatusMessage = () => {
+    if (queueStatus === 'closed') return 'Queue is currently closed';
+    if (position === null) return 'You\'re not in the queue';
+    return position === 0 ? 'It\'s your turn!' : `You are #${position} in line`;
+  };
+  
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-primary/5">
-        <CardTitle className="flex items-center justify-between">
-          <span>Your Queue Position</span>
-          {userPosition === 1 && (
-            <Bell className="h-5 w-5 text-primary animate-pulse" />
-          )}
+    <Card className="overflow-hidden border-t-4 border-t-blue-500">
+      <CardHeader className="bg-gradient-to-r from-sky-50 to-indigo-50">
+        <CardTitle className="flex justify-between items-center">
+          <span>Queue Status</span>
+          <Badge variant="secondary" className={getStatusColor()}>
+            {queueStatus === 'open' ? 'Open' : 'Closed'}
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="text-center mb-4">
-          <div className="text-4xl font-bold mb-2">
-            {userPosition === 1 ? (
-              <span className="text-primary animate-pulse">You're Next!</span>
-            ) : (
-              <>{userPosition}</>
+        {isLoading ? (
+          <div className="flex flex-col items-center py-6 text-center">
+            <Loader2 className="h-8 w-8 text-muted-foreground animate-spin mb-2" />
+            <p>Checking your position...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center py-6 text-center">
+            <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex justify-center items-center">
+              <div className="text-center">
+                <div className="flex justify-center">
+                  <User className="h-10 w-10 text-blue-500 mb-2" />
+                </div>
+                <h3 className="text-2xl font-bold mb-1">
+                  {getStatusMessage()}
+                </h3>
+                {position !== null && position > 0 && (
+                  <div className="flex items-center justify-center text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4 mr-1" />
+                    <span>Estimated wait: {estimatedWait ? formatWaitTime(estimatedWait) : 'Calculating...'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {position === null && queueStatus === 'open' && (
+              <div className="text-center text-sm text-muted-foreground">
+                <p>You are not currently in the queue.</p>
+                <p>Check in or make an appointment to join.</p>
+              </div>
             )}
           </div>
-          <Badge variant={userPosition <= 3 ? "default" : "outline"}>
-            {userPosition === 1 
-              ? 'Please be ready' 
-              : `${userPosition - 1} customer${userPosition - 1 !== 1 ? 's' : ''} ahead of you`
-            }
-          </Badge>
-        </div>
-
-        <div className="bg-muted/50 p-4 rounded-lg">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground">Estimated Wait</p>
-              <p className="font-medium">{formatWaitTime(estimatedWaitTime || 0)}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Service</p>
-              <p className="font-medium truncate">{userAppointment?.service_id || "General"}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Status</p>
-              <p className="font-medium">{userAppointment?.status === 'checked_in' ? 'Checked In' : 'Scheduled'}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Location</p>
-              <p className="font-medium truncate">{userAppointment?.location_id || "Main Office"}</p>
-            </div>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
