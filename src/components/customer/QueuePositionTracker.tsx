@@ -3,57 +3,45 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, User, Clock, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { formatWaitTime } from '@/lib/queue';
 
 const QueuePositionTracker = () => {
-  const { user } = useAuth();
   const [position, setPosition] = useState<number | null>(null);
   const [estimatedWait, setEstimatedWait] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [queueStatus, setQueueStatus] = useState<string>('closed');
+  const [queueStatus, setQueueStatus] = useState<string>('open');
 
   useEffect(() => {
-    const fetchQueuePosition = async () => {
-      if (!user?.id) return;
-      
+    const simulateQueuePosition = () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        // Fetch current customer's position from queue
-        const { data: queueData, error: queueError } = await supabase.functions.invoke('queue-position', {
-          method: 'POST',
-          body: JSON.stringify({ customerId: user.id })
-        });
-        
-        if (queueError) throw queueError;
-        
-        if (queueData) {
-          setPosition(queueData.position || null);
-          setEstimatedWait(queueData.estimatedWaitTime || null);
-          setQueueStatus(queueData.queueStatus || 'closed');
-        } else {
-          setPosition(null);
-          setEstimatedWait(null);
-        }
+        // Simulate queue position data
+        setTimeout(() => {
+          const mockPosition = Math.floor(Math.random() * 10) + 1;
+          const mockWaitTime = mockPosition * 15; // 15 minutes per person
+          
+          setPosition(mockPosition);
+          setEstimatedWait(mockWaitTime);
+          setQueueStatus('open');
+          setIsLoading(false);
+        }, 1000);
       } catch (err) {
         console.error('Error fetching queue position:', err);
         setError('Unable to retrieve your position in queue');
-      } finally {
         setIsLoading(false);
       }
     };
     
-    fetchQueuePosition();
+    simulateQueuePosition();
     
     // Set up interval to refresh position every 30 seconds
-    const interval = setInterval(fetchQueuePosition, 30000);
+    const interval = setInterval(simulateQueuePosition, 30000);
     
     return () => clearInterval(interval);
-  }, [user?.id]);
+  }, []);
   
   const getStatusColor = () => {
     if (queueStatus === 'open') {
