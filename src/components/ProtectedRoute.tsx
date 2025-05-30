@@ -27,18 +27,29 @@ const supervisorRoles: UserRole[] = ['supervisor', 'admin'];
 const powerUserRoles: UserRole[] = ['power_user', 'admin'];
 const adminRoles: UserRole[] = ['admin'];
 
+// Default permissions based on role hierarchy
+const getDefaultPermissions = (role: UserRole): RolePermissions => {
+  return {
+    role,
+    customer_access: true, // Everyone can access customer pages
+    staff_access: staffRoles.includes(role),
+    supervisor_access: supervisorRoles.includes(role),
+    power_user_access: powerUserRoles.includes(role),
+    admin_access: adminRoles.includes(role)
+  };
+};
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles, pageType = 'customer' }) => {
   const { user, isLoading, role } = useAuth();
   const location = useLocation();
 
-  // Fetch permissions for the current role
-  const { data: permissions, isLoading: isLoadingPermissions } = useQuery({
+  // Fetch permissions for the current role with better error handling
+  const { data: permissions, isLoading: isLoadingPermissions, error: permissionsError } = useQuery({
     queryKey: ['role-permissions', role],
     queryFn: async () => {
       if (!role) return null;
       
       try {
-        // Use type-safe table reference from the generated types
         const { data, error } = await supabase
           .from('role_permissions')
           .select('*')
@@ -46,16 +57,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
           .single();
           
         if (error) {
-          // If no permissions found, use defaults based on role
-          if (error.code === 'PGRST116') { // No rows returned
-            return {
-              role,
-              customer_access: true, // Everyone can access customer pages by default
-              staff_access: staffRoles.includes(role as UserRole),
-              supervisor_access: supervisorRoles.includes(role as UserRole),
-              power_user_access: powerUserRoles.includes(role as UserRole),
-              admin_access: adminRoles.includes(role as UserRole)
-            } as RolePermissions;
+          // If no permissions found in DB, use defaults based on role
+          if (error.code === 'PGRST116') {
+            console.log(`No permissions found in DB for role ${role}, using defaults`);
+            return getDefaultPermissions(role as UserRole);
           }
           throw error;
         }
@@ -71,18 +76,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
         } as RolePermissions;
       } catch (error) {
         console.error('Error fetching permissions:', error);
-        // Return default permissions based on role
-        return {
-          role,
-          customer_access: true, // Everyone can access customer pages by default
-          staff_access: staffRoles.includes(role as UserRole),
-          supervisor_access: supervisorRoles.includes(role as UserRole),
-          power_user_access: powerUserRoles.includes(role as UserRole),
-          admin_access: adminRoles.includes(role as UserRole)
-        } as RolePermissions;
+        // Always return default permissions based on role if DB query fails
+        return getDefaultPermissions(role as UserRole);
       }
     },
     enabled: !!role,
+    retry: 1, // Only retry once to avoid long delays
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Enhanced debug logging
@@ -92,13 +92,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     console.log("Protected Route - Required roles:", requiredRoles);
     console.log("Protected Route - Page type:", pageType);
     console.log("Protected Route - Permissions:", permissions);
+    console.log("Protected Route - Permissions error:", permissionsError);
     
     // Additional debugging for role check
     if (requiredRoles && requiredRoles.length > 0 && role) {
       const hasRequiredRole = requiredRoles.includes(role as UserRole);
       console.log("User has required role:", hasRequiredRole);
     }
-  }, [user, role, requiredRoles, pageType, permissions]);
+  }, [user, role, requiredRoles, pageType, permissions, permissionsError]);
 
   if (isLoading || isLoadingPermissions) {
     return <div className="flex items-center justify-center min-h-screen">
@@ -116,39 +117,45 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // First check specific roles if provided
+  // If we have specific required roles, check those first
   if (requiredRoles && requiredRoles.length > 0 && role) {
-    // Check if the user's role is in the required roles list
     const hasRequiredRole = requiredRoles.includes(role as UserRole);
     
     if (!hasRequiredRole) {
       toast({
         title: "Access Denied",
-        description: `Your role (${role || 'customer'}) doesn't have permission to access this page`,
+        description: `Your role (${role}) doesn't have permission to access this page`,
         variant: "destructive",
       });
       return <Navigate to="/unauthorized" state={{ from: location }} replace />;
     }
-  } 
-  // Then check page type permissions if no specific roles were required
-  else if (permissions) {
+    
+    // User has required role, allow access
+    return <>{children}</>;
+  }
+
+  // No specific roles required, check page type permissions
+  // Use default permissions if database permissions aren't available
+  const effectivePermissions = permissions || (role ? getDefaultPermissions(role as UserRole) : null);
+  
+  if (effectivePermissions) {
     let hasAccess = true;
     
     switch (pageType) {
       case 'admin':
-        hasAccess = permissions.admin_access;
+        hasAccess = effectivePermissions.admin_access;
         break;
       case 'power_user':
-        hasAccess = permissions.power_user_access;
+        hasAccess = effectivePermissions.power_user_access;
         break;
       case 'supervisor':
-        hasAccess = permissions.supervisor_access;
+        hasAccess = effectivePermissions.supervisor_access;
         break;
       case 'staff':
-        hasAccess = permissions.staff_access;
+        hasAccess = effectivePermissions.staff_access;
         break;
       case 'customer':
-        hasAccess = permissions.customer_access;
+        hasAccess = effectivePermissions.customer_access;
         break;
     }
     
@@ -160,9 +167,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
       });
       return <Navigate to="/unauthorized" state={{ from: location }} replace />;
     }
+  } else {
+    // Fallback: if no permissions can be determined, allow customer access but deny others
+    if (pageType !== 'customer') {
+      toast({
+        title: "Access Denied",
+        description: "Unable to verify permissions for this page",
+        variant: "destructive",
+      });
+      return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+    }
   }
   
-  // User is authenticated and has required role/permissions
+  // User is authenticated and has required permissions
   return <>{children}</>;
 };
 
