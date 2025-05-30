@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { UserRole } from '@/hooks/useUserRole';
 
 interface UserRoleSelectorProps {
   currentRole: string;
@@ -31,8 +30,6 @@ export const UserRoleSelector = ({
       <SelectContent>
         <SelectItem value="customer">Customer</SelectItem>
         <SelectItem value="staff">Staff</SelectItem>
-        <SelectItem value="supervisor">Supervisor</SelectItem>
-        <SelectItem value="power_user">Power User</SelectItem>
         <SelectItem value="admin">Admin</SelectItem>
       </SelectContent>
     </Select>

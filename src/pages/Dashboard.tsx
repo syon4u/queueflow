@@ -4,30 +4,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, Users, Settings, LayoutDashboard, User, UserCog, Shield, FileText } from 'lucide-react';
-import { UserRole } from '@/hooks/useUserRole';
+import { Home, Users, Settings, LayoutDashboard } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, role, signOut } = useAuth();
-
-  // Determine which cards to show based on role
-  const showCustomerCard = true; // Everyone can access customer pages
-  const showStaffCard = ['staff', 'supervisor', 'power_user', 'admin'].includes(role as UserRole);
-  const showSupervisorCard = ['supervisor', 'admin'].includes(role as UserRole);
-  const showPowerUserCard = ['power_user', 'admin'].includes(role as UserRole);
-  const showAdminCard = role === 'admin';
-
-  // Get proper role display name
-  const getRoleDisplayName = (role?: string | null): string => {
-    switch (role) {
-      case 'admin': return 'Administrator';
-      case 'power_user': return 'Power User';
-      case 'supervisor': return 'Supervisor';
-      case 'staff': return 'Staff';
-      case 'customer': return 'Customer';
-      default: return 'Customer';
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -39,7 +19,7 @@ const Dashboard = () => {
         </div>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-gray-600">
-            {user?.email} ({getRoleDisplayName(role)})
+            {user?.email} ({role || 'customer'})
           </span>
           <Button variant="outline" size="sm" onClick={signOut}>
             Sign Out
@@ -49,7 +29,7 @@ const Dashboard = () => {
 
       {/* Main content */}
       <main className="flex-1 container mx-auto py-12 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to the Service Portal</h2>
             <p className="text-lg text-gray-600">
@@ -57,40 +37,38 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Customer Card - Always shown */}
-            {showCustomerCard && (
-              <Card className="hover:shadow-lg transition-all duration-200 border-t-4 border-blue-500">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-blue-600" />
-                    Customer Portal
-                  </CardTitle>
-                  <CardDescription>
-                    Book appointments and manage your profile
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Access your appointments, book new services, and update your personal information.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-indigo-600">
-                    <Link to="/customer">
-                      Enter Customer Portal
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Customer Card */}
+            <Card className="hover:shadow-lg transition-all duration-200 border-t-4 border-blue-500">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-blue-600" />
+                  Customer Portal
+                </CardTitle>
+                <CardDescription>
+                  Book appointments and manage your profile
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Access your appointments, book new services, and update your personal information.
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-indigo-600">
+                  <Link to="/customer">
+                    Enter Customer Portal
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
 
-            {/* Staff Card */}
-            {showStaffCard && (
+            {/* Staff Card - Only shown if user has staff or admin role */}
+            {(role === 'staff' || role === 'admin') && (
               <Card className="hover:shadow-lg transition-all duration-200 border-t-4 border-green-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-600" />
+                    <LayoutDashboard className="h-5 w-5 text-green-600" />
                     Staff Portal
                   </CardTitle>
                   <CardDescription>
@@ -112,66 +90,12 @@ const Dashboard = () => {
               </Card>
             )}
 
-            {/* Supervisor Card */}
-            {showSupervisorCard && (
-              <Card className="hover:shadow-lg transition-all duration-200 border-t-4 border-amber-500">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <UserCog className="h-5 w-5 text-amber-600" />
-                    Supervisor Portal
-                  </CardTitle>
-                  <CardDescription>
-                    Staff management and team metrics
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Manage staff schedules, review performance metrics, and handle escalations.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button asChild className="w-full bg-gradient-to-r from-amber-600 to-orange-500">
-                    <Link to="/supervisor">
-                      Enter Supervisor Portal
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            )}
-
-            {/* Power User Card */}
-            {showPowerUserCard && (
-              <Card className="hover:shadow-lg transition-all duration-200 border-t-4 border-indigo-500">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-indigo-600" />
-                    Power User Portal
-                  </CardTitle>
-                  <CardDescription>
-                    Advanced features and reporting
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Access advanced system features, generate reports, and customize workflows.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button asChild className="w-full bg-gradient-to-r from-indigo-600 to-violet-600">
-                    <Link to="/power-user">
-                      Enter Power User Portal
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            )}
-
-            {/* Admin Card */}
-            {showAdminCard && (
+            {/* Admin Card - Only shown if user has admin role */}
+            {role === 'admin' && (
               <Card className="hover:shadow-lg transition-all duration-200 border-t-4 border-purple-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-purple-600" />
+                    <Settings className="h-5 w-5 text-purple-600" />
                     Admin Portal
                   </CardTitle>
                   <CardDescription>

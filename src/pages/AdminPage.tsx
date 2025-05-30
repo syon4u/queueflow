@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
@@ -14,11 +15,7 @@ import UserManagementTab from '@/components/admin/UserManagementTab';
 import { QueueProvider } from '@/context/QueueContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-interface AdminPageProps {
-  limitedAccess?: boolean;
-}
-
-const AdminPage: React.FC<AdminPageProps> = ({ limitedAccess = false }) => {
+const AdminPage = () => {
   const { user, role } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const isMobile = useIsMobile();
