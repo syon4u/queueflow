@@ -5,29 +5,9 @@ import * as reactTesting from '@testing-library/react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { authService } from '@/services/authService';
 
 // Extract the needed utilities from the testing library
 const { screen, waitFor } = reactTesting as any;
-
-// Mock the useUserRole hook
-vi.mock('@/hooks/useUserRole', () => ({
-  useUserRole: () => ({ role: 'customer', isLoading: false })
-}));
-
-// Mock the authService
-vi.mock('@/services/authService', () => ({
-  authService: {
-    getSession: vi.fn().mockResolvedValue({
-      data: { session: null },
-      error: null,
-    }),
-    signInWithEmail: vi.fn(),
-    signUpWithEmail: vi.fn(),
-    signOut: vi.fn(),
-    signInWithGoogle: vi.fn(),
-  }
-}));
 
 // Mock component to test the hook
 const AuthConsumer = () => {
@@ -68,7 +48,7 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('user').textContent).toBe('null');
     
     // Default role should be null
-    expect(screen.getByTestId('role').textContent).toBe('customer');
+    expect(screen.getByTestId('role').textContent).toBe('null');
   });
 
   it('should fetch user role when session is available', async () => {
@@ -78,6 +58,12 @@ describe('AuthProvider', () => {
     
     vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
       data: { session: mockSession as any },
+      error: null,
+    } as any);
+    
+    // Mock role response
+    vi.mocked(supabase.rpc).mockResolvedValueOnce({
+      data: 'customer',
       error: null,
     } as any);
 
@@ -102,6 +88,11 @@ describe('AuthProvider', () => {
   });
 
   it('should call signInWithPassword when signInWithEmail is called', async () => {
+    vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
+      data: {},
+      error: null,
+    } as any);
+
     render(
       <BrowserRouter>
         <AuthProvider>
@@ -113,9 +104,12 @@ describe('AuthProvider', () => {
     // Click login button
     screen.getByTestId('login-button').click();
 
-    // Verify signInWithEmail was called with correct params
+    // Verify signInWithPassword was called with correct params
     await waitFor(() => {
-      expect(authService.signInWithEmail).toHaveBeenCalledWith('test@example.com', 'password');
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'password',
+      });
     });
   });
 });

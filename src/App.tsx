@@ -7,7 +7,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Index from './pages/Index';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
 import StaffPage from './pages/StaffPage';
 import AdminPage from './pages/AdminPage';
 import CustomerPage from './pages/CustomerPage';
@@ -19,18 +18,9 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import PerformanceReportPage from './pages/PerformanceReportPage';
-import { UserRole } from './hooks/useUserRole';
 
 // Create a new QueryClient instance
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 30000,
-    },
-  }
-});
+const queryClient = new QueryClient();
 
 function App() {
   const { i18n } = useTranslation();
@@ -48,18 +38,12 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
+              <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
-              
-              {/* Staff routes */}
               <Route 
                 path="/staff" 
                 element={
-                  <ProtectedRoute pageType="staff">
+                  <ProtectedRoute requiredRoles={['staff', 'admin']}>
                     <StaffPage />
                   </ProtectedRoute>
                 } 
@@ -67,47 +51,23 @@ function App() {
               <Route 
                 path="/performance" 
                 element={
-                  <ProtectedRoute pageType="staff">
+                  <ProtectedRoute requiredRoles={['staff', 'admin']}>
                     <PerformanceReportPage />
                   </ProtectedRoute>
                 } 
               />
-              
-              {/* Supervisor routes */}
-              <Route 
-                path="/supervisor" 
-                element={
-                  <ProtectedRoute pageType="supervisor">
-                    <StaffPage supervisorView={true} />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Power user routes */}
-              <Route 
-                path="/power-user" 
-                element={
-                  <ProtectedRoute pageType="power_user">
-                    <AdminPage limitedAccess={true} />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Admin routes */}
               <Route 
                 path="/admin" 
                 element={
-                  <ProtectedRoute pageType="admin">
+                  <ProtectedRoute requiredRoles={['admin']}>
                     <AdminPage />
                   </ProtectedRoute>
                 } 
               />
-              
-              {/* Customer routes */}
               <Route 
                 path="/customer" 
                 element={
-                  <ProtectedRoute pageType="customer">
+                  <ProtectedRoute requiredRoles={['customer']}>
                     <CustomerPage />
                   </ProtectedRoute>
                 } 
@@ -115,7 +75,7 @@ function App() {
               <Route 
                 path="/profile" 
                 element={
-                  <ProtectedRoute pageType="customer">
+                  <ProtectedRoute>
                     <ProfilePage />
                   </ProtectedRoute>
                 } 
@@ -123,7 +83,7 @@ function App() {
               <Route 
                 path="/appointments" 
                 element={
-                  <ProtectedRoute pageType="customer">
+                  <ProtectedRoute>
                     <AppointmentsPage />
                   </ProtectedRoute>
                 } 
@@ -131,7 +91,7 @@ function App() {
               <Route 
                 path="/appointments/new" 
                 element={
-                  <ProtectedRoute pageType="customer">
+                  <ProtectedRoute requiredRoles={['customer']}>
                     <NewAppointmentPage />
                   </ProtectedRoute>
                 } 

@@ -1,12 +1,19 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
-import { authService } from '@/services/authService';
-import { useUserRole, UserRole } from '@/hooks/useUserRole';
-import { AuthContextType } from '@/types/auth';
+
+type AuthContextType = {
+  user: User | null;
+  session: Session | null;
+  isLoading: boolean;
+  role: string | null;
+  signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -14,13 +21,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState<string | null>(null);
   const navigate = useNavigate();
-  
-  // Use our custom hook to fetch role
-  const { role, isLoading: roleLoading } = useUserRole(user);
-  
-  // Determine overall loading state
-  const combinedLoading = isLoading || (user !== null && roleLoading);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -29,23 +31,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Auth state changed:', event);
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Redirect users after authentication events
-        if (event === 'SIGNED_IN') {
-          navigate('/');  // This will take them to the Dashboard
-        } else if (event === 'SIGNED_OUT') {
-          navigate('/login');
+
+        if (session?.user) {
+          // Defer Supabase calls with setTimeout
+          setTimeout(() => {
+            fetchUserRole(session.user.id);
+          }, 0);
+        } else {
+          setRole(null);
         }
       }
     );
 
     // THEN check for existing session
-    authService.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('Initial session check:', session?.user?.email || 'no session');
       setSession(session);
       setUser(session?.user ?? null);
       
-      if (!session?.user) {
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      } else {
         setIsLoading(false);
       }
     });
@@ -53,24 +59,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      console.log('Fetching role for user:', userId);
+      
+      // First check hardcoded admin emails for development convenience
+      if (user?.email === 'syon4u@gmail.com' || 
+          user?.email === 'syon4uu@gmail.com' || 
+          user?.email?.toLowerCase().includes('syon') ||
+          user?.email?.toLowerCase().includes('garrick')) {
+        setRole('admin');
+        console.log('Admin user detected via hardcoded check - setting admin role');
+        setIsLoading(false);
+        return;
+      }
+
+      // Try to get role from database using the fixed function
+      const { data, error } = await supabase.rpc('get_user_role', { user_id: userId });
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        
+        // Check for role in the user_roles table directly as fallback
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .single();
+        
+        if (roleError || !roleData) {
+          console.log('No role found in database, defaulting to customer');
+          setRole('customer');
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log('Role found in database:', roleData.role);
+        setRole(roleData.role);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Role from RPC function:', data);
+      setRole(data || 'customer');
+      console.log(`Role set to ${data || 'customer'} from database`);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch user role:', error);
+      setRole('customer');
+      setIsLoading(false);
+    }
+  };
 
   const signInWithGoogle = async () => {
     try {
-      await authService.signInWithGoogle();
-      // Note: We don't need to do anything here because onAuthStateChange will handle the session update
-    } catch (error: any) {
+      // Check for Google provider being enabled first
+      console.error('Google auth temporarily disabled - use email/password instead');
+      throw new Error('Google provider is not enabled in Supabase');
+    } catch (error) {
       console.error('Error signing in with Google:', error);
-      throw new Error(error.message || 'Google sign-in is not enabled. Please use email/password instead.');
+      throw error;
     }
   };
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      const data = await authService.signInWithEmail(email, password);
-      // No need to navigate here as onAuthStateChange will handle it
-      return data;
-    } catch (error: any) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
       console.error('Error signing in with email:', error);
       throw error;
     }
@@ -78,9 +142,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
-      const data = await authService.signUpWithEmail(email, password);
-      return data;
-    } catch (error: any) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
       console.error('Error signing up with email:', error);
       throw error;
     }
@@ -88,26 +158,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      setIsLoading(true);
-      await authService.signOut();
-      // No need to navigate here as onAuthStateChange will handle it
-    } catch (error: any) {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
+      navigate('/login');
+    } catch (error) {
       console.error('Error signing out:', error);
-      toast({
-        variant: "destructive",
-        title: "Sign out failed",
-        description: error.message || "There was an error signing out.",
-      });
-    } finally {
-      setIsLoading(false);
+      throw error;
     }
   };
 
-  const value: AuthContextType = {
+  const value = {
     user,
     session,
-    isLoading: combinedLoading,
-    role: role as UserRole | null,
+    isLoading,
+    role,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,

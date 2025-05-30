@@ -1,5 +1,5 @@
 
-import type { Customer } from "@/types/queue";
+import type { Customer } from "@/context/QueueContext";
 
 // Calculate estimated wait time based on position in queue and average serve time
 export const calculateEstimatedWaitTime = (

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Calendar } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueue } from '@/context/QueueContext';
 import { useAuth } from '@/context/AuthContext';
