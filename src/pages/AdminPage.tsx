@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
@@ -10,7 +9,7 @@ import { ServicesTab } from '@/components/admin/ServicesTab';
 import { StaffTab } from '@/components/admin/StaffTab';
 import { StatsTab } from '@/components/admin/StatsTab';
 import { QueueManagementTab } from '@/components/admin/QueueManagementTab';
-import { SystemSettingsTab } from '@/components/admin/SystemSettingsTab';
+import SystemSettingsTab from '@/components/admin/SystemSettingsTab';
 import { DashboardTab } from '@/components/admin/DashboardTab';
 import UserManagementTab from '@/components/admin/UserManagementTab';
 import { QueueProvider } from '@/context/QueueContext';

@@ -42,7 +42,7 @@ const BackendHealthCheck: React.FC = () => {
       const { data, error } = await supabase.from('locations').select('count').limit(1);
       if (error) throw error;
       updateResult('Supabase Connection', 'success', 'Connected successfully');
-    } catch (error) {
+    } catch (error: any) {
       updateResult('Supabase Connection', 'error', `Connection failed: ${error.message}`);
     }
 
@@ -55,21 +55,28 @@ const BackendHealthCheck: React.FC = () => {
       } else {
         updateResult('Authentication', 'warning', 'Not authenticated');
       }
-    } catch (error) {
+    } catch (error: any) {
       updateResult('Authentication', 'error', `Auth check failed: ${error.message}`);
     }
 
-    // 3. Test Tables Access
-    const tables = ['locations', 'services', 'staff', 'customers', 'appointments', 'user_roles'];
-    
-    for (const table of tables) {
-      updateResult(`Table: ${table}`, 'loading', 'Checking access...');
+    // 3. Test Tables Access - Individual calls to satisfy TypeScript
+    const tableChecks = [
+      { name: 'locations', table: 'locations' as const },
+      { name: 'services', table: 'services' as const },
+      { name: 'staff', table: 'staff' as const },
+      { name: 'customers', table: 'customers' as const },
+      { name: 'appointments', table: 'appointments' as const },
+      { name: 'user_roles', table: 'user_roles' as const }
+    ];
+
+    for (const { name, table } of tableChecks) {
+      updateResult(`Table: ${name}`, 'loading', 'Checking access...');
       try {
         const { data, error } = await supabase.from(table).select('count').limit(1);
         if (error) throw error;
-        updateResult(`Table: ${table}`, 'success', 'Accessible');
-      } catch (error) {
-        updateResult(`Table: ${table}`, 'error', `Access denied: ${error.message}`);
+        updateResult(`Table: ${name}`, 'success', 'Accessible');
+      } catch (error: any) {
+        updateResult(`Table: ${name}`, 'error', `Access denied: ${error.message}`);
       }
     }
 
@@ -82,7 +89,7 @@ const BackendHealthCheck: React.FC = () => {
         const { data, error } = await supabase.functions.invoke(func, { body: { test: true } });
         if (error) throw error;
         updateResult(`Function: ${func}`, 'success', 'Function accessible');
-      } catch (error) {
+      } catch (error: any) {
         updateResult(`Function: ${func}`, 'error', `Function failed: ${error.message}`);
       }
     }
@@ -93,7 +100,7 @@ const BackendHealthCheck: React.FC = () => {
       const { data, error } = await supabase.rpc('get_user_role');
       if (error) throw error;
       updateResult('Database Functions', 'success', `User role function works: ${data}`);
-    } catch (error) {
+    } catch (error: any) {
       updateResult('Database Functions', 'error', `DB function failed: ${error.message}`);
     }
 
@@ -109,7 +116,7 @@ const BackendHealthCheck: React.FC = () => {
       } else {
         updateResult('RLS Policies', 'warning', 'RLS may not be properly configured');
       }
-    } catch (error) {
+    } catch (error: any) {
       updateResult('RLS Policies', 'error', `RLS test failed: ${error.message}`);
     }
 
@@ -130,7 +137,7 @@ const BackendHealthCheck: React.FC = () => {
       } else {
         updateResult('Data Integrity', 'success', 'Basic data structure looks good');
       }
-    } catch (error) {
+    } catch (error: any) {
       updateResult('Data Integrity', 'error', `Data check failed: ${error.message}`);
     }
 
