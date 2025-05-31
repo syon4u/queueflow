@@ -18,13 +18,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     console.log("Protected Route - Current user:", user?.email);
     console.log("Protected Route - Current role:", role);
     console.log("Protected Route - Required roles:", requiredRoles);
-    
-    // Additional debugging for role check
-    if (requiredRoles && requiredRoles.length > 0) {
-      const hasRequiredRole = requiredRoles.includes(role || '');
-      console.log("User has required role:", hasRequiredRole);
-    }
-  }, [user, role, requiredRoles]);
+    console.log("Protected Route - Location pathname:", location.pathname);
+  }, [user, role, requiredRoles, location.pathname]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
@@ -42,22 +37,46 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check if specific roles are required
-  if (requiredRoles && requiredRoles.length > 0) {
-    // Check if the user's role is in the required roles list
-    const hasRequiredRole = requiredRoles.includes(role || '');
-    
-    if (!hasRequiredRole) {
-      toast({
-        title: "Access Denied",
-        description: `Your role (${role || 'customer'}) doesn't have permission to access this page`,
-        variant: "destructive",
-      });
-      return <Navigate to="/unauthorized" state={{ from: location }} replace />;
+  // If no specific roles are required, allow access
+  if (!requiredRoles || requiredRoles.length === 0) {
+    return <>{children}</>;
+  }
+
+  // Role hierarchy: admin can access everything, staff can access staff and customer, customer can only access customer
+  const currentRole = role || 'customer';
+  
+  const hasAccess = () => {
+    // Admin can access everything
+    if (currentRole === 'admin') {
+      return true;
     }
+    
+    // Staff can access staff and customer areas
+    if (currentRole === 'staff') {
+      return requiredRoles.some(r => ['staff', 'customer'].includes(r));
+    }
+    
+    // Customer can only access customer areas
+    if (currentRole === 'customer') {
+      return requiredRoles.includes('customer');
+    }
+    
+    // Default: check if current role is in required roles
+    return requiredRoles.includes(currentRole);
+  };
+
+  if (!hasAccess()) {
+    console.log(`Access denied: User role '${currentRole}' not in required roles:`, requiredRoles);
+    toast({
+      title: "Access Denied",
+      description: `Your role (${currentRole}) doesn't have permission to access this page`,
+      variant: "destructive",
+    });
+    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
   }
   
-  // User is authenticated and has required role (or no specific role is required)
+  // User is authenticated and has required role
+  console.log(`Access granted: User role '${currentRole}' has access to:`, requiredRoles);
   return <>{children}</>;
 };
 
