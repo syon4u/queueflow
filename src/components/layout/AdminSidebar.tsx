@@ -21,7 +21,7 @@ import {
   UserCheck,
   Building2,
   FileText,
-  Queue,
+  UsersRound,
   MessageSquare,
   BarChart3,
   Settings,
@@ -72,7 +72,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     {
       id: 'queue',
       label: 'Queue Management',
-      icon: Queue,
+      icon: UsersRound,
     },
     {
       id: 'templates',
