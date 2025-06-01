@@ -387,6 +387,6 @@ const BrowardDesignSystem: React.FC = () => {
       <BrowardFooter />
     </div>
   );
-};
+}
 
 export default BrowardDesignSystem;
