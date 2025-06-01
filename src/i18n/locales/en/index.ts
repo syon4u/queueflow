@@ -10,6 +10,7 @@ import communication from './communication.json';
 import notes from './notes.json';
 import admin from './admin.json';
 import profile from './profile.json';
+import queue from './queue.json';
 
 export default {
   auth,
@@ -22,5 +23,6 @@ export default {
   communication,
   notes,
   admin,
-  profile
+  profile,
+  queue
 };

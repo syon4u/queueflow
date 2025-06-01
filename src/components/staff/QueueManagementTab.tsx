@@ -1,12 +1,13 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import { CustomerCallingSystem } from './CustomerCallingSystem';
 import { QueueDisplayBoard } from './QueueDisplayBoard';
 import { EnhancedQueueControls } from './EnhancedQueueControls';
+import { EnhancedQueueManagement } from './EnhancedQueueManagement';
+import { useAuth } from '@/context/AuthContext';
 
-// Mock data for demonstration
+// Mock data for demonstration - keep existing mock data
 const mockCustomers = [
   {
     id: '1',
@@ -38,6 +39,7 @@ const mockCustomers = [
 
 export const QueueManagementTab: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const handleCustomerCalled = (customerId: string) => {
     console.log('Customer called:', customerId);
@@ -49,14 +51,22 @@ export const QueueManagementTab: React.FC = () => {
     // Implementation would remove customer from queue
   };
 
+  // Mock location ID - in real app this would come from user/context
+  const locationId = 'mock-location-id';
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="calling" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="enhanced" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="enhanced">{t('queue.enhancedQueue')}</TabsTrigger>
           <TabsTrigger value="calling">{t('queue.customerCalling')}</TabsTrigger>
           <TabsTrigger value="display">{t('queue.displayBoard')}</TabsTrigger>
           <TabsTrigger value="controls">{t('queue.queueControls')}</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="enhanced" className="space-y-4">
+          <EnhancedQueueManagement locationId={locationId} />
+        </TabsContent>
         
         <TabsContent value="calling" className="space-y-4">
           <CustomerCallingSystem
