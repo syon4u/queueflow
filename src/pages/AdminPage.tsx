@@ -14,8 +14,6 @@ import { DashboardTab } from '@/components/admin/DashboardTab';
 import UserManagementTab from '@/components/admin/UserManagementTab';
 import { QueueProvider } from '@/context/QueueContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import BrowardLayout from '@/components/layout/BrowardLayout';
-import BrowardHero from '@/components/layout/BrowardHero';
 
 const AdminPage = () => {
   const { user, role } = useAuth();
@@ -34,14 +32,18 @@ const AdminPage = () => {
   }, [location.search]);
   
   return (
-    <BrowardLayout headerTitle="Admin Portal">
-      <BrowardHero 
-        title="Admin Dashboard" 
-        subtitle="Manage system settings, users, and view analytics"
-        backgroundStyle="gradient"
-      />
-      
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Logged in as: {user?.email} (Role: {role || 'admin'})
+          </div>
+        </div>
+
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} value={activeTab} className="w-full">
           <TabsList className={`grid ${isMobile ? 'grid-cols-4' : 'grid-cols-8'} mb-6`}>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
@@ -85,8 +87,17 @@ const AdminPage = () => {
             </CardContent>
           </Card>
         </Tabs>
+        
+        <div className="flex space-x-4 mt-6">
+          <Button asChild variant="outline">
+            <Link to="/">Back to Home</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/staff">Staff Dashboard</Link>
+          </Button>
+        </div>
       </div>
-    </BrowardLayout>
+    </div>
   );
 };
 

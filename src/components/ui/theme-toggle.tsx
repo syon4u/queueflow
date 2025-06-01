@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun } from 'lucide-react';
 
 interface ThemeToggleProps {
   className?: string;
@@ -48,16 +47,11 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
 
   return (
     <button 
-      className={`flex items-center justify-center w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 ${className}`}
+      className={`theme-toggle ${className}`}
       onClick={toggleTheme}
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDarkMode ? (
-        <Sun className="h-4 w-4 text-bc-gold" />
-      ) : (
-        <Moon className="h-4 w-4 text-bc-navy" />
-      )}
       <span className="sr-only">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
     </button>
   );

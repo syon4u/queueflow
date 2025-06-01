@@ -1,12 +1,9 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
 import { ArrowRight, Users, Calendar, Clock } from 'lucide-react';
-import BrowardLayout from '@/components/layout/BrowardLayout';
-import BrowardHero from '@/components/layout/BrowardHero';
-import BrowardButton from '@/components/ui/broward-button';
-import BrowardCard from '@/components/ui/broward-card';
-import { ShieldCheckmarkAnimation, LandmarkCourthouse, LandmarkBeach, LandmarkPort } from '@/components/ui/broward-icons';
 
 const Index = () => {
   const [showGuide, setShowGuide] = useState(false);
@@ -22,133 +19,180 @@ const Index = () => {
   };
 
   return (
-    <BrowardLayout>
-      <BrowardHero 
-        title="Broward County Queue Management System" 
-        subtitle="Streamline customer flow, reduce wait times, and improve the overall experience"
-        backgroundStyle="gradient"
-      />
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      {/* Header with improved contrast and spacing */}
+      <header className="bg-white border-b border-border/40 shadow-sm">
+        <div className="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center">
+          <div className="flex items-center">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              QueueFlow
+            </h1>
+          </div>
+          <div>
+            {user ? (
+              <Button 
+                onClick={() => navigate('/staff')} 
+                variant="outline"
+                className="transition-all hover:bg-primary/10 focus:ring-2 focus:ring-primary/20"
+                aria-label="Go to Dashboard"
+              >
+                Dashboard
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => navigate('/login')} 
+                variant="outline"
+                className="transition-all hover:bg-primary/10 focus:ring-2 focus:ring-primary/20"
+                aria-label="Sign In"
+              >
+                Sign In
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </header>
       
-      <main className="container mx-auto px-4 py-12">
-        {/* Services Section */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl text-bc-navy dark:text-bc-blue mb-4">Our Services</h2>
-            <p className="max-w-2xl mx-auto text-neutral-600 dark:text-neutral-400">
-              Access our queue management services to efficiently handle customer flow
+      <main className="container mx-auto px-4 md:px-6 lg:px-8 py-8">
+        {/* Hero Section with enhanced typography and spacing */}
+        <div className="text-center py-10 md:py-16 lg:py-20 max-w-4xl mx-auto">
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+            Simple Queue Management for Your Business
+          </h1>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            Streamline customer flow, reduce wait times, and improve the overall experience 
+            with our intuitive queue management system.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/staff')}
+              className="font-medium shadow-sm hover:shadow transition-all"
+              aria-label="Get Started with QueueFlow"
+            >
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={handleShowGuide}
+              className="font-medium hover:bg-primary/10 transition-all"
+              aria-label="Learn more about QueueFlow"
+            >
+              Learn More
+            </Button>
+          </div>
+        </div>
+        
+        {/* Portal Cards with improved layout and hover effects */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 md:py-12">
+          <div 
+            className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
+            onClick={() => handleCardClick('/staff')}
+            role="button"
+            tabIndex={0}
+            aria-label="Staff Portal"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleCardClick('/staff');
+              }
+            }}
+          >
+            <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+              <Users className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Staff Portal</h3>
+            <p className="text-gray-600 flex-grow">
+              Manage customer queues, track wait times, and serve customers efficiently.
             </p>
+            <div className="mt-4 text-primary text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              Open portal <ArrowRight className="ml-1 h-3 w-3" />
+            </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <BrowardCard 
-              className="text-center cursor-pointer"
-              onClick={() => handleCardClick('/staff')}
-            >
-              <div className="flex justify-center mb-4">
-                <Users className="h-12 w-12 text-bc-blue" />
-              </div>
-              <h3 className="font-serif text-xl mb-2">Staff Portal</h3>
-              <p className="mb-4 text-neutral-600 dark:text-neutral-400">
-                Manage customer queues, track wait times, and serve customers efficiently.
-              </p>
-              <BrowardButton variant="primary">
-                Open Portal <ArrowRight className="ml-2 h-4 w-4" />
-              </BrowardButton>
-            </BrowardCard>
-            
-            <BrowardCard 
-              className="text-center cursor-pointer"
-              onClick={() => handleCardClick('/customer')}
-            >
-              <div className="flex justify-center mb-4">
-                <Calendar className="h-12 w-12 text-bc-teal" />
-              </div>
-              <h3 className="font-serif text-xl mb-2">Customer Portal</h3>
-              <p className="mb-4 text-neutral-600 dark:text-neutral-400">
-                Schedule appointments, check in, and monitor your position in the queue.
-              </p>
-              <BrowardButton variant="secondary">
-                Open Portal <ArrowRight className="ml-2 h-4 w-4" />
-              </BrowardButton>
-            </BrowardCard>
-            
-            <BrowardCard 
-              className="text-center cursor-pointer"
-              onClick={() => handleCardClick('/appointments')}
-            >
-              <div className="flex justify-center mb-4">
-                <Clock className="h-12 w-12 text-bc-navy" />
-              </div>
-              <h3 className="font-serif text-xl mb-2">Appointments</h3>
-              <p className="mb-4 text-neutral-600 dark:text-neutral-400">
-                View and manage all upcoming appointments and customer bookings.
-              </p>
-              <BrowardButton variant="outline">
-                Open Portal <ArrowRight className="ml-2 h-4 w-4" />
-              </BrowardButton>
-            </BrowardCard>
-          </div>
-        </section>
-        
-        {/* About Section with Landmarks */}
-        <section className="mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="font-serif text-3xl text-bc-navy dark:text-bc-blue mb-4">About QueueFlow</h2>
-              <p className="mb-4 text-neutral-600 dark:text-neutral-400">
-                QueueFlow is a modern queue management system designed to help businesses manage customer flow efficiently. 
-                Our platform helps reduce wait times, improve customer satisfaction, and optimize staff productivity.
-              </p>
-              <p className="mb-6 text-neutral-600 dark:text-neutral-400">
-                With features like real-time queue updates, appointment scheduling, and analytics, 
-                QueueFlow provides everything you need to create a smooth customer experience.
-              </p>
-              <BrowardButton variant="primary" onClick={handleShowGuide}>Learn More</BrowardButton>
+          <div 
+            className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
+            onClick={() => handleCardClick('/customer')}
+            role="button"
+            tabIndex={0}
+            aria-label="Customer Portal"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleCardClick('/customer');
+              }
+            }}
+          >
+            <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+              <Calendar className="h-5 w-5 text-primary" />
             </div>
-            
-            <div className="grid grid-cols-1 gap-6">
-              <div className="flex justify-center">
-                <LandmarkCourthouse />
-              </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="flex justify-center">
-                  <LandmarkBeach />
-                </div>
-                <div className="flex justify-center">
-                  <LandmarkPort />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* Call to Action with Wave Background */}
-        <section className="mb-16">
-          <div className="wave-animation bg-gradient-to-r from-bc-navy to-bc-blue rounded-lg p-8 md:p-12 text-center">
-            <h2 className="font-serif text-3xl text-white mb-4">Ready to Get Started?</h2>
-            <p className="text-bc-sand mb-8 max-w-2xl mx-auto">
-              Join QueueFlow today and transform your customer service experience with our 
-              powerful queue management system.
+            <h3 className="text-xl font-semibold mb-2">Customer Portal</h3>
+            <p className="text-gray-600 flex-grow">
+              Schedule appointments, check in, and monitor your position in the queue.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <BrowardButton 
-                variant="primary" 
-                className="bg-bc-gold text-bc-navy hover:bg-bc-sand"
-                onClick={() => navigate('/staff')}
-              >
-                Get Started
-              </BrowardButton>
-              <BrowardButton 
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-bc-navy"
-                onClick={handleShowGuide}
-              >
-                Learn More
-              </BrowardButton>
+            <div className="mt-4 text-primary text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              Open portal <ArrowRight className="ml-1 h-3 w-3" />
             </div>
           </div>
-        </section>
+          
+          <div 
+            className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
+            onClick={() => handleCardClick('/appointments')}
+            role="button"
+            tabIndex={0}
+            aria-label="Appointments"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleCardClick('/appointments');
+              }
+            }}
+          >
+            <div className="bg-primary/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+              <Clock className="h-5 w-5 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Appointments</h3>
+            <p className="text-gray-600 flex-grow">
+              View and manage all upcoming appointments and customer bookings.
+            </p>
+            <div className="mt-4 text-primary text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              Open portal <ArrowRight className="ml-1 h-3 w-3" />
+            </div>
+          </div>
+        </div>
+        
+        {/* About Section with improved layout and visual design */}
+        <div className="py-10 md:py-16 max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">About QueueFlow</h2>
+          <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-border/40">
+            <p className="text-gray-600 mb-4">
+              QueueFlow is a modern queue management system designed to help businesses manage customer flow efficiently. 
+              Our platform helps reduce wait times, improve customer satisfaction, and optimize staff productivity.
+            </p>
+            <p className="text-gray-600 mb-4">
+              With features like real-time queue updates, appointment scheduling, and analytics, 
+              QueueFlow provides everything you need to create a smooth customer experience.
+            </p>
+            <p className="text-gray-600">
+              Whether you're a small business or a large enterprise, QueueFlow scales to meet your needs.
+            </p>
+          </div>
+        </div>
       </main>
+
+      {/* Footer with improved spacing and contrast */}
+      <footer className="bg-gray-900 text-white py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <h2 className="text-xl font-bold">QueueFlow</h2>
+            </div>
+            <div className="text-gray-300 text-sm">
+              &copy; {new Date().getFullYear()} QueueFlow. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
       
       {/* Welcome guide modal with improved accessibility */}
       {showGuide && (
@@ -157,24 +201,24 @@ const Index = () => {
           onClick={() => setShowGuide(false)}
         >
           <div 
-            className="bg-white dark:bg-neutral-100 p-6 rounded-xl max-w-md w-full shadow-lg"
+            className="bg-white p-6 rounded-xl max-w-md w-full shadow-lg"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-labelledby="guide-title"
             aria-modal="true"
           >
-            <h3 id="guide-title" className="text-xl font-serif font-bold mb-2 text-bc-navy dark:text-bc-blue">Welcome to QueueFlow</h3>
-            <p className="mb-4 text-neutral-600 dark:text-neutral-400">A simple guide to get you started with our queue management system.</p>
-            <BrowardButton 
+            <h3 id="guide-title" className="text-xl font-bold mb-2">Welcome to QueueFlow</h3>
+            <p className="mb-4 text-gray-600">A simple guide to get you started with our queue management system.</p>
+            <Button 
               onClick={() => setShowGuide(false)} 
-              className="w-full"
+              className="w-full font-medium"
             >
               Got it
-            </BrowardButton>
+            </Button>
           </div>
         </div>
       )}
-    </BrowardLayout>
+    </div>
   );
 };
 

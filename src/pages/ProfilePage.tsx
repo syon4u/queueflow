@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,11 +9,6 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import BrowardLayout from '@/components/layout/BrowardLayout';
-import BrowardHero from '@/components/layout/BrowardHero';
-import BrowardCard from '@/components/ui/broward-card';
-import BrowardInput from '@/components/ui/broward-input';
-import BrowardButton from '@/components/ui/broward-button';
 
 const ProfilePage = () => {
   const { user, role } = useAuth();
@@ -22,11 +18,50 @@ const ProfilePage = () => {
   
   // Form state
   const [formData, setFormData] = useState({
-    firstName: 'Demo',
-    lastName: 'User',
+    firstName: '',
+    lastName: '',
     email: user?.email || '',
-    phone: '555-123-4567'
+    phone: ''
   });
+  
+  // Load user profile data
+  React.useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+          
+        if (error) throw error;
+        
+        if (data) {
+          setFormData({
+            firstName: data.first_name || '',
+            lastName: data.last_name || '',
+            email: data.email || user.email || '',
+            phone: data.phone || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          title: t('common.error'),
+          description: t('profile.errorFetching'),
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUserProfile();
+  }, [user?.id, toast, t, user?.email]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,8 +76,17 @@ const ProfilePage = () => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await supabase
+        .from('customers')
+        .upsert({
+          id: user.id,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone
+        });
+        
+      if (error) throw error;
       
       toast({
         title: t('profile.success'),
@@ -61,30 +105,31 @@ const ProfilePage = () => {
   };
   
   return (
-    <BrowardLayout headerTitle="User Profile">
-      <BrowardHero 
-        title="Your Profile" 
-        subtitle="Manage your personal information and account settings"
-        backgroundStyle="pattern"
-      />
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">{t('profile.title')}</h1>
       
-      <div className="container mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <BrowardCard title="Personal Information" elevation="md">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <BrowardInput
-                    label="First Name"
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>{t('profile.personalInfo')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">{t('profile.firstName')}</Label>
+                  <Input
                     id="firstName"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
                     placeholder={t('profile.firstNamePlaceholder')}
                   />
-                  
-                  <BrowardInput
-                    label="Last Name"
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">{t('profile.lastName')}</Label>
+                  <Input
                     id="lastName"
                     name="lastName"
                     value={formData.lastName}
@@ -92,9 +137,11 @@ const ProfilePage = () => {
                     placeholder={t('profile.lastNamePlaceholder')}
                   />
                 </div>
-                
-                <BrowardInput
-                  label="Email"
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('profile.email')}</Label>
+                <Input
                   id="email"
                   name="email"
                   type="email"
@@ -102,67 +149,68 @@ const ProfilePage = () => {
                   onChange={handleChange}
                   placeholder={t('profile.emailPlaceholder')}
                 />
-                
-                <BrowardInput
-                  label="Phone"
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phone">{t('profile.phone')}</Label>
+                <Input
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder={t('profile.phonePlaceholder')}
                 />
-                
-                <div className="pt-2">
-                  <BrowardButton type="submit" disabled={isLoading}>
-                    {isLoading ? t('common.saving') : t('common.save')}
-                  </BrowardButton>
-                </div>
-              </form>
-            </BrowardCard>
-          </div>
-          
-          <div>
-            <BrowardCard title="Account Information" elevation="md">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{t('profile.userRole')}</p>
-                  <p className="font-medium capitalize text-bc-navy dark:text-bc-blue">{role}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{t('profile.userId')}</p>
-                  <p className="font-mono text-xs text-neutral-600 dark:text-neutral-400">{user?.id}</p>
-                </div>
-                
-                <div className="pt-4 space-y-2">
-                  <BrowardButton asChild variant="outline" className="w-full">
-                    <Link to="/">{t('common.backToHome')}</Link>
-                  </BrowardButton>
-                  
-                  {role === 'customer' && (
-                    <BrowardButton asChild className="w-full">
-                      <Link to="/customer">{t('common.customerDashboard')}</Link>
-                    </BrowardButton>
-                  )}
-                  
-                  {(role === 'staff' || role === 'admin') && (
-                    <BrowardButton asChild className="w-full">
-                      <Link to="/staff">{t('common.staffDashboard')}</Link>
-                    </BrowardButton>
-                  )}
-                  
-                  {role === 'admin' && (
-                    <BrowardButton asChild className="w-full">
-                      <Link to="/admin">{t('admin.dashboard')}</Link>
-                    </BrowardButton>
-                  )}
-                </div>
               </div>
-            </BrowardCard>
-          </div>
-        </div>
+              
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? t('common.saving') : t('common.save')}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('profile.accountInfo')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">{t('profile.userRole')}</p>
+              <p className="font-medium capitalize">{role}</p>
+            </div>
+            
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">{t('profile.userId')}</p>
+              <p className="font-mono text-xs">{user?.id}</p>
+            </div>
+            
+            <div className="pt-4 space-y-2">
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/">{t('common.backToHome')}</Link>
+              </Button>
+              
+              {role === 'customer' && (
+                <Button asChild className="w-full">
+                  <Link to="/customer">{t('common.customerDashboard')}</Link>
+                </Button>
+              )}
+              
+              {(role === 'staff' || role === 'admin') && (
+                <Button asChild className="w-full">
+                  <Link to="/staff">{t('common.staffDashboard')}</Link>
+                </Button>
+              )}
+              
+              {role === 'admin' && (
+                <Button asChild className="w-full">
+                  <Link to="/admin">{t('admin.dashboard')}</Link>
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </BrowardLayout>
+    </div>
   );
 };
 

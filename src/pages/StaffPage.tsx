@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -22,8 +23,6 @@ import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import { PieChart } from 'lucide-react';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
-import BrowardLayout from '@/components/layout/BrowardLayout';
-import BrowardHero from '@/components/layout/BrowardHero';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -50,14 +49,29 @@ const StaffPage = () => {
   };
   
   return (
-    <BrowardLayout headerTitle="Staff Portal">
-      <BrowardHero 
-        title="Staff Dashboard" 
-        subtitle="Manage appointments, queue, and staff settings"
-        backgroundStyle="wave"
+    <div className="min-h-screen bg-gray-50">
+      <StaffHeader 
+        user={user} 
+        role={role}
+        onToggleShortcuts={toggleShortcutsDialog}
       />
       
-      <div className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{t('staff.dashboard')}</h1>
+              <p className="text-gray-600">{t('staff.managementDescription')}</p>
+            </div>
+            <Button asChild variant="outline" className="flex items-center gap-2">
+              <Link to="/performance">
+                <PieChart className="h-4 w-4" />
+                {t('performance.reports')}
+              </Link>
+            </Button>
+          </div>
+        </div>
+
         <StaffStatusSection onStatusChange={handleStatusChange} />
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-6">
@@ -91,12 +105,12 @@ const StaffPage = () => {
               </TabsContent>
               
               <TabsContent value="appointments">
-                <div className="bg-white rounded-lg dark:bg-neutral-100">
-                  <h2 className="text-xl font-serif mb-4">{t('staff.activeAppointments')}</h2>
+                <div className="bg-white rounded-lg">
+                  <h2 className="text-xl font-semibold mb-4">{t('staff.activeAppointments')}</h2>
                   
                   {loading ? (
                     <div className="flex justify-center p-8">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-bc-blue" aria-label={t('common.loading')}></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-label={t('common.loading')}></div>
                     </div>
                   ) : (
                     <StaffAppointmentTable 
@@ -112,9 +126,9 @@ const StaffPage = () => {
               </TabsContent>
               
               <TabsContent value="settings">
-                <div className="bg-white rounded-lg dark:bg-neutral-100">
-                  <h2 className="text-xl font-serif mb-4">{t('staff.settings')}</h2>
-                  <p className="text-neutral-600 dark:text-neutral-400">{t('staff.settingsDescription')}</p>
+                <div className="bg-white rounded-lg">
+                  <h2 className="text-xl font-semibold mb-4">{t('staff.settings')}</h2>
+                  <p className="text-gray-600">{t('staff.settingsDescription')}</p>
                 </div>
               </TabsContent>
             </CardContent>
@@ -128,14 +142,14 @@ const StaffPage = () => {
             </Button>
           )}
         </div>
-      </div>
+      </main>
       
       {/* Keyboard shortcuts dialog */}
       <StaffShortcuts 
         open={showShortcutsDialog} 
         onClose={() => setShowShortcutsDialog(false)} 
       />
-    </BrowardLayout>
+    </div>
   );
 };
 

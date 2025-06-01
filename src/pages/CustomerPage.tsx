@@ -8,9 +8,6 @@ import AppointmentStatusCard from '@/components/customer/AppointmentStatusCard';
 import WaitTimesCard from '@/components/customer/WaitTimesCard';
 import AppointmentConfirmationDialog from '@/components/customer/AppointmentConfirmationDialog';
 import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
-import BrowardLayout from '@/components/layout/BrowardLayout';
-import BrowardHero from '@/components/layout/BrowardHero';
-import BrowardCard from '@/components/ui/broward-card';
 
 const CustomerPage = () => {
   const { user, role } = useAuth();
@@ -23,43 +20,43 @@ const CustomerPage = () => {
   };
 
   return (
-    <BrowardLayout headerTitle="Customer Portal">
-      <BrowardHero 
-        title="Customer Portal" 
-        subtitle="Schedule appointments or check your status"
-        backgroundStyle="pattern"
-      />
-      
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-gradient text-3xl font-bold">Customer Portal</h1>
+            <p className="text-muted-foreground mt-1">Schedule appointments or check your status</p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-muted-foreground border border-border/40">
+            {user?.email} <span className="text-primary/60 font-medium ml-1">({role || 'customer'})</span>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="transition-all hover:translate-y-[-2px] duration-300">
-            <BrowardCard title="Schedule an Appointment" elevation="md">
-              <ScheduleAppointmentCard onAppointmentScheduled={handleAppointmentScheduled} />
-            </BrowardCard>
+            <ScheduleAppointmentCard onAppointmentScheduled={handleAppointmentScheduled} />
           </div>
           
           <div className="space-y-6">
             <div className="transition-all hover:translate-y-[-2px] duration-300">
-              <BrowardCard title="Your Queue Position" elevation="md">
-                <QueuePositionTracker />
-              </BrowardCard>
+              <QueuePositionTracker />
             </div>
             <div className="transition-all hover:translate-y-[-2px] duration-300">
-              <BrowardCard title="Check In" elevation="md">
-                <CheckInCard />
-              </BrowardCard>
+              <CheckInCard />
             </div>
             <div className="transition-all hover:translate-y-[-2px] duration-300">
-              <BrowardCard title="Appointment Status" elevation="md">
-                <AppointmentStatusCard />
-              </BrowardCard>
+              <AppointmentStatusCard />
             </div>
             <div className="transition-all hover:translate-y-[-2px] duration-300">
-              <BrowardCard title="Current Wait Times" elevation="md">
-                <WaitTimesCard />
-              </BrowardCard>
+              <WaitTimesCard />
             </div>
           </div>
+        </div>
+        
+        <div className="flex space-x-4">
+          <Button asChild variant="outline" className="shadow-sm border-gray-200 hover:bg-gray-50 transition-colors">
+            <Link to="/">Back to Home</Link>
+          </Button>
         </div>
       </div>
 
@@ -69,7 +66,7 @@ const CustomerPage = () => {
         onOpenChange={setShowConfirmation} 
         confirmationCode={confirmationCode} 
       />
-    </BrowardLayout>
+    </div>
   );
 };
 
