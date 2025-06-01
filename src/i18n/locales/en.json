@@ -41,7 +41,8 @@
     "weeks": "weeks",
     "months": "months",
     "years": "years",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "actions": "Actions"
   },
   "schedule": {
     "advancedScheduling": "Advanced Scheduling",
@@ -107,7 +108,8 @@
     "breakStartedDescription": "Your break has been scheduled for {{duration}} minutes",
     "breakErrorDescription": "There was a problem setting your break status",
     "startBreak": "Start {{duration}} min break",
-    "handoverRequestMessage": "{{name}} has gone on break for {{duration}} minutes and requested you take over their customers"
+    "handoverRequestMessage": "{{name}} has gone on break for {{duration}} minutes and requested you take over their customers",
+    "viewHistory": "View Customer History"
   },
   "performance": {
     "dashboardTitle": "Performance Dashboard",
@@ -187,6 +189,11 @@
     "noStaffFound": "No staff found.",
     "noServicesFound": "No services found.",
     "reasonForVisit": "Reason for Visit",
+    "checkIn": "Check In",
+    "startService": "Start Service",
+    "complete": "Complete",
+    "cancel": "Cancel",
+    "sendReminder": "Send Reminder",
     "status": {
       "scheduled": "Scheduled",
       "checked_in": "Checked In",
@@ -195,6 +202,12 @@
       "cancelled": "Cancelled",
       "no_show": "No Show"
     }
+  },
+  "communication": {
+    "sendMessage": "Send Message"
+  },
+  "notes": {
+    "manageNotes": "Manage Notes"
   },
   "admin": {
     "dashboard": "Admin Dashboard",
