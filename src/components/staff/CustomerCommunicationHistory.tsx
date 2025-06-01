@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw } from 'lucide-react';
-import { CommunicationFilters } from './communication/CommunicationFilters';
+import { RefreshCw, BarChart3 } from 'lucide-react';
+import { EnhancedCommunicationFilters } from './communication/EnhancedCommunicationFilters';
 import { CommunicationList } from './communication/CommunicationList';
-import { CommunicationStatistics } from './communication/CommunicationStatistics';
+import { CommunicationAnalytics } from './communication/CommunicationAnalytics';
+import { RetryFailedMessages } from './communication/RetryFailedMessages';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface CommunicationHistory {
   id: string;
@@ -16,6 +18,7 @@ interface CommunicationHistory {
   status: string;
   created_at: string;
   template_used?: string;
+  customer_id: string;
   staff?: {
     first_name: string;
     last_name: string;
@@ -37,6 +40,8 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [staffFilter, setStaffFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
 
   useEffect(() => {
     fetchCommunications();
@@ -85,13 +90,37 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
     }
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setTypeFilter('all');
+    setStatusFilter('all');
+    setStaffFilter('all');
+    setDateRange({});
+  };
+
   const filteredCommunications = communications.filter(comm => {
     const matchesSearch = comm.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (comm.subject && comm.subject.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesType = typeFilter === 'all' || comm.type === typeFilter;
     const matchesStatus = statusFilter === 'all' || comm.status === statusFilter;
-    return matchesSearch && matchesType && matchesStatus;
+    const matchesStaff = staffFilter === 'all' || 
+                        (comm.staff && `${comm.staff.first_name} ${comm.staff.last_name}` === staffFilter);
+    
+    let matchesDate = true;
+    if (dateRange.from || dateRange.to) {
+      const commDate = new Date(comm.created_at);
+      if (dateRange.from) {
+        matchesDate = matchesDate && commDate >= dateRange.from;
+      }
+      if (dateRange.to) {
+        matchesDate = matchesDate && commDate <= dateRange.to;
+      }
+    }
+    
+    return matchesSearch && matchesType && matchesStatus && matchesStaff && matchesDate;
   });
+
+  const failedCommunications = communications.filter(comm => comm.status === 'failed');
 
   return (
     <div className="space-y-6">
@@ -112,27 +141,56 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <CommunicationFilters
+      {/* Enhanced Filters */}
+      <EnhancedCommunicationFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         typeFilter={typeFilter}
         onTypeFilterChange={setTypeFilter}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+        staffFilter={staffFilter}
+        onStaffFilterChange={setStaffFilter}
+        onClearFilters={handleClearFilters}
       />
 
-      {/* Communications List */}
-      <CommunicationList
-        communications={filteredCommunications}
-        isLoading={isLoading}
-        searchTerm={searchTerm}
-        typeFilter={typeFilter}
-        statusFilter={statusFilter}
-      />
+      {/* Retry Failed Messages */}
+      {failedCommunications.length > 0 && (
+        <RetryFailedMessages
+          failedMessages={failedCommunications}
+          onRetryComplete={fetchCommunications}
+        />
+      )}
 
-      {/* Statistics */}
-      <CommunicationStatistics communications={communications} />
+      {/* Tabs for List and Analytics */}
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList>
+          <TabsTrigger value="list">Communications</TabsTrigger>
+          <TabsTrigger value="analytics">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Analytics
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="list" className="space-y-4">
+          <CommunicationList
+            communications={filteredCommunications}
+            isLoading={isLoading}
+            searchTerm={searchTerm}
+            typeFilter={typeFilter}
+            statusFilter={statusFilter}
+          />
+        </TabsContent>
+        
+        <TabsContent value="analytics" className="space-y-4">
+          <CommunicationAnalytics
+            communications={filteredCommunications}
+            dateRange={dateRange}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
