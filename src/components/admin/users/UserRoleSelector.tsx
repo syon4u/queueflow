@@ -19,9 +19,12 @@ export const UserRoleSelector = ({
   userId, 
   onRoleChange 
 }: UserRoleSelectorProps) => {
+  // Ensure currentRole is never an empty string
+  const roleValue = (!currentRole || currentRole === '') ? 'customer' : currentRole;
+
   return (
     <Select
-      defaultValue={currentRole || 'customer'}
+      value={roleValue}
       onValueChange={(value) => onRoleChange(userId, value)}
     >
       <SelectTrigger className="w-[130px]">

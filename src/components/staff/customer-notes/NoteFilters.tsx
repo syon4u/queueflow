@@ -21,6 +21,9 @@ export const NoteFilters: React.FC<NoteFiltersProps> = ({
   onCategoryChange,
   categories
 }) => {
+  // Ensure selectedCategory is never an empty string
+  const currentCategory = (!selectedCategory || selectedCategory === '') ? 'all' : selectedCategory;
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -32,7 +35,7 @@ export const NoteFilters: React.FC<NoteFiltersProps> = ({
           
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Category:</span>
-            <Select value={selectedCategory} onValueChange={onCategoryChange}>
+            <Select value={currentCategory} onValueChange={onCategoryChange}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue />
               </SelectTrigger>
@@ -47,13 +50,13 @@ export const NoteFilters: React.FC<NoteFiltersProps> = ({
             </Select>
           </div>
           
-          {selectedCategory !== 'all' && (
+          {currentCategory !== 'all' && (
             <Badge
               variant="secondary"
               className="cursor-pointer"
               onClick={() => onCategoryChange('all')}
             >
-              {categories.find(c => c.value === selectedCategory)?.label} ×
+              {categories.find(c => c.value === currentCategory)?.label} ×
             </Badge>
           )}
         </div>

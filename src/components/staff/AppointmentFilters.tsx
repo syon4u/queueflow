@@ -46,6 +46,12 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
     filters[key as keyof AppointmentFilterOptions] !== ''
   );
 
+  // Get the current status value, ensuring it's never an empty string
+  const getCurrentStatusValue = () => {
+    const status = filters.status;
+    return (!status || status === '') ? 'all' : status;
+  };
+
   return (
     <Card className="mb-6">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -70,7 +76,7 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
             <div className="space-y-2">
               <Label htmlFor="status-filter">{t('appointments.status')}</Label>
               <Select
-                value={filters.status || 'all'}
+                value={getCurrentStatusValue()}
                 onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}
               >
                 <SelectTrigger id="status-filter">
