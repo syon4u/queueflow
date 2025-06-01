@@ -12,7 +12,7 @@ import { UserManagementTab } from './UserManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
 import { QueueManagementTab } from './QueueManagementTab';
-import { SystemSettingsTab } from './SystemSettingsTab';
+import SystemSettingsTab from './SystemSettingsTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 
