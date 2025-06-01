@@ -147,6 +147,7 @@
     "viewDetails": "View Details",
     "noAppointments": "No appointments scheduled.",
     "scheduledFor": "Scheduled for",
+    "scheduledTime": "Scheduled Time",
     "with": "with",
     "status": "Status",
     "allStatuses": "All Statuses",
@@ -184,7 +185,16 @@
     "serviceSearchPlaceholder": "Search for a service...",
     "noCustomersFound": "No customers found.",
     "noStaffFound": "No staff found.",
-    "noServicesFound": "No services found."
+    "noServicesFound": "No services found.",
+    "reasonForVisit": "Reason for Visit",
+    "status": {
+      "scheduled": "Scheduled",
+      "checked_in": "Checked In",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No Show"
+    }
   },
   "admin": {
     "dashboard": "Admin Dashboard",
