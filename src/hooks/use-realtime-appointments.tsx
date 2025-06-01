@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,16 +20,30 @@ export function useRealtimeAppointments(locationId?: string) {
   const fetchAppointments = async () => {
     if (!user) throw new Error("User not authenticated");
     
-    const { data, error } = await supabase.functions.invoke('appointments');
-    
-    if (error) throw error;
-    
-    // Filter by location if specified
-    const filteredData = locationId 
-      ? data.filter((appointment: Appointment) => appointment.location_id === locationId)
-      : data;
-    
-    return filteredData;
+    try {
+      // Since Edge Functions might not be available in development,
+      // we'll use a direct database query as a fallback
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          services:service_id (name, duration),
+          locations:location_id (name)
+        `)
+        .order('scheduled_time', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Filter by location if specified
+      const filteredData = locationId 
+        ? data.filter((appointment: Appointment) => appointment.location_id === locationId)
+        : data;
+      
+      return filteredData;
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      throw error;
+    }
   };
 
   // Use SWR for data fetching with cache and revalidation
@@ -43,7 +56,7 @@ export function useRealtimeAppointments(locationId?: string) {
     user ? ['appointments', locationId, user.id] : null,
     fetchAppointments,
     {
-      refreshInterval: 0, // Disable polling as we'll use realtime
+      refreshInterval: 30000, // Refresh every 30 seconds as a fallback for realtime
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
       onSuccess: (data) => {
@@ -55,7 +68,7 @@ export function useRealtimeAppointments(locationId?: string) {
         console.error('Error fetching appointments:', err);
         toast({
           title: 'Error',
-          description: 'Failed to load appointments',
+          description: 'Failed to load appointments. Using cached data if available.',
           variant: 'destructive',
         });
       }
