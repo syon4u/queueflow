@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Users, Calendar, Clock } from 'lucide-react';
+import PageLayout from '@/components/layout/PageLayout';
 
 const Index = () => {
   const [showGuide, setShowGuide] = useState(false);
@@ -18,42 +20,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      {/* Header with improved contrast and spacing */}
-      <header className="bg-white border-b border-border/40 shadow-sm">
-        <div className="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-              QueueFlow
-            </h1>
-          </div>
-          <div>
-            {user ? (
-              <Button 
-                onClick={() => navigate('/staff')} 
-                variant="outline"
-                className="transition-all hover:bg-primary/10 focus:ring-2 focus:ring-primary/20"
-                aria-label="Go to Dashboard"
-              >
-                Dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={() => navigate('/login')} 
-                variant="outline"
-                className="transition-all hover:bg-primary/10 focus:ring-2 focus:ring-primary/20"
-                aria-label="Sign In"
-              >
-                Sign In
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
-      
-      <main className="container mx-auto px-4 md:px-6 lg:px-8 py-8">
+    <PageLayout 
+      headerTitle="Consumer Protection Division"
+      headerSubtitle="Protecting Broward County residents through education, mediation, and enforcement"
+    >
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
         {/* Hero Section with background pattern and enhanced typography */}
         <div className="bg-pattern-waves bg-gradient-overlay-blue text-center py-10 md:py-16 lg:py-20 max-w-4xl mx-auto rounded-xl">
           <div className="px-6">
@@ -88,7 +59,7 @@ const Index = () => {
         </div>
         
         {/* Portal Cards with improved layout, hover effects and background patterns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 md:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 md:py-12 container mx-auto px-4">
           <div 
             className="group bg-pattern-dots bg-gradient-overlay-blue p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
             onClick={() => handleCardClick('/staff')}
@@ -163,7 +134,7 @@ const Index = () => {
         </div>
         
         {/* About Section with improved layout, visual design and background image */}
-        <div className="py-10 md:py-16 max-w-4xl mx-auto">
+        <div className="py-10 md:py-16 max-w-4xl mx-auto container px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">About QueueFlow</h2>
           <div className="bg-image bg-image-overlay rounded-xl shadow-sm border border-border/40" 
                style={{ backgroundImage: "url('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg')" }}>
@@ -182,21 +153,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </main>
-
-      {/* Footer with improved spacing and contrast */}
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <h2 className="text-xl font-bold">QueueFlow</h2>
-            </div>
-            <div className="text-gray-300 text-sm">
-              &copy; {new Date().getFullYear()} QueueFlow. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+      </div>
       
       {/* Welcome guide modal with improved accessibility */}
       {showGuide && (
@@ -222,7 +179,7 @@ const Index = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageLayout>
   );
 };
 
