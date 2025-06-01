@@ -38,6 +38,13 @@ export const AppointmentTableRow: React.FC<AppointmentTableRowProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Get display names for better UX
+  const customerName = appointment.customer 
+    ? `${appointment.customer.first_name} ${appointment.customer.last_name}`
+    : 'Unknown Customer';
+  
+  const serviceName = appointment.service?.name || 'Unknown Service';
+
   return (
     <TableRow>
       <TableCell>
@@ -49,7 +56,12 @@ export const AppointmentTableRow: React.FC<AppointmentTableRowProps> = ({
         </Badge>
       </TableCell>
       <TableCell>
-        {appointment.service_id}
+        {serviceName}
+        {appointment.service?.duration && (
+          <span className="text-xs text-muted-foreground ml-1">
+            ({appointment.service.duration}m)
+          </span>
+        )}
         {appointment.reason_for_visit && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -65,7 +77,9 @@ export const AppointmentTableRow: React.FC<AppointmentTableRowProps> = ({
           </Tooltip>
         )}
       </TableCell>
-      <TableCell className="hidden md:table-cell">{appointment.customer_id}</TableCell>
+      <TableCell className="hidden md:table-cell">
+        {customerName}
+      </TableCell>
       <TableCell>
         <AppointmentActionButtons
           appointment={appointment}

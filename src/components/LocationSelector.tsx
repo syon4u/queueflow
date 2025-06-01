@@ -22,11 +22,15 @@ const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('locations')
-        .select('id, name');
+        .select('id, name')
+        .eq('queue_status', 'open'); // Only show open locations
       
       if (error) throw error;
-      // Filter out any locations with empty string IDs
-      return data?.filter(location => location.id && location.id.trim() !== '') || [];
+      
+      console.log('Fetched locations:', data);
+      
+      // Return all valid UUID locations
+      return data || [];
     },
   });
 

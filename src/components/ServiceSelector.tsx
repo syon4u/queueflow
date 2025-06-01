@@ -14,15 +14,14 @@ import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/f
 interface ServiceSelectorProps {
   value: string;
   onChange: (value: string) => void;
-  locationId?: string; // Add the locationId prop
+  locationId?: string;
 }
 
 const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) => {
   const { data: services, isLoading } = useQuery({
-    queryKey: ['services', locationId], // Include locationId in the query key for proper cache invalidation
+    queryKey: ['services', locationId],
     queryFn: async () => {
-      // If locationId is provided, filter services by location
-      let query = supabase.from('services').select('id, name, duration');
+      let query = supabase.from('services').select('id, name, duration, description');
       
       if (locationId) {
         query = query.eq('location_id', locationId);
@@ -31,20 +30,22 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
       const { data, error } = await query;
       
       if (error) throw error;
-      // Filter out any services with empty string IDs
-      return data?.filter(service => service.id && service.id.trim() !== '') || [];
+      
+      console.log('Fetched services:', data);
+      
+      // Return all valid services
+      return data || [];
     },
-    // Only run the query when we have a locationId
-    enabled: !locationId || !!locationId,
+    enabled: !!locationId, // Only run when locationId is available
   });
 
   return (
     <FormItem>
       <FormLabel>Service</FormLabel>
       <FormControl>
-        <Select value={value} onValueChange={onChange} disabled={isLoading}>
+        <Select value={value} onValueChange={onChange} disabled={isLoading || !locationId}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a service" />
+            <SelectValue placeholder={locationId ? "Select a service" : "Select a location first"} />
           </SelectTrigger>
           <SelectContent>
             {services?.map((service) => (

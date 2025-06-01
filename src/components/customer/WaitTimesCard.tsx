@@ -26,7 +26,7 @@ const WaitTimesCard = () => {
             status,
             scheduled_time,
             check_in_time,
-            services (
+            services!inner (
               name
             )
           `)
@@ -71,6 +71,25 @@ const WaitTimesCard = () => {
     };
 
     fetchWaitTimes();
+    
+    // Set up realtime subscription for live updates
+    const channel = supabase
+      .channel('wait-times-updates')
+      .on('postgres_changes', 
+        {
+          event: '*',
+          schema: 'public',
+          table: 'appointments'
+        },
+        () => {
+          fetchWaitTimes(); // Refresh when appointments change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

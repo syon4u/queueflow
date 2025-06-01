@@ -6,8 +6,10 @@ import { Bell } from 'lucide-react';
 import { formatWaitTime } from '@/lib/queue';
 import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const QueuePositionTracker: React.FC = () => {
+  const { user } = useAuth();
   const { userPosition, estimatedWaitTime, appointments } = useRealtimeAppointments();
   const { toast } = useToast();
   const [previousPosition, setPreviousPosition] = useState<number | null>(null);
@@ -43,8 +45,22 @@ const QueuePositionTracker: React.FC = () => {
 
   // Find user's appointment for additional details
   const userAppointment = appointments.find(appt => 
-    appt.status === 'checked_in' || appt.status === 'scheduled'
+    appt.customer_id === user?.id && 
+    (appt.status === 'checked_in' || appt.status === 'scheduled')
   );
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Queue Status</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center">
+          <p>Please log in to view your queue position.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!userPosition || !userAppointment) {
     return (
@@ -94,15 +110,21 @@ const QueuePositionTracker: React.FC = () => {
             </div>
             <div>
               <p className="text-muted-foreground">Service</p>
-              <p className="font-medium truncate">{userAppointment?.service_id || "General"}</p>
+              <p className="font-medium truncate">
+                {userAppointment?.service?.name || "General"}
+              </p>
             </div>
             <div>
               <p className="text-muted-foreground">Status</p>
-              <p className="font-medium">{userAppointment?.status === 'checked_in' ? 'Checked In' : 'Scheduled'}</p>
+              <p className="font-medium">
+                {userAppointment?.status === 'checked_in' ? 'Checked In' : 'Scheduled'}
+              </p>
             </div>
             <div>
               <p className="text-muted-foreground">Location</p>
-              <p className="font-medium truncate">{userAppointment?.location_id || "Main Office"}</p>
+              <p className="font-medium truncate">
+                {userAppointment?.location?.name || "Main Office"}
+              </p>
             </div>
           </div>
         </div>

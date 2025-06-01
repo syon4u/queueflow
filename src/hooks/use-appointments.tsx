@@ -1,5 +1,7 @@
+
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useRealtimeAppointments } from './use-realtime-appointments';
+import { useToast } from '@/hooks/use-toast';
 
 export type AppointmentStatus = 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
 
@@ -18,85 +20,161 @@ export interface Appointment {
   reason_for_visit: string | null;
   created_at: string;
   updated_at: string;
+  // Additional fields from joins
+  customer?: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+  };
+  service?: {
+    name: string;
+    duration: number;
+    description: string;
+  };
+  location?: {
+    name: string;
+    address: string;
+  };
+  staff?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
-// Mock appointments for demo
-const mockAppointments: Appointment[] = [
-  {
-    id: 'appt-1',
-    customer_id: 'customer-1',
-    service_id: 'service-1',
-    location_id: 'location-1',
-    staff_id: 'staff-1',
-    status: 'scheduled',
-    scheduled_time: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
-    check_in_time: null,
-    start_time: null,
-    end_time: null,
-    notes: 'First time visitor',
-    reason_for_visit: 'License renewal',
-    created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    updated_at: new Date(Date.now() - 86400000).toISOString()
-  },
-  {
-    id: 'appt-2',
-    customer_id: 'customer-2',
-    service_id: 'service-2',
-    location_id: 'location-1',
-    staff_id: 'staff-2',
-    status: 'checked_in',
-    scheduled_time: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-    check_in_time: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-    start_time: null,
-    end_time: null,
-    notes: null,
-    reason_for_visit: 'ID card application',
-    created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    updated_at: new Date(Date.now() - 900000).toISOString()
-  },
-  {
-    id: 'appt-3',
-    customer_id: 'customer-3',
-    service_id: 'service-3',
-    location_id: 'location-2',
-    staff_id: 'staff-1',
-    status: 'in_progress',
-    scheduled_time: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    check_in_time: new Date(Date.now() - 2700000).toISOString(), // 45 minutes ago
-    start_time: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-    end_time: null,
-    notes: 'Needs assistance with forms',
-    reason_for_visit: 'Vehicle registration',
-    created_at: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
-    updated_at: new Date(Date.now() - 1800000).toISOString()
-  }
-];
-
 export function useAppointments(serviceId?: string) {
-  // In a real app, we would use the useRealtimeAppointments hook
-  // But for demo purposes, we'll return mock data
-  
-  // Mock implementation
-  const mockData = {
-    appointments: mockAppointments,
-    isLoading: false,
-    error: null,
-    userPosition: 2,
-    estimatedWaitTime: 15,
-    refreshAppointments: () => console.log('Refreshing appointments')
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userPosition, setUserPosition] = useState<number | null>(null);
+  const [estimatedWaitTime, setEstimatedWaitTime] = useState<number | null>(null);
+  const { toast } = useToast();
+
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      let query = supabase
+        .from('appointments')
+        .select(`
+          *,
+          customers:customer_id (
+            first_name,
+            last_name,
+            email,
+            phone
+          ),
+          services:service_id (
+            name,
+            duration,
+            description
+          ),
+          locations:location_id (
+            name,
+            address
+          ),
+          staff:staff_id (
+            first_name,
+            last_name
+          )
+        `)
+        .order('scheduled_time', { ascending: true });
+
+      // Filter by service if provided
+      if (serviceId) {
+        query = query.eq('service_id', serviceId);
+      }
+
+      const { data, error: fetchError } = await query;
+
+      if (fetchError) {
+        console.error('Error fetching appointments:', fetchError);
+        setError(fetchError.message);
+        toast({
+          title: 'Error',
+          description: 'Failed to load appointments. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const formattedAppointments = (data || []).map(appointment => ({
+        ...appointment,
+        customer: appointment.customers,
+        service: appointment.services,
+        location: appointment.locations,
+        staff: appointment.staff
+      }));
+
+      setAppointments(formattedAppointments);
+      calculateUserPosition(formattedAppointments);
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      setError('An unexpected error occurred');
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred while loading appointments.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
-  
-  // Filter by service if provided
-  const filteredAppointments = serviceId
-    ? mockData.appointments.filter(appointment => appointment.service_id === serviceId)
-    : mockData.appointments;
+
+  // Calculate user's position in queue and estimated wait time
+  const calculateUserPosition = (appointmentsData: Appointment[]) => {
+    // This would need actual user context to work properly
+    // For now, we'll just calculate based on checked-in appointments
+    const checkedInAppointments = appointmentsData.filter(a => 
+      a.status === 'checked_in' || a.status === 'in_progress'
+    );
+
+    // Sort by check-in time for accurate queue position
+    checkedInAppointments.sort((a, b) => {
+      const aTime = a.check_in_time ? new Date(a.check_in_time).getTime() : 0;
+      const bTime = b.check_in_time ? new Date(b.check_in_time).getTime() : 0;
+      return aTime - bTime;
+    });
+
+    setUserPosition(checkedInAppointments.length);
+    setEstimatedWaitTime(checkedInAppointments.length * 15); // 15 minutes per person estimate
+  };
+
+  const refreshAppointments = () => {
+    fetchAppointments();
+  };
+
+  // Set up realtime subscription
+  useEffect(() => {
+    fetchAppointments();
+
+    const channel = supabase
+      .channel('appointments-changes')
+      .on('postgres_changes', 
+        {
+          event: '*', 
+          schema: 'public',
+          table: 'appointments'
+        }, 
+        (payload) => {
+          console.log('Appointment change detected:', payload);
+          fetchAppointments(); // Refetch data when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [serviceId]);
 
   return { 
-    appointments: filteredAppointments, 
-    loading: mockData.isLoading, 
-    error: mockData.error,
-    userPosition: mockData.userPosition,
-    estimatedWaitTime: mockData.estimatedWaitTime,
-    refreshAppointments: mockData.refreshAppointments
+    appointments, 
+    loading, 
+    error,
+    userPosition,
+    estimatedWaitTime,
+    refreshAppointments
   };
 }

@@ -1,5 +1,5 @@
+
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -11,95 +11,118 @@ import type { AppointmentStatus, Appointment } from '@/hooks/use-appointments';
  * @returns Object containing appointments data, loading state, error state, and user queue position info
  */
 export function useRealtimeAppointments(locationId?: string) {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [userPosition, setUserPosition] = useState<number | null>(null);
   const [estimatedWaitTime, setEstimatedWaitTime] = useState<number | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Create a fetcher function for SWR
+  // Fetch appointments from the database
   const fetchAppointments = async () => {
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
     
     try {
-      // Since Edge Functions might not be available in development,
-      // we'll use a direct database query as a fallback
-      const { data, error } = await supabase
+      setIsLoading(true);
+      setError(null);
+
+      let query = supabase
         .from('appointments')
         .select(`
           *,
-          services:service_id (name, duration),
-          locations:location_id (name)
+          customers:customer_id (
+            first_name,
+            last_name,
+            email,
+            phone
+          ),
+          services:service_id (
+            name,
+            duration,
+            description
+          ),
+          locations:location_id (
+            name,
+            address
+          ),
+          staff:staff_id (
+            first_name,
+            last_name
+          )
         `)
         .order('scheduled_time', { ascending: true });
       
-      if (error) throw error;
-      
       // Filter by location if specified
-      const filteredData = locationId 
-        ? data.filter((appointment: Appointment) => appointment.location_id === locationId)
-        : data;
+      if (locationId) {
+        query = query.eq('location_id', locationId);
+      }
       
-      return filteredData;
+      const { data, error: fetchError } = await query;
+      
+      if (fetchError) {
+        console.error('Error fetching appointments:', fetchError);
+        setError(fetchError.message);
+        toast({
+          title: 'Error',
+          description: 'Failed to load appointments. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      const formattedAppointments = (data || []).map(appointment => ({
+        ...appointment,
+        customer: appointment.customers,
+        service: appointment.services,
+        location: appointment.locations,
+        staff: appointment.staff
+      }));
+      
+      setAppointments(formattedAppointments);
+      calculateUserPosition(formattedAppointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
-      throw error;
+      setError('An unexpected error occurred');
+      toast({
+        title: 'Error',
+        description: 'Failed to load appointments. Using cached data if available.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Use SWR for data fetching with cache and revalidation
-  const { 
-    data: appointments, 
-    error, 
-    isLoading, 
-    mutate 
-  } = useSWR(
-    user ? ['appointments', locationId, user.id] : null,
-    fetchAppointments,
-    {
-      refreshInterval: 30000, // Refresh every 30 seconds as a fallback for realtime
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      onSuccess: (data) => {
-        if (data) {
-          calculateUserPosition(data);
-        }
-      },
-      onError: (err) => {
-        console.error('Error fetching appointments:', err);
-        toast({
-          title: 'Error',
-          description: 'Failed to load appointments. Using cached data if available.',
-          variant: 'destructive',
-        });
-      }
-    }
-  );
-
   // Setup realtime subscription
   useEffect(() => {
-    if (!user) return;
+    fetchAppointments();
 
     const channel = supabase
-      .channel('appointments-changes')
+      .channel('appointments-notifications')
       .on('postgres_changes', 
         {
           event: '*', 
           schema: 'public',
           table: 'appointments'
         }, 
-        () => {
-          // When any appointment changes, revalidate the data
-          mutate();
-      })
+        (payload) => {
+          console.log('Realtime appointment update:', payload);
+          // Refresh appointments when any change occurs
+          fetchAppointments();
+        }
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, mutate]);
+  }, [user, locationId]);
 
   // Calculate user's position in queue and estimated wait time
-  // Feature 4.2.0: Wait time measurement begins only when customer checks in
   const calculateUserPosition = (appointmentsData: Appointment[]) => {
     if (!user) return;
 
@@ -108,14 +131,10 @@ export function useRealtimeAppointments(locationId?: string) {
     if (!userAppointment) return;
 
     // Only count checked-in appointments ahead in the queue
-    // This implements Feature 4.2.0 - wait time starts only at check-in
     const checkedInAppointments = appointmentsData.filter(a => 
-      // Only consider checked-in or in-progress appointments
       (a.status === 'checked_in' || a.status === 'in_progress') && 
-      // For checked-in appointments, use check_in_time for sorting
       ((a.check_in_time && userAppointment.check_in_time && 
         new Date(a.check_in_time) <= new Date(userAppointment.check_in_time)) ||
-       // If user isn't checked in yet, still show them their position
        (a.status === 'checked_in' && userAppointment.status === 'scheduled')) &&
       a.id !== userAppointment.id
     );
@@ -136,11 +155,11 @@ export function useRealtimeAppointments(locationId?: string) {
   };
 
   return { 
-    appointments: appointments || [],
+    appointments,
     isLoading, 
     error,
     userPosition,
     estimatedWaitTime,
-    refreshAppointments: mutate
+    refreshAppointments: fetchAppointments
   };
 }
