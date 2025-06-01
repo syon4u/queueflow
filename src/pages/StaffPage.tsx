@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -22,6 +23,7 @@ import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import { PieChart } from 'lucide-react';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -56,6 +58,16 @@ const StaffPage = () => {
       />
       
       <main className="container mx-auto px-4 py-6">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb 
+            items={[
+              { label: 'Staff Dashboard', isActive: true }
+            ]}
+            className="mb-4"
+          />
+        </div>
+
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>

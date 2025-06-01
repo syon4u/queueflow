@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DataTable, Column } from './DataTable';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 interface Staff {
   id: string;
@@ -227,6 +228,17 @@ export const StaffTab: React.FC = () => {
 
   return (
     <div>
+      {/* Breadcrumb Navigation */}
+      <div className="mb-6">
+        <Breadcrumb 
+          items={[
+            { label: 'Admin Dashboard', href: '/admin' },
+            { label: 'Staff Management', isActive: true }
+          ]}
+          className="mb-4"
+        />
+      </div>
+
       <h1 className="text-2xl font-bold mb-6">Staff Members</h1>
       
       <DataTable

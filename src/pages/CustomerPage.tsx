@@ -10,6 +10,7 @@ import WaitTimesCard from '@/components/customer/WaitTimesCard';
 import AppointmentConfirmationDialog from '@/components/customer/AppointmentConfirmationDialog';
 import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
 import PageLayout from '@/components/layout/PageLayout';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 const CustomerPage = () => {
   const { user, role } = useAuth();
@@ -28,6 +29,16 @@ const CustomerPage = () => {
     >
       <div className="min-h-screen bg-pattern-grid bg-gradient-overlay-teal">
         <div className="container mx-auto px-4 py-6">
+          {/* Breadcrumb Navigation */}
+          <div className="mb-6">
+            <Breadcrumb 
+              items={[
+                { label: 'Customer Dashboard', isActive: true }
+              ]}
+              className="mb-4"
+            />
+          </div>
+
           <div className="bg-image bg-image-overlay rounded-xl mb-8" 
                style={{ backgroundImage: "url('https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg')" }}>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
