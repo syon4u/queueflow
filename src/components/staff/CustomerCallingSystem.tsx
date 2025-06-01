@@ -37,10 +37,10 @@ export const CustomerCallingSystem: React.FC<CustomerCallingSystemProps> = ({
     setCallingCustomer(customer.id);
     
     try {
-      // Update customer status to 'called'
+      // Update customer status to 'in_progress' (valid appointment status)
       const { error } = await supabase
         .from('appointments')
-        .update({ status: 'called' })
+        .update({ status: 'in_progress' })
         .eq('customer_id', customer.id);
 
       if (error) throw error;

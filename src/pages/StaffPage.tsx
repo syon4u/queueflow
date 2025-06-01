@@ -21,6 +21,7 @@ import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
 import EstimatedWaitTimes from '@/components/EstimatedWaitTimes';
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
+import { QueueManagementTab } from '@/components/staff/QueueManagementTab';
 import { PieChart } from 'lucide-react';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
