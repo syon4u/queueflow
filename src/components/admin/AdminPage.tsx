@@ -1,10 +1,9 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { DashboardTab } from './DashboardTab';
 import { StatsTab } from './StatsTab';
 import { StaffTab } from './StaffTab';
@@ -14,91 +13,89 @@ import { ServicesTab } from './ServicesTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
-import Breadcrumb from '@/components/navigation/Breadcrumb';
+import { AdminSidebar } from '@/components/layout/AdminSidebar';
+import { AdminDashboardHeader } from './AdminDashboardHeader';
 
 const AdminPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  const handleRefresh = () => {
+    // Handle refresh logic
+    console.log('Refreshing admin data...');
+  };
+
+  const handleNotificationClick = () => {
+    console.log('Notification center clicked');
+  };
+
+  const handleSettingsClick = () => {
+    console.log('Settings clicked');
+  };
+
+  const renderMainContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardTab />;
+      case 'users':
+        return <UserManagementTab />;
+      case 'staff':
+        return <StaffTab />;
+      case 'locations':
+        return <LocationsTab />;
+      case 'services':
+        return <ServicesTab />;
+      case 'queue':
+        return <QueueManagementTab />;
+      case 'templates':
+        return <CommunicationTemplatesTab />;
+      case 'stats':
+        return <StatsTab />;
+      case 'settings':
+        return <SystemSettingsTab />;
+      default:
+        return <DashboardTab />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-pattern-dots bg-gradient-overlay-blue">
-      <div className="container mx-auto px-4 py-6">
-        {/* Breadcrumb Navigation */}
-        <div className="mb-6">
-          <Breadcrumb 
-            items={[
-              { label: 'Admin Dashboard', isActive: true }
-            ]}
-            className="mb-4"
-          />
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard')}</h1>
-          <p className="text-gray-600">{t('admin.description')}</p>
-        </div>
-
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-5'} mb-6`}>
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="staff">Staff</TabsTrigger>
-            <TabsTrigger value="locations">Locations</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-            {!isMobile && (
-              <>
-                <TabsTrigger value="queue">Queue</TabsTrigger>
-                <TabsTrigger value="templates">Templates</TabsTrigger>
-                <TabsTrigger value="stats">Analytics</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </>
-            )}
-          </TabsList>
-          
-          <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
-            <CardContent className="p-6">
-              <TabsContent value="dashboard">
-                <DashboardTab />
-              </TabsContent>
-              
-              <TabsContent value="users">
-                <UserManagementTab />
-              </TabsContent>
-              
-              <TabsContent value="staff">
-                <StaffTab />
-              </TabsContent>
-              
-              <TabsContent value="locations">
-                <LocationsTab />
-              </TabsContent>
-              
-              <TabsContent value="services">
-                <ServicesTab />
-              </TabsContent>
-              
-              <TabsContent value="queue">
-                <QueueManagementTab />
-              </TabsContent>
-              
-              <TabsContent value="templates">
-                <CommunicationTemplatesTab />
-              </TabsContent>
-              
-              <TabsContent value="stats">
-                <StatsTab />
-              </TabsContent>
-              
-              <TabsContent value="settings">
-                <SystemSettingsTab />
-              </TabsContent>
-            </CardContent>
-          </Card>
-        </Tabs>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-50">
+        <AdminSidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+        
+        <SidebarInset className="flex-1">
+          <div className="flex flex-col min-h-screen">
+            {/* Header */}
+            <div className="bg-white border-b p-6">
+              <AdminDashboardHeader
+                systemStatus="healthy"
+                totalUsers={156}
+                activeStaff={12}
+                todayAppointments={24}
+                onRefresh={handleRefresh}
+                onNotificationClick={handleNotificationClick}
+                onSettingsClick={handleSettingsClick}
+              />
+            </div>
+            
+            {/* Main Content */}
+            <main className="flex-1 p-6">
+              <div className="max-w-7xl mx-auto">
+                <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
+                  <CardContent className="p-6">
+                    {renderMainContent()}
+                  </CardContent>
+                </Card>
+              </div>
+            </main>
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
