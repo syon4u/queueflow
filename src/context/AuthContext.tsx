@@ -25,9 +25,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // For demo purposes, create a mock user
+    // For demo purposes, create a mock user with valid UUID format
     const mockUser = {
-      id: 'mock-user-id',
+      id: '00000000-0000-0000-0000-000000000000',
       email: 'demo@example.com',
       user_metadata: {
         name: 'Demo User'
@@ -112,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // In demo mode, just set the mock user
       setUser({
-        id: 'mock-user-id',
+        id: '00000000-0000-0000-0000-000000000000',
         email: 'demo@example.com',
         user_metadata: {
           name: 'Demo User'
@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // In demo mode, just set the mock user
       setUser({
-        id: 'mock-user-id',
+        id: '00000000-0000-0000-0000-000000000000',
         email: email,
         user_metadata: {
           name: 'Demo User'
@@ -148,7 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // In demo mode, just set the mock user
       setUser({
-        id: 'mock-user-id',
+        id: '00000000-0000-0000-0000-000000000000',
         email: email,
         user_metadata: {
           name: 'Demo User'
