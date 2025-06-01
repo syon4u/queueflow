@@ -32,15 +32,18 @@ const AdminPage = () => {
   }, [location.search]);
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-pattern-circuit bg-gradient-overlay-blue">
       <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Logged in as: {user?.email} (Role: {role || 'admin'})
+        <div className="bg-image bg-image-overlay rounded-xl mb-6" 
+             style={{ backgroundImage: "url('https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg')" }}>
+          <div className="flex justify-between items-center p-6">
+            <div>
+              <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+              <p className="text-muted-foreground">Manage system settings, users, and view analytics</p>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Logged in as: {user?.email} (Role: {role || 'admin'})
+            </div>
           </div>
         </div>
 
@@ -56,7 +59,7 @@ const AdminPage = () => {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           
-          <Card>
+          <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
             <CardContent className="p-6">
               <TabsContent value="dashboard">
                 <DashboardTab />

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -105,110 +104,117 @@ const ProfilePage = () => {
   };
   
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">{t('profile.title')}</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>{t('profile.personalInfo')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="min-h-screen bg-pattern-grid bg-gradient-overlay-teal">
+      <div className="container mx-auto p-6">
+        <div className="bg-image bg-image-overlay rounded-xl mb-6" 
+             style={{ backgroundImage: "url('https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg')" }}>
+          <div className="p-6">
+            <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="col-span-2 bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
+            <CardHeader>
+              <CardTitle>{t('profile.personalInfo')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">{t('profile.firstName')}</Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder={t('profile.firstNamePlaceholder')}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">{t('profile.lastName')}</Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder={t('profile.lastNamePlaceholder')}
+                    />
+                  </div>
+                </div>
+                
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">{t('profile.firstName')}</Label>
+                  <Label htmlFor="email">{t('profile.email')}</Label>
                   <Input
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
                     onChange={handleChange}
-                    placeholder={t('profile.firstNamePlaceholder')}
+                    placeholder={t('profile.emailPlaceholder')}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">{t('profile.lastName')}</Label>
+                  <Label htmlFor="phone">{t('profile.phone')}</Label>
                   <Input
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
                     onChange={handleChange}
-                    placeholder={t('profile.lastNamePlaceholder')}
+                    placeholder={t('profile.phonePlaceholder')}
                   />
                 </div>
+                
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? t('common.saving') : t('common.save')}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
+            <CardHeader>
+              <CardTitle>{t('profile.accountInfo')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">{t('profile.userRole')}</p>
+                <p className="font-medium capitalize">{role}</p>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('profile.email')}</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t('profile.emailPlaceholder')}
-                />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">{t('profile.userId')}</p>
+                <p className="font-mono text-xs">{user?.id}</p>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="phone">{t('profile.phone')}</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder={t('profile.phonePlaceholder')}
-                />
+              <div className="pt-4 space-y-2">
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/">{t('common.backToHome')}</Link>
+                </Button>
+                
+                {role === 'customer' && (
+                  <Button asChild className="w-full">
+                    <Link to="/customer">{t('common.customerDashboard')}</Link>
+                  </Button>
+                )}
+                
+                {(role === 'staff' || role === 'admin') && (
+                  <Button asChild className="w-full">
+                    <Link to="/staff">{t('common.staffDashboard')}</Link>
+                  </Button>
+                )}
+                
+                {role === 'admin' && (
+                  <Button asChild className="w-full">
+                    <Link to="/admin">{t('admin.dashboard')}</Link>
+                  </Button>
+                )}
               </div>
-              
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? t('common.saving') : t('common.save')}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('profile.accountInfo')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">{t('profile.userRole')}</p>
-              <p className="font-medium capitalize">{role}</p>
-            </div>
-            
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">{t('profile.userId')}</p>
-              <p className="font-mono text-xs">{user?.id}</p>
-            </div>
-            
-            <div className="pt-4 space-y-2">
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/">{t('common.backToHome')}</Link>
-              </Button>
-              
-              {role === 'customer' && (
-                <Button asChild className="w-full">
-                  <Link to="/customer">{t('common.customerDashboard')}</Link>
-                </Button>
-              )}
-              
-              {(role === 'staff' || role === 'admin') && (
-                <Button asChild className="w-full">
-                  <Link to="/staff">{t('common.staffDashboard')}</Link>
-                </Button>
-              )}
-              
-              {role === 'admin' && (
-                <Button asChild className="w-full">
-                  <Link to="/admin">{t('admin.dashboard')}</Link>
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

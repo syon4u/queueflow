@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -63,15 +62,20 @@ const PerformanceReportPage = () => {
   const isLoading = staffLoading || serviceLoading || dailyLoading;
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-pattern-bubbles bg-gradient-overlay-blue">
       <div className="container mx-auto p-6">
         {/* Header */}
-        <PerformanceHeader 
-          timeRange={timeRange}
-          setTimeRange={setTimeRange}
-          isLoading={isLoading}
-          onDownload={downloadReportCSV}
-        />
+        <div className="bg-image bg-image-overlay rounded-xl mb-6" 
+             style={{ backgroundImage: "url('https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg')" }}>
+          <div className="p-6">
+            <PerformanceHeader 
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+              isLoading={isLoading}
+              onDownload={downloadReportCSV}
+            />
+          </div>
+        </div>
         
         {/* Main Content */}
         <div className="mt-6">
@@ -96,46 +100,48 @@ const PerformanceReportPage = () => {
               )}
             </TabsList>
             
-            <ScrollArea className="h-[calc(100vh-200px)] pr-4">
-              {isLoading ? (
-                <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                </div>
-              ) : (
-                <>
-                  <TabsContent value="summary" className="mt-0">
-                    <SummaryMetrics 
-                      dailyMetrics={dailyMetrics}
-                      staffMetrics={staffMetrics}
-                      serviceMetrics={serviceMetrics}
-                    />
-                  </TabsContent>
-                  
-                  <TabsContent value="staff" className="mt-0">
-                    <StaffPerformanceCard staffMetrics={staffMetrics} />
-                  </TabsContent>
-                  
-                  <TabsContent value="services" className="mt-0">
-                    <ServiceMetricsCard serviceMetrics={serviceMetrics} />
-                  </TabsContent>
-                  
-                  <TabsContent value="daily" className="mt-0">
-                    <Card className="p-6">
-                      <h2 className="text-xl font-semibold mb-4">
-                        {t('performance.dailyActivity')}
-                      </h2>
-                      <DailyPerformanceChart dailyMetrics={dailyMetrics} />
-                    </Card>
-                  </TabsContent>
-                  
-                  {role === 'admin' && (
-                    <TabsContent value="features" className="mt-0">
-                      <FeatureTrackingList />
+            <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
+              <ScrollArea className="h-[calc(100vh-200px)] pr-4 p-6">
+                {isLoading ? (
+                  <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                  </div>
+                ) : (
+                  <>
+                    <TabsContent value="summary" className="mt-0">
+                      <SummaryMetrics 
+                        dailyMetrics={dailyMetrics}
+                        staffMetrics={staffMetrics}
+                        serviceMetrics={serviceMetrics}
+                      />
                     </TabsContent>
-                  )}
-                </>
-              )}
-            </ScrollArea>
+                    
+                    <TabsContent value="staff" className="mt-0">
+                      <StaffPerformanceCard staffMetrics={staffMetrics} />
+                    </TabsContent>
+                    
+                    <TabsContent value="services" className="mt-0">
+                      <ServiceMetricsCard serviceMetrics={serviceMetrics} />
+                    </TabsContent>
+                    
+                    <TabsContent value="daily" className="mt-0">
+                      <Card className="p-6">
+                        <h2 className="text-xl font-semibold mb-4">
+                          {t('performance.dailyActivity')}
+                        </h2>
+                        <DailyPerformanceChart dailyMetrics={dailyMetrics} />
+                      </Card>
+                    </TabsContent>
+                    
+                    {role === 'admin' && (
+                      <TabsContent value="features" className="mt-0">
+                        <FeatureTrackingList />
+                      </TabsContent>
+                    )}
+                  </>
+                )}
+              </ScrollArea>
+            </Card>
           </Tabs>
         </div>
         

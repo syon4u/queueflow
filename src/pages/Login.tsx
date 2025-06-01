@@ -84,8 +84,8 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-pattern-dots bg-gradient-overlay-blue p-4">
+      <Card className="w-full max-w-md bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{t("auth.welcome")}</CardTitle>
           <CardDescription>

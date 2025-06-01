@@ -6,6 +6,8 @@
 
 /* Import the Broward County design system */
 @import './styles/design-system.css';
+/* Import background patterns */
+@import './styles/background-patterns.css';
 
 @layer base {
   :root {

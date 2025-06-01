@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -55,41 +54,43 @@ const Index = () => {
       </header>
       
       <main className="container mx-auto px-4 md:px-6 lg:px-8 py-8">
-        {/* Hero Section with enhanced typography and spacing */}
-        <div className="text-center py-10 md:py-16 lg:py-20 max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-            Simple Queue Management for Your Business
-          </h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Streamline customer flow, reduce wait times, and improve the overall experience 
-            with our intuitive queue management system.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={() => navigate('/staff')}
-              className="font-medium shadow-sm hover:shadow transition-all"
-              aria-label="Get Started with QueueFlow"
-            >
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              onClick={handleShowGuide}
-              className="font-medium hover:bg-primary/10 transition-all"
-              aria-label="Learn more about QueueFlow"
-            >
-              Learn More
-            </Button>
+        {/* Hero Section with background pattern and enhanced typography */}
+        <div className="bg-pattern-waves bg-gradient-overlay-blue text-center py-10 md:py-16 lg:py-20 max-w-4xl mx-auto rounded-xl">
+          <div className="px-6">
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              Simple Queue Management for Your Business
+            </h1>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Streamline customer flow, reduce wait times, and improve the overall experience 
+              with our intuitive queue management system.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                onClick={() => navigate('/staff')}
+                className="font-medium shadow-sm hover:shadow transition-all"
+                aria-label="Get Started with QueueFlow"
+              >
+                Get Started
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                onClick={handleShowGuide}
+                className="font-medium hover:bg-primary/10 transition-all"
+                aria-label="Learn more about QueueFlow"
+              >
+                Learn More
+              </Button>
+            </div>
           </div>
         </div>
         
-        {/* Portal Cards with improved layout and hover effects */}
+        {/* Portal Cards with improved layout, hover effects and background patterns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 md:py-12">
           <div 
-            className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
+            className="group bg-pattern-dots bg-gradient-overlay-blue p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
             onClick={() => handleCardClick('/staff')}
             role="button"
             tabIndex={0}
@@ -113,7 +114,7 @@ const Index = () => {
           </div>
           
           <div 
-            className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
+            className="group bg-pattern-circuit bg-gradient-overlay-teal p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
             onClick={() => handleCardClick('/customer')}
             role="button"
             tabIndex={0}
@@ -137,7 +138,7 @@ const Index = () => {
           </div>
           
           <div 
-            className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
+            className="group bg-pattern-bubbles bg-gradient-overlay-blue p-6 rounded-xl shadow-sm hover:shadow-md border border-border/40 transition-all cursor-pointer flex flex-col"
             onClick={() => handleCardClick('/appointments')}
             role="button"
             tabIndex={0}
@@ -161,21 +162,24 @@ const Index = () => {
           </div>
         </div>
         
-        {/* About Section with improved layout and visual design */}
+        {/* About Section with improved layout, visual design and background image */}
         <div className="py-10 md:py-16 max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">About QueueFlow</h2>
-          <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-border/40">
-            <p className="text-gray-600 mb-4">
-              QueueFlow is a modern queue management system designed to help businesses manage customer flow efficiently. 
-              Our platform helps reduce wait times, improve customer satisfaction, and optimize staff productivity.
-            </p>
-            <p className="text-gray-600 mb-4">
-              With features like real-time queue updates, appointment scheduling, and analytics, 
-              QueueFlow provides everything you need to create a smooth customer experience.
-            </p>
-            <p className="text-gray-600">
-              Whether you're a small business or a large enterprise, QueueFlow scales to meet your needs.
-            </p>
+          <div className="bg-image bg-image-overlay rounded-xl shadow-sm border border-border/40" 
+               style={{ backgroundImage: "url('https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg')" }}>
+            <div className="p-6 md:p-8">
+              <p className="text-gray-600 mb-4">
+                QueueFlow is a modern queue management system designed to help businesses manage customer flow efficiently. 
+                Our platform helps reduce wait times, improve customer satisfaction, and optimize staff productivity.
+              </p>
+              <p className="text-gray-600 mb-4">
+                With features like real-time queue updates, appointment scheduling, and analytics, 
+                QueueFlow provides everything you need to create a smooth customer experience.
+              </p>
+              <p className="text-gray-600">
+                Whether you're a small business or a large enterprise, QueueFlow scales to meet your needs.
+              </p>
+            </div>
           </div>
         </div>
       </main>

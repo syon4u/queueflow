@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -121,78 +120,83 @@ const AppointmentsPage = () => {
   };
   
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{t('appointments.title')}</h1>
-        <Button asChild>
-          <Link to="/new-appointment">{t('appointments.newAppointment')}</Link>
-        </Button>
-      </div>
-      
-      {isLoading ? (
-        <div className="flex justify-center p-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      ) : appointments.length === 0 ? (
-        <Card className="text-center p-12">
-          <CardContent className="pt-6">
-            <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">{t('appointments.noAppointments')}</h2>
-            <p className="text-muted-foreground mb-6">{t('appointments.bookAppointment')}</p>
+    <div className="min-h-screen bg-pattern-waves bg-gradient-overlay-teal">
+      <div className="container mx-auto p-6">
+        <div className="bg-image bg-image-overlay rounded-xl mb-6" 
+             style={{ backgroundImage: "url('https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg')" }}>
+          <div className="flex justify-between items-center p-6">
+            <h1 className="text-3xl font-bold">{t('appointments.title')}</h1>
             <Button asChild>
-              <Link to="/new-appointment">{t('appointments.scheduleNow')}</Link>
+              <Link to="/new-appointment">{t('appointments.newAppointment')}</Link>
             </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {appointments.map((appointment) => (
-            <Card key={appointment.id} className={appointment.status === 'cancelled' ? 'opacity-60' : ''}>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <Badge className={getStatusColor(appointment.status)}>{t(`appointments.status.${appointment.status}`)}</Badge>
-                    <CardTitle className="mt-2">{appointment.service.name}</CardTitle>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{t('appointments.location')}</p>
-                    <p>{appointment.location.name}</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{formatDateTime(appointment.scheduled_time)}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span className="text-sm">{t('appointments.duration')}: {appointment.service.duration} {t('appointments.minutes')}</span>
-                  </div>
-                </div>
-                
-                {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                  <div className="mt-4 flex justify-end">
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => handleCancel(appointment.id)}
-                    >
-                      {t('appointments.cancel')}
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+          </div>
         </div>
-      )}
-      
-      <div className="mt-6">
-        <Button asChild variant="outline">
-          <Link to="/">{t('common.backToHome')}</Link>
-        </Button>
+        
+        {isLoading ? (
+          <div className="flex justify-center p-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        ) : appointments.length === 0 ? (
+          <Card className="text-center p-12 bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
+            <CardContent className="pt-6">
+              <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h2 className="text-xl font-semibold mb-2">{t('appointments.noAppointments')}</h2>
+              <p className="text-muted-foreground mb-6">{t('appointments.bookAppointment')}</p>
+              <Button asChild>
+                <Link to="/new-appointment">{t('appointments.scheduleNow')}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {appointments.map((appointment) => (
+              <Card key={appointment.id} className={`${appointment.status === 'cancelled' ? 'opacity-60' : ''} bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50 transition-all hover:shadow-md`}>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <Badge className={getStatusColor(appointment.status)}>{t(`appointments.status.${appointment.status}`)}</Badge>
+                      <CardTitle className="mt-2">{appointment.service.name}</CardTitle>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">{t('appointments.location')}</p>
+                      <p>{appointment.location.name}</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span className="text-sm">{formatDateTime(appointment.scheduled_time)}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span className="text-sm">{t('appointments.duration')}: {appointment.service.duration} {t('appointments.minutes')}</span>
+                    </div>
+                  </div>
+                  
+                  {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                    <div className="mt-4 flex justify-end">
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleCancel(appointment.id)}
+                      >
+                        {t('appointments.cancel')}
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        
+        <div className="mt-6">
+          <Button asChild variant="outline">
+            <Link to="/">{t('common.backToHome')}</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

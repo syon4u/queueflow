@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -49,7 +48,7 @@ const StaffPage = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-pattern-dots bg-gradient-overlay-blue">
       <StaffHeader 
         user={user} 
         role={role}
@@ -82,7 +81,7 @@ const StaffPage = () => {
             <TabsTrigger value="settings">{t('staff.settings')}</TabsTrigger>
           </TabsList>
           
-          <Card>
+          <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
             <CardContent className="p-6">
               <TabsContent value="queue">
                 <QueueProvider>
