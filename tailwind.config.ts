@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,16 +25,13 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#2563eb',
-					lighter: '#60a5fa',
-					darker: '#1d4ed8',
+					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
-					DEFAULT: '#06b6d4',
+					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
-				neutral: '#f5f5f4',
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
@@ -66,15 +62,29 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				qflow: {
-					blue: '#1a365d',
-					teal: '#0d9488',
-					gray: '#f1f5f9',
-					lightBlue: '#60a5fa',
-					darkTeal: '#0f766e',
+				// Broward County Colors
+				'bc-blue': '#005A9C',
+				'bc-navy': '#003366',
+				'bc-teal': '#00859B',
+				'bc-gold': '#F3D54E',
+				'bc-sand': '#F0E6D2',
+				'bc-blue-60': 'rgba(0, 90, 156, 0.6)',
+				'bc-teal-70': 'rgba(0, 133, 155, 0.7)',
+				'bc-gold-80': 'rgba(243, 213, 78, 0.8)',
+				neutral: {
+					50: '#fafafa',
+					100: '#f5f5f5',
+					200: '#e5e5e5',
+					300: '#d4d4d4',
+					400: '#a3a3a3',
+					500: '#737373',
+					600: '#525252',
+					700: '#404040',
+					800: '#262626',
+					900: '#171717',
 				},
 				status: {
-					success: '#22c55e',
+					success: '#10b981',
 					warning: '#f59e0b',
 					error: '#ef4444',
 					info: '#3b82f6',
@@ -87,20 +97,12 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' },
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' },
 				},
 				'pulse-light': {
 					'0%, 100%': { opacity: '1' },
@@ -119,6 +121,10 @@ export default {
 				'float': {
 					'0%, 100%': { transform: 'translateY(0)' },
 					'50%': { transform: 'translateY(-5px)' },
+				},
+				'wave': {
+					'0%': { backgroundPositionX: '0' },
+					'100%': { backgroundPositionX: '1200px' },
 				}
 			},
 			animation: {
@@ -127,13 +133,11 @@ export default {
 				'pulse-light': 'pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'fade-in-up': 'fade-in-up 0.5s ease-out',
 				'float': 'float 3s ease-in-out infinite',
+				'wave': 'wave 10s linear infinite',
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],
-			},
-			fontSize: {
-				'base': '1rem',
-				'lg': '1.125rem',
+				serif: ['Merriweather', 'Georgia', 'serif'],
 			},
 			boxShadow: {
 				'card': '0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 4px -1px rgba(0, 0, 0, 0.1)',

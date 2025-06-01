@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,8 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
 import BackendHealthPage from "./pages/BackendHealthPage";
+import BrowardDesignSystem from "./pages/BrowardDesignSystem";
+import BrowardIndex from "./pages/BrowardIndex";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,8 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/design-system" element={<BrowardDesignSystem />} />
+                <Route path="/broward" element={<BrowardIndex />} />
                 
                 {/* Customer routes */}
                 <Route 
