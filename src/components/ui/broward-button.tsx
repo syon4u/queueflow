@@ -1,10 +1,12 @@
 import React from 'react';
+import { Slot } from '@radix-ui/react-slot';
 
 interface BrowardButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   children: React.ReactNode;
+  asChild?: boolean;
 }
 
 const BrowardButton: React.FC<BrowardButtonProps> = ({
@@ -12,6 +14,7 @@ const BrowardButton: React.FC<BrowardButtonProps> = ({
   size = 'md',
   className = '',
   children,
+  asChild = false,
   ...props
 }) => {
   const baseClasses = 'btn';
@@ -30,10 +33,12 @@ const BrowardButton: React.FC<BrowardButtonProps> = ({
   
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
   
+  const Comp = asChild ? Slot : 'button';
+  
   return (
-    <button className={classes} {...props}>
+    <Comp className={classes} {...props}>
       {children}
-    </button>
+    </Comp>
   );
 };
 

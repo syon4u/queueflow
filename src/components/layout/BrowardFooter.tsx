@@ -6,7 +6,7 @@ const BrowardFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-bc-navy text-white py-8 mt-12">
+    <footer className="bg-bc-navy text-white py-8 mt-auto">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -30,8 +30,8 @@ const BrowardFooter: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/services" className="text-bc-sand hover:text-bc-gold transition-colors">
-                  Services
+                <Link to="/customer" className="text-bc-sand hover:text-bc-gold transition-colors">
+                  Customer Portal
                 </Link>
               </li>
               <li>
@@ -40,8 +40,8 @@ const BrowardFooter: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-bc-sand hover:text-bc-gold transition-colors">
-                  Contact Us
+                <Link to="/staff" className="text-bc-sand hover:text-bc-gold transition-colors">
+                  Staff Portal
                 </Link>
               </li>
             </ul>
