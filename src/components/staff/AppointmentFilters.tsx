@@ -70,14 +70,14 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
             <div className="space-y-2">
               <Label htmlFor="status-filter">{t('appointments.status')}</Label>
               <Select
-                value={filters.status || ''}
-                onValueChange={(value) => handleFilterChange('status', value)}
+                value={filters.status || 'all'}
+                onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}
               >
                 <SelectTrigger id="status-filter">
                   <SelectValue placeholder={t('appointments.allStatuses')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{t('appointments.allStatuses')}</SelectItem>
+                  <SelectItem value="all">{t('appointments.allStatuses')}</SelectItem>
                   <SelectItem value="scheduled">{t('appointments.scheduled')}</SelectItem>
                   <SelectItem value="checked_in">{t('appointments.checkedIn')}</SelectItem>
                   <SelectItem value="in_progress">{t('appointments.inProgress')}</SelectItem>
