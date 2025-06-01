@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -18,6 +17,9 @@ import FeatureTrackingList from '@/components/admin/FeatureTrackingList';
 import { ArrowLeft } from 'lucide-react';
 import { useDailyMetrics, useServiceMetrics, useStaffMetrics } from '@/hooks/admin/use-performance-metrics';
 import { TIME_PERIODS } from '@/components/staff/performance/constants';
+import BrowardLayout from '@/components/layout/BrowardLayout';
+import BrowardHero from '@/components/layout/BrowardHero';
+import BrowardButton from '@/components/ui/broward-button';
 
 const PerformanceReportPage = () => {
   const { t } = useTranslation();
@@ -63,7 +65,13 @@ const PerformanceReportPage = () => {
   const isLoading = staffLoading || serviceLoading || dailyLoading;
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <BrowardLayout headerTitle="Performance Reports">
+      <BrowardHero 
+        title="Performance Dashboard" 
+        subtitle="View key performance indicators and analytics"
+        backgroundStyle="wave"
+      />
+      
       <div className="container mx-auto p-6">
         {/* Header */}
         <PerformanceHeader 
@@ -96,10 +104,10 @@ const PerformanceReportPage = () => {
               )}
             </TabsList>
             
-            <ScrollArea className="h-[calc(100vh-200px)] pr-4">
+            <ScrollArea className="h-[calc(100vh-300px)] pr-4">
               {isLoading ? (
                 <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-bc-blue"></div>
                 </div>
               ) : (
                 <>
@@ -121,7 +129,7 @@ const PerformanceReportPage = () => {
                   
                   <TabsContent value="daily" className="mt-0">
                     <Card className="p-6">
-                      <h2 className="text-xl font-semibold mb-4">
+                      <h2 className="text-xl font-serif mb-4 text-bc-navy dark:text-bc-blue">
                         {t('performance.dailyActivity')}
                       </h2>
                       <DailyPerformanceChart dailyMetrics={dailyMetrics} />
@@ -141,15 +149,15 @@ const PerformanceReportPage = () => {
         
         {/* Back button */}
         <div className="mt-6">
-          <Button asChild variant="outline" className="gap-2">
+          <BrowardButton asChild variant="outline" className="gap-2">
             <Link to="/staff">
               <ArrowLeft className="h-4 w-4" />
               {t('common.back')}
             </Link>
-          </Button>
+          </BrowardButton>
         </div>
       </div>
-    </div>
+    </BrowardLayout>
   );
 };
 
