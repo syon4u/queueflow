@@ -49,6 +49,16 @@ function App() {
                   } 
                 />
                 
+                {/* New Appointment - accessible to all authenticated users */}
+                <Route 
+                  path="/new-appointment" 
+                  element={
+                    <ProtectedRoute requiredRoles={['customer', 'staff', 'admin']}>
+                      <NewAppointmentPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                
                 {/* Staff routes */}
                 <Route 
                   path="/staff" 
