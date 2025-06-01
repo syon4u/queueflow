@@ -1,3 +1,4 @@
+
 {
   "auth": {
     "login": "Login",
@@ -39,7 +40,8 @@
     "days": "days",
     "weeks": "weeks",
     "months": "months",
-    "years": "years"
+    "years": "years",
+    "clearFilters": "Clear Filters"
   },
   "schedule": {
     "advancedScheduling": "Advanced Scheduling",
@@ -138,13 +140,28 @@
   },
   "appointments": {
     "title": "Appointments",
+    "filters": "Appointment Filters",
     "newAppointment": "New Appointment",
+    "createNew": "Create New Appointment",
     "editAppointment": "Edit Appointment",
     "viewDetails": "View Details",
     "noAppointments": "No appointments scheduled.",
     "scheduledFor": "Scheduled for",
     "with": "with",
     "status": "Status",
+    "allStatuses": "All Statuses",
+    "scheduled": "Scheduled",
+    "checkedIn": "Checked In",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "noShow": "No Show",
+    "customer": "Customer",
+    "searchCustomer": "Search by customer name",
+    "service": "Service",
+    "searchService": "Search by service name",
+    "dateRange": "Date Range",
+    "pickDateRange": "Pick a date range",
     "actions": "Actions",
     "createSuccess": "Appointment created successfully.",
     "createError": "Failed to create appointment.",
@@ -154,9 +171,7 @@
     "deleteError": "Failed to delete appointment.",
     "confirmDeletion": "Are you sure you want to delete this appointment?",
     "appointmentDetails": "Appointment Details",
-    "customer": "Customer",
     "staff": "Staff",
-    "service": "Service",
     "date": "Date",
     "time": "Time",
     "notes": "Notes",
