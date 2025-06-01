@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Users, Calendar, Clock, Shield } from 'lucide-react';
+import { ArrowRight, Users, Settings, Clock, Shield } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 
 const Index = () => {
@@ -90,7 +90,7 @@ const Index = () => {
             >
               <CardContent className="p-6">
                 <div className="bg-green-50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-green-100 transition-colors">
-                  <Calendar className="h-6 w-6 text-green-600" />
+                  <Clock className="h-6 w-6 text-green-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Customer Portal</h3>
                 <p className="text-gray-600 mb-4">
@@ -104,15 +104,15 @@ const Index = () => {
             
             <Card 
               className="group cursor-pointer transition-all hover:shadow-lg hover:scale-105"
-              onClick={() => handleCardClick('/appointments')}
+              onClick={() => handleCardClick('/admin')}
             >
               <CardContent className="p-6">
                 <div className="bg-amber-50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-amber-100 transition-colors">
-                  <Clock className="h-6 w-6 text-amber-600" />
+                  <Settings className="h-6 w-6 text-amber-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Appointments</h3>
+                <h3 className="text-xl font-semibold mb-2">Admin Portal</h3>
                 <p className="text-gray-600 mb-4">
-                  View and manage all upcoming appointments and customer bookings.
+                  Manage locations, services, staff, and system settings for the entire organization.
                 </p>
                 <div className="text-amber-600 text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                   Open portal <ArrowRight className="ml-1 h-3 w-3" />
