@@ -554,6 +554,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_admin_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_staff_location_id: {
         Args: Record<PropertyKey, never>
         Returns: string

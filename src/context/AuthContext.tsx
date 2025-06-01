@@ -25,13 +25,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // For demo purposes, create a mock user with valid UUID format
+    // For demo purposes, create a mock user with all required User properties
     const mockUser = {
       id: '00000000-0000-0000-0000-000000000000',
       email: 'demo@example.com',
       user_metadata: {
         name: 'Demo User'
-      }
+      },
+      app_metadata: {},
+      aud: 'authenticated',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      phone: '',
+      email_confirmed_at: new Date().toISOString(),
+      confirmed_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString(),
+      role: 'authenticated'
     } as User;
     
     setUser(mockUser);
@@ -116,7 +125,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: 'demo@example.com',
         user_metadata: {
           name: 'Demo User'
-        }
+        },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        phone: '',
+        email_confirmed_at: new Date().toISOString(),
+        confirmed_at: new Date().toISOString(),
+        last_sign_in_at: new Date().toISOString(),
+        role: 'authenticated'
       } as User);
       setRole('admin');
       navigate('/');
@@ -134,7 +152,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: email,
         user_metadata: {
           name: 'Demo User'
-        }
+        },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        phone: '',
+        email_confirmed_at: new Date().toISOString(),
+        confirmed_at: new Date().toISOString(),
+        last_sign_in_at: new Date().toISOString(),
+        role: 'authenticated'
       } as User);
       setRole('admin');
       navigate('/');
@@ -152,7 +179,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: email,
         user_metadata: {
           name: 'Demo User'
-        }
+        },
+        app_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        phone: '',
+        email_confirmed_at: new Date().toISOString(),
+        confirmed_at: new Date().toISOString(),
+        last_sign_in_at: new Date().toISOString(),
+        role: 'authenticated'
       } as User);
       setRole('admin');
       navigate('/');

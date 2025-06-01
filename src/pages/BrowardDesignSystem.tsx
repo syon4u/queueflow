@@ -11,6 +11,7 @@ import {
   HandshakeIcon, 
   DocumentIcon, 
   CheckIcon,
+  ShieldCheckmarkAnimation,
   LandmarkCourthouse,
   LandmarkBeach,
   LandmarkPort
