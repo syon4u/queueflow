@@ -1,141 +1,71 @@
 
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { format } from 'date-fns';
-import { Spinner } from '@/components/ui/spinner';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Customer } from '@/components/customer/CustomerSearchBox';
-import { Appointment } from '@/hooks/use-appointments';
+import { CustomerNotesManager } from './customer-notes/CustomerNotesManager';
+import { User, FileText, Calendar } from 'lucide-react';
 
 interface CustomerHistoryDialogProps {
-  customer: Customer | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  customerId: string;
+  customerName: string;
 }
 
-const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({ 
-  customer, 
-  open, 
-  onOpenChange 
+export const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({
+  open,
+  onOpenChange,
+  customerId,
+  customerName
 }) => {
-  const { t } = useTranslation();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [activeTab, setActiveTab] = useState('appointments');
-
-  // Fetch customer history when dialog opens
-  useEffect(() => {
-    if (customer && open) {
-      fetchCustomerHistory(customer.id);
-    }
-  }, [customer, open]);
-
-  const fetchCustomerHistory = async (customerId: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('customer-history', {
-        body: { customerId }
-      });
-
-      if (error) throw error;
-      
-      setAppointments(data.appointments || []);
-    } catch (error) {
-      console.error('Error fetching customer history:', error);
-      toast({
-        variant: 'destructive',
-        title: t('common.error'),
-        description: t('customer.historyError')
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!customer) return null;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle>{t('customer.history')}</DialogTitle>
-          <DialogDescription>{t('customer.historyDescription')}</DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Customer History - {customerName}
+          </DialogTitle>
         </DialogHeader>
-        
-        <div className="mt-4">
-          <Card className="mb-6">
-            <CardHeader className="pb-2">
-              <CardTitle>{customer.first_name} {customer.last_name}</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {customer.phone && <div>📱 {customer.phone}</div>}
-              {customer.email && <div>📧 {customer.email}</div>}
-            </CardContent>
-          </Card>
+
+        <Tabs defaultValue="notes" className="flex-1 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="notes" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Notes
+            </TabsTrigger>
+            <TabsTrigger value="appointments" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Appointments
+            </TabsTrigger>
+            <TabsTrigger value="communications" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Communications
+            </TabsTrigger>
+          </TabsList>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="appointments">{t('staff.appointments')}</TabsTrigger>
-              <TabsTrigger value="notes">{t('appointments.notes')}</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="appointments">
-              {loading ? (
-                <div className="flex justify-center p-8">
-                  <Spinner className="h-8 w-8" />
-                </div>
-              ) : appointments.length > 0 ? (
-                <div className="border rounded-md overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('appointments.date')}</TableHead>
-                        <TableHead>{t('appointments.service')}</TableHead>
-                        <TableHead>{t('appointments.status.scheduled')}</TableHead>
-                        <TableHead>{t('appointments.reasonForVisit')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {appointments.map((appointment) => (
-                        <TableRow key={appointment.id}>
-                          <TableCell>
-                            {format(new Date(appointment.scheduled_time), 'PPP')}
-                          </TableCell>
-                          <TableCell>{appointment.service_id}</TableCell>
-                          <TableCell>
-                            <span className="px-2 py-1 rounded-full text-xs font-medium capitalize bg-gray-100">
-                              {t(`appointments.status.${appointment.status}`)}
-                            </span>
-                          </TableCell>
-                          <TableCell>{appointment.reason_for_visit || '—'}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : (
-                <div className="text-center p-8 text-muted-foreground">
-                  {t('customer.noAppointmentHistory')}
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="notes">
-              <div className="text-center p-8 text-muted-foreground">
-                {t('performance.comingSoon')}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+          <TabsContent value="notes" className="flex-1 overflow-auto">
+            <CustomerNotesManager
+              customerId={customerId}
+              customerName={customerName}
+            />
+          </TabsContent>
+          
+          <TabsContent value="appointments" className="flex-1 overflow-auto">
+            <div className="text-center py-8 text-muted-foreground">
+              <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>Appointment history will be displayed here</p>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="communications" className="flex-1 overflow-auto">
+            <div className="text-center py-8 text-muted-foreground">
+              <User className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>Communication history will be displayed here</p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
 };
-
-export default CustomerHistoryDialog;
