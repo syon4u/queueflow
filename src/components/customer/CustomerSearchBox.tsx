@@ -141,11 +141,14 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
       </div>
       
       {/* Customer History Dialog */}
-      <CustomerHistoryDialog
-        customer={selectedCustomer}
-        open={showHistoryDialog}
-        onOpenChange={setShowHistoryDialog}
-      />
+      {selectedCustomer && (
+        <CustomerHistoryDialog
+          customerId={selectedCustomer.id}
+          customerName={`${selectedCustomer.first_name} ${selectedCustomer.last_name}`}
+          open={showHistoryDialog}
+          onOpenChange={setShowHistoryDialog}
+        />
+      )}
     </div>
   );
 };
