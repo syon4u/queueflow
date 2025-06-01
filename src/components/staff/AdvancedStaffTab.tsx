@@ -65,59 +65,59 @@ export const AdvancedStaffTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">{t('staff.advancedTools')}</h2>
+        <h2 className="text-2xl font-bold mb-2">Advanced Tools</h2>
         <p className="text-muted-foreground">
-          {t('staff.advancedToolsDescription')}
+          Advanced staff tools for appointment management, customer search, and detailed analytics
         </p>
       </div>
 
-      <Tabs defaultValue="appointments" className="w-full">
+      <Tabs defaultValue="appointment-search" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="appointments" className="flex items-center gap-2">
+          <TabsTrigger value="appointment-search" className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            {t('staff.appointments')}
+            Appointment Search
           </TabsTrigger>
-          <TabsTrigger value="customers" className="flex items-center gap-2">
+          <TabsTrigger value="customer-search" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {t('staff.customers')}
+            Customer Search
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
+          <TabsTrigger value="detailed-analytics" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
-            {t('staff.analytics')}
+            Detailed Analytics
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="appointments" className="space-y-4">
+        <TabsContent value="appointment-search" className="space-y-4">
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold">{statsData.total}</div>
-                <p className="text-xs text-muted-foreground">{t('appointments.total')}</p>
+                <p className="text-xs text-muted-foreground">Total Appointments</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-blue-600">{statsData.scheduled}</div>
-                <p className="text-xs text-muted-foreground">{t('appointments.scheduled')}</p>
+                <p className="text-xs text-muted-foreground">Scheduled</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-yellow-600">{statsData.inProgress}</div>
-                <p className="text-xs text-muted-foreground">{t('appointments.inProgress')}</p>
+                <p className="text-xs text-muted-foreground">In Progress</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-green-600">{statsData.completed}</div>
-                <p className="text-xs text-muted-foreground">{t('appointments.completed')}</p>
+                <p className="text-xs text-muted-foreground">Completed</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-red-600">{statsData.cancelled}</div>
-                <p className="text-xs text-muted-foreground">{t('appointments.cancelled')}</p>
+                <p className="text-xs text-muted-foreground">Cancelled</p>
               </CardContent>
             </Card>
           </div>
@@ -130,13 +130,13 @@ export const AdvancedStaffTab: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5" />
-                {t('appointments.filteredResults')} ({filteredAppointments.length})
+                Filtered Results ({filteredAppointments.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
                 <div className="flex justify-center p-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-label={t('common.loading')}></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-label="Loading"></div>
                 </div>
               ) : (
                 <StaffAppointmentTable 
@@ -148,19 +148,19 @@ export const AdvancedStaffTab: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="customers">
+        <TabsContent value="customer-search">
           <CustomerSearchTab />
         </TabsContent>
 
-        <TabsContent value="analytics">
+        <TabsContent value="detailed-analytics">
           <Card>
             <CardHeader>
-              <CardTitle>{t('staff.analyticsOverview')}</CardTitle>
+              <CardTitle>Detailed Analytics Overview</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8 text-muted-foreground">
                 <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>{t('staff.analyticsComingSoon')}</p>
+                <p>Advanced analytics features coming soon</p>
               </div>
             </CardContent>
           </Card>
