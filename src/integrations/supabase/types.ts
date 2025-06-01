@@ -9,6 +9,95 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointment_history: {
+        Row: {
+          appointment_id: string | null
+          change_type: string
+          changed_by: string | null
+          created_at: string | null
+          id: string
+          new_value: Json | null
+          old_value: Json | null
+          reason: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          change_type: string
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          reason?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          change_type?: string
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_value?: Json | null
+          old_value?: Json | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_history_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointment_reminders: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          reminder_type: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          reminder_type: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          reminder_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           check_in_time: string | null
@@ -82,6 +171,73 @@ export type Database = {
           },
           {
             foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      break_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          break_type: string
+          created_at: string | null
+          handover_staff_id: string | null
+          id: string
+          notes: string | null
+          requested_end: string
+          requested_start: string
+          staff_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          break_type: string
+          created_at?: string | null
+          handover_staff_id?: string | null
+          id?: string
+          notes?: string | null
+          requested_end: string
+          requested_start: string
+          staff_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          break_type?: string
+          created_at?: string | null
+          handover_staff_id?: string | null
+          id?: string
+          notes?: string | null
+          requested_end?: string
+          requested_start?: string
+          staff_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "break_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "break_requests_handover_staff_id_fkey"
+            columns: ["handover_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "break_requests_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "staff"
@@ -200,6 +356,51 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_surveys: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          customer_id: string | null
+          feedback: string | null
+          id: string
+          rating: number | null
+          submitted_at: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          feedback?: string | null
+          id?: string
+          rating?: number | null
+          submitted_at?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          feedback?: string | null
+          id?: string
+          rating?: number | null
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_surveys_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_surveys_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           created_at: string
@@ -237,6 +438,7 @@ export type Database = {
           email: string | null
           id: string
           name: string
+          operating_hours: Json | null
           phone: string | null
           queue_status: string | null
           updated_at: string
@@ -247,6 +449,7 @@ export type Database = {
           email?: string | null
           id?: string
           name: string
+          operating_hours?: Json | null
           phone?: string | null
           queue_status?: string | null
           updated_at?: string
@@ -257,11 +460,104 @@ export type Database = {
           email?: string | null
           id?: string
           name?: string
+          operating_hours?: Json | null
           phone?: string | null
           queue_status?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          appointments_completed: number | null
+          avg_service_time: number | null
+          created_at: string | null
+          customer_satisfaction_score: number | null
+          date: string
+          id: string
+          staff_id: string | null
+          total_break_time: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointments_completed?: number | null
+          avg_service_time?: number | null
+          created_at?: string | null
+          customer_satisfaction_score?: number | null
+          date: string
+          id?: string
+          staff_id?: string | null
+          total_break_time?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointments_completed?: number | null
+          avg_service_time?: number | null
+          created_at?: string | null
+          customer_satisfaction_score?: number | null
+          date?: string
+          id?: string
+          staff_id?: string | null
+          total_break_time?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_metrics_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      queue_positions: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          estimated_call_time: string | null
+          id: string
+          location_id: string | null
+          position: number
+          priority_level: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          estimated_call_time?: string | null
+          id?: string
+          location_id?: string | null
+          position: number
+          priority_level?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          estimated_call_time?: string | null
+          id?: string
+          location_id?: string | null
+          position?: number
+          priority_level?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queue_positions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "queue_positions_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       queue_schedule: {
         Row: {
@@ -435,7 +731,9 @@ export type Database = {
           description: string | null
           duration: number
           id: string
+          is_active: boolean | null
           location_id: string
+          max_appointments_per_slot: number | null
           name: string
           updated_at: string
         }
@@ -444,7 +742,9 @@ export type Database = {
           description?: string | null
           duration: number
           id?: string
+          is_active?: boolean | null
           location_id: string
+          max_appointments_per_slot?: number | null
           name: string
           updated_at?: string
         }
@@ -453,7 +753,9 @@ export type Database = {
           description?: string | null
           duration?: number
           id?: string
+          is_active?: boolean | null
           location_id?: string
+          max_appointments_per_slot?: number | null
           name?: string
           updated_at?: string
         }
@@ -469,7 +771,11 @@ export type Database = {
       }
       staff: {
         Row: {
+          break_end_time: string | null
+          break_start_time: string | null
+          break_type: string | null
           created_at: string
+          email: string | null
           first_name: string
           handover_staff_id: string | null
           id: string
@@ -482,7 +788,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          break_type?: string | null
           created_at?: string
+          email?: string | null
           first_name: string
           handover_staff_id?: string | null
           id: string
@@ -495,7 +805,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          break_type?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string
           handover_staff_id?: string | null
           id?: string
@@ -597,6 +911,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       temp_appointments: {
         Row: {
