@@ -1,0 +1,22 @@
+
+{
+  "advancedScheduling": "Advanced Scheduling",
+  "planQueueChanges": "Plan queue changes up to a year in advance",
+  "eventTitle": "Event Title",
+  "eventTitlePlaceholder": "Enter event title",
+  "eventType": "Event Type",
+  "selectEventType": "Select event type",
+  "queueClosed": "Queue Closed",
+  "limitedCapacity": "Limited Capacity",
+  "specialHours": "Special Hours",
+  "holiday": "Holiday",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "pickDate": "Pick a date",
+  "eventDescription": "Description",
+  "eventDescriptionPlaceholder": "Enter additional details about this schedule change",
+  "eventCreatedTitle": "Schedule Change Planned",
+  "eventCreatedDescription": "Your queue schedule change has been saved successfully",
+  "savingError": "There was a problem saving your schedule change",
+  "invalidEventDetails": "Please provide valid event details"
+}

@@ -1,0 +1,24 @@
+
+{
+  "viewHistory": "View Customer History",
+  "search": "Search Customer",
+  "searchPlaceholder": "Enter name, phone, or email",
+  "searchResults": "{{count}} results found",
+  "searchInstructions": "Search by name, phone, or email to find an existing customer.",
+  "createNew": "Create New Customer",
+  "noResults": "No customers found.",
+  "searchError": "Failed to search for customers.",
+  "customerDetails": "Customer Details",
+  "appointmentsHistory": "Appointments History",
+  "noAppointments": "No appointments found for this customer.",
+  "newAppointment": "New Appointment",
+  "editAppointment": "Edit Appointment",
+  "cancelAppointment": "Cancel Appointment",
+  "confirmCancellation": "Are you sure you want to cancel this appointment?",
+  "cancellationSuccess": "Appointment cancelled successfully.",
+  "cancellationError": "Failed to cancel appointment.",
+  "createSuccess": "Customer created successfully.",
+  "createError": "Failed to create customer.",
+  "updateSuccess": "Customer updated successfully.",
+  "updateError": "Failed to update customer."
+}

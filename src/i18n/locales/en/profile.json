@@ -1,0 +1,12 @@
+
+{
+  "title": "Profile",
+  "updateProfile": "Update Profile",
+  "profileDetails": "Profile Details",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "phone": "Phone",
+  "updateSuccess": "Profile updated successfully.",
+  "updateError": "Failed to update profile."
+}
