@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomerNotesManager } from './customer-notes/CustomerNotesManager';
-import { User, FileText, Calendar } from 'lucide-react';
+import { CustomerCommunicationHistory } from './CustomerCommunicationHistory';
+import { User, FileText, Calendar, MessageSquare } from 'lucide-react';
 
 interface CustomerHistoryDialogProps {
   open: boolean;
@@ -29,7 +30,7 @@ export const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="notes" className="flex-1 overflow-hidden">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="notes" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Notes
@@ -39,7 +40,7 @@ export const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({
               Appointments
             </TabsTrigger>
             <TabsTrigger value="communications" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
+              <MessageSquare className="h-4 w-4" />
               Communications
             </TabsTrigger>
           </TabsList>
@@ -59,10 +60,10 @@ export const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({
           </TabsContent>
           
           <TabsContent value="communications" className="flex-1 overflow-auto">
-            <div className="text-center py-8 text-muted-foreground">
-              <User className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Communication history will be displayed here</p>
-            </div>
+            <CustomerCommunicationHistory
+              customerId={customerId}
+              customerName={customerName}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>

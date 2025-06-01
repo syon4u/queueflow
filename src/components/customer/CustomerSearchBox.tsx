@@ -1,12 +1,14 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, UserPlus, History } from 'lucide-react';
+import { Search, UserPlus, History, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
 import { CustomerHistoryDialog } from '@/components/staff/CustomerHistoryDialog';
+import { DirectCommunicationDialog } from '@/components/staff/DirectCommunicationDialog';
 
 export type Customer = {
   id: string;
@@ -19,19 +21,22 @@ export type Customer = {
 type CustomerSearchBoxProps = {
   onSelectCustomer: (customer: Customer) => void;
   onCreateNew: () => void;
-  showHistory?: boolean; // Add option to show history button
+  showHistory?: boolean;
+  showCommunication?: boolean;
 };
 
 const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({ 
   onSelectCustomer, 
   onCreateNew,
-  showHistory = false // Default to false if not provided
+  showHistory = false,
+  showCommunication = false
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<Customer[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -70,6 +75,11 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
   const handleViewHistory = (customer: Customer) => {
     setSelectedCustomer(customer);
     setShowHistoryDialog(true);
+  };
+
+  const handleCommunicate = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setShowCommunicationDialog(true);
   };
 
   return (
@@ -114,16 +124,29 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
                   </div>
                 </button>
                 
-                {showHistory && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handleViewHistory(customer)}
-                  >
-                    <History className="h-4 w-4 mr-1" />
-                    {t('customer.viewHistory')}
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {showCommunication && (customer.email || customer.phone) && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleCommunicate(customer)}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-1" />
+                      {t('communication.sendMessage', 'Message')}
+                    </Button>
+                  )}
+                  
+                  {showHistory && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleViewHistory(customer)}
+                    >
+                      <History className="h-4 w-4 mr-1" />
+                      {t('customer.viewHistory')}
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -149,6 +172,13 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
           onOpenChange={setShowHistoryDialog}
         />
       )}
+
+      {/* Direct Communication Dialog */}
+      <DirectCommunicationDialog
+        customer={selectedCustomer}
+        open={showCommunicationDialog}
+        onOpenChange={setShowCommunicationDialog}
+      />
     </div>
   );
 };
