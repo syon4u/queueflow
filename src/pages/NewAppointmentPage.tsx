@@ -14,6 +14,7 @@ import ConfirmationStep from '@/components/appointments/ConfirmationStep';
 import AppointmentStepper from '@/components/appointments/AppointmentStepper';
 import AppointmentFormNavigation from '@/components/appointments/AppointmentFormNavigation';
 import PageLayout from '@/components/layout/PageLayout';
+import Breadcrumb, { BreadcrumbItem } from '@/components/navigation/Breadcrumb';
 import { LandmarkCourthouse, ShieldIcon } from '@/components/ui/broward-icons';
 
 const NewAppointmentPage = () => {
@@ -53,6 +54,27 @@ const NewAppointmentPage = () => {
       navigate('/customer');
     }
   };
+
+  // Create breadcrumb items based on current step
+  const getBreadcrumbItems = (): BreadcrumbItem[] => {
+    const steps = [
+      { label: 'Location', step: 1 },
+      { label: 'Service', step: 2 },
+      { label: 'Date & Time', step: 3 },
+      { label: 'Confirm', step: 4 }
+    ];
+
+    return steps.map(step => ({
+      label: step.label,
+      isActive: step.step === currentStep
+    }));
+  };
+
+  const getDashboardHref = () => {
+    if (role === 'admin') return '/admin';
+    if (role === 'staff') return '/staff';
+    return '/customer';
+  };
   
   return (
     <PageLayout 
@@ -61,8 +83,17 @@ const NewAppointmentPage = () => {
     >
       <div className="min-h-screen bg-pattern-bubbles bg-gradient-overlay-blue">
         <div className="container mx-auto px-4 py-8">
-          {/* Back Navigation */}
+          {/* Breadcrumb Navigation */}
           <div className="mb-6">
+            <Breadcrumb 
+              items={[
+                { label: 'Dashboard', href: getDashboardHref() },
+                { label: 'New Appointment', isActive: true }
+              ]}
+              className="mb-4"
+            />
+            
+            {/* Back Navigation */}
             <Button
               variant="ghost"
               onClick={handleBackNavigation}
@@ -84,6 +115,24 @@ const NewAppointmentPage = () => {
             <p className="text-lg text-broward-navy/80">
               Schedule your appointment with Broward County services
             </p>
+          </div>
+
+          {/* Step Progress Breadcrumbs */}
+          <div className="mb-6">
+            <Card className="bg-white/95 backdrop-blur-sm border-broward-teal/20 shadow-lg">
+              <CardContent className="p-4">
+                <div className="text-center mb-2">
+                  <span className="text-sm font-medium text-broward-navy/70">
+                    Step {currentStep} of 4
+                  </span>
+                </div>
+                <Breadcrumb 
+                  items={getBreadcrumbItems()}
+                  showHome={false}
+                  className="justify-center"
+                />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Progress Stepper */}
