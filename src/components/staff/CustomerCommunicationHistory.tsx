@@ -1,13 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, MessageSquare, Search, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { CommunicationFilters } from './communication/CommunicationFilters';
+import { CommunicationList } from './communication/CommunicationList';
+import { CommunicationStatistics } from './communication/CommunicationStatistics';
 
 interface CommunicationHistory {
   id: string;
@@ -94,20 +93,6 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'sent': return 'default';
-      case 'delivered': return 'default';
-      case 'failed': return 'destructive';
-      case 'pending': return 'secondary';
-      default: return 'secondary';
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -128,131 +113,26 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
       </div>
 
       {/* Search and Filters */}
-      <div className="flex gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search communications..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="email">Email</SelectItem>
-            <SelectItem value="sms">SMS</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="sent">Sent</SelectItem>
-            <SelectItem value="delivered">Delivered</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <CommunicationFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        typeFilter={typeFilter}
+        onTypeFilterChange={setTypeFilter}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
 
       {/* Communications List */}
-      <div className="space-y-3">
-        {isLoading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-sm text-muted-foreground">Loading communications...</p>
-          </div>
-        ) : filteredCommunications.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>No communications found</p>
-            <p className="text-sm">
-              {searchTerm || typeFilter !== 'all' || statusFilter !== 'all' 
-                ? 'Try adjusting your filters'
-                : 'No messages have been sent to this customer yet'
-              }
-            </p>
-          </div>
-        ) : (
-          filteredCommunications.map((comm) => (
-            <Card key={comm.id} className="p-4">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  {comm.type === 'email' ? (
-                    <Mail className="h-5 w-5 text-blue-500" />
-                  ) : (
-                    <MessageSquare className="h-5 w-5 text-green-500" />
-                  )}
-                  <Badge variant={getStatusColor(comm.status)}>
-                    {comm.status}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {formatDate(comm.created_at)}
-                  </span>
-                </div>
-                
-                <div className="text-right text-sm text-muted-foreground">
-                  {comm.staff && (
-                    <div>by {comm.staff.first_name} {comm.staff.last_name}</div>
-                  )}
-                  {comm.template_used && (
-                    <div className="text-xs">Template: {comm.template_used}</div>
-                  )}
-                </div>
-              </div>
-
-              {comm.subject && (
-                <div className="font-medium text-sm mb-2 text-blue-900">
-                  Subject: {comm.subject}
-                </div>
-              )}
-
-              <div className="text-sm bg-muted/50 p-3 rounded-md">
-                {comm.message}
-              </div>
-            </Card>
-          ))
-        )}
-      </div>
+      <CommunicationList
+        communications={filteredCommunications}
+        isLoading={isLoading}
+        searchTerm={searchTerm}
+        typeFilter={typeFilter}
+        statusFilter={statusFilter}
+      />
 
       {/* Statistics */}
-      {communications.length > 0 && (
-        <Card className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold">{communications.length}</div>
-              <div className="text-sm text-muted-foreground">Total</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-blue-500">
-                {communications.filter(c => c.type === 'email').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Emails</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-green-500">
-                {communications.filter(c => c.type === 'sms').length}
-              </div>
-              <div className="text-sm text-muted-foreground">SMS</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-red-500">
-                {communications.filter(c => c.status === 'failed').length}
-              </div>
-              <div className="text-sm text-muted-foreground">Failed</div>
-            </div>
-          </div>
-        </Card>
-      )}
+      <CommunicationStatistics communications={communications} />
     </div>
   );
 };
