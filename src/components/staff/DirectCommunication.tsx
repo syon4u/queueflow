@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,11 +68,13 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
 
       if (error) throw error;
       
-      // Type cast and parse variables
+      // Type cast and parse variables properly
       const typedTemplates: CommunicationTemplate[] = (data || []).map(template => ({
         ...template,
         type: template.type as 'email' | 'sms',
-        variables: Array.isArray(template.variables) ? template.variables : []
+        variables: Array.isArray(template.variables) 
+          ? template.variables.map(v => String(v))
+          : []
       }));
       
       setTemplates(typedTemplates);
