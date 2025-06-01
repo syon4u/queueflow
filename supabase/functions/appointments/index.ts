@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts"
 import { withAuth, corsHeaders, AuthContext } from "../_shared/auth.ts"
-import { Database } from "../_shared/types.ts"
 
 // Schema for creating appointment for new customer
 const CreateNewCustomerAppointmentSchema = z.object({
@@ -66,12 +65,67 @@ type AppointmentResponse = {
 
 // Handler for all appointment-related endpoints
 const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
-  // Get the URL and method
   const url = new URL(req.url)
   const method = req.method
   const { user, supabase } = ctx
   
   try {
+    // List user's appointments (GET /appointments)
+    if (method === 'GET') {
+      const userRole = user.role || 'customer'
+      
+      let query = supabase
+        .from('appointments')
+        .select(`
+          *,
+          services (
+            name,
+            duration
+          ),
+          locations (
+            name
+          ),
+          customers (
+            first_name,
+            last_name
+          )
+        `)
+        
+      // Filter appointments based on user role
+      if (userRole === 'customer') {
+        // Customers can only see their own appointments
+        query = query.eq('customer_id', user.id)
+      } else if (userRole === 'staff') {
+        // Staff can see appointments at their location
+        const { data: staffData } = await supabase
+          .from('staff')
+          .select('location_id')
+          .eq('id', user.id)
+          .single()
+          
+        if (staffData && staffData.location_id) {
+          query = query.eq('location_id', staffData.location_id)
+        }
+      }
+      // Admin role can see all appointments (no additional filter needed)
+      
+      // Execute the query
+      const { data: appointments, error } = await query.order('scheduled_time', { ascending: true })
+      
+      if (error) {
+        console.error('Error fetching appointments:', error)
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch appointments', details: error.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      return new Response(
+        JSON.stringify(appointments || []),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+    
     // Send reminder (POST /appointments/reminder)
     if (method === 'POST' && url.pathname.endsWith('/reminder')) {
       // Extract and validate the request body
@@ -150,7 +204,6 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
     
     // Create new appointment (POST /appointments)
     if (method === 'POST') {
-      // Extract the request body
       const body = await req.json()
       
       // Check if this is for a new or existing customer
@@ -170,7 +223,6 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
         
         const appointmentData = validation.data
         
-        // Insert the appointment with existing customer ID
         const { data: appointment, error } = await supabase
           .from('appointments')
           .insert({
@@ -267,61 +319,8 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
       }
     }
     
-    // List user's appointments (GET /appointments)
-    if (method === 'GET') {
-      // Determine if the user is a customer or staff
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-      
-      const userRole = userRoles && userRoles.length > 0 
-        ? userRoles[0].role 
-        : 'customer'
-      
-      let query = supabase
-        .from('appointments')
-        .select('*')
-        
-      // Filter appointments based on user role
-      if (userRole === 'customer') {
-        // Customers can only see their own appointments
-        query = query.eq('customer_id', user.id)
-      } else if (userRole === 'staff') {
-        // Staff can see appointments assigned to them or unassigned at their location
-        // This assumes staff members have a location_id in their profile
-        const { data: staffData } = await supabase
-          .from('staff')
-          .select('location_id')
-          .eq('id', user.id)
-          .single()
-          
-        if (staffData && staffData.location_id) {
-          query = query.eq('location_id', staffData.location_id)
-        }
-      }
-      // Admin role can see all appointments (no additional filter needed)
-      
-      // Execute the query
-      const { data: appointments, error } = await query
-      
-      if (error) {
-        console.error('Error fetching appointments:', error)
-        return new Response(
-          JSON.stringify({ error: 'Failed to fetch appointments', details: error.message }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
-      }
-      
-      return new Response(
-        JSON.stringify(appointments as AppointmentResponse[]),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-    
     // Update appointment status (PATCH /appointments/{id})
     if (method === 'PATCH') {
-      // Extract appointment ID from URL path
       const pathParts = url.pathname.split('/')
       const appointmentId = pathParts[pathParts.length - 1]
       
@@ -332,7 +331,6 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
         )
       }
       
-      // Extract and validate the request body
       const body = await req.json()
       const validation = UpdateAppointmentSchema.safeParse(body)
       
@@ -347,17 +345,7 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
       }
       
       const updateData = validation.data
-      
-      // Check if user has permission to update this appointment
-      // Only staff or admin should be able to update appointment status
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-      
-      const userRole = userRoles && userRoles.length > 0 
-        ? userRoles[0].role 
-        : 'customer'
+      const userRole = user.role || 'customer'
       
       if (userRole !== 'staff' && userRole !== 'admin') {
         return new Response(
@@ -369,22 +357,18 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
       // Special handling for certain status changes
       const updatePayload: any = { ...updateData }
       
-      // If status is changing to checked_in and no check_in_time provided, set it now
       if (updateData.status === 'checked_in') {
         updatePayload.check_in_time = updatePayload.check_in_time || new Date().toISOString()
       }
       
-      // If status is changing to in_progress and no start_time provided, set it now
       if (updateData.status === 'in_progress' && !updateData.start_time) {
         updatePayload.start_time = new Date().toISOString()
       }
       
-      // If status is changing to completed and no end_time provided, set it now
       if (updateData.status === 'completed' && !updateData.end_time) {
         updatePayload.end_time = new Date().toISOString()
       }
       
-      // Update the appointment in the database
       const { data: updatedAppointment, error } = await supabase
         .from('appointments')
         .update(updatePayload)
@@ -421,5 +405,4 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
   }
 })
 
-// Expose the handler as a Deno deployment function
 serve(appointmentHandler)

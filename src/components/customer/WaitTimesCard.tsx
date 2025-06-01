@@ -18,18 +18,53 @@ const WaitTimesCard = () => {
   useEffect(() => {
     const fetchWaitTimes = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('appointments', {
-          method: 'GET',
-          body: JSON.stringify({ request_type: 'wait_times' }),
+        // Get current appointments that are checked in or in progress
+        const { data: appointments, error: appointmentsError } = await supabase
+          .from('appointments')
+          .select(`
+            service_id,
+            status,
+            scheduled_time,
+            check_in_time,
+            services (
+              name
+            )
+          `)
+          .in('status', ['checked_in', 'in_progress']);
+
+        if (appointmentsError) throw appointmentsError;
+
+        // Calculate wait times by service
+        const serviceStats: { [key: string]: { name: string; count: number; totalWait: number } } = {};
+
+        appointments?.forEach(appointment => {
+          const serviceId = appointment.service_id;
+          const serviceName = appointment.services?.name || 'Unknown Service';
+          
+          if (!serviceStats[serviceId]) {
+            serviceStats[serviceId] = { name: serviceName, count: 0, totalWait: 0 };
+          }
+          
+          serviceStats[serviceId].count++;
+          
+          // Calculate wait time based on check-in time or scheduled time
+          const waitStart = appointment.check_in_time || appointment.scheduled_time;
+          const waitTime = Math.max(0, (new Date().getTime() - new Date(waitStart).getTime()) / (1000 * 60));
+          serviceStats[serviceId].totalWait += waitTime;
         });
 
-        if (error) throw error;
+        // Convert to the expected format
+        const waitTimesData: ServiceWaitTime[] = Object.entries(serviceStats).map(([serviceId, stats]) => ({
+          service_id: serviceId,
+          service_name: stats.name,
+          wait_time: stats.count > 0 ? Math.round(stats.totalWait / stats.count) : 0,
+          queue_length: stats.count
+        }));
 
-        if (data) {
-          setWaitTimes(data);
-        }
+        setWaitTimes(waitTimesData);
       } catch (error) {
         console.error('Error fetching wait times:', error);
+        setWaitTimes([]);
       } finally {
         setLoading(false);
       }
