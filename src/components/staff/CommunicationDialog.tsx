@@ -53,7 +53,14 @@ export const CommunicationDialog: React.FC<CommunicationDialogProps> = ({
         .order('name');
 
       if (error) throw error;
-      setTemplates(data || []);
+      
+      // Type cast to ensure proper typing
+      const typedTemplates: CommunicationTemplate[] = (data || []).map(template => ({
+        ...template,
+        type: template.type as 'email' | 'sms'
+      }));
+      
+      setTemplates(typedTemplates);
     } catch (error) {
       console.error('Error fetching templates:', error);
     }

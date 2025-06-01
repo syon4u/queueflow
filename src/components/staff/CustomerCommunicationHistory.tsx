@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, MessageSquare, Search, Filter, Send, RefreshCw } from 'lucide-react';
+import { Mail, MessageSquare, Search, RefreshCw } from 'lucide-react';
 
 interface CommunicationHistory {
   id: string;
@@ -66,7 +66,11 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
             .single();
           staff = staffData;
         }
-        communicationsWithStaff.push({ ...comm, staff });
+        communicationsWithStaff.push({ 
+          ...comm, 
+          type: comm.type as 'email' | 'sms',
+          staff 
+        });
       }
 
       setCommunications(communicationsWithStaff);

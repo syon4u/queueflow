@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, MessageSquare, Mail, Phone, History, Template } from 'lucide-react';
+import { Send, MessageSquare, Mail, Phone, History, FileText } from 'lucide-react';
 import { Customer } from '@/components/customer/CustomerSearchBox';
 
 interface CommunicationTemplate {
@@ -68,7 +68,15 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
         .order('name');
 
       if (error) throw error;
-      setTemplates(data || []);
+      
+      // Type cast and parse variables
+      const typedTemplates: CommunicationTemplate[] = (data || []).map(template => ({
+        ...template,
+        type: template.type as 'email' | 'sms',
+        variables: Array.isArray(template.variables) ? template.variables : []
+      }));
+      
+      setTemplates(typedTemplates);
     } catch (error) {
       console.error('Error fetching templates:', error);
     }
@@ -98,7 +106,11 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
             .single();
           staff = staffData;
         }
-        historyWithStaff.push({ ...comm, staff });
+        historyWithStaff.push({ 
+          ...comm, 
+          type: comm.type as 'email' | 'sms',
+          staff 
+        });
       }
 
       setHistory(historyWithStaff);
@@ -126,9 +138,9 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
 
   const replaceVariables = (text: string) => {
     return text
-      .replace(/{{customer_name}}/g, `${customer.first_name} ${customer.last_name}`)
-      .replace(/{{first_name}}/g, customer.first_name)
-      .replace(/{{last_name}}/g, customer.last_name);
+      .replace(/\{\{customer_name\}\}/g, `${customer.first_name} ${customer.last_name}`)
+      .replace(/\{\{first_name\}\}/g, customer.first_name)
+      .replace(/\{\{last_name\}\}/g, customer.last_name);
   };
 
   const handleSend = async () => {
@@ -264,7 +276,7 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
             onClick={() => setActiveTab('templates')}
             className="flex items-center gap-2"
           >
-            <Template className="h-4 w-4" />
+            <FileText className="h-4 w-4" />
             Templates
           </Button>
         </div>
@@ -337,7 +349,7 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
                 rows={6}
               />
               <div className="text-sm text-muted-foreground">
-                Available variables: {{customer_name}}, {{first_name}}, {{last_name}}
+                Available variables: {`{{customer_name}}, {{first_name}}, {{last_name}}`}
               </div>
             </div>
 
@@ -419,7 +431,7 @@ export const DirectCommunication: React.FC<DirectCommunicationProps> = ({
           <div className="space-y-4">
             {templates.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <Template className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>No templates available</p>
                 <p className="text-sm">Contact your administrator to add communication templates</p>
               </div>
