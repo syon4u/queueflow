@@ -76,6 +76,22 @@ const StaffPage = () => {
               <h1 className="text-2xl font-bold text-gray-900">{t('staff.dashboard')}</h1>
               <p className="text-gray-600">{t('staff.managementDescription')}</p>
             </div>
+          </div>
+        </div>
+
+        <StaffStatusSection onStatusChange={handleStatusChange} />
+        
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <TabsList className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-5'}`}>
+              <TabsTrigger value="basic-queue">Basic Queue</TabsTrigger>
+              <TabsTrigger value="enhanced-queue">Enhanced Queue</TabsTrigger>
+              <TabsTrigger value="appointments">Appointments</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="advanced-tools">Advanced Tools</TabsTrigger>
+            </TabsList>
+            
+            {/* Performance Reports button - now positioned next to tabs */}
             <Button asChild variant="outline" className="flex items-center gap-2">
               <Link to="/performance">
                 <PieChart className="h-4 w-4" />
@@ -83,18 +99,6 @@ const StaffPage = () => {
               </Link>
             </Button>
           </div>
-        </div>
-
-        <StaffStatusSection onStatusChange={handleStatusChange} />
-        
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-5'} mb-6`}>
-            <TabsTrigger value="basic-queue">Basic Queue</TabsTrigger>
-            <TabsTrigger value="enhanced-queue">Enhanced Queue</TabsTrigger>
-            <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="advanced-tools">Advanced Tools</TabsTrigger>
-          </TabsList>
           
           <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
             <CardContent className="p-6">
