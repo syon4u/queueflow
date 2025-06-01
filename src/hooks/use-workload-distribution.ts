@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +22,23 @@ export interface CustomerRouting {
   recommendedStaff: string[];
   routingReason: string;
 }
+
+const mapStatusToUnionType = (status: string | null): 'available' | 'busy' | 'break' | 'offline' => {
+  switch (status) {
+    case 'available':
+    case 'active':
+      return 'available';
+    case 'busy':
+      return 'busy';
+    case 'break':
+      return 'break';
+    case 'offline':
+    case 'inactive':
+      return 'offline';
+    default:
+      return 'offline';
+  }
+};
 
 export const useWorkloadDistribution = () => {
   const { user } = useAuth();
@@ -67,7 +83,7 @@ export const useWorkloadDistribution = () => {
           utilization: Math.round((currentLoad / 8) * 100),
           specialties: ['General'], // Would come from staff profile
           nextAvailable: currentLoad < 3 ? new Date() : nextSlot,
-          status: member.status || 'offline'
+          status: mapStatusToUnionType(member.status)
         };
       });
 

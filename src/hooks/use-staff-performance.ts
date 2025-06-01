@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +23,23 @@ export interface StaffPerformanceMetrics {
     status: 'available' | 'busy' | 'break' | 'offline';
   };
 }
+
+const mapStatusToUnionType = (status: string | null): 'available' | 'busy' | 'break' | 'offline' => {
+  switch (status) {
+    case 'available':
+    case 'active':
+      return 'available';
+    case 'busy':
+      return 'busy';
+    case 'break':
+      return 'break';
+    case 'offline':
+    case 'inactive':
+      return 'offline';
+    default:
+      return 'available';
+  }
+};
 
 export const useStaffPerformance = () => {
   const { user } = useAuth();
@@ -129,7 +145,7 @@ export const useStaffPerformance = () => {
           activeCustomers: currentQueue?.filter(a => a.status === 'in_progress').length || 0,
           queueLength: currentQueue?.filter(a => a.status === 'checked_in').length || 0,
           estimatedBacklog: (currentQueue?.length || 0) * 15, // 15 min per customer
-          status: staffData?.status || 'available'
+          status: mapStatusToUnionType(staffData?.status)
         }
       });
 

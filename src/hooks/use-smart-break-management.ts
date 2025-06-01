@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +22,23 @@ export interface StaffAvailability {
   status: 'available' | 'busy' | 'break' | 'offline';
   canCover: boolean;
 }
+
+const mapStatusToUnionType = (status: string | null): 'available' | 'busy' | 'break' | 'offline' => {
+  switch (status) {
+    case 'available':
+    case 'active':
+      return 'available';
+    case 'busy':
+      return 'busy';
+    case 'break':
+      return 'break';
+    case 'offline':
+    case 'inactive':
+      return 'offline';
+    default:
+      return 'offline';
+  }
+};
 
 export const useSmartBreakManagement = () => {
   const { user } = useAuth();
@@ -50,12 +66,14 @@ export const useSmartBreakManagement = () => {
             .eq('staff_id', s.id)
             .in('status', ['checked_in', 'in_progress']);
 
+          const mappedStatus = mapStatusToUnionType(s.status);
+
           return {
             staffId: s.id,
             name: `${s.first_name} ${s.last_name}`,
             currentWorkload: workload?.length || 0,
-            status: s.status || 'offline',
-            canCover: s.status === 'active' && (workload?.length || 0) < 3
+            status: mappedStatus,
+            canCover: mappedStatus === 'available' && (workload?.length || 0) < 3
           };
         })
       );
