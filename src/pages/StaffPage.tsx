@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -31,7 +32,7 @@ const StaffPage = () => {
   const { appointments, loading, refreshAppointments } = useAppointments();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState('queue');
+  const [activeTab, setActiveTab] = useState('basic-queue');
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
   
   // Enable staff notifications
@@ -87,18 +88,17 @@ const StaffPage = () => {
         <StaffStatusSection onStatusChange={handleStatusChange} />
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-6'} mb-6`}>
-            <TabsTrigger value="queue">{t('staff.queueManagement')}</TabsTrigger>
-            <TabsTrigger value="enhanced-queue">{t('staff.enhancedQueue')}</TabsTrigger>
-            <TabsTrigger value="advanced">{t('staff.advanced')}</TabsTrigger>
-            <TabsTrigger value="appointments">{t('staff.appointments')}</TabsTrigger>
-            <TabsTrigger value="stats">{t('staff.statistics')}</TabsTrigger>
-            <TabsTrigger value="settings">{t('staff.settings')}</TabsTrigger>
+          <TabsList className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-5'} mb-6`}>
+            <TabsTrigger value="basic-queue">Basic Queue</TabsTrigger>
+            <TabsTrigger value="enhanced-queue">Enhanced Queue</TabsTrigger>
+            <TabsTrigger value="appointments">Appointments</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="advanced-tools">Advanced Tools</TabsTrigger>
           </TabsList>
           
           <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
             <CardContent className="p-6">
-              <TabsContent value="queue">
+              <TabsContent value="basic-queue">
                 <QueueProvider>
                   <div className="space-y-6">
                     <QueueStats />
@@ -121,14 +121,10 @@ const StaffPage = () => {
               <TabsContent value="enhanced-queue">
                 <QueueManagementTab />
               </TabsContent>
-
-              <TabsContent value="advanced">
-                <AdvancedStaffTab />
-              </TabsContent>
               
               <TabsContent value="appointments">
                 <div className="bg-white rounded-lg">
-                  <h2 className="text-xl font-semibold mb-4">{t('staff.activeAppointments')}</h2>
+                  <h2 className="text-xl font-semibold mb-4">Active Appointments</h2>
                   
                   {loading ? (
                     <div className="flex justify-center p-8">
@@ -143,15 +139,12 @@ const StaffPage = () => {
                 </div>
               </TabsContent>
               
-              <TabsContent value="stats">
+              <TabsContent value="analytics">
                 <StaffPerformanceReport />
               </TabsContent>
               
-              <TabsContent value="settings">
-                <div className="bg-white rounded-lg">
-                  <h2 className="text-xl font-semibold mb-4">{t('staff.settings')}</h2>
-                  <p className="text-gray-600">{t('staff.settingsDescription')}</p>
-                </div>
+              <TabsContent value="advanced-tools">
+                <AdvancedStaffTab />
               </TabsContent>
             </CardContent>
           </Card>
