@@ -53,9 +53,11 @@
   "complete": "Complete",
   "cancel": "Cancel",
   "sendReminder": "Send Reminder",
+  "statusUpdated": "Appointment status updated successfully",
+  "statusUpdateError": "Failed to update appointment status",
   "status": {
     "scheduled": "Scheduled",
-    "checked_in": "Checked In",
+    "checked_in": "Checked In", 
     "in_progress": "In Progress",
     "completed": "Completed",
     "cancelled": "Cancelled",

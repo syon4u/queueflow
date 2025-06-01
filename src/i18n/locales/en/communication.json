@@ -1,4 +1,13 @@
 
 {
-  "sendMessage": "Send Message"
+  "sendMessage": "Send Message",
+  "sendToCustomer": "Send to Customer",
+  "type": "Communication Type",
+  "email": "Email",
+  "sms": "SMS",
+  "subject": "Subject",
+  "subjectPlaceholder": "Enter subject...",
+  "message": "Message",
+  "messagePlaceholder": "Enter your message...",
+  "send": "Send"
 }

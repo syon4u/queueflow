@@ -13,14 +13,25 @@ export const useAppointmentActions = (onStatusChange?: () => void) => {
   const updateAppointmentStatus = async (id: string, status: AppointmentStatus) => {
     setIsLoading(prev => ({ ...prev, [id]: true }));
     try {
+      console.log('Updating appointment status:', { id, status });
+      
       const { error } = await supabase
         .from('appointments')
-        .update({ status })
+        .update({ 
+          status,
+          // Add timestamp updates based on status
+          ...(status === 'checked_in' && { check_in_time: new Date().toISOString() }),
+          ...(status === 'in_progress' && { start_time: new Date().toISOString() }),
+          ...(status === 'completed' && { end_time: new Date().toISOString() })
+        })
         .eq('id', id);
 
       if (error) {
+        console.error('Supabase error:', error);
         throw error;
       }
+
+      console.log('Appointment status updated successfully');
 
       toast({
         title: t('common.success'),

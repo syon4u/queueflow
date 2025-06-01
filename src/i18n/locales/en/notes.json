@@ -1,4 +1,9 @@
 
 {
-  "manageNotes": "Manage Notes"
+  "manageNotes": "Manage Notes",
+  "customerNotes": "Customer Notes",
+  "addNote": "Add Note",
+  "new": "New Note",
+  "existingNotes": "Existing Notes",
+  "noNotes": "No notes found"
 }
