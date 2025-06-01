@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +9,10 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { DataTable, Column } from './DataTable';
 import { Badge } from '@/components/ui/badge';
-import { Mail, MessageSquare, Plus, Edit, Trash2 } from 'lucide-react';
+import { Mail, MessageSquare, Plus, Edit, Trash2, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getAvailableVariables, formatVariableForDisplay } from '@/utils/template-variables';
 
 interface CommunicationTemplate {
   id: string;
@@ -215,6 +216,8 @@ export const CommunicationTemplatesTab: React.FC = () => {
     setIsDialogOpen(true);
   };
 
+  const availableVariables = getAvailableVariables();
+
   const columns: Column[] = [
     {
       key: 'name',
@@ -367,8 +370,15 @@ export const CommunicationTemplatesTab: React.FC = () => {
               />
             </div>
 
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Available variables:</strong> {availableVariables.map(formatVariableForDisplay).join(', ')}
+              </AlertDescription>
+            </Alert>
+
             <div className="space-y-2">
-              <Label htmlFor="variables">Variables (comma-separated)</Label>
+              <Label htmlFor="variables">Used Variables (auto-detected or manual entry)</Label>
               <Input
                 id="variables"
                 value={formData.variables}
@@ -376,7 +386,7 @@ export const CommunicationTemplatesTab: React.FC = () => {
                 placeholder="customer_name, first_name, last_name"
               />
               <p className="text-xs text-muted-foreground">
-                Available variables: customer_name, first_name, last_name
+                Comma-separated list of variables used in this template
               </p>
             </div>
 

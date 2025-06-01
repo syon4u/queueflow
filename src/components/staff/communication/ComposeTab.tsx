@@ -7,8 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, Mail, MessageSquare } from 'lucide-react';
+import { Send, Mail, MessageSquare, Info } from 'lucide-react';
 import { Customer } from '@/components/customer/CustomerSearchBox';
+import { replaceTemplateVariables, getAvailableVariables, formatVariableForDisplay, type VariableContext } from '@/utils/template-variables';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface CommunicationTemplate {
   id: string;
@@ -38,6 +40,21 @@ export const ComposeTab: React.FC<ComposeTabProps> = ({
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [showPreview, setShowPreview] = useState(false);
+
+  const buildVariableContext = (): VariableContext => {
+    return {
+      customer_name: `${customer.first_name} ${customer.last_name}`.trim(),
+      first_name: customer.first_name,
+      last_name: customer.last_name,
+      // Add more context as needed from props or additional data
+    };
+  };
+
+  const getPreviewText = (text: string): string => {
+    const context = buildVariableContext();
+    return replaceTemplateVariables(text, context);
+  };
 
   const handleTemplateSelect = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
@@ -47,13 +64,6 @@ export const ComposeTab: React.FC<ComposeTabProps> = ({
       setMessage(template.content);
       setSelectedTemplate(templateId);
     }
-  };
-
-  const replaceVariables = (text: string) => {
-    return text
-      .replace(/\{\{customer_name\}\}/g, `${customer.first_name} ${customer.last_name}`)
-      .replace(/\{\{first_name\}\}/g, customer.first_name)
-      .replace(/\{\{last_name\}\}/g, customer.last_name);
   };
 
   const handleSend = async () => {
@@ -96,8 +106,9 @@ export const ComposeTab: React.FC<ComposeTabProps> = ({
 
     setIsSending(true);
     try {
-      const processedMessage = replaceVariables(message);
-      const processedSubject = communicationType === 'email' ? replaceVariables(subject) : undefined;
+      const context = buildVariableContext();
+      const processedMessage = replaceTemplateVariables(message, context);
+      const processedSubject = communicationType === 'email' ? replaceTemplateVariables(subject, context) : undefined;
 
       const { error } = await supabase.functions.invoke('send-communication', {
         body: {
@@ -134,6 +145,8 @@ export const ComposeTab: React.FC<ComposeTabProps> = ({
       setIsSending(false);
     }
   };
+
+  const availableVariables = getAvailableVariables();
 
   return (
     <div className="space-y-4">
@@ -189,11 +202,26 @@ export const ComposeTab: React.FC<ComposeTabProps> = ({
             onChange={(e) => setSubject(e.target.value)}
             placeholder="Enter email subject..."
           />
+          {showPreview && subject && (
+            <div className="text-sm text-muted-foreground bg-muted p-2 rounded">
+              <strong>Preview:</strong> {getPreviewText(subject)}
+            </div>
+          )}
         </div>
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="message">Message</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="message">Message</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPreview(!showPreview)}
+          >
+            {showPreview ? 'Hide Preview' : 'Show Preview'}
+          </Button>
+        </div>
         <Textarea
           id="message"
           value={message}
@@ -201,10 +229,20 @@ export const ComposeTab: React.FC<ComposeTabProps> = ({
           placeholder={`Enter your ${communicationType} message...`}
           rows={6}
         />
-        <div className="text-sm text-muted-foreground">
-          Available variables: {`{{customer_name}}, {{first_name}}, {{last_name}}`}
-        </div>
+        {showPreview && message && (
+          <div className="text-sm bg-muted p-3 rounded border">
+            <strong className="block mb-2">Preview:</strong>
+            <div className="whitespace-pre-wrap">{getPreviewText(message)}</div>
+          </div>
+        )}
       </div>
+
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Available variables:</strong> {availableVariables.map(formatVariableForDisplay).join(', ')}
+        </AlertDescription>
+      </Alert>
 
       <div className="flex gap-2">
         <Button onClick={handleSend} disabled={isSending || !message.trim()}>
