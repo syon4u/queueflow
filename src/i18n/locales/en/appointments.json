@@ -62,5 +62,11 @@
     "completed": "Completed",
     "cancelled": "Cancelled",
     "no_show": "No Show"
-  }
+  },
+  "location": "Location",
+  "selectLocation": "Select Location",
+  "selectDate": "Select Date",
+  "reasonPlaceholder": "Enter reason for visit...",
+  "notesPlaceholder": "Enter any additional notes...",
+  "create": "Create Appointment"
 }

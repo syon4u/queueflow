@@ -43,5 +43,19 @@
   "breakErrorDescription": "There was a problem setting your break status",
   "startBreak": "Start {{duration}} min break",
   "handoverRequestMessage": "{{name}} has gone on break for {{duration}} minutes and requested you take over their customers",
-  "viewHistory": "View Customer History"
+  "viewHistory": "View Customer History",
+  "shortcuts": {
+    "nextCustomer": "Call Next Customer",
+    "markServed": "Mark as Served",
+    "markNoShow": "Mark as No-Show",
+    "markAvailable": "Mark Available",
+    "markBusy": "Mark Busy",
+    "markOffline": "Mark Offline",
+    "showHelp": "Show Help"
+  },
+  "keyboardShortcuts": "Keyboard Shortcuts",
+  "shortcutsDescription": "Use these shortcuts to quickly manage your queue and status",
+  "queueStatusUpdated": "Queue status updated",
+  "queueIsNow": "Queue is now {{status}}",
+  "queueStatusUpdateError": "Failed to update queue status"
 }

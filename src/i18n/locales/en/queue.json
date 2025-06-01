@@ -59,5 +59,17 @@
   "queueStatus": "Queue Status",
   "open": "Open",
   "closed": "Closed",
-  "paused": "Paused"
+  "paused": "Paused",
+  "enhancedQueue": "Enhanced Queue",
+  "queueEmpty": "Queue is empty",
+  "customerAdded": "Customer added to queue",
+  "customerServed": "Customer served",
+  "serveError": "Failed to mark as served",
+  "markServed": "Mark as Served",
+  "noShow": "No Show",
+  "phone": "Phone",
+  "calledAt": "Called At",
+  "notes": "Notes",
+  "served": "Served",
+  "noShows": "No Shows"
 }
