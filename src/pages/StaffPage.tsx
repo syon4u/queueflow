@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -25,6 +24,7 @@ import { QueueManagementTab } from '@/components/staff/QueueManagementTab';
 import { PieChart } from 'lucide-react';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
+import { AdvancedStaffTab } from '@/components/staff/AdvancedStaffTab';
 
 const StaffPage = () => {
   const { user, role } = useAuth();
@@ -87,9 +87,10 @@ const StaffPage = () => {
         <StaffStatusSection onStatusChange={handleStatusChange} />
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <TabsList className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-5'} mb-6`}>
+          <TabsList className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-6'} mb-6`}>
             <TabsTrigger value="queue">{t('staff.queueManagement')}</TabsTrigger>
             <TabsTrigger value="enhanced-queue">{t('staff.enhancedQueue')}</TabsTrigger>
+            <TabsTrigger value="advanced">{t('staff.advanced')}</TabsTrigger>
             <TabsTrigger value="appointments">{t('staff.appointments')}</TabsTrigger>
             <TabsTrigger value="stats">{t('staff.statistics')}</TabsTrigger>
             <TabsTrigger value="settings">{t('staff.settings')}</TabsTrigger>
@@ -119,6 +120,10 @@ const StaffPage = () => {
 
               <TabsContent value="enhanced-queue">
                 <QueueManagementTab />
+              </TabsContent>
+
+              <TabsContent value="advanced">
+                <AdvancedStaffTab />
               </TabsContent>
               
               <TabsContent value="appointments">
