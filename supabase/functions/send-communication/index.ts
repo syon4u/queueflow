@@ -1,120 +1,14 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
-import { Resend } from "npm:resend@2.0.0";
+import { CommunicationRequest, VariableContext, CommunicationResult } from './types.ts';
+import { replaceTemplateVariables } from './variable-replacement.ts';
+import { sendSMS } from './sms-service.ts';
+import { sendEmail } from './email-service.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-interface CommunicationRequest {
-  customerId: string;
-  type: 'email' | 'sms';
-  subject?: string;
-  message: string;
-  templateId?: string;
-}
-
-interface VariableContext {
-  customer_name?: string;
-  first_name?: string;
-  last_name?: string;
-  appointment_time?: string;
-  service_name?: string;
-  location_name?: string;
-  queue_position?: string;
-  estimated_wait?: string;
-}
-
-const replaceTemplateVariables = (text: string, context: VariableContext): string => {
-  if (!text) return text;
-  
-  let result = text;
-  
-  // Replace customer variables
-  if (context.customer_name) {
-    result = result.replace(/\{\{customer_name\}\}/g, context.customer_name);
-  }
-  if (context.first_name) {
-    result = result.replace(/\{\{first_name\}\}/g, context.first_name);
-  }
-  if (context.last_name) {
-    result = result.replace(/\{\{last_name\}\}/g, context.last_name);
-  }
-  
-  // Replace appointment variables
-  if (context.appointment_time) {
-    result = result.replace(/\{\{appointment_time\}\}/g, context.appointment_time);
-  }
-  if (context.service_name) {
-    result = result.replace(/\{\{service_name\}\}/g, context.service_name);
-  }
-  if (context.location_name) {
-    result = result.replace(/\{\{location_name\}\}/g, context.location_name);
-  }
-  
-  // Replace queue variables
-  if (context.queue_position) {
-    result = result.replace(/\{\{queue_position\}\}/g, context.queue_position);
-  }
-  if (context.estimated_wait) {
-    result = result.replace(/\{\{estimated_wait\}\}/g, context.estimated_wait);
-  }
-  
-  return result;
-};
-
-const sendSMS = async (to: string, message: string): Promise<{ success: boolean; id?: string; error?: string }> => {
-  const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
-  const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-  const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
-
-  if (!accountSid || !authToken || !twilioPhoneNumber) {
-    console.error('Missing Twilio credentials');
-    return { success: false, error: 'Twilio credentials not configured' };
-  }
-
-  try {
-    // Clean the phone number to ensure it's in the correct format
-    const cleanedPhoneNumber = to.replace(/\D/g, '');
-    const formattedPhoneNumber = cleanedPhoneNumber.startsWith('1') 
-      ? `+${cleanedPhoneNumber}` 
-      : `+1${cleanedPhoneNumber}`;
-
-    console.log(`Sending SMS to ${formattedPhoneNumber}: ${message}`);
-
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    
-    const body = new URLSearchParams({
-      To: formattedPhoneNumber,
-      From: twilioPhoneNumber,
-      Body: message
-    });
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Twilio API error:', errorData);
-      return { success: false, error: errorData.message || 'Failed to send SMS' };
-    }
-
-    const data = await response.json();
-    console.log('SMS sent successfully:', data.sid);
-    return { success: true, id: data.sid };
-
-  } catch (error) {
-    console.error('Error sending SMS:', error);
-    return { success: false, error: error.message };
-  }
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -167,53 +61,24 @@ const handler = async (req: Request): Promise<Response> => {
     const processedMessage = replaceTemplateVariables(message, variableContext);
     const processedSubject = subject ? replaceTemplateVariables(subject, variableContext) : undefined;
 
-    let communicationResult;
+    let communicationResult: CommunicationResult;
     let status = 'sent';
 
     if (type === 'email' && customer.email) {
-      try {
-        const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
-        
-        const emailResponse = await resend.emails.send({
-          from: 'Queue Management <onboarding@resend.dev>',
-          to: [customer.email],
-          subject: processedSubject || 'Message from Queue Management System',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #333;">Message from Queue Management System</h2>
-              <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; white-space: pre-wrap;">${processedMessage}</p>
-              </div>
-              <p style="color: #666; font-size: 14px;">
-                This message was sent to you regarding your queue or appointment.
-              </p>
-            </div>
-          `,
-        });
-
-        console.log(`Email sent successfully to ${customer.email}:`, emailResponse);
-        communicationResult = { success: true, method: 'email', id: emailResponse.data?.id };
-      } catch (emailError) {
-        console.error('Error sending email:', emailError);
+      communicationResult = await sendEmail(
+        customer.email, 
+        processedSubject || 'Message from Queue Management System', 
+        processedMessage
+      );
+      
+      if (!communicationResult.success) {
         status = 'failed';
-        communicationResult = { success: false, method: 'email', error: emailError.message };
       }
     } else if (type === 'sms' && customer.phone) {
-      try {
-        const smsResult = await sendSMS(customer.phone, processedMessage);
-        
-        if (smsResult.success) {
-          console.log(`SMS sent successfully to ${customer.phone}:`, smsResult.id);
-          communicationResult = { success: true, method: 'sms', id: smsResult.id };
-        } else {
-          console.error('Error sending SMS:', smsResult.error);
-          status = 'failed';
-          communicationResult = { success: false, method: 'sms', error: smsResult.error };
-        }
-      } catch (smsError) {
-        console.error('Error sending SMS:', smsError);
+      communicationResult = await sendSMS(customer.phone, processedMessage);
+      
+      if (!communicationResult.success) {
         status = 'failed';
-        communicationResult = { success: false, method: 'sms', error: smsError.message };
       }
     } else {
       return new Response(JSON.stringify({ error: 'Customer contact information not available for selected method' }), {
