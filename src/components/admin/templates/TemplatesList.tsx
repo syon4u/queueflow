@@ -9,12 +9,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { MoreHorizontal, Edit, Trash2, Mail, MessageSquare, Plus, Eye } from 'lucide-react';
 import { TemplateFormDialog } from './TemplateFormDialog';
 import { TemplatePreviewDialog } from './TemplatePreviewDialog';
+import type { Json } from '@/integrations/supabase/types';
 
 interface CommunicationTemplate {
   id: string;
   name: string;
   type: 'email' | 'sms';
-  subject?: string;
+  subject?: string | null;
   content: string;
   variables: string[];
   is_active: boolean;
@@ -57,7 +58,10 @@ export const TemplatesList: React.FC<TemplatesListProps> = ({
       
       const typedTemplates: CommunicationTemplate[] = (data || []).map(template => ({
         ...template,
-        type: template.type as 'email' | 'sms'
+        type: template.type as 'email' | 'sms',
+        variables: Array.isArray(template.variables) ? template.variables as string[] : [],
+        is_active: template.is_active ?? true,
+        subject: template.subject || undefined
       }));
       
       setTemplates(typedTemplates);

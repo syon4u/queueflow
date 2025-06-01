@@ -18,7 +18,7 @@ interface CommunicationTemplate {
   id?: string;
   name: string;
   type: 'email' | 'sms';
-  subject?: string;
+  subject?: string | null;
   content: string;
   variables: string[];
   is_active: boolean;
