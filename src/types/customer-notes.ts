@@ -1,4 +1,3 @@
-
 export interface CustomerNote {
   id: string;
   customer_id: string;
@@ -12,7 +11,7 @@ export interface CustomerNote {
   staff?: {
     first_name: string;
     last_name: string;
-  };
+  } | null;
 }
 
 export interface CreateNoteData {

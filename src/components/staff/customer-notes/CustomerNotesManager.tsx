@@ -58,17 +58,38 @@ export const CustomerNotesManager: React.FC<CustomerNotesManagerProps> = ({
   const fetchNotes = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // First fetch the notes
+      const { data: notesData, error: notesError } = await supabase
         .from('customer_notes')
-        .select(`
-          *,
-          staff:staff_id(first_name, last_name)
-        `)
+        .select('*')
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setNotes(data || []);
+      if (notesError) throw notesError;
+
+      // Then fetch staff information for each note
+      const notesWithStaff: CustomerNote[] = [];
+      
+      for (const note of notesData || []) {
+        let staff = null;
+        
+        if (note.staff_id) {
+          const { data: staffData } = await supabase
+            .from('staff')
+            .select('first_name, last_name')
+            .eq('id', note.staff_id)
+            .single();
+          
+          staff = staffData;
+        }
+        
+        notesWithStaff.push({
+          ...note,
+          staff
+        });
+      }
+
+      setNotes(notesWithStaff);
     } catch (error) {
       console.error('Error fetching notes:', error);
       toast({

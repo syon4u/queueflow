@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { Spinner } from '@/components/ui/spinner';
 import { supabase } from '@/integrations/supabase/client';
-import CustomerHistoryDialog from '@/components/staff/CustomerHistoryDialog';
+import { CustomerHistoryDialog } from '@/components/staff/CustomerHistoryDialog';
 
 export type Customer = {
   id: string;
