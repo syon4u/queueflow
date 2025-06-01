@@ -89,6 +89,117 @@ export type Database = {
           },
         ]
       }
+      communication_templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string | null
+          type: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject?: string | null
+          type: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      customer_communications: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          message: string
+          staff_id: string | null
+          status: string
+          subject: string | null
+          template_used: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          message: string
+          staff_id?: string | null
+          status?: string
+          subject?: string | null
+          template_used?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          message?: string
+          staff_id?: string | null
+          status?: string
+          subject?: string | null
+          template_used?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      customer_notes: {
+        Row: {
+          category: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          is_important: boolean | null
+          note: string
+          staff_id: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_important?: boolean | null
+          note: string
+          staff_id?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_important?: boolean | null
+          note?: string
+          staff_id?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           created_at: string
@@ -198,6 +309,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      queue_schedules: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          end_datetime: string
+          id: string
+          is_active: boolean | null
+          location_id: string
+          recurring_pattern: Json | null
+          schedule_type: string
+          start_datetime: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_datetime: string
+          id?: string
+          is_active?: boolean | null
+          location_id: string
+          recurring_pattern?: Json | null
+          schedule_type: string
+          start_datetime: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_datetime?: string
+          id?: string
+          is_active?: boolean | null
+          location_id?: string
+          recurring_pattern?: Json | null
+          schedule_type?: string
+          start_datetime?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       role_permissions: {
         Row: {
@@ -367,6 +523,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          staff_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          staff_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          staff_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       staff_notifications: {
         Row: {

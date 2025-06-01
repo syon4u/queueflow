@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Bell, History } from 'lucide-react';
+import { Bell, History, Plus, MessageSquare, StickyNote } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import CustomerHistoryModal from './CustomerHistoryModal';
+import { CommunicationDialog } from './CommunicationDialog';
+import { CustomerNotesDialog } from './CustomerNotesDialog';
 import type { Appointment } from '@/hooks/use-appointments';
 
 interface AppointmentActionButtonsProps {
@@ -20,6 +22,8 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
   onOpenReminderDialog
 }) => {
   const { t } = useTranslation();
+  const [communicationOpen, setCommunicationOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
 
   return (
     <div className="flex items-center space-x-1">
@@ -67,6 +71,22 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
       >
         <Bell className="h-4 w-4" />
       </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => setCommunicationOpen(true)}
+        title={t('communication.sendMessage')}
+      >
+        <MessageSquare className="h-4 w-4" />
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => setNotesOpen(true)}
+        title={t('notes.manageNotes')}
+      >
+        <StickyNote className="h-4 w-4" />
+      </Button>
       <CustomerHistoryModal 
         customerId={appointment.customer_id}
         trigger={
@@ -78,6 +98,18 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
             <History className="h-4 w-4" />
           </Button>
         }
+      />
+
+      <CommunicationDialog
+        open={communicationOpen}
+        onOpenChange={setCommunicationOpen}
+        appointment={appointment}
+      />
+
+      <CustomerNotesDialog
+        open={notesOpen}
+        onOpenChange={setNotesOpen}
+        customerId={appointment.customer_id}
       />
     </div>
   );

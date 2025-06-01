@@ -2,11 +2,15 @@
 import React, { useState } from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import type { Appointment } from '@/hooks/use-appointments';
 import { SendReminderDialog } from './staff/SendReminderDialog';
+import { CreateAppointmentDialog } from './staff/CreateAppointmentDialog';
 import { AppointmentTableHeader } from './staff/AppointmentTableHeader';
 import { AppointmentTableRow } from './staff/AppointmentTableRow';
 import { useAppointmentActions } from '@/hooks/use-appointment-actions';
+import { useTranslation } from 'react-i18next';
 
 interface StaffAppointmentTableProps {
   appointments: Appointment[];
@@ -17,7 +21,9 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
   appointments, 
   onStatusChange 
 }) => {
+  const { t } = useTranslation();
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const { isLoading, updateAppointmentStatus } = useAppointmentActions(onStatusChange);
   
@@ -26,35 +32,49 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
     setReminderDialogOpen(true);
   };
 
-  if (!appointments.length) {
-    return (
-      <div className="text-center p-8 text-muted-foreground">
-        <p>No active appointments found</p>
-      </div>
-    );
-  }
-
   return (
     <TooltipProvider>
-      <Table>
-        <AppointmentTableHeader />
-        <TableBody>
-          {appointments.map((appointment) => (
-            <AppointmentTableRow
-              key={appointment.id}
-              appointment={appointment}
-              isLoading={isLoading[appointment.id]}
-              onUpdateStatus={updateAppointmentStatus}
-              onOpenReminderDialog={handleOpenReminderDialog}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <div className="space-y-4">
+        {/* Header with Create Appointment Button */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold">{t('appointments.title')}</h2>
+          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            {t('appointments.createNew')}
+          </Button>
+        </div>
+
+        {!appointments.length ? (
+          <div className="text-center p-8 text-muted-foreground">
+            <p>No active appointments found</p>
+          </div>
+        ) : (
+          <Table>
+            <AppointmentTableHeader />
+            <TableBody>
+              {appointments.map((appointment) => (
+                <AppointmentTableRow
+                  key={appointment.id}
+                  appointment={appointment}
+                  isLoading={isLoading[appointment.id]}
+                  onUpdateStatus={updateAppointmentStatus}
+                  onOpenReminderDialog={handleOpenReminderDialog}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
 
       <SendReminderDialog
         open={reminderDialogOpen}
         onOpenChange={setReminderDialogOpen}
         appointment={selectedAppointment}
+      />
+
+      <CreateAppointmentDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
       />
     </TooltipProvider>
   );
