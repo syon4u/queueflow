@@ -65,6 +65,58 @@ const replaceTemplateVariables = (text: string, context: VariableContext): strin
   return result;
 };
 
+const sendSMS = async (to: string, message: string): Promise<{ success: boolean; id?: string; error?: string }> => {
+  const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+  const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
+
+  if (!accountSid || !authToken || !twilioPhoneNumber) {
+    console.error('Missing Twilio credentials');
+    return { success: false, error: 'Twilio credentials not configured' };
+  }
+
+  try {
+    // Clean the phone number to ensure it's in the correct format
+    const cleanedPhoneNumber = to.replace(/\D/g, '');
+    const formattedPhoneNumber = cleanedPhoneNumber.startsWith('1') 
+      ? `+${cleanedPhoneNumber}` 
+      : `+1${cleanedPhoneNumber}`;
+
+    console.log(`Sending SMS to ${formattedPhoneNumber}: ${message}`);
+
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    
+    const body = new URLSearchParams({
+      To: formattedPhoneNumber,
+      From: twilioPhoneNumber,
+      Body: message
+    });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(`${accountSid}:${authToken}`)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: body.toString(),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Twilio API error:', errorData);
+      return { success: false, error: errorData.message || 'Failed to send SMS' };
+    }
+
+    const data = await response.json();
+    console.log('SMS sent successfully:', data.sid);
+    return { success: true, id: data.sid };
+
+  } catch (error) {
+    console.error('Error sending SMS:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -147,9 +199,22 @@ const handler = async (req: Request): Promise<Response> => {
         communicationResult = { success: false, method: 'email', error: emailError.message };
       }
     } else if (type === 'sms' && customer.phone) {
-      // For SMS, we'll log it for now (you can integrate with Twilio later if needed)
-      console.log(`SMS would be sent to ${customer.phone}: ${processedMessage}`);
-      communicationResult = { success: true, method: 'sms', note: 'SMS logging only (no provider configured)' };
+      try {
+        const smsResult = await sendSMS(customer.phone, processedMessage);
+        
+        if (smsResult.success) {
+          console.log(`SMS sent successfully to ${customer.phone}:`, smsResult.id);
+          communicationResult = { success: true, method: 'sms', id: smsResult.id };
+        } else {
+          console.error('Error sending SMS:', smsResult.error);
+          status = 'failed';
+          communicationResult = { success: false, method: 'sms', error: smsResult.error };
+        }
+      } catch (smsError) {
+        console.error('Error sending SMS:', smsError);
+        status = 'failed';
+        communicationResult = { success: false, method: 'sms', error: smsError.message };
+      }
     } else {
       return new Response(JSON.stringify({ error: 'Customer contact information not available for selected method' }), {
         status: 400,
