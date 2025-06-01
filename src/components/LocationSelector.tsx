@@ -25,7 +25,8 @@ const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
         .select('id, name');
       
       if (error) throw error;
-      return data;
+      // Filter out any locations with empty string IDs
+      return data?.filter(location => location.id && location.id.trim() !== '') || [];
     },
   });
 

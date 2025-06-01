@@ -31,7 +31,8 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
       const { data, error } = await query;
       
       if (error) throw error;
-      return data;
+      // Filter out any services with empty string IDs
+      return data?.filter(service => service.id && service.id.trim() !== '') || [];
     },
     // Only run the query when we have a locationId
     enabled: !locationId || !!locationId,
