@@ -49,15 +49,65 @@ interface QueueContextType {
 
 const QueueContext = createContext<QueueContextType | undefined>(undefined);
 
+// Create some mock data for demo purposes
+const createMockCustomers = (): Customer[] => {
+  return [
+    {
+      id: '1',
+      name: 'John Smith',
+      phone: '555-123-4567',
+      priority: 'normal',
+      status: 'waiting',
+      joinedAt: new Date(Date.now() - 30 * 60000), // 30 minutes ago
+      estimatedWaitTime: 15,
+      notes: 'First time visitor'
+    },
+    {
+      id: '2',
+      name: 'Maria Garcia',
+      phone: '555-987-6543',
+      priority: 'priority',
+      status: 'waiting',
+      joinedAt: new Date(Date.now() - 20 * 60000), // 20 minutes ago
+      estimatedWaitTime: 10,
+      notes: 'Needs assistance with forms'
+    },
+    {
+      id: '3',
+      name: 'Robert Johnson',
+      phone: '555-456-7890',
+      priority: 'normal',
+      status: 'waiting',
+      joinedAt: new Date(Date.now() - 15 * 60000), // 15 minutes ago
+      estimatedWaitTime: 20
+    },
+    {
+      id: '4',
+      name: 'Sarah Williams',
+      priority: 'normal',
+      status: 'served',
+      joinedAt: new Date(Date.now() - 60 * 60000), // 60 minutes ago
+      serviceId: 'service-1'
+    },
+    {
+      id: '5',
+      name: 'Michael Brown',
+      priority: 'normal',
+      status: 'no-show',
+      joinedAt: new Date(Date.now() - 90 * 60000) // 90 minutes ago
+    }
+  ];
+};
+
 export const QueueProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [queueStatus, setQueueStatus] = useState<string>('closed');
+  const [queueStatus, setQueueStatus] = useState<string>('open');
   const [currentQueueNumber, setCurrentQueueNumber] = useState<number | null>(null);
   const [waitingCount, setWaitingCount] = useState<number>(0);
-  const [averageWaitTime, setAverageWaitTime] = useState<number | null>(null);
-  const [locationId, setLocationId] = useState<string | null>(null);
+  const [averageWaitTime, setAverageWaitTime] = useState<number | null>(15);
+  const [locationId, setLocationId] = useState<string | null>('mock-location-id');
   
   // Add new state variables
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>(createMockCustomers());
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
 
   const { user } = useAuth();
@@ -71,63 +121,10 @@ export const QueueProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     averageWaitTime: averageWaitTime || 5, // Default to 5 minutes if no data
   };
   
-  // Fetch location ID and queue status when the component mounts
+  // Update waiting count when customers change
   useEffect(() => {
-    const fetchQueueStatus = async () => {
-      if (!user) return;
-      
-      try {
-        // First get staff's location_id
-        const { data: staffData, error: staffError } = await supabase
-          .from('staff')
-          .select('location_id')
-          .eq('id', user.id)
-          .single();
-        
-        if (staffError) throw staffError;
-        
-        if (staffData && staffData.location_id) {
-          setLocationId(staffData.location_id);
-          
-          // Now get the queue status for this location
-          const { data: locationData, error: locationError } = await supabase
-            .from('locations')
-            .select('queue_status')
-            .eq('id', staffData.location_id)
-            .single();
-          
-          if (locationError) throw locationError;
-          
-          if (locationData) {
-            // Fix here: Add type assertion or optional chaining
-            setQueueStatus(locationData.queue_status as string || 'closed');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching queue status:', error);
-      }
-    };
-    
-    fetchQueueStatus();
-    
-    // Subscribe to queue changes
-    const queueSubscription = supabase
-      .channel('queue')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'locations' }, payload => {
-        if (payload.new) {
-          // Fix here: Add type assertion
-          const newData = payload.new as { queue_status?: string };
-          if (newData.queue_status) {
-            setQueueStatus(newData.queue_status);
-          }
-        }
-      })
-      .subscribe();
-    
-    return () => {
-      supabase.removeChannel(queueSubscription);
-    };
-  }, [user]);
+    setWaitingCount(stats.waitingCustomers);
+  }, [stats.waitingCustomers]);
 
   // Add a customer to the queue
   const addCustomer = (customerData: Omit<Customer, 'id' | 'status' | 'joinedAt'>) => {

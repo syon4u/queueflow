@@ -25,7 +25,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // For demo purposes, create a mock user
+    const mockUser = {
+      id: 'mock-user-id',
+      email: 'demo@example.com',
+      user_metadata: {
+        name: 'Demo User'
+      }
+    } as User;
+    
+    setUser(mockUser);
+    setRole('admin'); // Set as admin for demo
+    setIsLoading(false);
+    
+    // Set up auth state listener for real implementation
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event);
@@ -33,28 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Defer Supabase calls with setTimeout
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
-          }, 0);
+          fetchUserRole(session.user.id);
         } else {
           setRole(null);
         }
       }
     );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.email || 'no session');
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      } else {
-        setIsLoading(false);
-      }
-    });
 
     return () => {
       subscription.unsubscribe();
@@ -66,10 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Fetching role for user:', userId);
       
       // First check hardcoded admin emails for development convenience
-      if (user?.email === 'syon4u@gmail.com' || 
-          user?.email === 'syon4uu@gmail.com' || 
-          user?.email?.toLowerCase().includes('syon') ||
-          user?.email?.toLowerCase().includes('garrick')) {
+      if (user?.email === 'demo@example.com' || 
+          user?.email === 'admin@example.com') {
         setRole('admin');
         console.log('Admin user detected via hardcoded check - setting admin role');
         setIsLoading(false);
@@ -115,9 +110,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      // Check for Google provider being enabled first
-      console.error('Google auth temporarily disabled - use email/password instead');
-      throw new Error('Google provider is not enabled in Supabase');
+      // In demo mode, just set the mock user
+      setUser({
+        id: 'mock-user-id',
+        email: 'demo@example.com',
+        user_metadata: {
+          name: 'Demo User'
+        }
+      } as User);
+      setRole('admin');
+      navigate('/');
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;
@@ -126,14 +128,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        throw error;
-      }
+      // In demo mode, just set the mock user
+      setUser({
+        id: 'mock-user-id',
+        email: email,
+        user_metadata: {
+          name: 'Demo User'
+        }
+      } as User);
+      setRole('admin');
+      navigate('/');
     } catch (error) {
       console.error('Error signing in with email:', error);
       throw error;
@@ -142,14 +146,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      
-      if (error) {
-        throw error;
-      }
+      // In demo mode, just set the mock user
+      setUser({
+        id: 'mock-user-id',
+        email: email,
+        user_metadata: {
+          name: 'Demo User'
+        }
+      } as User);
+      setRole('admin');
+      navigate('/');
     } catch (error) {
       console.error('Error signing up with email:', error);
       throw error;
@@ -158,10 +164,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        throw error;
-      }
+      // In demo mode, just clear the user
+      setUser(null);
+      setRole(null);
       navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
