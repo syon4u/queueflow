@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Filter, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
 interface EnhancedCommunicationFiltersProps {
   searchTerm: string;
@@ -42,6 +43,14 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
     staffFilter !== 'all' ||
     dateRange.from ||
     dateRange.to;
+
+  const handleDateRangeSelect = (range: DateRange | undefined) => {
+    if (range) {
+      onDateRangeChange({ from: range.from, to: range.to });
+    } else {
+      onDateRangeChange({});
+    }
+  };
 
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-background">
@@ -138,8 +147,8 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
                 initialFocus
                 mode="range"
                 defaultMonth={dateRange.from}
-                selected={dateRange}
-                onSelect={(range) => onDateRangeChange(range || {})}
+                selected={dateRange.from && dateRange.to ? { from: dateRange.from, to: dateRange.to } : undefined}
+                onSelect={handleDateRangeSelect}
                 numberOfMonths={2}
               />
             </PopoverContent>

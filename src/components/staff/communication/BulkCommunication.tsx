@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Send, Users, Mail, MessageSquare, Progress } from 'lucide-react';
+import { Send, Users, Mail, MessageSquare, Loader2 } from 'lucide-react';
 import { Customer } from '@/components/customer/CustomerSearchBox';
 import { Progress as ProgressBar } from '@/components/ui/progress';
 
@@ -358,7 +358,7 @@ export const BulkCommunication: React.FC<BulkCommunicationProps> = ({
           >
             {isSending ? (
               <>
-                <Progress className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Sending...
               </>
             ) : (
