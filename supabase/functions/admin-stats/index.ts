@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
-import { withAuth, corsHeaders, AuthContext } from "../_shared/auth.ts"
+import { withAuth, AuthContext } from "../_shared/auth.ts"
+import { corsHeaders } from "../_shared/cors.ts"
 
 // Handler for admin stats endpoint - restricted to admin role
 const adminStatsHandler = withAuth(async (req: Request, ctx: AuthContext) => {
