@@ -42,9 +42,6 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
-  /** 
-   * Fetch all active locations (no RLS blocking)
-   */
   const {
     data: locations = [],
     isLoading: locationsLoading,
@@ -57,7 +54,10 @@ export const useSimpleAppointmentForm = () => {
         .select('id, name, address')
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase locations error:', error);
+        throw error;
+      }
       return data || [];
     },
     retry: 1,
@@ -65,9 +65,6 @@ export const useSimpleAppointmentForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  /**
-   * Fetch services once a location is selected
-   */
   const {
     data: services = [],
     isLoading: servicesLoading,
@@ -84,7 +81,10 @@ export const useSimpleAppointmentForm = () => {
         .eq('is_active', true)
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase services error:', error);
+        throw error;
+      }
       return data || [];
     },
     enabled: Boolean(formData.locationId),
@@ -93,7 +93,6 @@ export const useSimpleAppointmentForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Update a single field in formData
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
@@ -104,7 +103,6 @@ export const useSimpleAppointmentForm = () => {
     });
   };
 
-  // Reset form back to initial state
   const resetForm = () => {
     setFormData({
       firstName: '',
@@ -120,7 +118,6 @@ export const useSimpleAppointmentForm = () => {
     });
   };
 
-  // Simple validation before submission
   const validateForm = (): string | null => {
     if (!formData.firstName.trim()) return 'First name is required';
     if (!formData.lastName.trim()) return 'Last name is required';
