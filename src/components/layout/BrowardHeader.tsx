@@ -106,23 +106,24 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                 <ThemeToggle />
               </div>
               
-              {/* Hamburger menu for admin/staff portals */}
-              {(role === 'staff' || role === 'admin') && (
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
-                    >
-                      <Menu className="h-5 w-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-80">
-                    <SheetHeader>
-                      <SheetTitle>Staff Portal</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-6 space-y-4">
+              {/* Hamburger menu - always visible */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-4">
+                    {/* Show staff/admin links only if user has appropriate role */}
+                    {(role === 'staff' || role === 'admin') && (
                       <Link
                         to="/staff"
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
@@ -133,36 +134,43 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                           <p className="text-sm text-muted-foreground">Manage appointments and queue</p>
                         </div>
                       </Link>
-                      
-                      {role === 'admin' && (
-                        <>
-                          <Link
-                            to="/admin"
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                          >
-                            <Settings className="h-5 w-5" />
-                            <div>
-                              <p className="font-medium">Admin Dashboard</p>
-                              <p className="text-sm text-muted-foreground">System administration</p>
-                            </div>
-                          </Link>
-                          
-                          <Link
-                            to="/performance"
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                          >
-                            <BarChart3 className="h-5 w-5" />
-                            <div>
-                              <p className="font-medium">Performance Reports</p>
-                              <p className="text-sm text-muted-foreground">Analytics and insights</p>
-                            </div>
-                          </Link>
-                        </>
-                      )}
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              )}
+                    )}
+                    
+                    {role === 'admin' && (
+                      <>
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                        >
+                          <Settings className="h-5 w-5" />
+                          <div>
+                            <p className="font-medium">Admin Dashboard</p>
+                            <p className="text-sm text-muted-foreground">System administration</p>
+                          </div>
+                        </Link>
+                        
+                        <Link
+                          to="/performance"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                        >
+                          <BarChart3 className="h-5 w-5" />
+                          <div>
+                            <p className="font-medium">Performance Reports</p>
+                            <p className="text-sm text-muted-foreground">Analytics and insights</p>
+                          </div>
+                        </Link>
+                      </>
+                    )}
+                    
+                    {/* Show message for users without special roles */}
+                    {(!role || role === 'customer') && (
+                      <div className="p-3 text-center text-muted-foreground">
+                        <p>No additional menu options available</p>
+                      </div>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
