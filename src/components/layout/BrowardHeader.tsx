@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheckmarkAnimation } from '@/components/ui/broward-icons';
@@ -13,6 +12,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Menu, User, Settings, BarChart3 } from 'lucide-react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface BrowardHeaderProps {
   title?: string;
@@ -102,6 +102,12 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
             </nav>
             
             <div className="flex items-center gap-4">
+              {/* Language Switcher - moved to the left */}
+              <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
+                <LanguageSwitcher />
+              </div>
+              
+              {/* Dark Mode Toggle */}
               <div className="bg-white/10 rounded-lg p-2 backdrop-blur-sm">
                 <ThemeToggle />
               </div>
