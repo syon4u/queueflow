@@ -12,6 +12,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [roleIsFetching, setRoleIsFetching] = useState(false);
   
   const { role, fetchUserRole, clearRole } = useUserRole();
   const authMethods = useAuthMethods();
@@ -24,12 +25,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
 
-        if (session?.user) {
-          // Fetch user role after authentication
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
-          }, 0);
-        } else {
+        if (session?.user && !roleIsFetching) {
+          // Prevent multiple simultaneous role fetches
+          setRoleIsFetching(true);
+          try {
+            await fetchUserRole(session.user.id);
+          } finally {
+            setRoleIsFetching(false);
+          }
+        } else if (!session?.user) {
           clearRole();
         }
         setIsLoading(false);
@@ -41,8 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       
-      if (session?.user) {
-        fetchUserRole(session.user.id);
+      if (session?.user && !roleIsFetching) {
+        setRoleIsFetching(true);
+        fetchUserRole(session.user.id).finally(() => {
+          setRoleIsFetching(false);
+        });
       } else {
         setIsLoading(false);
       }
@@ -51,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchUserRole, clearRole]);
+  }, [fetchUserRole, clearRole, roleIsFetching]);
 
   const value = {
     user,
