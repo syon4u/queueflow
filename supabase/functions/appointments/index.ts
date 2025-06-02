@@ -11,6 +11,7 @@ const CreateNewCustomerAppointmentSchema = z.object({
   reason_for_visit: z.string().optional(),
   customer_name: z.string(),
   phone_number: z.string(),
+  email: z.string().email().optional(),
 })
 
 // Schema for creating appointment for existing customer
@@ -38,30 +39,10 @@ const UpdateAppointmentSchema = z.object({
   end_time: z.string().datetime().optional(),
 })
 
-// Schema for sending reminders
-const SendReminderSchema = z.object({
-  appointment_id: z.string().uuid(),
-  message: z.string(),
-  type: z.enum(['sms', 'email', 'app']),
-  send_time: z.string().datetime().optional() // If not provided, send immediately
+// Schema for check-in
+const CheckInSchema = z.object({
+  confirmation_code: z.string(),
 })
-
-// Type for appointment responses
-type AppointmentResponse = {
-  id: string;
-  customer_id: string;
-  service_id: string;
-  location_id: string;
-  staff_id: string | null;
-  status: string;
-  scheduled_time: string;
-  check_in_time: string | null;
-  start_time: string | null;
-  end_time: string | null;
-  notes: string | null;
-  created_at: string;
-  updated_at: string;
-}
 
 // Handler for all appointment-related endpoints
 const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
@@ -69,7 +50,100 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
   const method = req.method
   const { user, supabase } = ctx
   
+  console.log(`Appointments API - ${method} ${url.pathname}`)
+  
   try {
+    // Handle CORS preflight requests
+    if (method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    // Check-in endpoint (POST /appointments/check-in)
+    if (method === 'POST' && url.pathname.endsWith('/check-in')) {
+      const body = await req.json()
+      const validation = CheckInSchema.safeParse(body)
+      
+      if (!validation.success) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Invalid request data', 
+            details: validation.error.format() 
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      const { confirmation_code } = validation.data
+      
+      // Extract appointment ID from confirmation code (format: APT-XXXXXXXX)
+      if (!confirmation_code.startsWith('APT-')) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid confirmation code format' }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase()
+      
+      // Find appointment by ID prefix
+      const { data: appointments, error: searchError } = await supabase
+        .from('appointments')
+        .select('id, status, scheduled_time, customer_id')
+        .ilike('id', `${appointmentIdPrefix}%`)
+        .limit(1)
+      
+      if (searchError || !appointments || appointments.length === 0) {
+        console.error('Check-in error - appointment not found:', searchError)
+        return new Response(
+          JSON.stringify({ error: 'Appointment not found' }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      const appointment = appointments[0]
+      
+      // Check if appointment can be checked in
+      if (appointment.status !== 'scheduled') {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Appointment cannot be checked in', 
+            current_status: appointment.status 
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      // Update appointment status to checked_in
+      const { data: updatedAppointment, error: updateError } = await supabase
+        .from('appointments')
+        .update({ 
+          status: 'checked_in',
+          check_in_time: new Date().toISOString()
+        })
+        .eq('id', appointment.id)
+        .select()
+        .single()
+      
+      if (updateError) {
+        console.error('Check-in error - failed to update:', updateError)
+        return new Response(
+          JSON.stringify({ error: 'Failed to check in', details: updateError.message }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        )
+      }
+      
+      console.log('Appointment checked in successfully:', appointment.id)
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          appointment: updatedAppointment,
+          message: 'Successfully checked in'
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      )
+    }
+    
     // List user's appointments (GET /appointments)
     if (method === 'GET') {
       const userRole = user.role || 'customer'
@@ -122,82 +196,6 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
       
       return new Response(
         JSON.stringify(appointments || []),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      )
-    }
-    
-    // Send reminder (POST /appointments/reminder)
-    if (method === 'POST' && url.pathname.endsWith('/reminder')) {
-      // Extract and validate the request body
-      const body = await req.json()
-      const validation = SendReminderSchema.safeParse(body)
-      
-      if (!validation.success) {
-        return new Response(
-          JSON.stringify({ 
-            error: 'Invalid request data', 
-            details: validation.error.format() 
-          }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
-      }
-      
-      const reminderData = validation.data
-      
-      // Get the appointment details to make sure it exists
-      const { data: appointment, error: fetchError } = await supabase
-        .from('appointments')
-        .select('id, customer_id')
-        .eq('id', reminderData.appointment_id)
-        .single()
-      
-      if (fetchError || !appointment) {
-        return new Response(
-          JSON.stringify({ error: 'Appointment not found', details: fetchError?.message }),
-          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
-      }
-      
-      // Check authorization - only staff/admin or the appointment owner can send reminders
-      const { data: userRoles } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-      
-      const userRole = userRoles && userRoles.length > 0 ? userRoles[0].role : 'customer'
-      
-      if (userRole !== 'staff' && userRole !== 'admin' && appointment.customer_id !== user.id) {
-        return new Response(
-          JSON.stringify({ error: 'Unauthorized to send reminders for this appointment' }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
-      }
-      
-      // Log the reminder (in a real app, this would send an SMS/email)
-      const { data: reminderLog, error: logError } = await supabase
-        .from('appointment_reminders')
-        .insert({
-          appointment_id: reminderData.appointment_id,
-          message: reminderData.message,
-          type: reminderData.type,
-          scheduled_for: reminderData.send_time || new Date().toISOString(),
-          sent_by: user.id
-        })
-        .select()
-      
-      if (logError) {
-        console.error('Error logging reminder:', logError)
-        return new Response(
-          JSON.stringify({ error: 'Failed to send reminder', details: logError.message }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        )
-      }
-      
-      // For now, we just log that we would send the reminder
-      console.log(`Would send ${reminderData.type} reminder to appointment ${reminderData.appointment_id}: ${reminderData.message}`)
-      
-      return new Response(
-        JSON.stringify({ success: true, reminder: reminderLog }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
@@ -268,32 +266,53 @@ const appointmentHandler = withAuth(async (req: Request, ctx: AuthContext) => {
         // Parse the name into first and last name
         const nameParts = appointmentData.customer_name.trim().split(' ')
         const firstName = nameParts[0]
-        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ''
         
-        // First create a customer record
-        const { data: customer, error: customerError } = await supabase
+        // Check if customer exists by phone number
+        let customerId: string;
+        const { data: existingCustomer } = await supabase
           .from('customers')
-          .insert({
-            first_name: firstName,
-            last_name: lastName,
-            phone: appointmentData.phone_number,
-          })
-          .select()
-          .single()
+          .select('id')
+          .eq('phone', appointmentData.phone_number)
+          .maybeSingle()
         
-        if (customerError) {
-          console.error('Error creating customer:', customerError)
-          return new Response(
-            JSON.stringify({ error: 'Failed to create customer', details: customerError.message }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          )
+        if (existingCustomer) {
+          customerId = existingCustomer.id
+          console.log('Using existing customer:', customerId)
+        } else {
+          // Generate a UUID for the new customer (aligning with frontend logic)
+          const newCustomerId = crypto.randomUUID()
+          
+          // Create customer first with explicit ID
+          const { data: customerData, error: customerError } = await supabase
+            .from('customers')
+            .insert({
+              id: newCustomerId,
+              first_name: firstName,
+              last_name: lastName,
+              phone: appointmentData.phone_number,
+              email: appointmentData.email || null,
+            })
+            .select('id')
+            .single()
+          
+          if (customerError) {
+            console.error('Error creating customer:', customerError)
+            return new Response(
+              JSON.stringify({ error: 'Failed to create customer', details: customerError.message }),
+              { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            )
+          }
+          
+          customerId = customerData.id
+          console.log('Created new customer:', customerId)
         }
         
-        // Insert the appointment with the new customer ID
+        // Insert the appointment
         const { data: appointment, error } = await supabase
           .from('appointments')
           .insert({
-            customer_id: customer.id,
+            customer_id: customerId,
             service_id: appointmentData.service_id,
             location_id: appointmentData.location_id,
             scheduled_time: appointmentData.scheduled_time,
