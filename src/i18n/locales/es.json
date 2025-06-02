@@ -12,6 +12,35 @@
     "actions": "Acciones",
     "cancel": "Cancelar"
   },
+  "landing": {
+    "headerTitle": "División de Protección al Consumidor",
+    "headerSubtitle": "Protegiendo a los residentes del condado de Broward a través de educación, mediación y aplicación",
+    "hero": {
+      "title": "QueueFlow",
+      "subtitle": "Evita la espera, programa tu visita y obtén la ayuda que necesitas más rápido con nuestro sistema inteligente de colas.",
+      "scheduleButton": "Programar Cita",
+      "learnMoreButton": "Saber Más"
+    },
+    "services": {
+      "title": "¿Cómo Podemos Ayudarte Hoy?",
+      "subtitle": "Obtén los servicios de protección al consumidor que necesitas con nuestras herramientas en línea convenientes.",
+      "schedule": {
+        "title": "Programar una Cita",
+        "description": "Reserva tu visita con anticipación y evita la espera. Elige tu hora y servicio preferidos.",
+        "action": "Comenzar"
+      },
+      "queue": {
+        "title": "Verificar Estado de la Cola",
+        "description": "Ve los tiempos de espera actuales y regístrate para servicios sin cita. Mantente informado sobre tu posición en la cola.",
+        "action": "Verificar estado"
+      }
+    },
+    "guide": {
+      "title": "Bienvenido a QueueFlow",
+      "description": "QueueFlow te ayuda a administrar mejor tu tiempo permitiéndote programar citas con anticipación o verificar los tiempos de espera para servicios sin cita. ¡No más hacer largas filas!",
+      "button": "Entendido"
+    }
+  },
   "customer": {
     "viewHistory": "Ver Historial",
     "history": "Historial de Visitas del Cliente",

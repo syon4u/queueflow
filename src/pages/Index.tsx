@@ -5,9 +5,12 @@ import HeroSection from '@/components/landing/HeroSection';
 import CustomerServiceCards from '@/components/landing/CustomerServiceCards';
 import UserMenu from '@/components/landing/UserMenu';
 import WelcomeGuideModal from '@/components/landing/WelcomeGuideModal';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [showGuide, setShowGuide] = useState(false);
+  const { t } = useTranslation();
   
   const handleShowGuide = () => {
     setShowGuide(true);
@@ -15,10 +18,15 @@ const Index = () => {
 
   return (
     <PageLayout 
-      headerTitle="Consumer Protection Division"
-      headerSubtitle="Protecting Broward County residents through education, mediation, and enforcement"
+      headerTitle={t('landing.headerTitle')}
+      headerSubtitle={t('landing.headerSubtitle')}
     >
       <div className="min-h-screen bg-gray-50">
+        {/* Language Switcher */}
+        <div className="absolute top-4 left-4 z-20">
+          <LanguageSwitcher />
+        </div>
+        
         {/* Hero Section with Background Image */}
         <div className="relative">
           <UserMenu />

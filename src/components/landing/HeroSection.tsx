@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield } from 'lucide-react';
 
@@ -10,6 +11,7 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="relative bg-white border-b overflow-hidden">
@@ -38,10 +40,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
           <Shield className="h-16 w-16 text-white drop-shadow-lg mr-4" />
           <div>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
-              QueueFlow
+              {t('landing.hero.title')}
             </h1>
             <p className="text-xl text-white max-w-2xl mx-auto drop-shadow-lg font-medium">
-              Skip the wait, schedule your visit, and get the help you need faster with our smart queue system.
+              {t('landing.hero.subtitle')}
             </p>
           </div>
         </div>
@@ -52,7 +54,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
             onClick={() => navigate('/customer')}
             className="font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            Schedule Appointment
+            {t('landing.hero.scheduleButton')}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           <Button 
@@ -61,7 +63,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
             onClick={onShowGuide}
             className="font-medium bg-white/20 border-white/30 text-white hover:bg-white/30 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            Learn More
+            {t('landing.hero.learnMoreButton')}
           </Button>
         </div>
       </div>

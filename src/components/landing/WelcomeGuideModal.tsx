@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -9,6 +10,8 @@ interface WelcomeGuideModalProps {
 }
 
 const WelcomeGuideModal: React.FC<WelcomeGuideModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -21,15 +24,15 @@ const WelcomeGuideModal: React.FC<WelcomeGuideModalProps> = ({ isOpen, onClose }
         onClick={(e) => e.stopPropagation()}
       >
         <CardContent className="p-6">
-          <h3 className="text-xl font-bold mb-2">Welcome to QueueFlow</h3>
+          <h3 className="text-xl font-bold mb-2">{t('landing.guide.title')}</h3>
           <p className="mb-4 text-gray-600">
-            QueueFlow helps you manage your time better by allowing you to schedule appointments in advance or check wait times for walk-in services. No more standing in long lines!
+            {t('landing.guide.description')}
           </p>
           <Button 
             onClick={onClose} 
             className="w-full"
           >
-            Got it
+            {t('landing.guide.button')}
           </Button>
         </CardContent>
       </Card>

@@ -12,6 +12,7 @@ import admin from './admin.json';
 import profile from './profile.json';
 import queue from './queue.json';
 import unauthorized from './unauthorized.json';
+import landing from './landing.json';
 
 export default {
   auth,
@@ -26,5 +27,6 @@ export default {
   admin,
   profile,
   queue,
-  unauthorized
+  unauthorized,
+  landing
 };

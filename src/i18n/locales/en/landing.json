@@ -1,0 +1,30 @@
+
+{
+  "headerTitle": "Consumer Protection Division",
+  "headerSubtitle": "Protecting Broward County residents through education, mediation, and enforcement",
+  "hero": {
+    "title": "QueueFlow",
+    "subtitle": "Skip the wait, schedule your visit, and get the help you need faster with our smart queue system.",
+    "scheduleButton": "Schedule Appointment",
+    "learnMoreButton": "Learn More"
+  },
+  "services": {
+    "title": "How Can We Help You Today?",
+    "subtitle": "Get the consumer protection services you need with our convenient online tools.",
+    "schedule": {
+      "title": "Schedule an Appointment",
+      "description": "Book your visit in advance and skip the wait. Choose your preferred time and service.",
+      "action": "Get started"
+    },
+    "queue": {
+      "title": "Check Queue Status",
+      "description": "See current wait times and check in for walk-in services. Stay informed about your queue position.",
+      "action": "Check status"
+    }
+  },
+  "guide": {
+    "title": "Welcome to QueueFlow",
+    "description": "QueueFlow helps you manage your time better by allowing you to schedule appointments in advance or check wait times for walk-in services. No more standing in long lines!",
+    "button": "Got it"
+  }
+}
