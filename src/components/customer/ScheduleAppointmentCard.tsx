@@ -134,10 +134,14 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
       if (existingCustomer) {
         customerId = existingCustomer.id;
       } else {
-        // Create new customer - let the database generate the ID
+        // Generate a UUID for the new customer
+        const customerUuid = crypto.randomUUID();
+        
+        // Create new customer with explicit ID
         const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
+            id: customerUuid,
             first_name: firstName,
             last_name: lastName,
             phone: data.phone,
