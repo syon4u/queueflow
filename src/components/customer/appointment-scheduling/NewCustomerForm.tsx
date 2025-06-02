@@ -1,16 +1,24 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
-import { NewCustomerFormValues } from '../../../hooks/appointment-scheduling/types';
-import { useNewCustomerAppointment } from '../../../hooks/appointment-scheduling/useNewCustomerAppointment';
-import NewCustomerFormHeader from './NewCustomerFormHeader';
 import CustomerDetailsFields from './CustomerDetailsFields';
 import LocationServiceSelector from './LocationServiceSelector';
 import DateTimePicker from './DateTimePicker';
-import ReasonForVisitField from './ReasonForVisitField';
+
+export interface NewCustomerFormValues {
+  name: string;
+  phone: string;
+  email?: string;
+  service_id: string;
+  location_id: string;
+  reason_for_visit?: string;
+}
 
 interface NewCustomerFormProps {
   selectedDate: Date | undefined;
@@ -40,7 +48,6 @@ const NewCustomerForm = ({
       const { data, error } = await supabase
         .from('locations')
         .select('*')
-        .eq('queue_status', 'open')
         .order('name');
       if (error) {
         console.error('NewCustomerForm - Error fetching locations:', error);
@@ -80,19 +87,6 @@ const NewCustomerForm = ({
     enabled: !!selectedLocationId,
   });
 
-  const { createAppointment, isSubmitting: isCreating } = useNewCustomerAppointment(onSubmit);
-
-  const handleFormSubmit = (data: NewCustomerFormValues) => {
-    console.log('NewCustomerForm - Form submitted:', data);
-    if (!selectedDate || !selectedTime) return;
-    
-    createAppointment({
-      formData: data,
-      selectedDate,
-      selectedTime
-    });
-  };
-
   // Clear service selection when location changes
   React.useEffect(() => {
     if (selectedLocationId) {
@@ -102,9 +96,15 @@ const NewCustomerForm = ({
 
   return (
     <div className="space-y-6">
-      <NewCustomerFormHeader onBack={onBack} />
+      <div className="flex items-center gap-4">
+        <Button variant="outline" size="sm" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+      </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <CustomerDetailsFields register={register} errors={errors} />
 
         <LocationServiceSelector
@@ -123,14 +123,18 @@ const NewCustomerForm = ({
           setSelectedTime={setSelectedTime}
         />
 
-        <ReasonForVisitField register={register} />
+        <div className="space-y-2">
+          <Label htmlFor="reason">Reason for Visit</Label>
+          <Input
+            id="reason"
+            {...register('reason_for_visit')}
+            placeholder="Brief description of your visit"
+          />
+        </div>
 
         <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            disabled={isCreating || !selectedDate || !selectedTime}
-          >
-            {isCreating ? 'Scheduling...' : 'Schedule Appointment'}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Scheduling...' : 'Schedule Appointment'}
           </Button>
         </div>
       </form>

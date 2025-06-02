@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -132,13 +132,9 @@ export const useEmployeeManagement = () => {
 
         if (error) throw error;
       } else {
-        // Generate a UUID for new staff member
-        const newId = crypto.randomUUID();
-        
         const { error } = await supabase
           .from('staff')
           .insert({
-            id: newId,
             first_name: formData.first_name,
             last_name: formData.last_name,
             phone: formData.phone,

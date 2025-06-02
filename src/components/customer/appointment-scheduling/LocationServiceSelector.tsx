@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { UseFormSetValue } from 'react-hook-form';
-import { NewCustomerFormValues } from '../../../hooks/appointment-scheduling/types';
+import { NewCustomerFormValues } from './NewCustomerForm';
 
 interface Location {
   id: string;

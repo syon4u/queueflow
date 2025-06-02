@@ -22,53 +22,37 @@ export const useAppointmentCreation = () => {
         throw new Error('User email not found');
       }
 
-      // Check if customer exists by email
+      // Check if customer exists
       let customerId;
-      const { data: existingCustomer, error: customerSearchError } = await supabase
+      const { data: existingCustomer } = await supabase
         .from('customers')
         .select('id')
         .eq('email', user.email)
-        .maybeSingle();
-
-      if (customerSearchError) {
-        console.error('Error searching for customer:', customerSearchError);
-        throw customerSearchError;
-      }
+        .single();
 
       if (existingCustomer) {
         customerId = existingCustomer.id;
-        console.log('Found existing customer:', customerId);
       } else {
-        // Create new customer using the authenticated user's ID
-        console.log('Creating new customer with user ID:', user.id);
-        
+        // Create new customer
+        const customerUuid = crypto.randomUUID();
         const { error: customerError } = await supabase
           .from('customers')
           .insert({
-            id: user.id, // Use the authenticated user's ID
+            id: customerUuid,
             first_name: user.user_metadata?.first_name || 'Customer',
             last_name: user.user_metadata?.last_name || 'User',
             email: user.email,
             phone: user.user_metadata?.phone
           });
 
-        if (customerError) {
-          console.error('Error creating customer:', customerError);
-          throw customerError;
-        }
-        
-        customerId = user.id;
-        console.log('Created new customer:', customerId);
+        if (customerError) throw customerError;
+        customerId = customerUuid;
       }
 
       // Create appointment
-      const appointmentUuid = crypto.randomUUID();
-      console.log('Creating appointment with ID:', appointmentUuid);
-      
       const { data, error } = await supabase
         .from('appointments')
         .insert({
-          id: appointmentUuid,
           customer_id: customerId,
           service_id: appointmentData.service_id,
           location_id: appointmentData.location_id,
@@ -80,12 +64,7 @@ export const useAppointmentCreation = () => {
         .select()
         .single();
 
-      if (error) {
-        console.error('Error creating appointment:', error);
-        throw error;
-      }
-      
-      console.log('Appointment created successfully:', data);
+      if (error) throw error;
       return data;
     },
     onSuccess: (data) => {
@@ -101,7 +80,7 @@ export const useAppointmentCreation = () => {
       console.error('useAppointmentCreation - Error creating appointment:', error);
       toast({
         title: t('common.error'),
-        description: error.message || t('appointments.createError'),
+        description: t('appointments.createError'),
         variant: 'destructive',
       });
     },
