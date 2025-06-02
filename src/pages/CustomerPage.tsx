@@ -25,7 +25,7 @@ const CustomerPage = () => {
   return (
     <PageLayout 
       headerTitle="Consumer Protection Division"
-      headerSubtitle="Schedule appointments or check your status"
+      headerSubtitle="Schedule appointments and manage your visits"
     >
       <div className="min-h-screen bg-pattern-grid bg-gradient-overlay-teal">
         <div className="container mx-auto px-4 py-6">
@@ -33,7 +33,7 @@ const CustomerPage = () => {
           <div className="mb-6">
             <Breadcrumb 
               items={[
-                { label: 'Customer Dashboard', isActive: true }
+                { label: 'Customer Portal', isActive: true }
               ]}
               className="mb-4"
             />
@@ -44,7 +44,7 @@ const CustomerPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
               <div>
                 <h1 className="text-gradient text-3xl font-bold">Customer Portal</h1>
-                <p className="text-muted-foreground mt-1">Schedule appointments or check your status</p>
+                <p className="text-muted-foreground mt-1">Schedule appointments and manage your visits</p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-muted-foreground border border-border/40">
                 {user?.email} <span className="text-primary/60 font-medium ml-1">({role || 'customer'})</span>

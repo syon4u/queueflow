@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
-  appointment_code: z.string().min(1, "Appointment code is required"),
+  appointment_code: z.string().min(1, "Confirmation code is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -43,16 +43,16 @@ const CheckInCard = () => {
       if (error) throw error;
 
       toast({
-        title: "Check-in Successful",
-        description: "You have successfully checked in for your appointment",
+        title: "Check-In Successful",
+        description: "You have been successfully checked in for your appointment",
       });
       
       form.reset();
     } catch (error) {
       console.error('Error checking in:', error);
       toast({
-        title: "Error",
-        description: "Failed to check in. Please verify your appointment code.",
+        title: "Check-In Failed",
+        description: "Please verify your confirmation code and try again.",
         variant: "destructive",
       });
     } finally {
@@ -65,7 +65,7 @@ const CheckInCard = () => {
       <CardHeader>
         <CardTitle>Check In</CardTitle>
         <CardDescription>
-          Enter your appointment code to check in
+          Enter your confirmation code to check in for your appointment
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,9 +76,9 @@ const CheckInCard = () => {
               name="appointment_code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Appointment Code</FormLabel>
+                  <FormLabel>Confirmation Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your appointment code" {...field} />
+                    <Input placeholder="Enter your confirmation code" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -86,7 +86,7 @@ const CheckInCard = () => {
             />
             
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Checking in..." : "Check In"}
+              {isSubmitting ? "Checking In..." : "Check In"}
             </Button>
           </form>
         </Form>

@@ -22,7 +22,7 @@ const AppointmentConfirmationDialog = ({
           <div className="mx-auto">
             <CheckCircle className="h-12 w-12 text-green-500" />
           </div>
-          <DialogTitle className="text-center">Appointment Scheduled!</DialogTitle>
+          <DialogTitle className="text-center">Appointment Confirmed!</DialogTitle>
           <DialogDescription className="text-center">
             Your appointment has been successfully scheduled. Please save your confirmation code.
           </DialogDescription>
@@ -35,7 +35,7 @@ const AppointmentConfirmationDialog = ({
           </div>
           
           <div className="text-center text-sm text-muted-foreground max-w-xs mx-auto">
-            <p>Please keep this code for check-in and status updates. You can use it to check your place in line.</p>
+            <p>Keep this code for check-in and status updates. Use it to check your queue position.</p>
           </div>
         </div>
         
@@ -44,7 +44,7 @@ const AppointmentConfirmationDialog = ({
             onClick={() => onOpenChange(false)}
             className="w-full sm:w-auto"
           >
-            Close
+            Got It
           </Button>
         </DialogFooter>
       </DialogContent>

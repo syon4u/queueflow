@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatWaitTime } from '@/lib/queue';
 
 const formSchema = z.object({
-  appointment_code: z.string().min(1, "Appointment code is required"),
+  appointment_code: z.string().min(1, "Confirmation code is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -55,16 +55,16 @@ const AppointmentStatusCard = () => {
         setAppointment(appointmentData);
       } else {
         toast({
-          title: "Not Found",
-          description: "No appointment found with that code",
+          title: "Appointment Not Found",
+          description: "No appointment found with that confirmation code",
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Error checking appointment status:', error);
       toast({
-        title: "Error",
-        description: "Failed to retrieve appointment status",
+        title: "Status Check Failed",
+        description: "Unable to retrieve appointment status. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -94,9 +94,9 @@ const AppointmentStatusCard = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Appointment Status</CardTitle>
+        <CardTitle>Check Status</CardTitle>
         <CardDescription>
-          Check the status of your appointment
+          View the current status of your appointment
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -107,9 +107,9 @@ const AppointmentStatusCard = () => {
               name="appointment_code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Appointment Code</FormLabel>
+                  <FormLabel>Confirmation Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your appointment code" {...field} />
+                    <Input placeholder="Enter your confirmation code" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,7 +117,7 @@ const AppointmentStatusCard = () => {
             />
             
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Checking..." : "Check Status"}
+              {isSubmitting ? "Checking Status..." : "Check Status"}
             </Button>
           </form>
         </Form>
@@ -136,20 +136,20 @@ const AppointmentStatusCard = () => {
                 <span>{appointment.service_name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Time:</span>
+                <span className="text-muted-foreground">Scheduled Time:</span>
                 <span>{new Date(appointment.scheduled_time).toLocaleString()}</span>
               </div>
               
               {appointment.position && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Position:</span>
+                  <span className="text-muted-foreground">Queue Position:</span>
                   <span>#{appointment.position} in line</span>
                 </div>
               )}
               
               {appointment.estimated_wait !== null && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Wait Time:</span>
+                  <span className="text-muted-foreground">Estimated Wait:</span>
                   <span>{formatWaitTime(appointment.estimated_wait)}</span>
                 </div>
               )}
