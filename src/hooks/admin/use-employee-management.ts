@@ -118,7 +118,8 @@ export const useEmployeeManagement = () => {
     e.preventDefault();
     
     try {
-      if (isEditing) {
+      if (isEditing && formData.id) {
+        // Update existing staff member
         const { error } = await supabase
           .from('staff')
           .update({
@@ -132,9 +133,12 @@ export const useEmployeeManagement = () => {
 
         if (error) throw error;
       } else {
+        // Create new staff member - generate UUID for id
+        const newId = crypto.randomUUID();
         const { error } = await supabase
           .from('staff')
           .insert({
+            id: newId,
             first_name: formData.first_name,
             last_name: formData.last_name,
             phone: formData.phone,
