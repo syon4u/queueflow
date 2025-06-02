@@ -1,189 +1,39 @@
 
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useLocations } from './appointment-form/useLocations';
+import { useServices } from './appointment-form/useServices';
+import { useAppointmentCreation } from './appointment-form/useAppointmentCreation';
+import { useFormState } from './appointment-form/useFormState';
 
-export interface Location {
-  id: string;
-  name: string;
-  address?: string;
-}
-
-export interface Service {
-  id: string;
-  name: string;
-  duration: number;
-  description?: string;
-}
+// Re-export types for backward compatibility
+export type { Location, Service } from './appointment-form/types';
 
 export const useAppointmentForm = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedLocationId, setSelectedLocationId] = useState('');
-  const [selectedServiceId, setSelectedServiceId] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
-  const [selectedTime, setSelectedTime] = useState('');
-  const [notes, setNotes] = useState('');
-  const [reasonForVisit, setReasonForVisit] = useState('');
-
-  console.log('useAppointmentForm - Current state:', {
+  const {
     currentStep,
     selectedLocationId,
+    setSelectedLocationId,
     selectedServiceId,
+    setSelectedServiceId,
     selectedDate,
-    selectedTime
-  });
+    setSelectedDate,
+    selectedTime,
+    setSelectedTime,
+    notes,
+    setNotes,
+    reasonForVisit,
+    setReasonForVisit,
+    nextStep,
+    prevStep
+  } = useFormState();
 
-  // Fetch locations
-  const { data: locations = [] } = useQuery({
-    queryKey: ['locations'],
-    queryFn: async () => {
-      console.log('useAppointmentForm - Fetching locations...');
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name, address')
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching locations:', error);
-        throw error;
-      }
-      
-      console.log('useAppointmentForm - Locations fetched:', data);
-      return data || [];
-    },
-  });
-
-  // Fetch services based on selected location
-  const { 
-    data: services = [], 
-    isLoading: servicesLoading, 
-    error: servicesError 
-  } = useQuery({
-    queryKey: ['services', selectedLocationId],
-    queryFn: async () => {
-      console.log('useAppointmentForm - Fetching services for location:', selectedLocationId);
-      
-      if (!selectedLocationId) {
-        console.log('useAppointmentForm - No location selected, returning empty array');
-        return [];
-      }
-      
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, duration, description')
-        .eq('location_id', selectedLocationId)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) {
-        console.error('useAppointmentForm - Error fetching services:', error);
-        throw error;
-      }
-      
-      console.log('useAppointmentForm - Services fetched:', data);
-      return data || [];
-    },
-    enabled: !!selectedLocationId,
-  });
-
-  // Clear service selection when location changes
-  useEffect(() => {
-    console.log('useAppointmentForm - Location changed, clearing service selection');
-    setSelectedServiceId('');
-  }, [selectedLocationId]);
-
-  // Create appointment mutation
-  const createAppointment = useMutation({
-    mutationFn: async (appointmentData: any) => {
-      console.log('useAppointmentForm - Creating appointment:', appointmentData);
-      
-      if (!user?.email) {
-        throw new Error('User email not found');
-      }
-
-      // Check if customer exists
-      let customerId;
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('email', user.email)
-        .single();
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
-      } else {
-        // Create new customer
-        const customerUuid = crypto.randomUUID();
-        const { error: customerError } = await supabase
-          .from('customers')
-          .insert({
-            id: customerUuid,
-            first_name: user.user_metadata?.first_name || 'Customer',
-            last_name: user.user_metadata?.last_name || 'User',
-            email: user.email,
-            phone: user.user_metadata?.phone
-          });
-
-        if (customerError) throw customerError;
-        customerId = customerUuid;
-      }
-
-      // Create appointment
-      const { data, error } = await supabase
-        .from('appointments')
-        .insert({
-          customer_id: customerId,
-          service_id: appointmentData.service_id,
-          location_id: appointmentData.location_id,
-          scheduled_time: appointmentData.scheduled_time,
-          reason_for_visit: appointmentData.reason_for_visit,
-          notes: appointmentData.notes,
-          status: 'scheduled'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
-      console.log('useAppointmentForm - Appointment created successfully:', data);
-      toast({
-        title: t('common.success'),
-        description: t('appointments.created'),
-      });
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      navigate('/customer');
-    },
-    onError: (error) => {
-      console.error('useAppointmentForm - Error creating appointment:', error);
-      toast({
-        title: t('common.error'),
-        description: t('appointments.createError'),
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const nextStep = () => {
-    console.log('useAppointmentForm - Moving to next step from:', currentStep);
-    setCurrentStep(prev => Math.min(prev + 1, 4));
-  };
-
-  const prevStep = () => {
-    console.log('useAppointmentForm - Moving to previous step from:', currentStep);
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
+  const { locations } = useLocations();
+  const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
+  const { createAppointment, isSubmitting } = useAppointmentCreation();
 
   const handleSubmit = async () => {
     console.log('useAppointmentForm - Submitting appointment...');
@@ -209,7 +59,7 @@ export const useAppointmentForm = () => {
       notes,
     };
 
-    createAppointment.mutate(appointmentData);
+    createAppointment(appointmentData);
   };
 
   return {
@@ -229,8 +79,8 @@ export const useAppointmentForm = () => {
     locations,
     services,
     servicesLoading,
-    servicesError: servicesError?.message || null,
-    isSubmitting: createAppointment.isPending,
+    servicesError,
+    isSubmitting,
     nextStep,
     prevStep,
     handleSubmit,
