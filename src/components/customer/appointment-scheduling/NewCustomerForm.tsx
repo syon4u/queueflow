@@ -1,17 +1,15 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import CustomerDetailsFields from './CustomerDetailsFields';
+import LocationServiceSelector from './LocationServiceSelector';
+import DateTimePicker from './DateTimePicker';
 
 export interface NewCustomerFormValues {
   name: string;
@@ -31,12 +29,6 @@ interface NewCustomerFormProps {
   onBack: () => void;
   isSubmitting: boolean;
 }
-
-const timeSlots = [
-  '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
-  '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
-  '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM'
-];
 
 const NewCustomerForm = ({
   selectedDate,
@@ -113,147 +105,23 @@ const NewCustomerForm = ({
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name *</Label>
-            <Input
-              id="name"
-              {...register('name', { required: 'Name is required' })}
-              placeholder="Enter full name"
-            />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-          </div>
+        <CustomerDetailsFields register={register} errors={errors} />
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number *</Label>
-            <Input
-              id="phone"
-              {...register('phone', { required: 'Phone number is required' })}
-              placeholder="Enter phone number"
-            />
-            {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
-          </div>
+        <LocationServiceSelector
+          locations={locations}
+          services={services}
+          servicesLoading={servicesLoading}
+          servicesError={servicesError}
+          selectedLocationId={selectedLocationId}
+          setValue={setValue}
+        />
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address (Optional)</Label>
-            <Input
-              id="email"
-              type="email"
-              {...register('email')}
-              placeholder="Enter email address"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location">Location *</Label>
-            <Select onValueChange={(value) => setValue('location_id', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a location" />
-              </SelectTrigger>
-              <SelectContent>
-                {locations?.map((location) => (
-                  <SelectItem key={location.id} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="service">Service *</Label>
-            
-            {servicesError && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Error loading services: {servicesError.message}
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            {!selectedLocationId && (
-              <Alert>
-                <AlertDescription>
-                  Please select a location first to see available services.
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            <Select 
-              onValueChange={(value) => setValue('service_id', value)}
-              disabled={!selectedLocationId || servicesLoading || !services?.length}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={
-                  !selectedLocationId 
-                    ? "Select a location first"
-                    : servicesLoading 
-                      ? "Loading services..."
-                      : !services?.length 
-                        ? "No services available"
-                        : "Select a service"
-                } />
-                {servicesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              </SelectTrigger>
-              <SelectContent>
-                {services?.map((service) => (
-                  <SelectItem key={service.id} value={service.id}>
-                    <div className="flex flex-col">
-                      <span>{service.name}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {service.duration} min
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Preferred Date *</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="time">Preferred Time *</Label>
-            <Select value={selectedTime} onValueChange={setSelectedTime}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {timeSlots.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <DateTimePicker
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          selectedTime={selectedTime}
+          setSelectedTime={setSelectedTime}
+        />
 
         <div className="space-y-2">
           <Label htmlFor="reason">Reason for Visit</Label>
