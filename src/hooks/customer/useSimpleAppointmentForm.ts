@@ -43,7 +43,7 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: ''
   });
 
-  // Fetch locations
+  // Fetch locations with improved error handling
   const { 
     data: locations = [], 
     isLoading: locationsLoading, 
@@ -56,10 +56,17 @@ export const useSimpleAppointmentForm = () => {
       try {
         console.log('🔄 Making Supabase query to locations table...');
         
+        // Add a timeout to prevent hanging queries
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
         const { data, error, count } = await supabase
           .from('locations')
           .select('id, name, address', { count: 'exact' })
-          .order('name');
+          .order('name')
+          .abortSignal(controller.signal);
+        
+        clearTimeout(timeoutId);
         
         console.log('📊 Raw Supabase response:', { 
           data, 
@@ -73,22 +80,34 @@ export const useSimpleAppointmentForm = () => {
           throw new Error(`Failed to load locations: ${error.message}`);
         }
         
-        if (!data) {
-          console.warn('⚠️ No data returned from locations query');
+        if (!data || data.length === 0) {
+          console.warn('⚠️ No locations found in database');
           return [];
         }
         
         console.log('✅ Successfully fetched locations:', data.length);
         console.log('📋 Location details:', data);
         
-        return data || [];
+        return data;
       } catch (err) {
         console.error('💥 Fetch error in try/catch:', err);
-        throw err;
+        
+        // Return empty array instead of throwing to prevent app crash
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.error('🕐 Query timed out');
+          return [];
+        }
+        
+        // For other errors, still return empty array but log the error
+        console.error('🔥 Unexpected error:', err);
+        return [];
       }
     },
-    retry: 2,
+    retry: 1, // Reduce retries to prevent getting stuck
+    retryDelay: 1000,
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   // Fetch services based on selected location
@@ -107,30 +126,38 @@ export const useSimpleAppointmentForm = () => {
       console.log('🟢 Fetching services for location:', formData.locationId);
       
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
         const { data, error } = await supabase
           .from('services')
           .select('id, name, duration, description')
           .eq('location_id', formData.locationId)
           .eq('is_active', true)
-          .order('name');
+          .order('name')
+          .abortSignal(controller.signal);
+        
+        clearTimeout(timeoutId);
         
         console.log('📊 Services query response:', { data, error });
         
         if (error) {
           console.error('❌ Services error:', error);
-          throw new Error(`Failed to load services: ${error.message}`);
+          return [];
         }
         
         console.log('✅ Fetched services:', data?.length || 0);
         return data || [];
       } catch (err) {
         console.error('💥 Services fetch error:', err);
-        throw err;
+        return [];
       }
     },
     enabled: !!formData.locationId,
-    retry: 2,
+    retry: 1,
+    retryDelay: 1000,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   console.log('🎯 Hook state summary:', {
