@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheckmarkAnimation } from '@/components/ui/broward-icons';
@@ -11,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, User, Settings, BarChart3 } from 'lucide-react';
+import { Menu, User, Settings, BarChart3, Home } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface BrowardHeaderProps {
@@ -128,7 +129,19 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                     <SheetTitle>Menu</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6 space-y-4">
-                    {/* Show staff/admin links only if user has appropriate role */}
+                    {/* Customer Services - Always visible */}
+                    <Link
+                      to="/customer"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      <Home className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">Customer Services</p>
+                        <p className="text-sm text-muted-foreground">Schedule appointments and check queue</p>
+                      </div>
+                    </Link>
+
+                    {/* Staff Dashboard - Show for staff and admin */}
                     {(role === 'staff' || role === 'admin') && (
                       <Link
                         to="/staff"
@@ -142,6 +155,7 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                       </Link>
                     )}
                     
+                    {/* Admin Dashboard - Show only for admin */}
                     {role === 'admin' && (
                       <>
                         <Link
@@ -168,10 +182,10 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                       </>
                     )}
                     
-                    {/* Show message for users without special roles */}
+                    {/* Show message only for customers without additional roles */}
                     {(!role || role === 'customer') && (
-                      <div className="p-3 text-center text-muted-foreground">
-                        <p>No additional menu options available</p>
+                      <div className="p-3 text-center text-muted-foreground border-t">
+                        <p className="text-sm">Additional options available for staff and administrators</p>
                       </div>
                     )}
                   </div>
