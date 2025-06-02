@@ -22,10 +22,17 @@ export const useLocations = () => {
       }
       
       console.log('useLocations - Locations fetched successfully:', data);
+      console.log('useLocations - Number of locations:', data?.length || 0);
       return data || [];
     },
     retry: 1, // Reduce retries since we've fixed the RLS issue
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  console.log('useLocations - Hook state:', {
+    locationsCount: locations?.length || 0,
+    isLoading,
+    error: error?.message || null
   });
 
   return { 

@@ -32,11 +32,19 @@ export const useServices = (selectedLocationId: string) => {
       }
       
       console.log('useServices - Services fetched successfully:', data);
+      console.log('useServices - Number of services:', data?.length || 0);
       return data || [];
     },
     enabled: !!selectedLocationId,
     retry: 1, // Reduce retries since we've fixed the RLS issue
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  console.log('useServices - Hook state:', {
+    selectedLocationId,
+    servicesCount: services?.length || 0,
+    servicesLoading,
+    servicesError: servicesError?.message || null
   });
 
   return {
