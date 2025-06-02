@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
@@ -6,53 +7,38 @@ import { QueueDisplayBoard } from './QueueDisplayBoard';
 import { EnhancedQueueControls } from './EnhancedQueueControls';
 import { EnhancedQueueManagement } from './EnhancedQueueManagement';
 import { useAuth } from '@/context/AuthContext';
-
-// Mock data for demonstration - keep existing mock data
-const mockCustomers = [
-  {
-    id: '1',
-    name: 'John Doe',
-    phone: '+1 (555) 123-4567',
-    service: 'Document Review',
-    waitTime: 25,
-    priority: 'normal' as const,
-    status: 'waiting' as const
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    phone: '+1 (555) 987-6543',
-    service: 'Application Process',
-    waitTime: 45,
-    priority: 'priority' as const,
-    status: 'waiting' as const
-  },
-  {
-    id: '3',
-    name: 'Bob Johnson',
-    service: 'Consultation',
-    waitTime: 15,
-    priority: 'normal' as const,
-    status: 'waiting' as const
-  }
-];
+import { useQueue } from '@/context/QueueContext';
 
 export const QueueManagementTab: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { customers } = useQueue();
+
+  // Convert QueueContext customers to the format expected by CustomerCallingSystem
+  const formattedCustomers = customers
+    .filter(c => c.status === 'waiting')
+    .map(customer => ({
+      id: customer.id,
+      name: customer.name,
+      phone: customer.phone,
+      service: customer.service,
+      waitTime: Math.floor((new Date().getTime() - customer.joinedAt.getTime()) / 60000),
+      priority: customer.priority,
+      status: customer.status
+    }));
 
   const handleCustomerCalled = (customerId: string) => {
     console.log('Customer called:', customerId);
-    // Implementation would update queue state
+    // Implementation would update queue state via QueueContext
   };
 
   const handleNoShow = (customerId: string) => {
     console.log('Customer marked as no-show:', customerId);
-    // Implementation would remove customer from queue
+    // Implementation would remove customer from queue via QueueContext
   };
 
-  // Mock location ID - in real app this would come from user/context
-  const locationId = 'mock-location-id';
+  // Use user's location if available, otherwise use default
+  const locationId = user?.location_id || 'default-location';
 
   return (
     <div className="space-y-6">
@@ -70,7 +56,7 @@ export const QueueManagementTab: React.FC = () => {
         
         <TabsContent value="calling" className="space-y-4">
           <CustomerCallingSystem
-            customers={mockCustomers}
+            customers={formattedCustomers}
             onCustomerCalled={handleCustomerCalled}
             onNoShow={handleNoShow}
           />

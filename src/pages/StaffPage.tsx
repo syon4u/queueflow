@@ -62,21 +62,19 @@ const StaffPage = () => {
     switch (activeSection) {
       case 'basic-queue':
         return (
-          <QueueProvider>
-            <div className="space-y-6">
-              <QueueStats />
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                  <CustomerQueue />
-                  <EstimatedWaitTimes />
-                </div>
-                <div className="space-y-6">
-                  <QueueControls />
-                  <AddCustomerForm />
-                </div>
+          <div className="space-y-6">
+            <QueueStats />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <CustomerQueue />
+                <EstimatedWaitTimes />
+              </div>
+              <div className="space-y-6">
+                <QueueControls />
+                <AddCustomerForm />
               </div>
             </div>
-          </QueueProvider>
+          </div>
         );
 
       case 'enhanced-queue':
@@ -115,50 +113,52 @@ const StaffPage = () => {
   };
   
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50">
-        <StaffSidebar
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-          notificationCount={0}
-        />
-        
-        <SidebarInset className="flex-1">
-          <div className="flex flex-col min-h-screen">
-            {/* Header */}
-            <div className="bg-white border-b p-6">
-              <StaffDashboardHeader
-                queueStatus="open"
-                staffStatus="active"
-                activeAppointments={activeAppointments.length}
-                waitingCustomers={5}
-                onRefresh={handleRefresh}
-                onNotificationClick={handleNotificationClick}
-                onSettingsClick={handleSettingsClick}
-              />
-            </div>
-
-            {/* Status Section */}
-            <div className="bg-white border-b px-6 py-4">
-              <StaffStatusSection onStatusChange={handleStatusChange} />
-            </div>
-            
-            {/* Main Content */}
-            <main className="flex-1 p-6">
-              <div className="max-w-7xl mx-auto">
-                {renderMainContent()}
+    <QueueProvider>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-gray-50">
+          <StaffSidebar
+            activeSection={activeSection}
+            onSectionChange={setActiveSection}
+            notificationCount={0}
+          />
+          
+          <SidebarInset className="flex-1">
+            <div className="flex flex-col min-h-screen">
+              {/* Header */}
+              <div className="bg-white border-b p-6">
+                <StaffDashboardHeader
+                  queueStatus="open"
+                  staffStatus="active"
+                  activeAppointments={activeAppointments.length}
+                  waitingCustomers={5}
+                  onRefresh={handleRefresh}
+                  onNotificationClick={handleNotificationClick}
+                  onSettingsClick={handleSettingsClick}
+                />
               </div>
-            </main>
-          </div>
-        </SidebarInset>
-      </div>
-      
-      {/* Keyboard shortcuts dialog */}
-      <StaffShortcuts 
-        open={showShortcutsDialog} 
-        onClose={() => setShowShortcutsDialog(false)} 
-      />
-    </SidebarProvider>
+
+              {/* Status Section */}
+              <div className="bg-white border-b px-6 py-4">
+                <StaffStatusSection onStatusChange={handleStatusChange} />
+              </div>
+              
+              {/* Main Content */}
+              <main className="flex-1 p-6">
+                <div className="max-w-7xl mx-auto">
+                  {renderMainContent()}
+                </div>
+              </main>
+            </div>
+          </SidebarInset>
+        </div>
+        
+        {/* Keyboard shortcuts dialog */}
+        <StaffShortcuts 
+          open={showShortcutsDialog} 
+          onClose={() => setShowShortcutsDialog(false)} 
+        />
+      </SidebarProvider>
+    </QueueProvider>
   );
 };
 
