@@ -1,113 +1,41 @@
 
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-
-const formSchema = z.object({
-  appointment_code: z.string().min(1, "Confirmation code is required"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { QrCode, CheckCircle } from 'lucide-react';
 
 const CheckInCard = () => {
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      appointment_code: "",
-    },
-  });
-
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-    
-    try {
-      // Find appointment by confirmation code (using ID as confirmation code for now)
-      const { data: appointments, error: fetchError } = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('id', data.appointment_code)
-        .single();
-
-      if (fetchError || !appointments) {
-        toast({
-          title: "Invalid Confirmation Code",
-          description: "Please verify your confirmation code and try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Update appointment status to checked_in
-      const { error: updateError } = await supabase
-        .from('appointments')
-        .update({ 
-          status: 'checked_in',
-          check_in_time: new Date().toISOString()
-        })
-        .eq('id', data.appointment_code);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      toast({
-        title: "Check-In Successful",
-        description: "You have been successfully checked in for your appointment",
-      });
-      
-      form.reset();
-    } catch (error) {
-      console.error('Error checking in:', error);
-      toast({
-        title: "Check-In Failed",
-        description: "An error occurred while checking in. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Check In</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <QrCode className="h-5 w-5" />
+          Quick Check-In
+        </CardTitle>
         <CardDescription>
-          Enter your confirmation code to check in for your appointment
+          Enter your confirmation code to check in
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="appointment_code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirmation Code</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your confirmation code" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Checking In..." : "Check In"}
-            </Button>
-          </form>
-        </Form>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="confirmation-code">Confirmation Code</Label>
+          <Input
+            id="confirmation-code"
+            placeholder="Enter your appointment code"
+            className="text-center font-mono"
+          />
+        </div>
+        
+        <Button className="w-full">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Check In
+        </Button>
+        
+        <div className="text-center text-sm text-muted-foreground">
+          <p>Don't have a code? Schedule an appointment above.</p>
+        </div>
       </CardContent>
     </Card>
   );

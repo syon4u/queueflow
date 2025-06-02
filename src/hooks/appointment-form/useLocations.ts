@@ -7,7 +7,7 @@ export const useLocations = () => {
   const { data: locations = [], isLoading, error } = useQuery({
     queryKey: ['locations'],
     queryFn: async (): Promise<Location[]> => {
-      console.log('useLocations - Starting location fetch...');
+      console.log('useLocations - Starting location fetch for anonymous user...');
       
       try {
         // Fetch open locations for anonymous users

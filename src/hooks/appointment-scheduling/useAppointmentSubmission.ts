@@ -1,144 +1,105 @@
 
-import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { NewCustomerFormValues, ExistingCustomerFormValues, Customer } from './types';
-import { useNotifications } from './useNotifications';
-import { useTimeParser } from './useTimeParser';
+import { toast } from '@/components/ui/use-toast';
+import { Customer } from '@/components/customer/CustomerSearchBox';
+import { NewCustomerFormValues, ExistingCustomerFormValues, AppointmentStep } from './types';
 
-export const useAppointmentSubmission = (
-  onAppointmentScheduled: (code: string) => void
-) => {
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const { sendConfirmationNotifications } = useNotifications();
-  const { parseTimeAndDate } = useTimeParser();
+export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) => void) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitNewCustomerAppointment = async (
     data: NewCustomerFormValues,
     selectedDate: Date | undefined,
     selectedTime: string,
-    setIsSubmitting: (submitting: boolean) => void,
-    setStep: (step: 'search' | 'new-customer' | 'existing-customer') => void
+    setIsSubmittingState: (submitting: boolean) => void,
+    setStep: (step: AppointmentStep) => void
   ) => {
     if (!selectedDate) {
       toast({
-        title: t('common.error'),
-        description: t('appointments.selectDate'),
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please select a date for your appointment.',
+        variant: 'destructive',
       });
       return;
     }
 
-    setIsSubmitting(true);
+    setIsSubmittingState(true);
+    console.log('useAppointmentSubmission - Creating appointment for new customer:', data);
 
     try {
-      const scheduledDate = parseTimeAndDate(selectedDate, selectedTime);
+      // Parse the time and create the scheduled datetime
+      const [time, modifier] = selectedTime.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours, 10);
       
-      const [firstName, ...lastNameParts] = data.name.trim().split(' ');
-      const lastName = lastNameParts.join(' ') || firstName;
-      
-      let customerId: string;
-      let customerData: any;
-      
-      // Check if customer already exists by phone
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('phone', data.phone)
-        .single();
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
-        customerData = existingCustomer;
-      } else {
-        // Generate a UUID for the new customer
-        const customerUuid = crypto.randomUUID();
-        
-        // Create new customer with explicit ID
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert({
-            id: customerUuid,
-            first_name: firstName,
-            last_name: lastName,
-            phone: data.phone,
-            email: data.email || null
-          })
-          .select('*')
-          .single();
-
-        if (customerError) throw customerError;
-        customerId = newCustomer.id;
-        customerData = newCustomer;
-
-        // Create a user account for the customer if they provided an email
-        if (data.email) {
-          try {
-            // Create auth user (this will trigger the handle_new_user function)
-            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-              email: data.email,
-              email_confirm: true,
-              user_metadata: {
-                first_name: firstName,
-                last_name: lastName,
-                phone: data.phone
-              }
-            });
-
-            if (authError) {
-              console.warn('Could not create auth user:', authError);
-            } else if (authData.user) {
-              // Ensure customer role is set
-              await supabase
-                .from('user_roles')
-                .upsert({
-                  user_id: authData.user.id,
-                  role: 'customer'
-                });
-            }
-          } catch (error) {
-            console.warn('Error creating auth user for customer:', error);
-            // Continue without creating auth user - customer record still exists
-          }
-        }
+      if (modifier === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (modifier === 'AM' && hour === 12) {
+        hour = 0;
       }
-      
-      // Create the appointment
-      const { data: appointment, error: appointmentError } = await supabase
-        .from('appointments')
+
+      const scheduledDateTime = new Date(selectedDate);
+      scheduledDateTime.setHours(hour, parseInt(minutes, 10), 0, 0);
+
+      // Split name into first and last name
+      const nameParts = data.name.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      // Create customer first
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
         .insert({
-          customer_id: customerId,
-          service_id: data.service_id,
-          location_id: data.location_id,
-          scheduled_time: scheduledDate.toISOString(),
-          reason_for_visit: data.reason_for_visit,
-          status: 'scheduled'
+          first_name: firstName,
+          last_name: lastName,
+          phone: data.phone,
+          email: data.email || null,
         })
         .select('id')
         .single();
 
-      if (appointmentError) throw appointmentError;
+      if (customerError) {
+        console.error('useAppointmentSubmission - Customer creation error:', customerError);
+        throw new Error(`Failed to create customer: ${customerError.message}`);
+      }
+
+      // Create appointment
+      const { data: appointmentData, error: appointmentError } = await supabase
+        .from('appointments')
+        .insert({
+          customer_id: customerData.id,
+          location_id: data.location_id,
+          service_id: data.service_id,
+          scheduled_time: scheduledDateTime.toISOString(),
+          reason_for_visit: data.reason_for_visit || null,
+          status: 'scheduled',
+        })
+        .select('id')
+        .single();
+
+      if (appointmentError) {
+        console.error('useAppointmentSubmission - Appointment creation error:', appointmentError);
+        throw new Error(`Failed to create appointment: ${appointmentError.message}`);
+      }
+
+      const confirmationCode = `APT-${appointmentData.id.slice(0, 8).toUpperCase()}`;
       
-      const confirmationCode = appointment.id;
-      
-      // Send confirmation notifications
-      await sendConfirmationNotifications(customerId, confirmationCode, customerData);
-      
-      onAppointmentScheduled(confirmationCode);
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      setStep('search');
-    } catch (error) {
-      console.error('Error creating appointment:', error);
       toast({
-        title: t('common.error'),
-        description: t('appointments.createError'),
-        variant: "destructive",
+        title: 'Success!',
+        description: 'Your appointment has been scheduled successfully.',
+      });
+
+      onAppointmentScheduled(confirmationCode);
+    } catch (error: any) {
+      console.error('useAppointmentSubmission - Error:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create appointment. Please try again.',
+        variant: 'destructive',
       });
     } finally {
-      setIsSubmitting(false);
+      setIsSubmittingState(false);
     }
   };
 
@@ -147,56 +108,72 @@ export const useAppointmentSubmission = (
     selectedDate: Date | undefined,
     selectedTime: string,
     selectedCustomer: Customer | null,
-    setIsSubmitting: (submitting: boolean) => void,
-    setStep: (step: 'search' | 'new-customer' | 'existing-customer') => void
+    setIsSubmittingState: (submitting: boolean) => void,
+    setStep: (step: AppointmentStep) => void
   ) => {
     if (!selectedDate || !selectedCustomer) {
       toast({
-        title: t('common.error'),
-        description: t('appointments.selectDateAndCustomer'),
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please select a date and customer for the appointment.',
+        variant: 'destructive',
       });
       return;
     }
 
-    setIsSubmitting(true);
+    setIsSubmittingState(true);
+    console.log('useAppointmentSubmission - Creating appointment for existing customer:', selectedCustomer.id);
 
     try {
-      const scheduledDate = parseTimeAndDate(selectedDate, selectedTime);
+      // Parse the time and create the scheduled datetime
+      const [time, modifier] = selectedTime.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours, 10);
       
-      // Create the appointment
-      const { data: appointment, error } = await supabase
+      if (modifier === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (modifier === 'AM' && hour === 12) {
+        hour = 0;
+      }
+
+      const scheduledDateTime = new Date(selectedDate);
+      scheduledDateTime.setHours(hour, parseInt(minutes, 10), 0, 0);
+
+      // Create appointment
+      const { data: appointmentData, error: appointmentError } = await supabase
         .from('appointments')
         .insert({
           customer_id: selectedCustomer.id,
-          service_id: data.service_id,
           location_id: data.location_id,
-          scheduled_time: scheduledDate.toISOString(),
-          reason_for_visit: data.reason_for_visit,
-          status: 'scheduled'
+          service_id: data.service_id,
+          scheduled_time: scheduledDateTime.toISOString(),
+          reason_for_visit: data.reason_for_visit || null,
+          status: 'scheduled',
         })
         .select('id')
         .single();
 
-      if (error) throw error;
+      if (appointmentError) {
+        console.error('useAppointmentSubmission - Appointment creation error:', appointmentError);
+        throw new Error(`Failed to create appointment: ${appointmentError.message}`);
+      }
 
-      const confirmationCode = appointment.id;
+      const confirmationCode = `APT-${appointmentData.id.slice(0, 8).toUpperCase()}`;
       
-      // Send confirmation notifications
-      await sendConfirmationNotifications(selectedCustomer.id, confirmationCode, selectedCustomer);
+      toast({
+        title: 'Success!',
+        description: 'Your appointment has been scheduled successfully.',
+      });
 
       onAppointmentScheduled(confirmationCode);
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      setStep('search');
-    } catch (error) {
-      console.error('Error creating appointment:', error);
+    } catch (error: any) {
+      console.error('useAppointmentSubmission - Error:', error);
       toast({
-        title: t('common.error'),
-        description: t('appointments.createError'),
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to create appointment. Please try again.',
+        variant: 'destructive',
       });
     } finally {
-      setIsSubmitting(false);
+      setIsSubmittingState(false);
     }
   };
 

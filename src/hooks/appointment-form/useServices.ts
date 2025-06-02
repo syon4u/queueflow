@@ -11,7 +11,7 @@ export const useServices = (selectedLocationId: string) => {
   } = useQuery({
     queryKey: ['services', selectedLocationId],
     queryFn: async (): Promise<Service[]> => {
-      console.log('useServices - Fetching services for location:', selectedLocationId);
+      console.log('useServices - Fetching services for anonymous user, location:', selectedLocationId);
       
       if (!selectedLocationId) {
         console.log('useServices - No location selected, returning empty array');
