@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, RefreshCw } from 'lucide-react';
 import type { Appointment } from '@/hooks/use-appointments';
 import { SendReminderDialog } from './staff/SendReminderDialog';
 import { CreateAppointmentDialog } from './staff/CreateAppointmentDialog';
@@ -27,9 +27,17 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const { isLoading, updateAppointmentStatus } = useAppointmentActions(onStatusChange);
   
+  console.log('StaffAppointmentTable - received appointments:', appointments);
+  
   const handleOpenReminderDialog = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
     setReminderDialogOpen(true);
+  };
+
+  const handleRefresh = () => {
+    if (onStatusChange) {
+      onStatusChange();
+    }
   };
 
   return (
@@ -38,15 +46,22 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
         {/* Header with Create Appointment Button */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">{t('appointments.title')}</h2>
-          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            {t('appointments.createNew')}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleRefresh} variant="outline" size="sm">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+            <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              {t('appointments.createNew')}
+            </Button>
+          </div>
         </div>
 
         {!appointments.length ? (
           <div className="text-center p-8 text-muted-foreground">
             <p>No active appointments found</p>
+            <p className="text-sm mt-2">Appointments created by customers should appear here automatically</p>
           </div>
         ) : (
           <Table>

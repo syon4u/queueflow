@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { useAppointments } from '@/hooks/use-appointments';
+import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
 import StaffAppointmentTable from '@/components/StaffAppointmentTable';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -26,7 +27,7 @@ import StaffShortcuts from '@/components/staff/StaffShortcuts';
 
 const StaffPageContent = () => {
   const { user, role } = useAuth();
-  const { appointments, loading, refreshAppointments } = useAppointments();
+  const { appointments, isLoading: loading, refreshAppointments } = useRealtimeAppointments();
   const { stats } = useQueue();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -37,6 +38,7 @@ const StaffPageContent = () => {
   useStaffNotifications();
 
   // Debug logging for StaffPage
+  console.log('StaffPage - appointments from useRealtimeAppointments:', appointments);
   console.log('StaffPage - stats from useQueue:', stats);
   console.log('StaffPage - stats.waitingCustomers:', stats.waitingCustomers);
   
@@ -44,6 +46,8 @@ const StaffPageContent = () => {
   const activeAppointments = appointments.filter(
     (appointment) => !['completed', 'cancelled', 'no_show'].includes(appointment.status)
   );
+
+  console.log('StaffPage - activeAppointments:', activeAppointments);
   
   const handleStatusChange = () => {
     refreshAppointments();
