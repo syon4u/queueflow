@@ -49,6 +49,18 @@ export const useAppointmentCreation = () => {
         customerId = customerUuid;
       }
 
+      // Ensure user has customer role in user_roles
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert({
+          user_id: user.id,
+          role: 'customer'
+        });
+
+      if (roleError) {
+        console.warn('Could not set customer role:', roleError);
+      }
+
       // Create appointment
       const { data, error } = await supabase
         .from('appointments')

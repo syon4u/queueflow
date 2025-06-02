@@ -73,6 +73,37 @@ export const useAppointmentSubmission = (
         if (customerError) throw customerError;
         customerId = newCustomer.id;
         customerData = newCustomer;
+
+        // Create a user account for the customer if they provided an email
+        if (data.email) {
+          try {
+            // Create auth user (this will trigger the handle_new_user function)
+            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+              email: data.email,
+              email_confirm: true,
+              user_metadata: {
+                first_name: firstName,
+                last_name: lastName,
+                phone: data.phone
+              }
+            });
+
+            if (authError) {
+              console.warn('Could not create auth user:', authError);
+            } else if (authData.user) {
+              // Ensure customer role is set
+              await supabase
+                .from('user_roles')
+                .upsert({
+                  user_id: authData.user.id,
+                  role: 'customer'
+                });
+            }
+          } catch (error) {
+            console.warn('Error creating auth user for customer:', error);
+            // Continue without creating auth user - customer record still exists
+          }
+        }
       }
       
       // Create the appointment

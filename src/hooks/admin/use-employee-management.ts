@@ -1,26 +1,19 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface EmployeeFormData {
   id?: string;
   first_name: string;
   last_name: string;
   phone: string;
-  role: 'admin' | 'staff';
+  role: 'admin' | 'staff' | 'customer';
   location_id: string;
 }
 
-interface Location {
-  id: string;
-  name: string;
-}
-
 export const useEmployeeManagement = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<EmployeeFormData>({
@@ -28,23 +21,28 @@ export const useEmployeeManagement = () => {
     last_name: '',
     phone: '',
     role: 'staff',
-    location_id: ''
+    location_id: '',
   });
 
-  // Fetch staff members
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch staff members from profiles with user_roles
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ['staff-members'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('staff')
+        .from('profiles')
         .select(`
-          *,
-          locations (
-            id,
-            name
-          )
+          id,
+          first_name,
+          last_name,
+          phone,
+          location_id,
+          user_roles!inner(role),
+          locations(name)
         `)
-        .order('created_at', { ascending: false });
+        .in('user_roles.role', ['staff', 'admin']);
 
       if (error) throw error;
       return data;
@@ -65,105 +63,179 @@ export const useEmployeeManagement = () => {
     },
   });
 
-  const handleAddClick = () => {
+  // Create staff member
+  const createStaffMember = useMutation({
+    mutationFn: async (data: EmployeeFormData) => {
+      // First create the profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          phone: data.phone,
+          location_id: data.location_id || null,
+        })
+        .select()
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Then set the user role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: profile.id,
+          role: data.role,
+        });
+
+      if (roleError) throw roleError;
+
+      return profile;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Staff member created successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['staff-members'] });
+      setIsDialogOpen(false);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Error creating staff member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create staff member",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update staff member
+  const updateStaffMember = useMutation({
+    mutationFn: async (data: EmployeeFormData) => {
+      if (!data.id) throw new Error('No ID provided for update');
+
+      // Update the profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          phone: data.phone,
+          location_id: data.location_id || null,
+        })
+        .eq('id', data.id);
+
+      if (profileError) throw profileError;
+
+      // Update the user role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .update({ role: data.role })
+        .eq('user_id', data.id);
+
+      if (roleError) throw roleError;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Staff member updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['staff-members'] });
+      setIsDialogOpen(false);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Error updating staff member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update staff member",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete staff member
+  const deleteStaffMember = useMutation({
+    mutationFn: async (id: string) => {
+      // Delete user role first (due to foreign key constraints)
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', id);
+
+      if (roleError) throw roleError;
+
+      // Then delete the profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', id);
+
+      if (profileError) throw profileError;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Staff member deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['staff-members'] });
+    },
+    onError: (error) => {
+      console.error('Error deleting staff member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete staff member",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetForm = () => {
     setFormData({
       first_name: '',
       last_name: '',
       phone: '',
       role: 'staff',
-      location_id: ''
+      location_id: '',
     });
     setIsEditing(false);
-    setIsDialogOpen(true);
   };
 
-  const handleEditClick = (staff: any) => {
+  const handleAddClick = useCallback(() => {
+    resetForm();
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleEditClick = useCallback((member: any) => {
     setFormData({
-      id: staff.id,
-      first_name: staff.first_name,
-      last_name: staff.last_name,
-      phone: staff.phone || '',
-      role: staff.role,
-      location_id: staff.location_id || ''
+      id: member.id,
+      first_name: member.first_name,
+      last_name: member.last_name,
+      phone: member.phone || '',
+      role: member.user_roles?.role || 'staff',
+      location_id: member.location_id || '',
     });
     setIsEditing(true);
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const handleDeleteClick = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('staff')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['staff-members'] });
-      
-      toast({
-        title: 'Success',
-        description: 'Employee deleted successfully'
-      });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: error.message
-      });
+  const handleDeleteClick = useCallback((id: string) => {
+    if (confirm('Are you sure you want to delete this staff member?')) {
+      deleteStaffMember.mutate(id);
     }
-  };
+  }, [deleteStaffMember]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      if (isEditing && formData.id) {
-        // Update existing staff member
-        const { error } = await supabase
-          .from('staff')
-          .update({
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            phone: formData.phone,
-            role: formData.role,
-            location_id: formData.location_id || null
-          })
-          .eq('id', formData.id);
-
-        if (error) throw error;
-      } else {
-        // Create new staff member - generate UUID for id
-        const newId = crypto.randomUUID();
-        const { error } = await supabase
-          .from('staff')
-          .insert({
-            id: newId,
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            phone: formData.phone,
-            role: formData.role,
-            location_id: formData.location_id || null
-          });
-
-        if (error) throw error;
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['staff-members'] });
-      setIsDialogOpen(false);
-      
-      toast({
-        title: 'Success',
-        description: `Employee ${isEditing ? 'updated' : 'created'} successfully`
-      });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: error.message
-      });
+    if (isEditing) {
+      updateStaffMember.mutate(formData);
+    } else {
+      createStaffMember.mutate(formData);
     }
-  };
+  }, [formData, isEditing, createStaffMember, updateStaffMember]);
 
   return {
     staffMembers,
@@ -177,6 +249,6 @@ export const useEmployeeManagement = () => {
     handleAddClick,
     handleEditClick,
     handleDeleteClick,
-    handleSubmit
+    handleSubmit,
   };
 };

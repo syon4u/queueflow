@@ -16,7 +16,7 @@ interface EmployeeFormData {
   first_name: string;
   last_name: string;
   phone: string;
-  role: 'admin' | 'staff';
+  role: 'admin' | 'staff' | 'customer';
   location_id: string;
 }
 
@@ -102,7 +102,7 @@ export const EmployeeFormDialog: React.FC<EmployeeFormDialogProps> = ({
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 required
               >
-                <option value="staff">Employee</option>
+                <option value="staff">Staff</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
