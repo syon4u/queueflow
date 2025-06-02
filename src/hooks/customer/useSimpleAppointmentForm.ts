@@ -51,20 +51,41 @@ export const useSimpleAppointmentForm = () => {
   } = useQuery({
     queryKey: ['simple-locations'],
     queryFn: async (): Promise<Location[]> => {
-      console.log('Fetching locations for simple appointment form...');
+      console.log('🟢 Starting location fetch for simple appointment form...');
       
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name, address')
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching locations:', error);
-        throw new Error(`Failed to load locations: ${error.message}`);
+      try {
+        console.log('🔄 Making Supabase query to locations table...');
+        
+        const { data, error, count } = await supabase
+          .from('locations')
+          .select('id, name, address', { count: 'exact' })
+          .order('name');
+        
+        console.log('📊 Raw Supabase response:', { 
+          data, 
+          error, 
+          count,
+          dataLength: data?.length 
+        });
+        
+        if (error) {
+          console.error('❌ Supabase error:', error);
+          throw new Error(`Failed to load locations: ${error.message}`);
+        }
+        
+        if (!data) {
+          console.warn('⚠️ No data returned from locations query');
+          return [];
+        }
+        
+        console.log('✅ Successfully fetched locations:', data.length);
+        console.log('📋 Location details:', data);
+        
+        return data || [];
+      } catch (err) {
+        console.error('💥 Fetch error in try/catch:', err);
+        throw err;
       }
-      
-      console.log('Fetched locations:', data?.length || 0);
-      return data || [];
     },
     retry: 2,
     staleTime: 5 * 60 * 1000,
@@ -79,29 +100,47 @@ export const useSimpleAppointmentForm = () => {
     queryKey: ['simple-services', formData.locationId],
     queryFn: async (): Promise<Service[]> => {
       if (!formData.locationId) {
+        console.log('🔍 No location selected for services query');
         return [];
       }
       
-      console.log('Fetching services for location:', formData.locationId);
+      console.log('🟢 Fetching services for location:', formData.locationId);
       
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, duration, description')
-        .eq('location_id', formData.locationId)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching services:', error);
-        throw new Error(`Failed to load services: ${error.message}`);
+      try {
+        const { data, error } = await supabase
+          .from('services')
+          .select('id, name, duration, description')
+          .eq('location_id', formData.locationId)
+          .eq('is_active', true)
+          .order('name');
+        
+        console.log('📊 Services query response:', { data, error });
+        
+        if (error) {
+          console.error('❌ Services error:', error);
+          throw new Error(`Failed to load services: ${error.message}`);
+        }
+        
+        console.log('✅ Fetched services:', data?.length || 0);
+        return data || [];
+      } catch (err) {
+        console.error('💥 Services fetch error:', err);
+        throw err;
       }
-      
-      console.log('Fetched services:', data?.length || 0);
-      return data || [];
     },
     enabled: !!formData.locationId,
     retry: 2,
     staleTime: 5 * 60 * 1000,
+  });
+
+  console.log('🎯 Hook state summary:', {
+    locationsCount: locations?.length || 0,
+    locationsLoading,
+    locationsError: locationsError?.message || null,
+    servicesCount: services?.length || 0,
+    servicesLoading,
+    servicesError: servicesError?.message || null,
+    formLocationId: formData.locationId
   });
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
