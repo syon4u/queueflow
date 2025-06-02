@@ -45,7 +45,7 @@ const CustomerPage = () => {
                 <p className="text-muted-foreground mt-1">Schedule appointments and manage your visits</p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-muted-foreground border border-border/40">
-                Walk-in Customer Portal
+                Anonymous Customer Portal
               </div>
             </div>
           </div>

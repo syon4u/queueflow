@@ -4,11 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users } from 'lucide-react';
 import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
-import { useAuth } from '@/context/AuthContext';
 import { formatWaitTime } from '@/lib/queue';
 
 const QueuePositionTracker = () => {
-  const { user } = useAuth();
   const { userPosition, estimatedWaitTime, isLoading, error } = useRealtimeAppointments();
 
   if (isLoading) {
@@ -53,7 +51,7 @@ const QueuePositionTracker = () => {
     );
   }
 
-  if (!user || userPosition === null) {
+  if (userPosition === null) {
     return (
       <Card>
         <CardHeader>
