@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Clock, Shield } from 'lucide-react';
+import { ArrowRight, Clock, Shield, CheckCircle } from 'lucide-react';
 
 const CustomerServiceCards: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const CustomerServiceCards: React.FC = () => {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         <Card 
           className="group cursor-pointer transition-all hover:shadow-lg hover:scale-105"
           onClick={() => handleCardClick('/customer')}
@@ -37,6 +37,24 @@ const CustomerServiceCards: React.FC = () => {
             </p>
             <div className="text-green-600 text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
               {t('landing.services.schedule.action')} <ArrowRight className="ml-1 h-3 w-3" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="group cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+          onClick={() => handleCardClick('/customer')}
+        >
+          <CardContent className="p-6">
+            <div className="bg-orange-50 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-orange-100 transition-colors">
+              <CheckCircle className="h-6 w-6 text-orange-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Check In</h3>
+            <p className="text-gray-600 mb-4">
+              Check in for your scheduled appointment or join the walk-in queue.
+            </p>
+            <div className="text-orange-600 text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              Check in now <ArrowRight className="ml-1 h-3 w-3" />
             </div>
           </CardContent>
         </Card>
