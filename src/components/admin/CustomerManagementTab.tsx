@@ -1,20 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Search, Phone, Mail, Calendar, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { CustomerStatsCards } from './customer/CustomerStatsCards';
+import { CustomerSearchBox } from './customer/CustomerSearchBox';
+import { CustomerTable } from './customer/CustomerTable';
 
 interface Customer {
   id: string;
@@ -133,14 +124,6 @@ const CustomerManagementTab = () => {
     );
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
   console.log('CustomerManagementTab - Current state:', {
     loading,
     customersCount: customers.length,
@@ -172,136 +155,20 @@ const CustomerManagementTab = () => {
       </div>
 
       {/* Search and Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="md:col-span-2">
-          <CardContent className="p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search customers by name, email, or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <User className="h-4 w-4 text-blue-600" />
-              <div>
-                <p className="text-sm font-medium">Total Customers</p>
-                <p className="text-2xl font-bold">{customers.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-4 w-4 text-green-600" />
-              <div>
-                <p className="text-sm font-medium">Active Customers</p>
-                <p className="text-2xl font-bold">
-                  {customers.filter(c => c.appointment_count && c.appointment_count > 0).length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CustomerSearchBox
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+        <CustomerStatsCards customers={customers} />
       </div>
 
       {/* Customer List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Customer List</CardTitle>
-          <CardDescription>
-            Showing {filteredCustomers.length} of {customers.length} customers
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {customers.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground text-lg">No customers found in the database.</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Customers will appear here once they create appointments.
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Appointments</TableHead>
-                  <TableHead>Last Visit</TableHead>
-                  <TableHead>Registered</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCustomers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell>
-                      <div className="font-medium">
-                        {customer.first_name} {customer.last_name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {customer.email && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Mail className="h-3 w-3" />
-                            {customer.email}
-                          </div>
-                        )}
-                        {customer.phone && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Phone className="h-3 w-3" />
-                            {customer.phone}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={customer.appointment_count > 0 ? "default" : "secondary"}>
-                        {customer.appointment_count || 0} appointments
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {customer.last_appointment ? (
-                        <span className="text-sm">
-                          {formatDate(customer.last_appointment)}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-muted-foreground">
-                          No appointments
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">
-                        {formatDate(customer.created_at)}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredCustomers.length === 0 && customers.length > 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
-                      <div className="text-muted-foreground">
-                        No customers found matching your search "{searchTerm}".
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      <CustomerTable
+        customers={customers}
+        filteredCustomers={filteredCustomers}
+        searchTerm={searchTerm}
+      />
     </div>
   );
 };
