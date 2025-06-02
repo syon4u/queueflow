@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useQueue } from '@/context/QueueContext';
+
 export const QueueManagementTab: React.FC = () => {
   const {
     customers,
@@ -12,7 +14,9 @@ export const QueueManagementTab: React.FC = () => {
     markAsNoShow,
     resetQueue
   } = useQueue();
-  return <div>
+
+  return (
+    <div>
       <h1 className="text-2xl font-bold mb-6">Queue Management</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -76,9 +80,11 @@ export const QueueManagementTab: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers.length > 0 ? customers.map(customer => <TableRow key={customer.id}>
+              {customers.length > 0 ? (
+                customers.map(customer => (
+                  <TableRow key={customer.id}>
                     <TableCell>{customer.name}</TableCell>
-                    <TableCell>{customer.serviceId || 'N/A'}</TableCell>
+                    <TableCell>{customer.service || 'N/A'}</TableCell>
                     <TableCell>{customer.status}</TableCell>
                     <TableCell>
                       {Math.floor((new Date().getTime() - new Date(customer.joinedAt).getTime()) / 60000)}{' '}
@@ -89,12 +95,17 @@ export const QueueManagementTab: React.FC = () => {
                         {customer.priority}
                       </span>
                     </TableCell>
-                  </TableRow>) : <TableRow>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
                   <TableCell colSpan={5} className="text-center">Queue is empty</TableCell>
-                </TableRow>}
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };

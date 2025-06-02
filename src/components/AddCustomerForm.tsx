@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 const AddCustomerForm: React.FC = () => {
@@ -14,6 +15,7 @@ const AddCustomerForm: React.FC = () => {
   const [name, setName] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [notes, setNotes] = React.useState('');
+  const [service, setService] = React.useState('');
   const [priority, setPriority] = React.useState<'normal' | 'priority'>('normal');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,10 +26,16 @@ const AddCustomerForm: React.FC = () => {
       return;
     }
     
+    if (!service) {
+      toast.error('Service selection is required');
+      return;
+    }
+    
     addCustomer({
       name: name.trim(),
       phone: phone.trim() || undefined,
       notes: notes.trim() || undefined,
+      service,
       priority,
       estimatedWaitTime: 5, // Default estimate
     });
@@ -36,6 +44,7 @@ const AddCustomerForm: React.FC = () => {
     setName('');
     setPhone('');
     setNotes('');
+    setService('');
     setPriority('normal');
   };
 
@@ -65,6 +74,22 @@ const AddCustomerForm: React.FC = () => {
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Optional"
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="service">Service <span className="text-red-500">*</span></Label>
+            <Select value={service} onValueChange={setService} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a service" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Business License">Business License</SelectItem>
+                <SelectItem value="Code Violation">Code Violation</SelectItem>
+                <SelectItem value="General Inquiry">General Inquiry</SelectItem>
+                <SelectItem value="Permit Application">Permit Application</SelectItem>
+                <SelectItem value="Document Review">Document Review</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           <div className="space-y-2">
