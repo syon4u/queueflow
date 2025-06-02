@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Users, Settings, Clock, Shield } from 'lucide-react';
+import { ArrowRight, Users, Settings, Clock, Shield, LogOut } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 
 const Index = () => {
   const [showGuide, setShowGuide] = useState(false);
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user, role, signOut } = useAuth();
   
   const handleShowGuide = () => {
     setShowGuide(true);
@@ -18,6 +18,14 @@ const Index = () => {
   
   const handleCardClick = (route: string) => {
     navigate(route);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -47,6 +55,26 @@ const Index = () => {
               `
             }}></div>
           </div>
+          
+          {/* User info and logout in top right */}
+          {user && (
+            <div className="absolute top-4 right-4 z-20">
+              <div className="flex items-center gap-3 bg-white/10 rounded-lg px-4 py-2 backdrop-blur-sm">
+                <span className="text-white/95 font-medium drop-shadow text-sm">
+                  {user.email}
+                </span>
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/20 hover:bg-white/30 text-white font-medium border-white/20 hover:border-white/40 drop-shadow-lg hover:scale-105 transition-all duration-200"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  Logout
+                </Button>
+              </div>
+            </div>
+          )}
           
           <div className="container mx-auto px-4 py-16 text-center relative z-10">
             <div className="flex items-center justify-center mb-6">
