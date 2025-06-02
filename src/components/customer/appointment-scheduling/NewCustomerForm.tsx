@@ -46,7 +46,7 @@ const NewCustomerForm = ({
   const selectedServiceId = watch('service_id');
   const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
 
-  console.log('NewCustomerForm - Complete component state:', {
+  console.log('NewCustomerForm - Component state:', {
     locationsCount: locations?.length || 0,
     locationsLoading,
     locationsError,
@@ -54,9 +54,7 @@ const NewCustomerForm = ({
     selectedServiceId,
     servicesCount: services?.length || 0,
     servicesLoading,
-    servicesError,
-    locations: locations,
-    services: services
+    servicesError
   });
 
   // Clear service selection when location changes
@@ -79,7 +77,58 @@ const NewCustomerForm = ({
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading available locations...</p>
-          <p className="mt-1 text-sm text-gray-500">This may take a few moments</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (locationsError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+        </div>
+        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+          <p className="font-medium">Unable to load locations</p>
+          <p className="mt-1 text-sm">Error: {locationsError}</p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            className="mt-3"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!locations || locations.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+        </div>
+        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg">
+          <p className="font-medium">No locations available</p>
+          <p className="mt-1 text-sm">
+            There are currently no open locations available for scheduling. Please check back later.
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            className="mt-3"
+          >
+            Refresh
+          </Button>
         </div>
       </div>
     );
@@ -95,38 +144,11 @@ const NewCustomerForm = ({
         <h3 className="text-lg font-semibold">New Customer Appointment</h3>
       </div>
 
-      {locationsError && (
-        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg mb-4">
-          <p className="font-medium">Location loading issue</p>
-          <p className="mt-1 text-sm">
-            There was an issue loading locations, but you can still proceed. Error: {locationsError}
-          </p>
-        </div>
-      )}
-
-      {!locations || locations.length === 0 ? (
-        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg mb-4">
-          <p className="font-medium">No locations currently available</p>
-          <p className="mt-1 text-sm">
-            There are currently no locations available for scheduling. Please check back later or contact support.
-          </p>
-          <div className="mt-3">
-            <Button 
-              variant="outline" 
-              onClick={() => window.location.reload()}
-              className="text-amber-700 border-amber-300 hover:bg-amber-100"
-            >
-              Refresh Page
-            </Button>
-          </div>
-        </div>
-      ) : null}
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <CustomerDetailsFields register={register} errors={errors} />
 
         <LocationServiceSelector
-          locations={locations || []}
+          locations={locations}
           services={services}
           servicesLoading={servicesLoading}
           servicesError={servicesError ? new Error(servicesError) : null}
@@ -154,7 +176,7 @@ const NewCustomerForm = ({
         <div className="flex justify-end">
           <Button 
             type="submit" 
-            disabled={isSubmitting || locationsLoading || !selectedLocationId}
+            disabled={isSubmitting || !selectedLocationId || !selectedServiceId}
           >
             {isSubmitting ? 'Scheduling...' : 'Schedule Appointment'}
           </Button>

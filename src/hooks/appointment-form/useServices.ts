@@ -18,26 +18,33 @@ export const useServices = (selectedLocationId: string) => {
         return [];
       }
       
-      // For anonymous users, we can now fetch services thanks to RLS policy
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, duration, description')
-        .eq('location_id', selectedLocationId)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) {
-        console.error('useServices - Error fetching services:', error);
-        throw error;
+      try {
+        const { data, error } = await supabase
+          .from('services')
+          .select('id, name, duration, description')
+          .eq('location_id', selectedLocationId)
+          .eq('is_active', true)
+          .order('name');
+        
+        console.log('useServices - Query result:', { data, error });
+        
+        if (error) {
+          console.error('useServices - Database error:', error);
+          throw new Error(`Failed to load services: ${error.message}`);
+        }
+        
+        const result = data || [];
+        console.log('useServices - Returning services:', result.length);
+        return result;
+        
+      } catch (err) {
+        console.error('useServices - Fetch error:', err);
+        throw err;
       }
-      
-      console.log('useServices - Services fetched successfully:', data);
-      console.log('useServices - Number of services:', data?.length || 0);
-      return data || [];
     },
     enabled: !!selectedLocationId,
-    retry: 1, // Reduce retries since we've fixed the RLS issue
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
   });
 
   console.log('useServices - Hook state:', {
