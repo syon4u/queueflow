@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,9 @@ import {
   VolumeX,
   Clock,
   Users,
-  RefreshCw
+  RefreshCw,
+  Timer,
+  MessageSquare
 } from 'lucide-react';
 import { useEnhancedQueue } from '@/hooks/use-enhanced-queue';
 import { formatTime } from '@/lib/queue';
@@ -70,7 +71,7 @@ export const EnhancedQueueManagement: React.FC<EnhancedQueueManagementProps> = (
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t('queue.served')}</CardTitle>
+            <CardTitle className="text-sm font-medium">Served Today</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{stats.servedCustomers}</div>
@@ -79,7 +80,7 @@ export const EnhancedQueueManagement: React.FC<EnhancedQueueManagementProps> = (
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">{t('queue.noShows')}</CardTitle>
+            <CardTitle className="text-sm font-medium">No Shows</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{stats.noShowCustomers}</div>
@@ -90,7 +91,7 @@ export const EnhancedQueueManagement: React.FC<EnhancedQueueManagementProps> = (
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              {t('queue.averageWaitTime')}
+              Avg Wait Time
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -99,13 +100,18 @@ export const EnhancedQueueManagement: React.FC<EnhancedQueueManagementProps> = (
         </Card>
       </div>
 
-      {/* Current Customer Being Served */}
-      <Card className={currentCustomer ? "border-green-500 bg-green-50" : ""}>
+      {/* Current Customer Being Served - Enhanced Version */}
+      <Card className={currentCustomer ? "border-green-500 bg-green-50 shadow-lg" : "border-gray-200"}>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
               <Phone className="h-5 w-5" />
-              {t('queue.nowServing')}
+              Now Serving
+              {currentCustomer && (
+                <Badge className="bg-green-600 text-white animate-pulse ml-2">
+                  ACTIVE
+                </Badge>
+              )}
             </CardTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -129,34 +135,61 @@ export const EnhancedQueueManagement: React.FC<EnhancedQueueManagementProps> = (
         <CardContent>
           {currentCustomer ? (
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-lg border">
-                <h3 className="font-semibold text-lg mb-2">{currentCustomer.name}</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">{t('queue.service')}: </span>
-                    <span className="font-medium">{currentCustomer.service}</span>
+              <div className="bg-white p-6 rounded-lg border shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-xl text-gray-900">{currentCustomer.name}</h3>
+                  <div className="flex items-center gap-2">
+                    {currentCustomer.priority === 'priority' && (
+                      <Badge className="bg-amber-100 text-amber-800 border-amber-300">
+                        Priority
+                      </Badge>
+                    )}
+                    <Badge className="bg-blue-100 text-blue-800">
+                      {currentCustomer.service}
+                    </Badge>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">{t('queue.joinedAt')}: </span>
-                    <span className="font-medium">{formatTime(currentCustomer.joinedAt)}</span>
-                  </div>
-                  {currentCustomer.phone && (
-                    <div>
-                      <span className="text-muted-foreground">{t('queue.phone')}: </span>
-                      <span className="font-medium">{currentCustomer.phone}</span>
-                    </div>
-                  )}
-                  {currentCustomer.calledAt && (
-                    <div>
-                      <span className="text-muted-foreground">{t('queue.calledAt')}: </span>
-                      <span className="font-medium">{formatTime(currentCustomer.calledAt)}</span>
-                    </div>
-                  )}
                 </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                      <span className="text-gray-600">Joined: </span>
+                      <span className="font-medium">{formatTime(currentCustomer.joinedAt)}</span>
+                    </div>
+                    {currentCustomer.phone && (
+                      <div className="flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                        <span className="font-medium">{currentCustomer.phone}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <Timer className="h-4 w-4 mr-2 text-gray-500" />
+                      <span className="text-gray-600">Wait Time: </span>
+                      <span className="font-medium">
+                        {Math.floor((new Date().getTime() - currentCustomer.joinedAt.getTime()) / 60000)}m
+                      </span>
+                    </div>
+                    {currentCustomer.calledAt && (
+                      <div className="flex items-center">
+                        <span className="text-gray-600">Called: </span>
+                        <span className="font-medium">{formatTime(currentCustomer.calledAt)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
                 {currentCustomer.notes && (
-                  <div className="mt-3 p-2 bg-gray-50 rounded text-sm">
-                    <span className="text-muted-foreground">{t('queue.notes')}: </span>
-                    {currentCustomer.notes}
+                  <div className="mt-4 p-3 bg-gray-50 rounded border">
+                    <div className="flex items-start">
+                      <MessageSquare className="h-4 w-4 mr-2 mt-0.5 text-gray-500" />
+                      <div>
+                        <p className="font-medium text-sm text-gray-700 mb-1">Customer Notes:</p>
+                        <p className="text-sm text-gray-600">{currentCustomer.notes}</p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -164,37 +197,42 @@ export const EnhancedQueueManagement: React.FC<EnhancedQueueManagementProps> = (
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 border-red-300 hover:bg-red-50 text-red-700"
+                  className="flex-1 border-red-300 hover:bg-red-50 text-red-700 hover:text-red-800"
                   onClick={markAsNoShow}
                   disabled={isLoading}
                 >
-                  <UserX className="h-4 w-4 mr-1" />
-                  {t('queue.noShow')}
+                  <UserX className="h-4 w-4 mr-2" />
+                  Mark No-Show
                 </Button>
                 <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                   onClick={markAsServed}
                   disabled={isLoading}
                 >
-                  <UserCheck className="h-4 w-4 mr-1" />
-                  {t('queue.markServed')}
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  {isLoading ? 'Processing...' : 'Mark as Served'}
                 </Button>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <div className="mb-4">
-                <Phone className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                <p className="text-xl font-medium">{t('queue.noOneBeingServed')}</p>
+            <div className="text-center py-12">
+              <div className="bg-gray-50 rounded-lg p-8 border-2 border-dashed border-gray-300">
+                <Phone className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-xl font-medium text-gray-700 mb-2">No Customer Being Served</p>
+                <p className="text-gray-500 mb-6">Ready to serve the next customer in queue</p>
+                <Button
+                  onClick={callNextCustomer}
+                  disabled={isLoading || waitingCustomers.length === 0}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+                  size="lg"
+                >
+                  <Phone className="h-5 w-5 mr-2" />
+                  {isLoading ? 'Calling...' : 'Call Next Customer'}
+                </Button>
+                {waitingCustomers.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-3">No customers waiting in queue</p>
+                )}
               </div>
-              <Button
-                onClick={callNextCustomer}
-                disabled={isLoading || waitingCustomers.length === 0}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Phone className="h-4 w-4 mr-2" />
-                {t('queue.callNext')}
-              </Button>
             </div>
           )}
         </CardContent>
