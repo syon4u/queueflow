@@ -39,21 +39,29 @@ const StaffPageContent = () => {
 
   // Debug logging for StaffPage
   console.log('StaffPage - appointments from useRealtimeAppointments:', appointments);
+  console.log('StaffPage - appointments count:', appointments.length);
   console.log('StaffPage - stats from useQueue:', stats);
   console.log('StaffPage - stats.waitingCustomers:', stats.waitingCustomers);
   
   // Filter to only show active appointments (not completed or cancelled)
   const activeAppointments = appointments.filter(
-    (appointment) => !['completed', 'cancelled', 'no_show'].includes(appointment.status)
+    (appointment) => {
+      const isActive = !['completed', 'cancelled', 'no_show'].includes(appointment.status);
+      console.log(`StaffPage - Appointment ${appointment.id} status: ${appointment.status}, isActive: ${isActive}`);
+      return isActive;
+    }
   );
 
   console.log('StaffPage - activeAppointments:', activeAppointments);
+  console.log('StaffPage - activeAppointments count:', activeAppointments.length);
   
   const handleStatusChange = () => {
+    console.log('StaffPage - handleStatusChange called');
     refreshAppointments();
   };
 
   const handleRefresh = () => {
+    console.log('StaffPage - handleRefresh called');
     refreshAppointments();
   };
 
@@ -93,7 +101,7 @@ const StaffPageContent = () => {
           <div className="space-y-6">
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Active Appointments</h2>
+                <h2 className="text-xl font-semibold mb-4">Active Appointments ({activeAppointments.length})</h2>
                 {loading ? (
                   <div className="flex justify-center p-8">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-label={t('common.loading')}></div>

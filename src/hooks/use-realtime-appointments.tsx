@@ -21,14 +21,11 @@ export function useRealtimeAppointments(locationId?: string) {
 
   // Fetch appointments from the database
   const fetchAppointments = async () => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-    
     try {
       setIsLoading(true);
       setError(null);
+      
+      console.log('useRealtimeAppointments - Starting fetch...');
 
       let query = supabase
         .from('appointments')
@@ -63,6 +60,9 @@ export function useRealtimeAppointments(locationId?: string) {
       
       const { data, error: fetchError } = await query;
       
+      console.log('useRealtimeAppointments - Raw data from Supabase:', data);
+      console.log('useRealtimeAppointments - Fetch error:', fetchError);
+      
       if (fetchError) {
         console.error('Error fetching appointments:', fetchError);
         setError(fetchError.message);
@@ -74,14 +74,19 @@ export function useRealtimeAppointments(locationId?: string) {
         return;
       }
       
-      const formattedAppointments = (data || []).map(appointment => ({
-        ...appointment,
-        customer: appointment.customers,
-        service: appointment.services,
-        location: appointment.locations,
-        staff: appointment.staff
-      }));
+      const formattedAppointments = (data || []).map(appointment => {
+        const formatted = {
+          ...appointment,
+          customer: appointment.customers,
+          service: appointment.services,
+          location: appointment.locations,
+          staff: appointment.staff
+        };
+        console.log('useRealtimeAppointments - Formatted appointment:', formatted);
+        return formatted;
+      });
       
+      console.log('useRealtimeAppointments - Final formatted appointments:', formattedAppointments);
       setAppointments(formattedAppointments);
       calculateUserPosition(formattedAppointments);
     } catch (error) {
@@ -99,6 +104,7 @@ export function useRealtimeAppointments(locationId?: string) {
 
   // Setup realtime subscription
   useEffect(() => {
+    console.log('useRealtimeAppointments - Setting up subscription and initial fetch');
     fetchAppointments();
 
     const channel = supabase
@@ -110,14 +116,17 @@ export function useRealtimeAppointments(locationId?: string) {
           table: 'appointments'
         }, 
         (payload) => {
-          console.log('Realtime appointment update:', payload);
+          console.log('useRealtimeAppointments - Realtime appointment update received:', payload);
           // Refresh appointments when any change occurs
           fetchAppointments();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('useRealtimeAppointments - Subscription status:', status);
+      });
 
     return () => {
+      console.log('useRealtimeAppointments - Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, [user, locationId]);
