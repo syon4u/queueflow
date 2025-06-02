@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useLocations } from '@/hooks/appointment-form/useLocations';
 
 interface Location {
   id: string;
@@ -42,6 +43,14 @@ export const useSimpleAppointmentForm = () => {
     reasonForVisit: '',
     additionalNotes: ''
   });
+
+  // Use the existing useLocations hook for debugging
+  const { data: locationsFromHook, error: locationsHookError, isLoading: locationsHookLoading } = useLocations();
+
+  useEffect(() => {
+    console.log('🧭 Location Data:', locationsFromHook);
+    console.log('❗ Error:', locationsHookError);
+  }, [locationsFromHook, locationsHookError]);
 
   // Fetch locations with improved error handling
   const { 
