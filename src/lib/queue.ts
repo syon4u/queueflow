@@ -1,4 +1,3 @@
-
 import { Customer } from '@/context/QueueContext';
 
 export const formatTime = (date: Date): string => {
@@ -10,12 +9,18 @@ export const formatTime = (date: Date): string => {
 };
 
 export const formatWaitTime = (minutes: number): string => {
-  if (minutes < 60) {
-    return `${Math.round(minutes)}m`;
+  if (minutes < 1) {
+    return "< 1 min";
+  } else if (minutes < 60) {
+    return `${Math.round(minutes)} min`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = Math.round(minutes % 60);
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${remainingMinutes}m`;
   }
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = Math.round(minutes % 60);
-  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
 };
 
 export const calculateWaitTime = (joinedAt: Date): number => {

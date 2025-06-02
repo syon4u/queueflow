@@ -123,35 +123,69 @@ export function useRealtimeAppointments(locationId?: string) {
   }, [user, locationId]);
 
   // Calculate user's position in queue and estimated wait time
-  const calculateUserPosition = (appointmentsData: Appointment[]) => {
+  const calculateUserPosition = async (appointmentsData: Appointment[]) => {
     if (!user) return;
 
-    // Find user's appointment
-    const userAppointment = appointmentsData.find(a => a.customer_id === user.id);
-    if (!userAppointment) return;
+    try {
+      // First, find if the user has any appointments by looking up their customer record
+      const { data: customerData } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('email', user.email)
+        .single();
 
-    // Only count checked-in appointments ahead in the queue
-    const checkedInAppointments = appointmentsData.filter(a => 
-      (a.status === 'checked_in' || a.status === 'in_progress') && 
-      ((a.check_in_time && userAppointment.check_in_time && 
-        new Date(a.check_in_time) <= new Date(userAppointment.check_in_time)) ||
-       (a.status === 'checked_in' && userAppointment.status === 'scheduled')) &&
-      a.id !== userAppointment.id
-    );
+      if (!customerData) {
+        setUserPosition(null);
+        setEstimatedWaitTime(null);
+        return;
+      }
 
-    // Sort by check-in time for more accurate queue position
-    checkedInAppointments.sort((a, b) => {
-      const aTime = a.check_in_time ? new Date(a.check_in_time).getTime() : 0;
-      const bTime = b.check_in_time ? new Date(b.check_in_time).getTime() : 0;
-      return aTime - bTime;
-    });
+      // Find user's most recent checked-in or scheduled appointment
+      const userAppointment = appointmentsData.find(a => 
+        a.customer_id === customerData.id && 
+        (a.status === 'checked_in' || a.status === 'scheduled')
+      );
 
-    const position = checkedInAppointments.length + 1;
-    setUserPosition(position);
+      if (!userAppointment) {
+        setUserPosition(null);
+        setEstimatedWaitTime(null);
+        return;
+      }
 
-    // Estimate wait time (15 minutes per person ahead)
-    const waitTimeInMinutes = (position - 1) * 15;
-    setEstimatedWaitTime(waitTimeInMinutes);
+      // For scheduled appointments that aren't checked in yet
+      if (userAppointment.status === 'scheduled') {
+        setUserPosition(null);
+        setEstimatedWaitTime(null);
+        return;
+      }
+
+      // Only count checked-in appointments ahead in the queue
+      const checkedInAppointments = appointmentsData.filter(a => 
+        a.status === 'checked_in' && 
+        a.check_in_time && 
+        userAppointment.check_in_time &&
+        new Date(a.check_in_time) <= new Date(userAppointment.check_in_time) &&
+        a.id !== userAppointment.id
+      );
+
+      // Sort by check-in time for more accurate queue position
+      checkedInAppointments.sort((a, b) => {
+        const aTime = a.check_in_time ? new Date(a.check_in_time).getTime() : 0;
+        const bTime = b.check_in_time ? new Date(b.check_in_time).getTime() : 0;
+        return aTime - bTime;
+      });
+
+      const position = checkedInAppointments.length + 1;
+      setUserPosition(position);
+
+      // Estimate wait time (15 minutes per person ahead)
+      const waitTimeInMinutes = (position - 1) * 15;
+      setEstimatedWaitTime(waitTimeInMinutes);
+    } catch (error) {
+      console.error('Error calculating user position:', error);
+      setUserPosition(null);
+      setEstimatedWaitTime(null);
+    }
   };
 
   return { 
