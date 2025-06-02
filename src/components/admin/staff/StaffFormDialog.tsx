@@ -16,7 +16,7 @@ interface StaffFormData {
   first_name: string;
   last_name: string;
   phone: string;
-  role: 'admin' | 'staff';
+  role: 'admin' | 'staff' | 'customer';
   location_id: string;
 }
 
@@ -133,7 +133,7 @@ export const StaffFormDialog: React.FC<StaffFormDialogProps> = ({
             <Button type="submit">
               {isEditing ? 'Update' : 'Create'}
             </Button>
-          </DialogFooter>
+            </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
