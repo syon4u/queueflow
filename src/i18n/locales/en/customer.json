@@ -26,5 +26,11 @@
   "viewHistory": "View Customer History",
   "history": "Customer History",
   "historyDescription": "View past appointments and service history",
-  "noAppointmentHistory": "No appointment history found"
+  "noAppointmentHistory": "No appointment history found",
+  "searchPlaceholder": "Search by name, phone, or email...",
+  "searchInstructions": "Enter customer information to find existing records",
+  "createNew": "Create New Customer",
+  "selectCustomer": "Select Customer",
+  "noCustomersFound": "No customers found",
+  "searchError": "Error searching customers"
 }
