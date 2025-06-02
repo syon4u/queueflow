@@ -40,25 +40,9 @@ function App() {
                 <Route path="/design-system" element={<BrowardDesignSystem />} />
                 <Route path="/broward" element={<BrowardIndex />} />
                 
-                {/* Customer routes */}
-                <Route 
-                  path="/customer" 
-                  element={
-                    <ProtectedRoute requiredRoles={['customer', 'staff', 'admin']}>
-                      <CustomerPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* New Appointment - accessible to all authenticated users */}
-                <Route 
-                  path="/new-appointment" 
-                  element={
-                    <ProtectedRoute requiredRoles={['customer', 'staff', 'admin']}>
-                      <NewAppointmentPage />
-                    </ProtectedRoute>
-                  } 
-                />
+                {/* Customer routes - No authentication required */}
+                <Route path="/customer" element={<CustomerPage />} />
+                <Route path="/new-appointment" element={<NewAppointmentPage />} />
                 
                 {/* Staff routes */}
                 <Route 
