@@ -45,6 +45,7 @@ const NewCustomerForm = ({
     queryKey: ['locations'],
     queryFn: async () => {
       console.log('NewCustomerForm - Fetching locations...');
+      // Remove authentication for public access to locations
       const { data, error } = await supabase
         .from('locations')
         .select('*')
@@ -69,6 +70,7 @@ const NewCustomerForm = ({
       }
       
       console.log('NewCustomerForm - Fetching services for location:', selectedLocationId);
+      // Remove authentication for public access to services
       const { data, error } = await supabase
         .from('services')
         .select('*')
