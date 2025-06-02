@@ -3,7 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { NewCustomerFormValues } from './NewCustomerForm';
+import { NewCustomerFormValues } from '../../../hooks/appointment-scheduling/types';
 
 interface CustomerDetailsFieldsProps {
   register: UseFormRegister<NewCustomerFormValues>;
