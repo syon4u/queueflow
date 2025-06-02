@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,7 +92,7 @@ const NewCustomerForm = ({
     enabled: !!selectedLocationId,
   });
 
-  // Create appointment for new customer
+  // Create appointment for new customer without the standalone customer creation
   const createAppointment = useMutation({
     mutationFn: async (formData: NewCustomerFormValues) => {
       console.log('NewCustomerForm - Creating appointment for new customer:', formData);
@@ -107,23 +106,61 @@ const NewCustomerForm = ({
       const firstName = nameParts[0];
       const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
 
-      // Create customer first
-      const customerUuid = crypto.randomUUID();
-      console.log('Creating customer with ID:', customerUuid);
+      // Check if customer already exists by phone or email
+      let customerId: string;
+      let customerData: any;
       
-      const { error: customerError } = await supabase
+      const { data: existingCustomer } = await supabase
         .from('customers')
-        .insert({
-          id: customerUuid,
-          first_name: firstName,
-          last_name: lastName,
-          phone: formData.phone,
-          email: formData.email
-        });
+        .select('*')
+        .or(`phone.eq.${formData.phone}${formData.email ? `,email.eq.${formData.email}` : ''}`)
+        .maybeSingle();
 
-      if (customerError) {
-        console.error('Error creating customer:', customerError);
-        throw customerError;
+      if (existingCustomer) {
+        customerId = existingCustomer.id;
+        customerData = existingCustomer;
+        console.log('Found existing customer:', customerId);
+      } else {
+        // For walk-in customers without authentication, we'll use a different approach
+        // Generate a customer UUID that doesn't conflict with auth.users
+        const customerUuid = crypto.randomUUID();
+        
+        // Insert directly without foreign key constraint to auth.users
+        const { data: newCustomer, error: customerError } = await supabase
+          .rpc('create_walk_in_customer', {
+            customer_id: customerUuid,
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: formData.phone,
+            email_address: formData.email || null
+          });
+
+        if (customerError) {
+          console.error('Error creating walk-in customer:', customerError);
+          // Fallback: try direct insert (this might still fail due to RLS)
+          const { data: fallbackCustomer, error: fallbackError } = await supabase
+            .from('customers')
+            .insert({
+              id: customerUuid,
+              first_name: firstName,
+              last_name: lastName,
+              phone: formData.phone,
+              email: formData.email || null
+            })
+            .select('*')
+            .single();
+
+          if (fallbackError) {
+            throw fallbackError;
+          }
+          customerId = fallbackCustomer.id;
+          customerData = fallbackCustomer;
+        } else {
+          customerId = customerUuid;
+          customerData = newCustomer;
+        }
+        
+        console.log('Created new walk-in customer:', customerId);
       }
 
       // Create appointment
@@ -138,7 +175,7 @@ const NewCustomerForm = ({
         .from('appointments')
         .insert({
           id: appointmentUuid,
-          customer_id: customerUuid,
+          customer_id: customerId,
           service_id: formData.service_id,
           location_id: formData.location_id,
           scheduled_time: scheduledDateTime.toISOString(),
@@ -151,7 +188,7 @@ const NewCustomerForm = ({
         throw appointmentError;
       }
 
-      return { customerId: customerUuid, appointmentId: appointmentUuid };
+      return { customerId: customerId, appointmentId: appointmentUuid };
     },
     onSuccess: (data) => {
       console.log('NewCustomerForm - Appointment created successfully:', data);

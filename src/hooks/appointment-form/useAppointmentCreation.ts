@@ -22,7 +22,7 @@ export const useAppointmentCreation = () => {
         throw new Error('User email not found');
       }
 
-      // Check if customer exists
+      // Check if customer exists by email
       let customerId;
       const { data: existingCustomer, error: customerSearchError } = await supabase
         .from('customers')
@@ -39,14 +39,13 @@ export const useAppointmentCreation = () => {
         customerId = existingCustomer.id;
         console.log('Found existing customer:', customerId);
       } else {
-        // Create new customer
-        const customerUuid = crypto.randomUUID();
-        console.log('Creating new customer with ID:', customerUuid);
+        // Create new customer using the authenticated user's ID
+        console.log('Creating new customer with user ID:', user.id);
         
         const { error: customerError } = await supabase
           .from('customers')
           .insert({
-            id: customerUuid,
+            id: user.id, // Use the authenticated user's ID
             first_name: user.user_metadata?.first_name || 'Customer',
             last_name: user.user_metadata?.last_name || 'User',
             email: user.email,
@@ -58,7 +57,7 @@ export const useAppointmentCreation = () => {
           throw customerError;
         }
         
-        customerId = customerUuid;
+        customerId = user.id;
         console.log('Created new customer:', customerId);
       }
 
