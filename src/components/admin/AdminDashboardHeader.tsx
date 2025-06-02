@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Settings, RefreshCw, Shield } from 'lucide-react';
+import { Bell, Settings, RefreshCw, Shield, Users, UserCheck, Calendar, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 
@@ -82,7 +82,7 @@ export const AdminDashboardHeader: React.FC<AdminDashboardHeaderProps> = ({
         </div>
       </div>
 
-      {/* Status Cards Row */}
+      {/* Status Cards Row - Consistent with Staff */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -93,6 +93,7 @@ export const AdminDashboardHeader: React.FC<AdminDashboardHeaderProps> = ({
                   {systemStatus.charAt(0).toUpperCase() + systemStatus.slice(1)}
                 </Badge>
               </div>
+              <Activity className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -102,8 +103,9 @@ export const AdminDashboardHeader: React.FC<AdminDashboardHeaderProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-blue-600">{totalUsers}</p>
+                <div className="text-2xl font-bold text-blue-600">{totalUsers}</div>
               </div>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -113,8 +115,9 @@ export const AdminDashboardHeader: React.FC<AdminDashboardHeaderProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Active Staff</p>
-                <p className="text-2xl font-bold text-green-600">{activeStaff}</p>
+                <div className="text-2xl font-bold text-green-600">{activeStaff}</div>
               </div>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -124,8 +127,9 @@ export const AdminDashboardHeader: React.FC<AdminDashboardHeaderProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Today's Appointments</p>
-                <p className="text-2xl font-bold text-amber-600">{todayAppointments}</p>
+                <div className="text-2xl font-bold text-amber-600">{todayAppointments}</div>
               </div>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>

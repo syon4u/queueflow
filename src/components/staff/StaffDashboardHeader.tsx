@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Settings, RefreshCw } from 'lucide-react';
+import { Bell, Settings, RefreshCw, Users, Clock, CheckCircle, UserCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { useQueue } from '@/context/QueueContext';
@@ -80,7 +80,7 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
         </div>
       </div>
 
-      {/* Status Cards Row */}
+      {/* Status Cards Row - Consistent with Admin */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -91,6 +91,7 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
                   {queueStatus === 'open' ? 'Open' : 'Closed'}
                 </Badge>
               </div>
+              <Clock className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -104,6 +105,7 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
                   {staffStatus.replace('_', ' ').toUpperCase()}
                 </Badge>
               </div>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -113,8 +115,9 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Active Appointments</p>
-                <p className="text-2xl font-bold text-blue-600">{activeAppointments}</p>
+                <div className="text-2xl font-bold text-blue-600">{activeAppointments}</div>
               </div>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
@@ -124,8 +127,9 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Waiting Customers</p>
-                <p className="text-2xl font-bold text-amber-600">{waitingCustomers}</p>
+                <div className="text-2xl font-bold text-amber-600">{waitingCustomers}</div>
               </div>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
