@@ -52,6 +52,37 @@ export const getStatusText = (status: Customer['status']): string => {
   }
 };
 
+export const getStatusDisplay = (status: Customer['status']): string => {
+  return getStatusText(status);
+};
+
+export const getPriorityLabel = (priority: Customer['priority']): string => {
+  switch (priority) {
+    case 'priority':
+      return 'Priority';
+    case 'normal':
+      return 'Regular';
+    default:
+      return 'Regular';
+  }
+};
+
+export const getQueuePosition = (customerId: string, customers: Customer[]): number => {
+  const waitingCustomers = customers
+    .filter(c => c.status === 'waiting')
+    .sort((a, b) => {
+      // Priority customers first
+      if (a.priority !== b.priority) {
+        return a.priority === 'priority' ? -1 : 1;
+      }
+      // Then by join time (earliest first)
+      return a.joinedAt.getTime() - b.joinedAt.getTime();
+    });
+  
+  const index = waitingCustomers.findIndex(c => c.id === customerId);
+  return index === -1 ? -1 : index + 1;
+};
+
 export const sortCustomersByPriority = (customers: Customer[]): Customer[] => {
   return [...customers].sort((a, b) => {
     // First, filter to only waiting customers for queue position

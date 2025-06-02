@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,6 +10,7 @@ export interface Customer {
   priority: 'normal' | 'priority';
   status: 'waiting' | 'serving' | 'served' | 'no_show';
   joinedAt: Date;
+  calledAt?: Date;
   estimatedWaitTime?: number;
   notes?: string;
 }
@@ -166,11 +166,11 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     // Simulate API call delay
     setTimeout(() => {
-      setCurrentCustomer({ ...nextCustomer, status: 'serving' });
+      setCurrentCustomer({ ...nextCustomer, status: 'serving', calledAt: new Date() });
       setCustomers(prev => 
         prev.map(c => 
           c.id === nextCustomer.id 
-            ? { ...c, status: 'serving' }
+            ? { ...c, status: 'serving', calledAt: new Date() }
             : c
         )
       );
