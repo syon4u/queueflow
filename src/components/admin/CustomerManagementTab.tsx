@@ -36,56 +36,81 @@ const CustomerManagementTab = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
+      console.log('CustomerManagementTab - Fetching customers...');
       
-      // Fetch customers with appointment counts
-      const { data: customersData, error } = await supabase
+      // Fetch customers first
+      const { data: customersData, error: customersError } = await supabase
         .from('customers')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          email,
-          phone,
-          created_at,
-          appointments:appointments(count)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching customers:', error);
+      if (customersError) {
+        console.error('Error fetching customers:', customersError);
         toast({
           title: 'Error',
-          description: 'Failed to load customers',
+          description: 'Failed to load customers: ' + customersError.message,
           variant: 'destructive',
         });
         return;
       }
 
-      // Get last appointment date for each customer
-      const customersWithStats = await Promise.all(
-        (customersData || []).map(async (customer) => {
-          const { data: lastAppointment } = await supabase
-            .from('appointments')
-            .select('scheduled_time')
-            .eq('customer_id', customer.id)
-            .order('scheduled_time', { ascending: false })
-            .limit(1)
-            .single();
+      console.log('CustomerManagementTab - Customers data:', customersData);
 
-          return {
-            ...customer,
-            appointment_count: customer.appointments?.[0]?.count || 0,
-            last_appointment: lastAppointment?.scheduled_time || null,
-          };
+      if (!customersData || customersData.length === 0) {
+        console.log('CustomerManagementTab - No customers found');
+        setCustomers([]);
+        return;
+      }
+
+      // Get appointment counts for each customer
+      const customersWithStats = await Promise.all(
+        customersData.map(async (customer) => {
+          try {
+            // Get appointment count
+            const { count: appointmentCount, error: countError } = await supabase
+              .from('appointments')
+              .select('*', { count: 'exact', head: true })
+              .eq('customer_id', customer.id);
+
+            if (countError) {
+              console.error('Error fetching appointment count for customer:', customer.id, countError);
+            }
+
+            // Get last appointment date
+            const { data: lastAppointment, error: lastError } = await supabase
+              .from('appointments')
+              .select('scheduled_time')
+              .eq('customer_id', customer.id)
+              .order('scheduled_time', { ascending: false })
+              .limit(1);
+
+            if (lastError) {
+              console.error('Error fetching last appointment for customer:', customer.id, lastError);
+            }
+
+            return {
+              ...customer,
+              appointment_count: appointmentCount || 0,
+              last_appointment: lastAppointment && lastAppointment.length > 0 ? lastAppointment[0].scheduled_time : null,
+            };
+          } catch (error) {
+            console.error('Error processing customer stats:', error);
+            return {
+              ...customer,
+              appointment_count: 0,
+              last_appointment: null,
+            };
+          }
         })
       );
 
+      console.log('CustomerManagementTab - Customers with stats:', customersWithStats);
       setCustomers(customersWithStats);
     } catch (error) {
       console.error('Unexpected error:', error);
       toast({
         title: 'Error',
-        description: 'An unexpected error occurred',
+        description: 'An unexpected error occurred while loading customers',
         variant: 'destructive',
       });
     } finally {
@@ -94,6 +119,7 @@ const CustomerManagementTab = () => {
   };
 
   useEffect(() => {
+    console.log('CustomerManagementTab - Component mounted, fetching customers');
     fetchCustomers();
   }, []);
 
@@ -115,10 +141,18 @@ const CustomerManagementTab = () => {
     });
   };
 
+  console.log('CustomerManagementTab - Current state:', {
+    loading,
+    customersCount: customers.length,
+    filteredCount: filteredCustomers.length,
+    searchTerm
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-2">Loading customers...</span>
       </div>
     );
   }
@@ -189,74 +223,83 @@ const CustomerManagementTab = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Appointments</TableHead>
-                <TableHead>Last Visit</TableHead>
-                <TableHead>Registered</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCustomers.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell>
-                    <div className="font-medium">
-                      {customer.first_name} {customer.last_name}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      {customer.email && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Mail className="h-3 w-3" />
-                          {customer.email}
-                        </div>
-                      )}
-                      {customer.phone && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Phone className="h-3 w-3" />
-                          {customer.phone}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={customer.appointment_count > 0 ? "default" : "secondary"}>
-                      {customer.appointment_count || 0} appointments
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {customer.last_appointment ? (
-                      <span className="text-sm">
-                        {formatDate(customer.last_appointment)}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">
-                        No appointments
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-muted-foreground">
-                      {formatDate(customer.created_at)}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredCustomers.length === 0 && (
+          {customers.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground text-lg">No customers found in the database.</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Customers will appear here once they create appointments.
+              </p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
-                    <div className="text-muted-foreground">
-                      {searchTerm ? 'No customers found matching your search.' : 'No customers found.'}
-                    </div>
-                  </TableCell>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Appointments</TableHead>
+                  <TableHead>Last Visit</TableHead>
+                  <TableHead>Registered</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.map((customer) => (
+                  <TableRow key={customer.id}>
+                    <TableCell>
+                      <div className="font-medium">
+                        {customer.first_name} {customer.last_name}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {customer.email && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Mail className="h-3 w-3" />
+                            {customer.email}
+                          </div>
+                        )}
+                        {customer.phone && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Phone className="h-3 w-3" />
+                            {customer.phone}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={customer.appointment_count > 0 ? "default" : "secondary"}>
+                        {customer.appointment_count || 0} appointments
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {customer.last_appointment ? (
+                        <span className="text-sm">
+                          {formatDate(customer.last_appointment)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          No appointments
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {formatDate(customer.created_at)}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filteredCustomers.length === 0 && customers.length > 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8">
+                      <div className="text-muted-foreground">
+                        No customers found matching your search "{searchTerm}".
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
