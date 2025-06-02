@@ -4,73 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 import { Monitor, Users, Clock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-interface DisplayCustomer {
-  id: string;
-  name: string;
-  service: string;
-  status: 'now_serving' | 'called' | 'waiting';
-  position?: number;
-}
+import { useQueue } from '@/context/QueueContext';
 
 export const QueueDisplayBoard: React.FC = () => {
   const { t } = useTranslation();
-  const [currentCustomer, setCurrentCustomer] = useState<DisplayCustomer | null>(null);
-  const [calledCustomers, setCalledCustomers] = useState<DisplayCustomer[]>([]);
-  const [waitingCount, setWaitingCount] = useState(0);
+  const { currentCustomer, customers, stats } = useQueue();
 
-  useEffect(() => {
-    // Subscribe to real-time queue updates
-    const channel = supabase
-      .channel('queue-display')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'appointments'
-        },
-        (payload) => {
-          console.log('Queue update:', payload);
-          // Update display based on status changes
-          fetchQueueData();
-        }
-      )
-      .subscribe();
-
-    fetchQueueData();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchQueueData = async () => {
-    try {
-      // This would be replaced with actual queue data fetching
-      // For now, using mock data to demonstrate the interface
-      setCurrentCustomer({
-        id: '1',
-        name: 'John Doe',
-        service: 'Document Review',
-        status: 'now_serving'
-      });
-
-      setCalledCustomers([
-        {
-          id: '2',
-          name: 'Jane Smith',
-          service: 'Application Process',
-          status: 'called'
-        }
-      ]);
-
-      setWaitingCount(5);
-    } catch (error) {
-      console.error('Error fetching queue data:', error);
-    }
-  };
+  const recentlyCalledCustomers = customers
+    .filter(c => c.status === 'served' && c.calledAt)
+    .sort((a, b) => (b.calledAt?.getTime() || 0) - (a.calledAt?.getTime() || 0))
+    .slice(0, 3);
 
   return (
     <div className="space-y-4">
@@ -84,22 +27,35 @@ export const QueueDisplayBoard: React.FC = () => {
         <CardContent>
           {currentCustomer ? (
             <div className="text-center py-4">
-              <div className="text-2xl font-bold text-green-800 mb-2">
+              <div className="text-3xl font-bold text-green-800 mb-2">
                 {currentCustomer.name}
               </div>
-              <Badge variant="outline" className="text-green-700 border-green-300">
+              <Badge variant="outline" className="text-green-700 border-green-300 text-lg px-4 py-1">
                 {currentCustomer.service}
               </Badge>
+              {currentCustomer.phone && (
+                <div className="text-sm text-green-600 mt-2">
+                  Phone: {currentCustomer.phone}
+                </div>
+              )}
+              <div className="text-xs text-green-600 mt-2">
+                Called at: {currentCustomer.calledAt?.toLocaleTimeString()}
+              </div>
             </div>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              {t('queue.noOneBeingServed')}
+              <div className="text-xl font-medium text-gray-600">
+                {t('queue.noOneBeingServed')}
+              </div>
+              <div className="text-sm text-gray-500 mt-1">
+                Ready to serve the next customer
+              </div>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {calledCustomers.length > 0 && (
+      {recentlyCalledCustomers.length > 0 && (
         <Card className="bg-blue-50 border-blue-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-800">
@@ -109,7 +65,7 @@ export const QueueDisplayBoard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {calledCustomers.map((customer) => (
+              {recentlyCalledCustomers.map((customer) => (
                 <div key={customer.id} className="flex items-center justify-between p-2 bg-white rounded border">
                   <span className="font-medium">{customer.name}</span>
                   <Badge variant="outline" className="text-blue-700 border-blue-300">
@@ -132,11 +88,16 @@ export const QueueDisplayBoard: React.FC = () => {
         <CardContent>
           <div className="text-center py-4">
             <div className="text-3xl font-bold text-primary mb-2">
-              {waitingCount}
+              {stats.waitingCustomers}
             </div>
             <div className="text-sm text-muted-foreground">
               {t('queue.customersInQueue')}
             </div>
+            {stats.averageWaitTime > 0 && (
+              <div className="text-xs text-muted-foreground mt-1">
+                Average wait: {Math.round(stats.averageWaitTime)}m
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

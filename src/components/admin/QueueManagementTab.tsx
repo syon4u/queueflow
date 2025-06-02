@@ -3,21 +3,64 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useQueue } from '@/context/QueueContext';
 
 export const QueueManagementTab: React.FC = () => {
   const {
     customers,
+    currentCustomer,
     stats,
     callNextCustomer,
     markAsServed,
     markAsNoShow,
-    resetQueue
+    resetQueue,
+    isLoading
   } = useQueue();
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Queue Management</h1>
+      
+      {/* Current Customer Being Served */}
+      {currentCustomer && (
+        <Card className="mb-6 border-green-500 bg-green-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Now Serving
+              <Badge className="bg-green-600 text-white">ACTIVE</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold">{currentCustomer.name}</h3>
+                <p className="text-sm text-gray-600">{currentCustomer.service}</p>
+                {currentCustomer.phone && (
+                  <p className="text-sm text-gray-600">{currentCustomer.phone}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={markAsNoShow} 
+                  variant="outline" 
+                  className="border-red-300 hover:bg-red-50 text-red-700"
+                  disabled={isLoading}
+                >
+                  Mark as No-Show
+                </Button>
+                <Button 
+                  onClick={markAsServed} 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  disabled={isLoading}
+                >
+                  Mark as Served
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
@@ -58,10 +101,18 @@ export const QueueManagementTab: React.FC = () => {
       </div>
       
       <div className="flex flex-wrap gap-2 mb-6">
-        <Button onClick={callNextCustomer}>Call Next</Button>
-        <Button onClick={markAsServed} variant="secondary" className="bg-neutral-950 hover:bg-neutral-800 text-slate-100">Mark as Served</Button>
-        <Button onClick={markAsNoShow} variant="outline" className="bg-neutral-950 hover:bg-neutral-800 text-slate-50">Mark as No-Show</Button>
-        <Button onClick={resetQueue} variant="destructive">Reset Queue</Button>
+        <Button 
+          onClick={callNextCustomer} 
+          disabled={isLoading || !!currentCustomer}
+        >
+          {isLoading ? 'Calling...' : 'Call Next'}
+        </Button>
+        <Button 
+          onClick={resetQueue} 
+          variant="destructive"
+        >
+          Reset Queue
+        </Button>
       </div>
       
       <Card>
@@ -82,10 +133,17 @@ export const QueueManagementTab: React.FC = () => {
             <TableBody>
               {customers.length > 0 ? (
                 customers.map(customer => (
-                  <TableRow key={customer.id}>
-                    <TableCell>{customer.name}</TableCell>
+                  <TableRow key={customer.id} className={customer.status === 'serving' ? 'bg-green-50' : ''}>
+                    <TableCell className={customer.status === 'serving' ? 'font-bold' : ''}>{customer.name}</TableCell>
                     <TableCell>{customer.service || 'N/A'}</TableCell>
-                    <TableCell>{customer.status}</TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={customer.status === 'serving' ? 'default' : 'outline'}
+                        className={customer.status === 'serving' ? 'bg-green-600' : ''}
+                      >
+                        {customer.status === 'serving' ? 'Now Serving' : customer.status}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
                       {Math.floor((new Date().getTime() - new Date(customer.joinedAt).getTime()) / 60000)}{' '}
                       min

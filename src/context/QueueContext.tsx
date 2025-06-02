@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -166,11 +167,12 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     // Simulate API call delay
     setTimeout(() => {
-      setCurrentCustomer({ ...nextCustomer, status: 'serving', calledAt: new Date() });
+      const updatedCustomer = { ...nextCustomer, status: 'serving' as const, calledAt: new Date() };
+      setCurrentCustomer(updatedCustomer);
       setCustomers(prev => 
         prev.map(c => 
           c.id === nextCustomer.id 
-            ? { ...c, status: 'serving', calledAt: new Date() }
+            ? updatedCustomer
             : c
         )
       );
@@ -194,7 +196,7 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setCustomers(prev => 
         prev.map(c => 
           c.id === customerId 
-            ? { ...c, status: 'served' }
+            ? { ...c, status: 'served' as const }
             : c
         )
       );
@@ -219,7 +221,7 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setCustomers(prev => 
         prev.map(c => 
           c.id === customerId 
-            ? { ...c, status: 'no_show' }
+            ? { ...c, status: 'no_show' as const }
             : c
         )
       );
