@@ -12,10 +12,10 @@ import {
   getPriorityLabel
 } from '@/lib/queue';
 import { Badge } from '@/components/ui/badge';
-import { Phone, Clock, MessageSquare, Flag } from 'lucide-react';
+import { Phone, Clock, MessageSquare, Flag, Timer } from 'lucide-react';
 
 const CustomerQueue: React.FC = () => {
-  const { customers } = useQueue();
+  const { customers, getEstimatedWaitTime } = useQueue();
   
   // Get waiting customers only, ordered by priority then join time
   const waitingCustomers = [...customers]
@@ -50,15 +50,16 @@ const CustomerQueue: React.FC = () => {
             <div className="space-y-3">
               {waitingCustomers.map((customer) => {
                 const position = getQueuePosition(customer.id, customers);
+                const estimatedWait = getEstimatedWaitTime(customer.id);
                 return (
                   <div 
                     key={customer.id}
                     className="p-4 rounded-lg border bg-card flex flex-col gap-2"
                   >
                     <div className="flex justify-between items-start">
-                      <div>
+                      <div className="flex-1">
                         <p className="font-semibold flex items-center">
-                          <span className="w-5 h-5 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs mr-2">
+                          <span className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-xs mr-2 font-bold">
                             {position}
                           </span>
                           {customer.name}
@@ -68,12 +69,30 @@ const CustomerQueue: React.FC = () => {
                           <span>Joined at {formatTime(customer.joinedAt)}</span>
                         </div>
                       </div>
-                      <Badge 
-                        variant="secondary"
-                        className={`${customer.priority === 'priority' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' : ''}`}
-                      >
-                        {getPriorityLabel(customer.priority)}
-                      </Badge>
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge 
+                          variant="secondary"
+                          className={`${customer.priority === 'priority' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' : ''}`}
+                        >
+                          {getPriorityLabel(customer.priority)}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {customer.service}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Estimated Wait Time - Prominently displayed */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-2 mt-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-blue-700">
+                          <Timer className="h-4 w-4 mr-2" />
+                          <span className="font-medium text-sm">Estimated Wait:</span>
+                        </div>
+                        <span className="font-bold text-blue-800">
+                          {estimatedWait === 0 ? 'Next up!' : formatWaitTime(estimatedWait)}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap gap-3 mt-1 text-xs text-muted-foreground">
@@ -81,13 +100,6 @@ const CustomerQueue: React.FC = () => {
                         <div className="flex items-center">
                           <Phone className="h-3 w-3 mr-1" />
                           <span>{customer.phone}</span>
-                        </div>
-                      )}
-                      
-                      {customer.estimatedWaitTime && (
-                        <div className="flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          <span>Est. wait: {formatWaitTime(customer.estimatedWaitTime)}</span>
                         </div>
                       )}
                       
