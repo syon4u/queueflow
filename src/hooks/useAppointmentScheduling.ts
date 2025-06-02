@@ -156,7 +156,6 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
           service_id: data.service_id,
           location_id: data.location_id,
           scheduled_time: scheduledDate.toISOString(),
-          notes: data.notes,
           reason_for_visit: data.reason_for_visit,
           status: 'scheduled'
         })
@@ -208,7 +207,6 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
           service_id: data.service_id,
           location_id: data.location_id,
           scheduled_time: scheduledDate.toISOString(),
-          notes: data.notes,
           reason_for_visit: data.reason_for_visit,
           status: 'scheduled'
         })

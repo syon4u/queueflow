@@ -3,7 +3,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -20,7 +19,6 @@ export interface NewCustomerFormValues {
   email?: string;
   service_id: string;
   location_id: string;
-  notes?: string;
   reason_for_visit?: string;
 }
 
@@ -205,16 +203,6 @@ const NewCustomerForm = ({
             id="reason"
             {...register('reason_for_visit')}
             placeholder="Brief description of your visit"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="notes">Additional Notes</Label>
-          <Textarea
-            id="notes"
-            {...register('notes')}
-            placeholder="Any additional information or special requests"
-            rows={3}
           />
         </div>
 
