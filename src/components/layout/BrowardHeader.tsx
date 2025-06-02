@@ -129,46 +129,40 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                     <SheetTitle>Menu</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6 space-y-4">
-                    {/* Staff Dashboard - Show for staff and admin */}
-                    {(role === 'staff' || role === 'admin') && (
-                      <Link
-                        to="/staff"
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                      >
-                        <User className="h-5 w-5" />
-                        <div>
-                          <p className="font-medium">Staff Dashboard</p>
-                          <p className="text-sm text-muted-foreground">Manage appointments and queue</p>
-                        </div>
-                      </Link>
-                    )}
+                    {/* Staff Dashboard - Always visible */}
+                    <Link
+                      to="/staff"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      <User className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">Staff Dashboard</p>
+                        <p className="text-sm text-muted-foreground">Manage appointments and queue</p>
+                      </div>
+                    </Link>
                     
-                    {/* Admin Dashboard - Show only for admin */}
-                    {role === 'admin' && (
-                      <>
-                        <Link
-                          to="/admin"
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                        >
-                          <Settings className="h-5 w-5" />
-                          <div>
-                            <p className="font-medium">Admin Dashboard</p>
-                            <p className="text-sm text-muted-foreground">System administration</p>
-                          </div>
-                        </Link>
-                        
-                        <Link
-                          to="/performance"
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                        >
-                          <BarChart3 className="h-5 w-5" />
-                          <div>
-                            <p className="font-medium">Performance Reports</p>
-                            <p className="text-sm text-muted-foreground">Analytics and insights</p>
-                          </div>
-                        </Link>
-                      </>
-                    )}
+                    {/* Admin Portal - Always visible */}
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      <Settings className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">Admin Portal</p>
+                        <p className="text-sm text-muted-foreground">System administration</p>
+                      </div>
+                    </Link>
+                    
+                    <Link
+                      to="/performance"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      <BarChart3 className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">Performance Reports</p>
+                        <p className="text-sm text-muted-foreground">Analytics and insights</p>
+                      </div>
+                    </Link>
                   </div>
                 </SheetContent>
               </Sheet>
