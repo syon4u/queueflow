@@ -11,6 +11,7 @@ import notes from './notes.json';
 import admin from './admin.json';
 import profile from './profile.json';
 import queue from './queue.json';
+import unauthorized from './unauthorized.json';
 
 export default {
   auth,
@@ -24,5 +25,6 @@ export default {
   notes,
   admin,
   profile,
-  queue
+  queue,
+  unauthorized
 };

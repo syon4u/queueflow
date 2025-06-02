@@ -57,5 +57,9 @@
   "shortcutsDescription": "Use these shortcuts to quickly manage your queue and status",
   "queueStatusUpdated": "Queue status updated",
   "queueIsNow": "Queue is now {{status}}",
-  "queueStatusUpdateError": "Failed to update queue status"
+  "queueStatusUpdateError": "Failed to update queue status",
+  "statusFetchError": "Failed to fetch staff status",
+  "statusUpdated": "Status updated",
+  "statusUpdatedDescription": "Your status has been updated to {{status}}",
+  "statusUpdateError": "Failed to update status"
 }

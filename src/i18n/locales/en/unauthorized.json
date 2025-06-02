@@ -1,0 +1,9 @@
+
+{
+  "title": "Unauthorized Access",
+  "description": "You don't have permission to access this page.",
+  "backToHome": "Return to Home",
+  "customerDashboard": "Go to Customer Dashboard",
+  "staffDashboard": "Go to Staff Dashboard",
+  "adminDashboard": "Go to Admin Dashboard"
+}
