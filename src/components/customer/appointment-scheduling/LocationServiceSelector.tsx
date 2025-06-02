@@ -24,6 +24,7 @@ interface LocationServiceSelectorProps {
   servicesLoading: boolean;
   servicesError: Error | null;
   selectedLocationId: string;
+  selectedServiceId: string;
   setValue: UseFormSetValue<NewCustomerFormValues>;
 }
 
@@ -33,13 +34,20 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
   servicesLoading,
   servicesError,
   selectedLocationId,
+  selectedServiceId,
   setValue
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <Label htmlFor="location">Location *</Label>
-        <Select onValueChange={(value) => setValue('location_id', value)}>
+        <Select 
+          value={selectedLocationId}
+          onValueChange={(value) => {
+            setValue('location_id', value);
+            setValue('service_id', ''); // Clear service when location changes
+          }}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select a location" />
           </SelectTrigger>
@@ -74,6 +82,7 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
         )}
         
         <Select 
+          value={selectedServiceId}
           onValueChange={(value) => setValue('service_id', value)}
           disabled={!selectedLocationId || servicesLoading || !services?.length}
         >

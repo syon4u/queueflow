@@ -43,6 +43,7 @@ const NewCustomerForm = ({
 
   const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
   const selectedLocationId = watch('location_id');
+  const selectedServiceId = watch('service_id');
   const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
 
   console.log('NewCustomerForm - Component state:', {
@@ -50,6 +51,7 @@ const NewCustomerForm = ({
     locationsLoading,
     locationsError,
     selectedLocationId,
+    selectedServiceId,
     servicesCount: services?.length || 0,
     servicesLoading,
     servicesError,
@@ -140,6 +142,7 @@ const NewCustomerForm = ({
           servicesLoading={servicesLoading}
           servicesError={servicesError ? new Error(servicesError) : null}
           selectedLocationId={selectedLocationId}
+          selectedServiceId={selectedServiceId}
           setValue={setValue}
         />
 
