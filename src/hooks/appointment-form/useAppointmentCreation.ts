@@ -3,62 +3,57 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { AppointmentFormData } from './types';
 
 export const useAppointmentCreation = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const createAppointment = useMutation({
-    mutationFn: async (appointmentData: AppointmentFormData) => {
-      console.log('useAppointmentCreation - Creating appointment:', appointmentData);
+    mutationFn: async (appointmentData: AppointmentFormData & { customerDetails: { name: string; phone: string; email?: string } }) => {
+      console.log('useAppointmentCreation - Creating appointment for anonymous user:', appointmentData);
       
-      if (!user?.email) {
-        throw new Error('User email not found');
-      }
-
-      // Check if customer exists
-      let customerId;
+      const { customerDetails, ...appointment } = appointmentData;
+      
+      // Parse the customer name
+      const [firstName, ...lastNameParts] = customerDetails.name.trim().split(' ');
+      const lastName = lastNameParts.join(' ') || firstName;
+      
+      let customerId: string;
+      
+      // Check if customer already exists by phone
       const { data: existingCustomer } = await supabase
         .from('customers')
         .select('id')
-        .eq('email', user.email)
-        .single();
+        .eq('phone', customerDetails.phone)
+        .maybeSingle();
 
       if (existingCustomer) {
         customerId = existingCustomer.id;
+        console.log('useAppointmentCreation - Using existing customer:', customerId);
       } else {
-        // Create new customer
+        // Generate a UUID for the new customer
         const customerUuid = crypto.randomUUID();
-        const { error: customerError } = await supabase
+        
+        // Create new customer with explicit ID
+        const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
             id: customerUuid,
-            first_name: user.user_metadata?.first_name || 'Customer',
-            last_name: user.user_metadata?.last_name || 'User',
-            email: user.email,
-            phone: user.user_metadata?.phone
-          });
+            first_name: firstName,
+            last_name: lastName,
+            phone: customerDetails.phone,
+            email: customerDetails.email || null
+          })
+          .select('id')
+          .single();
 
         if (customerError) throw customerError;
-        customerId = customerUuid;
-      }
-
-      // Ensure user has customer role in user_roles
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .upsert({
-          user_id: user.id,
-          role: 'customer'
-        });
-
-      if (roleError) {
-        console.warn('Could not set customer role:', roleError);
+        customerId = newCustomer.id;
+        console.log('useAppointmentCreation - Created new customer:', customerId);
       }
 
       // Create appointment
@@ -66,11 +61,11 @@ export const useAppointmentCreation = () => {
         .from('appointments')
         .insert({
           customer_id: customerId,
-          service_id: appointmentData.service_id,
-          location_id: appointmentData.location_id,
-          scheduled_time: appointmentData.scheduled_time,
-          reason_for_visit: appointmentData.reason_for_visit,
-          notes: appointmentData.notes,
+          service_id: appointment.service_id,
+          location_id: appointment.location_id,
+          scheduled_time: appointment.scheduled_time,
+          reason_for_visit: appointment.reason_for_visit,
+          notes: appointment.notes,
           status: 'scheduled'
         })
         .select()

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import ScheduleAppointmentCard from '@/components/customer/ScheduleAppointmentCard';
 import CheckInCard from '@/components/customer/CheckInCard';
 import AppointmentStatusCard from '@/components/customer/AppointmentStatusCard';
@@ -13,7 +12,6 @@ import PageLayout from '@/components/layout/PageLayout';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 const CustomerPage = () => {
-  const { user, role } = useAuth();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
 
@@ -47,7 +45,7 @@ const CustomerPage = () => {
                 <p className="text-muted-foreground mt-1">Schedule appointments and manage your visits</p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-muted-foreground border border-border/40">
-                {user?.email} <span className="text-primary/60 font-medium ml-1">({role || 'customer'})</span>
+                Walk-in Customer Portal
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Users, Settings, LogOut } from 'lucide-react';
+import { Menu, X, Users, Settings, LogOut, LogIn } from 'lucide-react';
 
 const UserMenu: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -52,22 +52,31 @@ const UserMenu: React.FC = () => {
       {showMenu && (
         <div className="absolute top-12 right-0 bg-white rounded-lg shadow-lg border min-w-48 z-30">
           <div className="py-2">
-            <button
-              onClick={() => handleMenuItemClick('/staff')}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-            >
-              <Users className="h-4 w-4 text-blue-600" />
-              Staff Portal
-            </button>
-            <button
-              onClick={() => handleMenuItemClick('/admin')}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-            >
-              <Settings className="h-4 w-4 text-amber-600" />
-              Admin Portal
-            </button>
+            {!user && (
+              <button
+                onClick={() => handleMenuItemClick('/login')}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+              >
+                <LogIn className="h-4 w-4 text-green-600" />
+                Staff Login
+              </button>
+            )}
             {user && (
               <>
+                <button
+                  onClick={() => handleMenuItemClick('/staff')}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <Users className="h-4 w-4 text-blue-600" />
+                  Staff Portal
+                </button>
+                <button
+                  onClick={() => handleMenuItemClick('/admin')}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <Settings className="h-4 w-4 text-amber-600" />
+                  Admin Portal
+                </button>
                 <div className="border-t my-1"></div>
                 <button
                   onClick={() => {

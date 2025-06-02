@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { useLocations } from './appointment-form/useLocations';
@@ -12,6 +13,11 @@ export type { Location, Service } from './appointment-form/types';
 export const useAppointmentForm = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  
+  // Customer details state for anonymous users
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
 
   const {
     currentStep,
@@ -36,12 +42,12 @@ export const useAppointmentForm = () => {
   const { createAppointment, isSubmitting } = useAppointmentCreation();
 
   const handleSubmit = async () => {
-    console.log('useAppointmentForm - Submitting appointment...');
+    console.log('useAppointmentForm - Submitting appointment for anonymous user...');
     
-    if (!selectedLocationId || !selectedServiceId || !selectedDate || !selectedTime) {
+    if (!selectedLocationId || !selectedServiceId || !selectedDate || !selectedTime || !customerName || !customerPhone) {
       toast({
         title: t('common.error'),
-        description: 'Please fill in all required fields',
+        description: 'Please fill in all required fields including your name and phone number',
         variant: 'destructive',
       });
       return;
@@ -57,6 +63,11 @@ export const useAppointmentForm = () => {
       scheduled_time: scheduledDateTime.toISOString(),
       reason_for_visit: reasonForVisit,
       notes,
+      customerDetails: {
+        name: customerName,
+        phone: customerPhone,
+        email: customerEmail || undefined
+      }
     };
 
     createAppointment(appointmentData);
@@ -76,6 +87,12 @@ export const useAppointmentForm = () => {
     setNotes,
     reasonForVisit,
     setReasonForVisit,
+    customerName,
+    setCustomerName,
+    customerPhone,
+    setCustomerPhone,
+    customerEmail,
+    setCustomerEmail,
     locations,
     services,
     servicesLoading,

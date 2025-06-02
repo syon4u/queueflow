@@ -2,8 +2,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import { useAppointmentForm } from '@/hooks/useAppointmentForm';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import PageLayout from '@/components/layout/PageLayout';
 import AppointmentPageHeader from '@/components/appointments/AppointmentPageHeader';
 import AppointmentStepHeader from '@/components/appointments/AppointmentStepHeader';
@@ -16,7 +17,6 @@ import AppointmentHelpSection from '@/components/appointments/AppointmentHelpSec
 const NewAppointmentPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { role } = useAuth();
   
   const {
     selectedLocationId,
@@ -31,6 +31,12 @@ const NewAppointmentPage = () => {
     setNotes,
     reasonForVisit,
     setReasonForVisit,
+    customerName,
+    setCustomerName,
+    customerPhone,
+    setCustomerPhone,
+    customerEmail,
+    setCustomerEmail,
     isSubmitting,
     currentStep,
     locations,
@@ -52,14 +58,7 @@ const NewAppointmentPage = () => {
   });
   
   const handleBackNavigation = () => {
-    // Navigate back based on user role
-    if (role === 'admin') {
-      navigate('/admin');
-    } else if (role === 'staff') {
-      navigate('/staff');
-    } else {
-      navigate('/customer');
-    }
+    navigate('/customer');
   };
   
   return (
@@ -78,26 +77,67 @@ const NewAppointmentPage = () => {
             <AppointmentStepperCard currentStep={currentStep} />
           </div>
           
-          {/* Main Form Card */}
-          <AppointmentFormCard
-            currentStep={currentStep}
-            selectedLocationId={selectedLocationId}
-            setSelectedLocationId={setSelectedLocationId}
-            selectedServiceId={selectedServiceId}
-            setSelectedServiceId={setSelectedServiceId}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            selectedTime={selectedTime}
-            setSelectedTime={setSelectedTime}
-            notes={notes}
-            setNotes={setNotes}
-            reasonForVisit={reasonForVisit}
-            setReasonForVisit={setReasonForVisit}
-            locations={locations}
-            services={services}
-            servicesLoading={servicesLoading}
-            servicesError={servicesError}
-          />
+          {/* Customer Details Form - Step 1 */}
+          {currentStep === 1 && (
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-4">Your Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="customerName">Full Name <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="customerName"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="customerPhone">Phone Number <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="customerPhone"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="Enter your phone number"
+                    required
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="customerEmail">Email Address (Optional)</Label>
+                  <Input
+                    id="customerEmail"
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Main Form Card - Steps 2-4 */}
+          {currentStep > 1 && (
+            <AppointmentFormCard
+              currentStep={currentStep}
+              selectedLocationId={selectedLocationId}
+              setSelectedLocationId={setSelectedLocationId}
+              selectedServiceId={selectedServiceId}
+              setSelectedServiceId={setSelectedServiceId}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              selectedTime={selectedTime}
+              setSelectedTime={setSelectedTime}
+              notes={notes}
+              setNotes={setNotes}
+              reasonForVisit={reasonForVisit}
+              setReasonForVisit={setReasonForVisit}
+              locations={locations}
+              services={services}
+              servicesLoading={servicesLoading}
+              servicesError={servicesError}
+            />
+          )}
           
           {/* Navigation */}
           <AppointmentNavigationCard
