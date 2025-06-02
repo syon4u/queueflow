@@ -14,41 +14,37 @@ export const useUserRole = () => {
         .from('staff')
         .select('role, status')
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // Use maybeSingle to avoid errors when no data found
 
-      if (staffError) {
-        console.log('User not found in staff table, checking profiles/user_roles:', staffError);
+      if (staffData && !staffError) {
+        console.log('Staff data from database:', staffData);
         
-        // Fallback to user_roles table for other users
-        const { data: userRoleData, error: userRoleError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .single();
-
-        if (userRoleError) {
-          console.log('User not found in user_roles either, defaulting to customer:', userRoleError);
-          setRole('customer');
+        // Check if staff member is active
+        if (staffData.status !== 'active') {
+          console.log('Staff member is not active, checking user_roles table');
+        } else {
+          console.log('Role from staff table:', staffData.role);
+          setRole(staffData.role || 'staff');
           return;
         }
-
-        console.log('Role from user_roles table:', userRoleData?.role);
-        setRole(userRoleData?.role || 'customer');
-        return;
+      } else {
+        console.log('User not found in staff table, checking user_roles:', staffError);
       }
-
-      // User found in staff table
-      console.log('Staff data from database:', staffData);
       
-      // Check if staff member is active
-      if (staffData.status !== 'active') {
-        console.log('Staff member is not active, setting role to customer');
-        setRole('customer');
-        return;
-      }
+      // Check user_roles table
+      const { data: userRoleData, error: userRoleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle(); // Use maybeSingle to avoid errors when no data found
 
-      console.log('Role from staff table:', staffData.role);
-      setRole(staffData.role || 'staff');
+      if (userRoleData && !userRoleError) {
+        console.log('Role from user_roles table:', userRoleData.role);
+        setRole(userRoleData.role || 'customer');
+      } else {
+        console.log('User not found in user_roles either, defaulting to customer:', userRoleError);
+        setRole('customer');
+      }
     } catch (error) {
       console.error('Failed to fetch user role:', error);
       setRole('customer');
