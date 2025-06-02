@@ -8,60 +8,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Clock, MapPin, User, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useLocations } from '@/hooks/appointment-form/useLocations';
-import { useServices } from '@/hooks/appointment-form/useServices';
-
-interface CustomerInfo {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  locationId: string;
-  serviceId: string;
-  preferredDate: string;
-  preferredTime: string;
-  reasonForVisit: string;
-  additionalNotes: string;
-}
+import { useSimpleAppointmentForm, CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentForm';
 
 interface SimpleAppointmentFormProps {
-  onSubmit: (customerInfo: CustomerInfo) => void;
+  onSubmit: (customerInfo: CustomerAppointmentData) => void;
 }
 
 const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CustomerInfo>({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    locationId: '',
-    serviceId: '',
-    preferredDate: '',
-    preferredTime: '',
-    reasonForVisit: '',
-    additionalNotes: ''
-  });
-
-  const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
-  const { services, servicesLoading, servicesError } = useServices(formData.locationId);
-
-  const handleInputChange = (field: keyof CustomerInfo, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  
+  const {
+    formData,
+    updateField,
+    resetForm,
+    validateForm,
+    locations,
+    locationsLoading,
+    locationsError,
+    services,
+    servicesLoading,
+    servicesError
+  } = useSimpleAppointmentForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.locationId || !formData.serviceId) {
+    const validationError = validateForm();
+    if (validationError) {
       toast({
         title: 'Missing Information',
-        description: 'Please fill in your name, phone number, location, and service.',
+        description: validationError,
         variant: 'destructive',
       });
       return;
@@ -75,19 +52,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
         description: 'We will contact you soon to confirm your appointment.',
       });
       
-      // Reset form
-      setFormData({
-        firstName: '',
-        lastName: '',
-        phone: '',
-        email: '',
-        locationId: '',
-        serviceId: '',
-        preferredDate: '',
-        preferredTime: '',
-        reasonForVisit: '',
-        additionalNotes: ''
-      });
+      resetForm();
     } catch (error) {
       toast({
         title: 'Error',
@@ -121,7 +86,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 <Input
                   id="firstName"
                   value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  onChange={(e) => updateField('firstName', e.target.value)}
                   placeholder="Enter your first name"
                   required
                 />
@@ -131,7 +96,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 <Input
                   id="lastName"
                   value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  onChange={(e) => updateField('lastName', e.target.value)}
                   placeholder="Enter your last name"
                   required
                 />
@@ -145,7 +110,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                   id="phone"
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={(e) => updateField('phone', e.target.value)}
                   placeholder="(555) 123-4567"
                   required
                 />
@@ -156,7 +121,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => updateField('email', e.target.value)}
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -177,7 +142,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 )}
                 <Select 
                   value={formData.locationId} 
-                  onValueChange={(value) => handleInputChange('locationId', value)}
+                  onValueChange={(value) => updateField('locationId', value)}
                   disabled={locationsLoading}
                 >
                   <SelectTrigger>
@@ -205,7 +170,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 )}
                 <Select 
                   value={formData.serviceId} 
-                  onValueChange={(value) => handleInputChange('serviceId', value)}
+                  onValueChange={(value) => updateField('serviceId', value)}
                   disabled={!formData.locationId || servicesLoading}
                 >
                   <SelectTrigger>
@@ -248,7 +213,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                   id="preferredDate"
                   type="date"
                   value={formData.preferredDate}
-                  onChange={(e) => handleInputChange('preferredDate', e.target.value)}
+                  onChange={(e) => updateField('preferredDate', e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
@@ -258,7 +223,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                   id="preferredTime"
                   type="time"
                   value={formData.preferredTime}
-                  onChange={(e) => handleInputChange('preferredTime', e.target.value)}
+                  onChange={(e) => updateField('preferredTime', e.target.value)}
                 />
               </div>
             </div>
@@ -272,7 +237,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
               <Textarea
                 id="reasonForVisit"
                 value={formData.reasonForVisit}
-                onChange={(e) => handleInputChange('reasonForVisit', e.target.value)}
+                onChange={(e) => updateField('reasonForVisit', e.target.value)}
                 placeholder="Please describe the nature of your visit..."
                 rows={3}
               />
@@ -283,7 +248,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
               <Textarea
                 id="additionalNotes"
                 value={formData.additionalNotes}
-                onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
+                onChange={(e) => updateField('additionalNotes', e.target.value)}
                 placeholder="Any additional information or special requests..."
                 rows={3}
               />
