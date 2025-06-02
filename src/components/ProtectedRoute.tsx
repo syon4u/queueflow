@@ -1,8 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { toast } from '@/components/ui/use-toast';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,22 +14,32 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
 
   // Enhanced debug logging
   useEffect(() => {
-    console.log("=== PROTECTED ROUTE DEBUG ===");
+    console.log("=== PROTECTED ROUTE DEBUG (AUTH DISABLED) ===");
     console.log("Current user:", user?.email);
     console.log("Current role:", role);
     console.log("Required roles:", requiredRoles);
     console.log("Location pathname:", location.pathname);
     console.log("Is loading:", isLoading);
     console.log("User ID:", user?.id);
+    console.log("Authentication temporarily disabled for development");
     console.log("============================");
   }, [user, role, requiredRoles, location.pathname, isLoading]);
 
+  // Show loading spinner while auth is loading
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
     </div>;
   }
 
+  // TEMPORARILY DISABLED: Authentication checks are bypassed for development
+  // This allows access to all routes without requiring login
+  console.log("✅ ProtectedRoute: Authentication disabled - allowing access to all routes");
+  return <>{children}</>;
+
+  /* 
+  // Original authentication logic (commented out for development):
+  
   // Not logged in - redirect to login
   if (!user) {
     console.log("❌ ProtectedRoute: User not authenticated, redirecting to login");
@@ -93,6 +102,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles
   // User is authenticated and has required role
   console.log(`✅ ProtectedRoute: Access granted for role '${currentRole}' to routes:`, requiredRoles);
   return <>{children}</>;
+  */
 };
 
 export default ProtectedRoute;

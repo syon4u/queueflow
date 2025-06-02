@@ -38,6 +38,15 @@ const UserMenu: React.FC = () => {
           </div>
         )}
         
+        {/* Show development notice when auth is disabled */}
+        {!user && (
+          <div className="bg-amber-500/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+            <span className="text-white/95 font-medium drop-shadow text-sm">
+              Dev Mode (No Auth)
+            </span>
+          </div>
+        )}
+        
         <Button
           onClick={toggleMenu}
           variant="outline"
@@ -53,30 +62,36 @@ const UserMenu: React.FC = () => {
         <div className="absolute top-12 right-0 bg-white rounded-lg shadow-lg border min-w-48 z-30">
           <div className="py-2">
             {!user && (
-              <button
-                onClick={() => handleMenuItemClick('/login')}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-              >
-                <LogIn className="h-4 w-4 text-green-600" />
-                Staff Login
-              </button>
+              <>
+                <div className="px-4 py-2 text-xs text-amber-600 bg-amber-50 border-b">
+                  Authentication is temporarily disabled for development
+                </div>
+                <button
+                  onClick={() => handleMenuItemClick('/login')}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <LogIn className="h-4 w-4 text-green-600" />
+                  Staff Login (Optional)
+                </button>
+              </>
             )}
+            {/* Show navigation options regardless of auth status in dev mode */}
+            <button
+              onClick={() => handleMenuItemClick('/staff')}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+            >
+              <Users className="h-4 w-4 text-blue-600" />
+              Staff Portal
+            </button>
+            <button
+              onClick={() => handleMenuItemClick('/admin')}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4 text-amber-600" />
+              Admin Portal
+            </button>
             {user && (
               <>
-                <button
-                  onClick={() => handleMenuItemClick('/staff')}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                >
-                  <Users className="h-4 w-4 text-blue-600" />
-                  Staff Portal
-                </button>
-                <button
-                  onClick={() => handleMenuItemClick('/admin')}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                >
-                  <Settings className="h-4 w-4 text-amber-600" />
-                  Admin Portal
-                </button>
                 <div className="border-t my-1"></div>
                 <button
                   onClick={() => {
