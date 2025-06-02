@@ -49,6 +49,52 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
     return scheduledDate;
   };
 
+  const sendConfirmationNotifications = async (customerId: string, confirmationCode: string, customerData: any) => {
+    try {
+      // Send email notification if customer has email
+      if (customerData.email) {
+        await supabase.functions.invoke('send-communication', {
+          body: {
+            customerId: customerId,
+            type: 'email',
+            subject: 'Appointment Confirmation',
+            message: `Your appointment has been confirmed! Your confirmation code is: ${confirmationCode}. Please keep this code for check-in and status updates.`,
+          }
+        });
+      }
+
+      // Send SMS notification if customer has phone
+      if (customerData.phone) {
+        await supabase.functions.invoke('send-communication', {
+          body: {
+            customerId: customerId,
+            type: 'sms',
+            message: `Your appointment is confirmed! Confirmation code: ${confirmationCode}. Keep this code for check-in.`,
+          }
+        });
+      }
+
+      // Show success message based on what was sent
+      const notificationMethods = [];
+      if (customerData.email) notificationMethods.push('email');
+      if (customerData.phone) notificationMethods.push('SMS');
+      
+      if (notificationMethods.length > 0) {
+        toast({
+          title: t('common.success'),
+          description: `Confirmation sent via ${notificationMethods.join(' and ')}`,
+        });
+      }
+    } catch (error) {
+      console.error('Error sending confirmation notifications:', error);
+      toast({
+        title: t('common.warning'),
+        description: 'Appointment created but confirmation notifications may not have been sent.',
+        variant: "destructive",
+      });
+    }
+  };
+
   const submitNewCustomerAppointment = async (data: NewCustomerFormValues) => {
     if (!selectedDate) {
       toast({
@@ -68,16 +114,18 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
       const lastName = lastNameParts.join(' ') || firstName;
       
       let customerId: string;
+      let customerData: any;
       
       // Check if customer already exists by phone
       const { data: existingCustomer } = await supabase
         .from('customers')
-        .select('id')
+        .select('*')
         .eq('phone', data.phone)
         .single();
 
       if (existingCustomer) {
         customerId = existingCustomer.id;
+        customerData = existingCustomer;
       } else {
         // Generate a UUID for the new customer
         const customerUuid = crypto.randomUUID();
@@ -90,13 +138,14 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
             first_name: firstName,
             last_name: lastName,
             phone: data.phone,
-            email: null
+            email: data.email || null
           })
-          .select('id')
+          .select('*')
           .single();
 
         if (customerError) throw customerError;
         customerId = newCustomer.id;
+        customerData = newCustomer;
       }
       
       // Create the appointment
@@ -117,8 +166,11 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
       if (appointmentError) throw appointmentError;
       
       const confirmationCode = appointment.id;
-      onAppointmentScheduled(confirmationCode);
       
+      // Send confirmation notifications
+      await sendConfirmationNotifications(customerId, confirmationCode, customerData);
+      
+      onAppointmentScheduled(confirmationCode);
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       setStep('search');
     } catch (error) {
@@ -166,8 +218,11 @@ export const useAppointmentScheduling = (onAppointmentScheduled: (code: string) 
       if (error) throw error;
 
       const confirmationCode = appointment.id;
-      onAppointmentScheduled(confirmationCode);
       
+      // Send confirmation notifications
+      await sendConfirmationNotifications(selectedCustomer.id, confirmationCode, selectedCustomer);
+
+      onAppointmentScheduled(confirmationCode);
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       setStep('search');
     } catch (error) {
