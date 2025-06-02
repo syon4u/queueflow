@@ -31,19 +31,32 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
       
       if (error) throw error;
       
-      console.log('Fetched services:', data);
+      console.log('ServiceSelector - Fetched services:', data);
       
-      // Return all valid services
-      return data || [];
+      // Filter out any services with empty or invalid IDs
+      const validServices = (data || []).filter(service => 
+        service.id && 
+        service.id.trim() !== '' && 
+        service.name && 
+        service.name.trim() !== ''
+      );
+      
+      console.log('ServiceSelector - Valid services:', validServices);
+      
+      return validServices;
     },
     enabled: !!locationId, // Only run when locationId is available
   });
+
+  console.log('ServiceSelector - Current value:', value);
+  console.log('ServiceSelector - LocationId:', locationId);
+  console.log('ServiceSelector - Available services:', services);
 
   return (
     <FormItem>
       <FormLabel>Service</FormLabel>
       <FormControl>
-        <Select value={value} onValueChange={onChange} disabled={isLoading || !locationId}>
+        <Select value={value || ''} onValueChange={onChange} disabled={isLoading || !locationId}>
           <SelectTrigger>
             <SelectValue placeholder={locationId ? "Select a service" : "Select a location first"} />
           </SelectTrigger>

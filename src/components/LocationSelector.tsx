@@ -27,18 +27,30 @@ const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
       
       if (error) throw error;
       
-      console.log('Fetched locations:', data);
+      console.log('LocationSelector - Fetched locations:', data);
       
-      // Return all valid UUID locations
-      return data || [];
+      // Filter out any locations with empty or invalid IDs
+      const validLocations = (data || []).filter(location => 
+        location.id && 
+        location.id.trim() !== '' && 
+        location.name && 
+        location.name.trim() !== ''
+      );
+      
+      console.log('LocationSelector - Valid locations:', validLocations);
+      
+      return validLocations;
     },
   });
+
+  console.log('LocationSelector - Current value:', value);
+  console.log('LocationSelector - Available locations:', locations);
 
   return (
     <FormItem>
       <FormLabel>Location</FormLabel>
       <FormControl>
-        <Select value={value} onValueChange={onChange} disabled={isLoading}>
+        <Select value={value || ''} onValueChange={onChange} disabled={isLoading}>
           <SelectTrigger>
             <SelectValue placeholder="Select a location" />
           </SelectTrigger>

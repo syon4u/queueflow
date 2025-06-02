@@ -21,8 +21,14 @@ export const NoteFilters: React.FC<NoteFiltersProps> = ({
   onCategoryChange,
   categories
 }) => {
-  // Ensure selectedCategory is never an empty string
+  // Ensure selectedCategory is never an empty string and filter out any empty categories
   const currentCategory = (!selectedCategory || selectedCategory === '') ? 'all' : selectedCategory;
+  const validCategories = categories.filter(category => category.value && category.value.trim() !== '');
+
+  console.log('NoteFilters - selectedCategory:', selectedCategory);
+  console.log('NoteFilters - currentCategory:', currentCategory);
+  console.log('NoteFilters - categories:', categories);
+  console.log('NoteFilters - validCategories:', validCategories);
 
   return (
     <Card>
@@ -41,7 +47,7 @@ export const NoteFilters: React.FC<NoteFiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
+                {validCategories.map((category) => (
                   <SelectItem key={category.value} value={category.value}>
                     {category.label}
                   </SelectItem>
@@ -56,7 +62,7 @@ export const NoteFilters: React.FC<NoteFiltersProps> = ({
               className="cursor-pointer"
               onClick={() => onCategoryChange('all')}
             >
-              {categories.find(c => c.value === currentCategory)?.label} ×
+              {validCategories.find(c => c.value === currentCategory)?.label} ×
             </Badge>
           )}
         </div>

@@ -49,8 +49,14 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
   // Get the current status value, ensuring it's never an empty string
   const getCurrentStatusValue = () => {
     const status = filters.status;
-    return (!status || status === '') ? 'all' : status;
+    if (!status || status === '') {
+      return 'all';
+    }
+    return status;
   };
+
+  console.log('AppointmentFilters - Current filters:', filters);
+  console.log('AppointmentFilters - Current status value:', getCurrentStatusValue());
 
   return (
     <Card className="mb-6">
