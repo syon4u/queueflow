@@ -11,13 +11,19 @@ export const useEmployeeTableColumns = (): Column[] => {
     { 
       key: 'role', 
       header: 'Role',
-      cell: (row) => row.user_roles?.role || 'staff'
+      cell: (row) => row.role || 'staff'
     },
     { 
       key: 'location_id', 
       header: 'Location',
       cell: (row) => row.locations?.name || 'Unassigned'
     },
-    { key: 'phone', header: 'Phone' }
+    { 
+      key: 'status', 
+      header: 'Status',
+      cell: (row) => row.status || 'inactive'
+    },
+    { key: 'phone', header: 'Phone' },
+    { key: 'email', header: 'Email' }
   ];
 };

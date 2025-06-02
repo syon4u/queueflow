@@ -3,22 +3,24 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useEmployeeQueries = () => {
-  // Fetch staff members from profiles with user_roles
+  // Fetch staff members from staff table
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ['staff-members'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('staff')
         .select(`
           id,
           first_name,
           last_name,
           phone,
+          email,
+          role,
+          status,
           location_id,
-          user_roles!inner(role),
           locations(name)
         `)
-        .in('user_roles.role', ['staff', 'admin']);
+        .order('first_name');
 
       if (error) throw error;
       return data;

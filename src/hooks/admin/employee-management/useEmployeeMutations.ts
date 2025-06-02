@@ -11,36 +11,28 @@ export const useEmployeeMutations = () => {
   // Create staff member
   const createStaffMember = useMutation({
     mutationFn: async (data: EmployeeFormData) => {
-      // Generate a UUID for the new profile
-      const profileId = crypto.randomUUID();
+      // Generate a UUID for the new staff member
+      const staffId = crypto.randomUUID();
       
-      // First create the profile
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
+      // Insert into staff table
+      const { data: staffRecord, error: staffError } = await supabase
+        .from('staff')
         .insert({
-          id: profileId,
+          id: staffId,
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone,
+          email: `${data.first_name.toLowerCase()}.${data.last_name.toLowerCase()}@example.com`,
+          role: data.role as 'admin' | 'staff',
           location_id: data.location_id || null,
-          status: 'inactive'
+          status: 'active'
         })
         .select()
         .single();
 
-      if (profileError) throw profileError;
+      if (staffError) throw staffError;
 
-      // Then set the user role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: profileId,
-          role: data.role,
-        });
-
-      if (roleError) throw roleError;
-
-      return profile;
+      return staffRecord;
     },
     onSuccess: () => {
       toast({
@@ -64,26 +56,19 @@ export const useEmployeeMutations = () => {
     mutationFn: async (data: EmployeeFormData) => {
       if (!data.id) throw new Error('No ID provided for update');
 
-      // Update the profile
-      const { error: profileError } = await supabase
-        .from('profiles')
+      // Update the staff record
+      const { error: staffError } = await supabase
+        .from('staff')
         .update({
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone,
+          role: data.role as 'admin' | 'staff',
           location_id: data.location_id || null,
         })
         .eq('id', data.id);
 
-      if (profileError) throw profileError;
-
-      // Update the user role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .update({ role: data.role })
-        .eq('user_id', data.id);
-
-      if (roleError) throw roleError;
+      if (staffError) throw staffError;
     },
     onSuccess: () => {
       toast({
@@ -105,21 +90,13 @@ export const useEmployeeMutations = () => {
   // Delete staff member
   const deleteStaffMember = useMutation({
     mutationFn: async (id: string) => {
-      // Delete user role first (due to foreign key constraints)
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', id);
-
-      if (roleError) throw roleError;
-
-      // Then delete the profile
-      const { error: profileError } = await supabase
-        .from('profiles')
+      // Delete the staff record
+      const { error: staffError } = await supabase
+        .from('staff')
         .delete()
         .eq('id', id);
 
-      if (profileError) throw profileError;
+      if (staffError) throw staffError;
     },
     onSuccess: () => {
       toast({

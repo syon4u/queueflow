@@ -35,7 +35,7 @@ export const useEmployeeFormState = () => {
       first_name: member.first_name,
       last_name: member.last_name,
       phone: member.phone || '',
-      role: member.user_roles?.role || 'staff',
+      role: member.role || 'staff',
       location_id: member.location_id || '',
     });
     setIsEditing(true);
