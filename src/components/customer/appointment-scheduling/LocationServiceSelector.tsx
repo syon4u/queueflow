@@ -6,11 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { UseFormSetValue } from 'react-hook-form';
 import { NewCustomerFormValues } from './NewCustomerForm';
-
-interface Location {
-  id: string;
-  name: string;
-}
+import { useLocations } from '@/hooks/appointment-form/useLocations';
 
 interface Service {
   id: string;
@@ -19,7 +15,6 @@ interface Service {
 }
 
 interface LocationServiceSelectorProps {
-  locations: Location[] | undefined;
   services: Service[] | undefined;
   servicesLoading: boolean;
   servicesError: Error | null;
@@ -29,7 +24,6 @@ interface LocationServiceSelectorProps {
 }
 
 const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
-  locations,
   services,
   servicesLoading,
   servicesError,
@@ -37,19 +31,50 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
   selectedServiceId,
   setValue
 }) => {
+  const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
+
+  console.log('LocationServiceSelector - Component state:', {
+    locationsCount: locations?.length || 0,
+    locationsLoading,
+    locationsError,
+    servicesCount: services?.length || 0,
+    servicesLoading,
+    servicesError: servicesError?.message,
+    selectedLocationId,
+    selectedServiceId
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <Label htmlFor="location">Location *</Label>
+        
+        {locationsError && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Error loading locations: {locationsError}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <Select 
           value={selectedLocationId}
           onValueChange={(value) => {
             setValue('location_id', value);
             setValue('service_id', ''); // Clear service when location changes
           }}
+          disabled={locationsLoading || !locations?.length}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select a location" />
+            <SelectValue placeholder={
+              locationsLoading 
+                ? "Loading locations..."
+                : !locations?.length 
+                  ? "No locations available"
+                  : "Select a location"
+            } />
+            {locationsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           </SelectTrigger>
           <SelectContent>
             {locations?.map((location) => (

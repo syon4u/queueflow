@@ -10,22 +10,38 @@ export const useLocations = () => {
       console.log('useLocations - Starting location fetch...');
       
       try {
-        // Fetch all locations (not just open ones for now to debug)
-        const { data, error } = await supabase
+        // First, let's check if the locations table exists and what data it contains
+        const { data, error, count } = await supabase
           .from('locations')
-          .select('id, name, address')
+          .select('id, name, address', { count: 'exact' })
           .order('name');
         
-        console.log('useLocations - Raw query result:', { data, error });
+        console.log('useLocations - Raw query result:', { data, error, count });
         
         if (error) {
           console.error('useLocations - Database error:', error);
           throw new Error(`Failed to load locations: ${error.message}`);
         }
         
-        const result = data || [];
-        console.log('useLocations - Final locations result:', result);
-        return result;
+        if (!data) {
+          console.warn('useLocations - No data returned from query');
+          return [];
+        }
+        
+        console.log('useLocations - Successfully fetched locations:', data.length);
+        console.log('useLocations - Location details:', data);
+        
+        // Validate that each location has required fields
+        const validLocations = data.filter(location => {
+          const isValid = location && location.id && location.name;
+          if (!isValid) {
+            console.warn('useLocations - Invalid location found:', location);
+          }
+          return isValid;
+        });
+        
+        console.log('useLocations - Valid locations after filtering:', validLocations.length);
+        return validLocations;
         
       } catch (err) {
         console.error('useLocations - Fetch error:', err);
@@ -33,7 +49,7 @@ export const useLocations = () => {
       }
     },
     retry: 3,
-    retryDelay: 1000,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });

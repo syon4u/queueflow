@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useLocations } from '@/hooks/appointment-form/useLocations';
 import {
   Select,
   SelectContent,
@@ -17,45 +16,74 @@ interface LocationSelectorProps {
 }
 
 const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
-  const { data: locations, isLoading } = useQuery({
-    queryKey: ['locations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name')
-        .eq('queue_status', 'open'); // Only show open locations
-      
-      if (error) throw error;
-      
-      console.log('LocationSelector - Fetched locations:', data);
-      
-      // Filter out any locations with empty or invalid IDs
-      const validLocations = (data || []).filter(location => 
-        location.id && 
-        location.id.trim() !== '' && 
-        location.name && 
-        location.name.trim() !== ''
-      );
-      
-      console.log('LocationSelector - Valid locations:', validLocations);
-      
-      return validLocations;
-    },
+  const { locations, isLoading, error } = useLocations();
+
+  console.log('LocationSelector - Component state:', {
+    locationsCount: locations?.length || 0,
+    isLoading,
+    error,
+    currentValue: value
   });
 
-  console.log('LocationSelector - Current value:', value);
-  console.log('LocationSelector - Available locations:', locations);
+  if (isLoading) {
+    return (
+      <FormItem>
+        <FormLabel>Location</FormLabel>
+        <FormControl>
+          <Select disabled>
+            <SelectTrigger>
+              <SelectValue placeholder="Loading locations..." />
+            </SelectTrigger>
+          </Select>
+        </FormControl>
+      </FormItem>
+    );
+  }
+
+  if (error) {
+    console.error('LocationSelector - Error state:', error);
+    return (
+      <FormItem>
+        <FormLabel>Location</FormLabel>
+        <FormControl>
+          <Select disabled>
+            <SelectTrigger>
+              <SelectValue placeholder="Error loading locations" />
+            </SelectTrigger>
+          </Select>
+        </FormControl>
+        <FormMessage>Unable to load locations: {error}</FormMessage>
+      </FormItem>
+    );
+  }
+
+  if (!locations || locations.length === 0) {
+    console.warn('LocationSelector - No locations available');
+    return (
+      <FormItem>
+        <FormLabel>Location</FormLabel>
+        <FormControl>
+          <Select disabled>
+            <SelectTrigger>
+              <SelectValue placeholder="No locations available" />
+            </SelectTrigger>
+          </Select>
+        </FormControl>
+        <FormMessage>No locations are currently available</FormMessage>
+      </FormItem>
+    );
+  }
 
   return (
     <FormItem>
       <FormLabel>Location</FormLabel>
       <FormControl>
-        <Select value={value || ''} onValueChange={onChange} disabled={isLoading}>
+        <Select value={value || ''} onValueChange={onChange}>
           <SelectTrigger>
             <SelectValue placeholder="Select a location" />
           </SelectTrigger>
           <SelectContent>
-            {locations?.map((location) => (
+            {locations.map((location) => (
               <SelectItem key={location.id} value={location.id}>
                 {location.name}
               </SelectItem>
