@@ -4,7 +4,6 @@ import PageLayout from '@/components/layout/PageLayout';
 import HeroSection from '@/components/landing/HeroSection';
 import CustomerServiceCards from '@/components/landing/CustomerServiceCards';
 import WelcomeGuideModal from '@/components/landing/WelcomeGuideModal';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
 const Index = () => {
@@ -21,11 +20,6 @@ const Index = () => {
       headerSubtitle={t('landing.headerSubtitle')}
     >
       <div className="min-h-screen bg-gray-50">
-        {/* Language Switcher moved to top-right */}
-        <div className="absolute top-4 right-4 z-20">
-          <LanguageSwitcher />
-        </div>
-        
         {/* Hero Section with Background Image */}
         <div className="relative">
           <HeroSection onShowGuide={handleShowGuide} />
