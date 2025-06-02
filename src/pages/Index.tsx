@@ -21,8 +21,8 @@ const Index = () => {
       headerSubtitle={t('landing.headerSubtitle')}
     >
       <div className="min-h-screen bg-gray-50">
-        {/* Language Switcher */}
-        <div className="absolute top-4 left-4 z-20">
+        {/* Language Switcher moved to top-right */}
+        <div className="absolute top-4 right-4 z-20">
           <LanguageSwitcher />
         </div>
         
