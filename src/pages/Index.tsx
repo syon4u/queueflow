@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import PageLayout from '@/components/layout/PageLayout';
 import HeroSection from '@/components/landing/HeroSection';
 import CustomerServiceCards from '@/components/landing/CustomerServiceCards';
-import UserMenu from '@/components/landing/UserMenu';
 import WelcomeGuideModal from '@/components/landing/WelcomeGuideModal';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +28,6 @@ const Index = () => {
         
         {/* Hero Section with Background Image */}
         <div className="relative">
-          <UserMenu />
           <HeroSection onShowGuide={handleShowGuide} />
         </div>
         
