@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -274,7 +273,18 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const getEstimatedWaitTime = (customerId: string) => {
     const position = getQueuePosition(customerId);
-    return position === -1 ? 0 : position * 15; // 15 minutes per customer estimate
+    if (position === -1) return 0;
+    
+    // Use average service time from stats, with a minimum of 10 minutes
+    const avgServiceTime = Math.max(stats.averageWaitTime || 15, 10);
+    
+    // Calculate based on position and average service time
+    const estimatedWait = position * avgServiceTime;
+    
+    // If someone is currently being served, add some buffer time
+    const bufferTime = currentCustomer ? 5 : 0;
+    
+    return estimatedWait + bufferTime;
   };
 
   const resetQueue = () => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,29 +6,40 @@ import { Clock, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatWaitTime } from '@/lib/queue';
 import { toast } from 'sonner';
+import { useQueue } from '@/context/QueueContext';
 
-type WaitTimeData = {
+type ServiceWaitTimeData = {
   service_name: string;
-  average_wait_time: number;
-  day_name: string;
-  time_period: string;
+  current_queue_length: number;
+  estimated_wait_minutes: number;
+  service_id: string;
 };
 
 const EstimatedWaitTimes: React.FC = () => {
-  const [waitTimes, setWaitTimes] = useState<WaitTimeData[]>([]);
+  const [serviceWaitTimes, setServiceWaitTimes] = useState<ServiceWaitTimeData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { customers, stats } = useQueue();
 
-  // Get day name from day of week number
-  const getDayName = (day: number): string => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[day];
-  };
+  // Calculate wait times based on current queue data
+  const calculateCurrentWaitTimes = () => {
+    const waitingCustomers = customers.filter(c => c.status === 'waiting');
+    const serviceGroups: { [key: string]: number } = {};
+    
+    // Group customers by service
+    waitingCustomers.forEach(customer => {
+      const service = customer.service || 'General Service';
+      serviceGroups[service] = (serviceGroups[service] || 0) + 1;
+    });
 
-  // Get time period from hour
-  const getTimePeriod = (hour: number): string => {
-    if (hour < 12) return `${hour}:00 AM`;
-    if (hour === 12) return '12:00 PM';
-    return `${hour - 12}:00 PM`;
+    // Convert to wait time data
+    const waitTimeData: ServiceWaitTimeData[] = Object.entries(serviceGroups).map(([serviceName, queueLength]) => ({
+      service_name: serviceName,
+      current_queue_length: queueLength,
+      estimated_wait_minutes: queueLength * 15, // 15 minutes per customer estimate
+      service_id: serviceName.toLowerCase().replace(/\s+/g, '-')
+    }));
+
+    return waitTimeData.sort((a, b) => b.current_queue_length - a.current_queue_length);
   };
 
   useEffect(() => {
@@ -35,40 +47,51 @@ const EstimatedWaitTimes: React.FC = () => {
       try {
         setIsLoading(true);
         
-        // This is a mock query - in a real app, you'd join with services table
-        // to get actual service names and more detailed information
-        const { data, error } = await supabase
+        // First, try to get historical wait times from the database
+        const { data: historicalData, error: historicalError } = await supabase
           .from('service_wait_times')
           .select(`
-            id,
             service_id,
+            average_wait_time,
             day_of_week,
-            hour_of_day,
-            average_wait_time
+            hour_of_day
           `)
-          .order('average_wait_time', { ascending: false })
-          .limit(5);
-          
-        if (error) {
-          console.error('Error fetching wait times:', error);
-          return;
+          .eq('day_of_week', new Date().getDay())
+          .eq('hour_of_day', new Date().getHours())
+          .limit(10);
+
+        if (historicalError) {
+          console.error('Error fetching historical wait times:', historicalError);
         }
+
+        // Get current queue-based wait times
+        const currentWaitTimes = calculateCurrentWaitTimes();
         
-        // Transform the data for display
-        // In a real app, you would join with the services table to get actual service names
-        if (data) {
-          // Simulate joined data with service names since we don't have access to the full schema
-          const transformedData: WaitTimeData[] = data.map(item => ({
-            service_name: `Service ${item.service_id.substring(0, 6)}...`,
-            average_wait_time: item.average_wait_time,
-            day_name: getDayName(item.day_of_week),
-            time_period: getTimePeriod(item.hour_of_day)
+        // If we have current queue data, use that; otherwise show historical data
+        if (currentWaitTimes.length > 0) {
+          setServiceWaitTimes(currentWaitTimes);
+        } else {
+          // Fallback to showing some default services with zero wait times
+          const defaultServices = [
+            'Business License',
+            'Code Violation',
+            'General Inquiry',
+            'Permit Application',
+            'Document Review'
+          ];
+          
+          const defaultWaitTimes: ServiceWaitTimeData[] = defaultServices.map(service => ({
+            service_name: service,
+            current_queue_length: 0,
+            estimated_wait_minutes: 0,
+            service_id: service.toLowerCase().replace(/\s+/g, '-')
           }));
           
-          setWaitTimes(transformedData);
+          setServiceWaitTimes(defaultWaitTimes);
         }
       } catch (err) {
         console.error('Failed to fetch wait times:', err);
+        toast.error('Failed to load wait time estimates');
       } finally {
         setIsLoading(false);
       }
@@ -76,35 +99,18 @@ const EstimatedWaitTimes: React.FC = () => {
     
     fetchWaitTimes();
     
-    // Subscribe to real-time updates for service wait times
-    const channel = supabase
-      .channel('wait-time-updates')
-      .on(
-        'postgres_changes',
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'service_wait_times' 
-        },
-        () => {
-          // Refresh wait times when changes occur
-          fetchWaitTimes();
-          toast.info('Wait time estimates have been updated');
-        }
-      )
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    // Refresh wait times every 30 seconds
+    const interval = setInterval(fetchWaitTimes, 30000);
+    
+    return () => clearInterval(interval);
+  }, [customers]); // Re-calculate when customers change
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold flex items-center">
           <Clock className="h-5 w-5 mr-2 text-qflow-teal" />
-          Estimated Wait Times
+          Current Wait Times
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -112,27 +118,51 @@ const EstimatedWaitTimes: React.FC = () => {
           <div className="flex justify-center py-4">
             <div className="animate-pulse h-20 w-full bg-muted rounded-md"></div>
           </div>
-        ) : waitTimes.length > 0 ? (
+        ) : serviceWaitTimes.length > 0 ? (
           <div className="space-y-3">
-            {waitTimes.map((item, index) => (
-              <div key={index} className="flex justify-between items-center p-3 border rounded-md bg-card">
-                <div>
-                  <p className="font-medium">{item.service_name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {item.day_name}, {item.time_period}
+            {serviceWaitTimes.map((item, index) => (
+              <div key={item.service_id} className="flex justify-between items-center p-3 border rounded-md bg-card hover:bg-muted/50 transition-colors">
+                <div className="flex-1">
+                  <p className="font-medium text-sm">{item.service_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.current_queue_length} {item.current_queue_length === 1 ? 'person' : 'people'} waiting
                   </p>
                 </div>
-                <Badge variant="secondary" className="bg-muted">
-                  {formatWaitTime(item.average_wait_time)}
-                </Badge>
+                <div className="text-right">
+                  <Badge 
+                    variant="secondary" 
+                    className={`${
+                      item.estimated_wait_minutes === 0 
+                        ? 'bg-green-100 text-green-800' 
+                        : item.estimated_wait_minutes <= 15 
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {item.estimated_wait_minutes === 0 ? 'No wait' : formatWaitTime(item.estimated_wait_minutes)}
+                  </Badge>
+                </div>
               </div>
             ))}
+            
+            {stats.waitingCustomers > 0 && (
+              <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-200">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-700 font-medium">
+                    Total customers in queue: {stats.waitingCustomers}
+                  </span>
+                  <span className="text-blue-600">
+                    Avg wait: {Math.round(stats.averageWaitTime)}m
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-6 text-muted-foreground flex flex-col items-center">
             <AlertCircle className="h-8 w-8 mb-2" />
-            <p>No wait time data available</p>
-            <p className="text-sm">Wait times will appear as services are completed</p>
+            <p className="font-medium">No customers currently waiting</p>
+            <p className="text-sm">Wait times will appear when customers join the queue</p>
           </div>
         )}
       </CardContent>
