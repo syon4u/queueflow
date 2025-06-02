@@ -5,17 +5,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Clock, MapPin, User } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, Clock, MapPin, User, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLocations } from '@/hooks/appointment-form/useLocations';
+import { useServices } from '@/hooks/appointment-form/useServices';
 
 interface CustomerInfo {
   firstName: string;
   lastName: string;
   phone: string;
   email: string;
+  locationId: string;
+  serviceId: string;
   preferredDate: string;
   preferredTime: string;
-  serviceType: string;
   reasonForVisit: string;
   additionalNotes: string;
 }
@@ -32,12 +36,16 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     lastName: '',
     phone: '',
     email: '',
+    locationId: '',
+    serviceId: '',
     preferredDate: '',
     preferredTime: '',
-    serviceType: '',
     reasonForVisit: '',
     additionalNotes: ''
   });
+
+  const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
+  const { services, servicesLoading, servicesError } = useServices(formData.locationId);
 
   const handleInputChange = (field: keyof CustomerInfo, value: string) => {
     setFormData(prev => ({
@@ -50,10 +58,10 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.firstName || !formData.lastName || !formData.phone) {
+    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.locationId || !formData.serviceId) {
       toast({
         title: 'Missing Information',
-        description: 'Please fill in your name and phone number.',
+        description: 'Please fill in your name, phone number, location, and service.',
         variant: 'destructive',
       });
       return;
@@ -73,9 +81,10 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
         lastName: '',
         phone: '',
         email: '',
+        locationId: '',
+        serviceId: '',
         preferredDate: '',
         preferredTime: '',
-        serviceType: '',
         reasonForVisit: '',
         additionalNotes: ''
       });
@@ -154,6 +163,78 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
             </div>
           </div>
 
+          {/* Location and Service Selection */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Location and Service
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="location">Location *</Label>
+                {locationsError && (
+                  <p className="text-sm text-red-600">Error loading locations: {locationsError}</p>
+                )}
+                <Select 
+                  value={formData.locationId} 
+                  onValueChange={(value) => handleInputChange('locationId', value)}
+                  disabled={locationsLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={
+                      locationsLoading 
+                        ? "Loading locations..." 
+                        : "Select a location"
+                    } />
+                    {locationsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations?.map((location) => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="service">Service *</Label>
+                {servicesError && (
+                  <p className="text-sm text-red-600">Error loading services: {servicesError}</p>
+                )}
+                <Select 
+                  value={formData.serviceId} 
+                  onValueChange={(value) => handleInputChange('serviceId', value)}
+                  disabled={!formData.locationId || servicesLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={
+                      !formData.locationId 
+                        ? "Select a location first"
+                        : servicesLoading 
+                          ? "Loading services..."
+                          : "Select a service"
+                    } />
+                    {servicesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {services?.map((service) => (
+                      <SelectItem key={service.id} value={service.id}>
+                        <div className="flex flex-col">
+                          <span>{service.name}</span>
+                          <span className="text-sm text-muted-foreground">
+                            {service.duration} min
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
           {/* Appointment Preferences */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium flex items-center gap-2">
@@ -181,24 +262,11 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 />
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="serviceType">Type of Service Needed</Label>
-              <Input
-                id="serviceType"
-                value={formData.serviceType}
-                onChange={(e) => handleInputChange('serviceType', e.target.value)}
-                placeholder="e.g., Consumer Protection, Business License, etc."
-              />
-            </div>
           </div>
 
           {/* Visit Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Visit Details
-            </h3>
+            <h3 className="text-lg font-medium">Visit Details</h3>
             <div className="space-y-2">
               <Label htmlFor="reasonForVisit">Reason for Visit</Label>
               <Textarea
