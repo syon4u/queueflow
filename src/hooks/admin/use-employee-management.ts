@@ -66,14 +66,19 @@ export const useEmployeeManagement = () => {
   // Create staff member
   const createStaffMember = useMutation({
     mutationFn: async (data: EmployeeFormData) => {
+      // Generate a UUID for the new profile
+      const profileId = crypto.randomUUID();
+      
       // First create the profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .insert({
+          id: profileId,
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone,
           location_id: data.location_id || null,
+          status: 'inactive'
         })
         .select()
         .single();
@@ -84,7 +89,7 @@ export const useEmployeeManagement = () => {
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
-          user_id: profile.id,
+          user_id: profileId,
           role: data.role,
         });
 
