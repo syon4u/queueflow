@@ -66,27 +66,6 @@ const NewCustomerForm = ({
     }
   }, [selectedLocationId, setValue]);
 
-  if (locationsError) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
-        </div>
-        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
-          <p className="font-medium">Error loading locations</p>
-          <p className="mt-1 text-sm">{locationsError}</p>
-          <div className="mt-2 text-sm">
-            Please try refreshing the page or contact support if the issue persists.
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (locationsLoading) {
     return (
       <div className="space-y-6">
@@ -106,20 +85,30 @@ const NewCustomerForm = ({
     );
   }
 
-  if (!locations || locations.length === 0) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
-        </div>
-        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg">
-          <p className="font-medium">No locations available</p>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Button variant="outline" size="sm" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+      </div>
+
+      {locationsError && (
+        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg mb-4">
+          <p className="font-medium">Location loading issue</p>
           <p className="mt-1 text-sm">
-            There are currently no open locations accepting appointments. Please check back later or contact us directly.
+            There was an issue loading locations, but you can still proceed. Error: {locationsError}
+          </p>
+        </div>
+      )}
+
+      {!locations || locations.length === 0 ? (
+        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg mb-4">
+          <p className="font-medium">No locations currently available</p>
+          <p className="mt-1 text-sm">
+            There are currently no locations available for scheduling. Please check back later or contact support.
           </p>
           <div className="mt-3">
             <Button 
@@ -131,25 +120,13 @@ const NewCustomerForm = ({
             </Button>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <h3 className="text-lg font-semibold">New Customer Appointment</h3>
-      </div>
+      ) : null}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <CustomerDetailsFields register={register} errors={errors} />
 
         <LocationServiceSelector
-          locations={locations}
+          locations={locations || []}
           services={services}
           servicesLoading={servicesLoading}
           servicesError={servicesError ? new Error(servicesError) : null}

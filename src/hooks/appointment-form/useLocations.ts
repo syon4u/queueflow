@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Location } from './types';
+import type { Location } from './types';
 
 export const useLocations = () => {
   const { data: locations = [], isLoading, error } = useQuery({
@@ -11,6 +11,7 @@ export const useLocations = () => {
       
       try {
         // First, try to get open locations
+        console.log('Attempting to fetch open locations...');
         const { data: openData, error: openError } = await supabase
           .from('locations')
           .select('id, name, address')
@@ -19,17 +20,9 @@ export const useLocations = () => {
         
         console.log('Open query result:', { data: openData, error: openError });
         
-        if (openError) {
-          console.error('Supabase error details:', {
-            code: openError.code,
-            message: openError.message,
-            hint: openError.hint
-          });
-          throw new Error(`Failed to fetch locations: ${openError.message}`);
-        }
-        
         // If we have open locations, return them
         if (openData && openData.length > 0) {
+          console.log('Found open locations:', openData.length);
           return openData;
         }
         
@@ -42,20 +35,15 @@ export const useLocations = () => {
         
         console.log('All locations result:', { data: allData, error: allError });
         
-        if (allError) {
-          console.error('Supabase error details:', {
-            code: allError.code,
-            message: allError.message,
-            hint: allError.hint
-          });
-          throw new Error(`Failed to fetch all locations: ${allError.message}`);
-        }
-        
         // Return all locations or empty array
-        return allData || [];
+        const result = allData || [];
+        console.log('Final result:', result);
+        return result;
+        
       } catch (err) {
         console.error('Location fetch error:', err);
-        throw err;
+        // Return empty array instead of throwing to allow the form to still render
+        return [];
       }
     },
     retry: (failureCount, error) => {
@@ -64,6 +52,14 @@ export const useLocations = () => {
     },
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    // Ensure the query runs immediately without any conditions
+    enabled: true,
+  });
+
+  console.log('useLocations - Hook final state:', {
+    locationsCount: locations?.length || 0,
+    isLoading,
+    error: error?.message || null
   });
 
   return { 
