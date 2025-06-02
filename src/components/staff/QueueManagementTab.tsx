@@ -9,13 +9,24 @@ import { EnhancedQueueManagement } from './EnhancedQueueManagement';
 import { useAuth } from '@/context/AuthContext';
 import { useQueue } from '@/context/QueueContext';
 
+// Define the interface expected by CustomerCallingSystem
+interface QueueCustomer {
+  id: string;
+  name: string;
+  phone?: string;
+  service: string;
+  waitTime: number;
+  priority: 'normal' | 'priority';
+  status: 'waiting' | 'called' | 'no_show';
+}
+
 export const QueueManagementTab: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { customers } = useQueue();
+  const { customers, updateCustomer, removeCustomer } = useQueue();
 
   // Convert QueueContext customers to the format expected by CustomerCallingSystem
-  const formattedCustomers = customers
+  const formattedCustomers: QueueCustomer[] = customers
     .filter(c => c.status === 'waiting')
     .map(customer => ({
       id: customer.id,
@@ -24,17 +35,22 @@ export const QueueManagementTab: React.FC = () => {
       service: customer.service,
       waitTime: Math.floor((new Date().getTime() - customer.joinedAt.getTime()) / 60000),
       priority: customer.priority,
-      status: 'waiting' as const // Map to the expected status type
+      status: 'waiting' as const // Always 'waiting' since we filter for waiting customers
     }));
 
   const handleCustomerCalled = (customerId: string) => {
     console.log('Customer called:', customerId);
-    // Implementation would update queue state via QueueContext
+    // Update customer status to 'serving' in QueueContext
+    updateCustomer(customerId, { 
+      status: 'serving',
+      calledAt: new Date()
+    });
   };
 
   const handleNoShow = (customerId: string) => {
     console.log('Customer marked as no-show:', customerId);
-    // Implementation would remove customer from queue via QueueContext
+    // Update customer status to 'no_show' in QueueContext
+    updateCustomer(customerId, { status: 'no_show' });
   };
 
   // Use a default location since User doesn't have location_id

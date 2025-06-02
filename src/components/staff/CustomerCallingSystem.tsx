@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { Phone, PhoneCall, UserX, Clock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface QueueCustomer {
   id: string;
@@ -37,14 +36,6 @@ export const CustomerCallingSystem: React.FC<CustomerCallingSystemProps> = ({
     setCallingCustomer(customer.id);
     
     try {
-      // Update customer status to 'in_progress' (valid appointment status)
-      const { error } = await supabase
-        .from('appointments')
-        .update({ status: 'in_progress' })
-        .eq('customer_id', customer.id);
-
-      if (error) throw error;
-
       // Show display board notification
       toast({
         title: t('queue.customerCalled'),
@@ -52,6 +43,7 @@ export const CustomerCallingSystem: React.FC<CustomerCallingSystemProps> = ({
         duration: 5000,
       });
 
+      // Call the parent handler to update queue state
       onCustomerCalled(customer.id);
     } catch (error) {
       console.error('Error calling customer:', error);
@@ -67,18 +59,12 @@ export const CustomerCallingSystem: React.FC<CustomerCallingSystemProps> = ({
 
   const markNoShow = async (customer: QueueCustomer) => {
     try {
-      const { error } = await supabase
-        .from('appointments')
-        .update({ status: 'no_show' })
-        .eq('customer_id', customer.id);
-
-      if (error) throw error;
-
       toast({
         title: t('queue.markedNoShow'),
         description: customer.name,
       });
 
+      // Call the parent handler to update queue state
       onNoShow(customer.id);
     } catch (error) {
       console.error('Error marking no-show:', error);

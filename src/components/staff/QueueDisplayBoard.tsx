@@ -1,10 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 import { Monitor, Users, Clock } from 'lucide-react';
 import { useQueue } from '@/context/QueueContext';
+import { formatTime } from '@/lib/queue';
 
 export const QueueDisplayBoard: React.FC = () => {
   const { t } = useTranslation();
@@ -39,7 +40,7 @@ export const QueueDisplayBoard: React.FC = () => {
                 </div>
               )}
               <div className="text-xs text-green-600 mt-2">
-                Called at: {currentCustomer.calledAt?.toLocaleTimeString()}
+                Called at: {currentCustomer.calledAt ? formatTime(currentCustomer.calledAt) : 'Recently'}
               </div>
             </div>
           ) : (
