@@ -33,7 +33,6 @@ const AppointmentProgressCard: React.FC<AppointmentProgressCardProps> = ({ curre
           </div>
           <Breadcrumb 
             items={getBreadcrumbItems()}
-            showHome={false}
             className="justify-center"
           />
         </CardContent>
