@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -133,14 +134,14 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
       if (existingCustomer) {
         customerId = existingCustomer.id;
       } else {
-        // Create new customer
+        // Create new customer - let the database generate the ID
         const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
             first_name: firstName,
             last_name: lastName,
             phone: data.phone,
-            email: null // Will be set when they create an account
+            email: null
           })
           .select('id')
           .single();
