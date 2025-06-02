@@ -20,11 +20,11 @@ export const QueueManagementTab: React.FC = () => {
     .map(customer => ({
       id: customer.id,
       name: customer.name,
-      phone: customer.phone,
+      phone: customer.phone || '',
       service: customer.service,
       waitTime: Math.floor((new Date().getTime() - customer.joinedAt.getTime()) / 60000),
       priority: customer.priority,
-      status: customer.status
+      status: 'waiting' as const // Map to the expected status type
     }));
 
   const handleCustomerCalled = (customerId: string) => {
@@ -37,8 +37,8 @@ export const QueueManagementTab: React.FC = () => {
     // Implementation would remove customer from queue via QueueContext
   };
 
-  // Use user's location if available, otherwise use default
-  const locationId = user?.location_id || 'default-location';
+  // Use a default location since User doesn't have location_id
+  const locationId = 'default-location';
 
   return (
     <div className="space-y-6">
