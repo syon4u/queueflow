@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQueue } from '@/context/QueueContext';
+import { useQueue, Customer } from '@/context/QueueContext';
 import { formatWaitTime } from '@/lib/queue';
 
 interface ServiceWaitTime {
