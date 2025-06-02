@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
+import { useLocations } from '@/hooks/appointment-form/useLocations';
+import { useServices } from '@/hooks/appointment-form/useServices';
 import CustomerDetailsFields from './CustomerDetailsFields';
 import LocationServiceSelector from './LocationServiceSelector';
 import DateTimePicker from './DateTimePicker';
@@ -41,52 +41,18 @@ const NewCustomerForm = ({
 }: NewCustomerFormProps) => {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<NewCustomerFormValues>();
 
-  const { data: locations } = useQuery({
-    queryKey: ['locations'],
-    queryFn: async () => {
-      console.log('NewCustomerForm - Fetching locations...');
-      // Remove authentication for public access to locations
-      const { data, error } = await supabase
-        .from('locations')
-        .select('*')
-        .order('name');
-      if (error) {
-        console.error('NewCustomerForm - Error fetching locations:', error);
-        throw error;
-      }
-      console.log('NewCustomerForm - Locations fetched:', data);
-      return data;
-    },
-  });
-
+  const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
   const selectedLocationId = watch('location_id');
+  const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
 
-  const { data: services, isLoading: servicesLoading, error: servicesError } = useQuery({
-    queryKey: ['services', selectedLocationId],
-    queryFn: async () => {
-      if (!selectedLocationId) {
-        console.log('NewCustomerForm - No location selected, returning empty array');
-        return [];
-      }
-      
-      console.log('NewCustomerForm - Fetching services for location:', selectedLocationId);
-      // Remove authentication for public access to services
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('location_id', selectedLocationId)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) {
-        console.error('NewCustomerForm - Error fetching services:', error);
-        throw error;
-      }
-      
-      console.log('NewCustomerForm - Services fetched:', data);
-      return data;
-    },
-    enabled: !!selectedLocationId,
+  console.log('NewCustomerForm - Component state:', {
+    locationsCount: locations?.length || 0,
+    locationsLoading,
+    locationsError,
+    selectedLocationId,
+    servicesCount: services?.length || 0,
+    servicesLoading,
+    servicesError
   });
 
   // Clear service selection when location changes
@@ -95,6 +61,23 @@ const NewCustomerForm = ({
       setValue('service_id', '');
     }
   }, [selectedLocationId, setValue]);
+
+  if (locationsError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+        </div>
+        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+          Error loading locations: {locationsError}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -113,7 +96,7 @@ const NewCustomerForm = ({
           locations={locations}
           services={services}
           servicesLoading={servicesLoading}
-          servicesError={servicesError}
+          servicesError={servicesError ? new Error(servicesError) : null}
           selectedLocationId={selectedLocationId}
           setValue={setValue}
         />
@@ -135,7 +118,10 @@ const NewCustomerForm = ({
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || locationsLoading}
+          >
             {isSubmitting ? 'Scheduling...' : 'Schedule Appointment'}
           </Button>
         </div>

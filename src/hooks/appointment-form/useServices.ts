@@ -18,6 +18,7 @@ export const useServices = (selectedLocationId: string) => {
         return [];
       }
       
+      // For anonymous users, fetch services without authentication
       const { data, error } = await supabase
         .from('services')
         .select('id, name, duration, description')
@@ -30,10 +31,12 @@ export const useServices = (selectedLocationId: string) => {
         throw error;
       }
       
-      console.log('useServices - Services fetched:', data);
+      console.log('useServices - Services fetched successfully:', data);
       return data || [];
     },
     enabled: !!selectedLocationId,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   return {
