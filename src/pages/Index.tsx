@@ -141,28 +141,6 @@ const Index = () => {
             </Card>
           </div>
         </div>
-        
-        {/* About Section */}
-        <div className="bg-white border-t">
-          <div className="container mx-auto px-4 py-16">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-6">About QueueFlow</h2>
-              <div className="text-left space-y-4 text-gray-600">
-                <p>
-                  QueueFlow is a modern queue management system designed to help businesses manage customer flow efficiently. 
-                  Our platform helps reduce wait times, improve customer satisfaction, and optimize staff productivity.
-                </p>
-                <p>
-                  With features like real-time queue updates, appointment scheduling, and analytics, 
-                  QueueFlow provides everything you need to create a smooth customer experience.
-                </p>
-                <p>
-                  Whether you're a small business or a large enterprise, QueueFlow scales to meet your needs.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       
       {/* Welcome guide modal */}
