@@ -47,7 +47,7 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      // Create customer first
+      // Create customer first - let database generate the ID
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
         .insert({

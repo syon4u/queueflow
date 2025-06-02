@@ -44,7 +44,7 @@ export const useAppointmentCreation = () => {
         customerId = existingCustomer.id;
         console.log('useAppointmentCreation - Using existing customer:', customerId);
       } else {
-        // Create new customer
+        // Create new customer - let database generate the ID
         const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
