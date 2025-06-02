@@ -18,7 +18,7 @@ export const useServices = (selectedLocationId: string) => {
         return [];
       }
       
-      // For anonymous users, fetch services without authentication
+      // For anonymous users, we can now fetch services thanks to RLS policy
       const { data, error } = await supabase
         .from('services')
         .select('id, name, duration, description')
@@ -35,8 +35,8 @@ export const useServices = (selectedLocationId: string) => {
       return data || [];
     },
     enabled: !!selectedLocationId,
-    retry: 3,
-    retryDelay: 1000,
+    retry: 1, // Reduce retries since we've fixed the RLS issue
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   return {

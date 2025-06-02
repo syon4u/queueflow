@@ -52,7 +52,8 @@ const NewCustomerForm = ({
     selectedLocationId,
     servicesCount: services?.length || 0,
     servicesLoading,
-    servicesError
+    servicesError,
+    locations
   });
 
   // Clear service selection when location changes
@@ -74,6 +75,47 @@ const NewCustomerForm = ({
         </div>
         <div className="text-red-600 p-4 bg-red-50 rounded-lg">
           Error loading locations: {locationsError}
+          <div className="mt-2 text-sm">
+            Please try refreshing the page or contact support if the issue persists.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (locationsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+        </div>
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading available locations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!locations || locations.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h3 className="text-lg font-semibold">New Customer Appointment</h3>
+        </div>
+        <div className="text-amber-600 p-4 bg-amber-50 rounded-lg">
+          <p className="font-medium">No locations available</p>
+          <p className="mt-1 text-sm">
+            There are currently no open locations accepting appointments. Please check back later or contact us directly.
+          </p>
         </div>
       </div>
     );
@@ -120,7 +162,7 @@ const NewCustomerForm = ({
         <div className="flex justify-end">
           <Button 
             type="submit" 
-            disabled={isSubmitting || locationsLoading}
+            disabled={isSubmitting || locationsLoading || !selectedLocationId}
           >
             {isSubmitting ? 'Scheduling...' : 'Schedule Appointment'}
           </Button>

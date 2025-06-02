@@ -9,7 +9,7 @@ export const useLocations = () => {
     queryFn: async (): Promise<Location[]> => {
       console.log('useLocations - Fetching locations for anonymous user...');
       
-      // For anonymous users, we need to fetch locations without authentication
+      // For anonymous users, we can now fetch locations thanks to RLS policy
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, address')
@@ -24,8 +24,8 @@ export const useLocations = () => {
       console.log('useLocations - Locations fetched successfully:', data);
       return data || [];
     },
-    retry: 3,
-    retryDelay: 1000,
+    retry: 1, // Reduce retries since we've fixed the RLS issue
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   return { 
