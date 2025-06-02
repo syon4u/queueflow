@@ -46,7 +46,7 @@ const NewCustomerForm = ({
   const selectedServiceId = watch('service_id');
   const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
 
-  console.log('NewCustomerForm - Component state:', {
+  console.log('NewCustomerForm - Complete component state:', {
     locationsCount: locations?.length || 0,
     locationsLoading,
     locationsError,
@@ -55,7 +55,8 @@ const NewCustomerForm = ({
     servicesCount: services?.length || 0,
     servicesLoading,
     servicesError,
-    locations
+    locations: locations,
+    services: services
   });
 
   // Clear service selection when location changes
@@ -76,7 +77,8 @@ const NewCustomerForm = ({
           <h3 className="text-lg font-semibold">New Customer Appointment</h3>
         </div>
         <div className="text-red-600 p-4 bg-red-50 rounded-lg">
-          Error loading locations: {locationsError}
+          <p className="font-medium">Error loading locations</p>
+          <p className="mt-1 text-sm">{locationsError}</p>
           <div className="mt-2 text-sm">
             Please try refreshing the page or contact support if the issue persists.
           </div>
@@ -98,6 +100,7 @@ const NewCustomerForm = ({
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading available locations...</p>
+          <p className="mt-1 text-sm text-gray-500">This may take a few moments</p>
         </div>
       </div>
     );
@@ -118,6 +121,15 @@ const NewCustomerForm = ({
           <p className="mt-1 text-sm">
             There are currently no open locations accepting appointments. Please check back later or contact us directly.
           </p>
+          <div className="mt-3">
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.reload()}
+              className="text-amber-700 border-amber-300 hover:bg-amber-100"
+            >
+              Refresh Page
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -141,8 +153,8 @@ const NewCustomerForm = ({
           services={services}
           servicesLoading={servicesLoading}
           servicesError={servicesError ? new Error(servicesError) : null}
-          selectedLocationId={selectedLocationId}
-          selectedServiceId={selectedServiceId}
+          selectedLocationId={selectedLocationId || ''}
+          selectedServiceId={selectedServiceId || ''}
           setValue={setValue}
         />
 
