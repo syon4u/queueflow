@@ -23,7 +23,12 @@ interface QueueCustomer {
 export const QueueManagementTab: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { customers, updateCustomer, removeCustomer } = useQueue();
+  const { customers, updateCustomer, removeCustomer, stats } = useQueue();
+
+  // Debug logging for QueueManagementTab
+  console.log('QueueManagementTab - customers:', customers);
+  console.log('QueueManagementTab - stats:', stats);
+  console.log('QueueManagementTab - stats.waitingCustomers:', stats.waitingCustomers);
 
   // Convert QueueContext customers to the format expected by CustomerCallingSystem
   const formattedCustomers: QueueCustomer[] = customers
@@ -37,6 +42,8 @@ export const QueueManagementTab: React.FC = () => {
       priority: customer.priority,
       status: 'waiting' as const // Always 'waiting' since we filter for waiting customers
     }));
+
+  console.log('QueueManagementTab - formattedCustomers count:', formattedCustomers.length);
 
   const handleCustomerCalled = (customerId: string) => {
     console.log('Customer called:', customerId);

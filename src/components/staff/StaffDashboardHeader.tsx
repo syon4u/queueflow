@@ -28,6 +28,9 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Debug logging for StaffDashboardHeader
+  console.log('StaffDashboardHeader - waitingCustomers prop:', waitingCustomers);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':

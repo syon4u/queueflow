@@ -6,7 +6,12 @@ import { Users, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { formatWaitTime } from '@/lib/queue';
 
 const QueueStats: React.FC = () => {
-  const { stats } = useQueue();
+  const { stats, customers } = useQueue();
+
+  // Debug logging for QueueStats
+  console.log('QueueStats - stats.waitingCustomers:', stats.waitingCustomers);
+  console.log('QueueStats - all customers:', customers);
+  console.log('QueueStats - waiting customers filtered:', customers.filter(c => c.status === 'waiting'));
 
   const statItems = [
     {

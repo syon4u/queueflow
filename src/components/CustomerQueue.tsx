@@ -15,7 +15,12 @@ import { Badge } from '@/components/ui/badge';
 import { Phone, Clock, MessageSquare, Flag, Timer } from 'lucide-react';
 
 const CustomerQueue: React.FC = () => {
-  const { customers, getEstimatedWaitTime } = useQueue();
+  const { customers, getEstimatedWaitTime, stats } = useQueue();
+  
+  // Debug logging for CustomerQueue
+  console.log('CustomerQueue - customers:', customers);
+  console.log('CustomerQueue - stats:', stats);
+  console.log('CustomerQueue - stats.waitingCustomers:', stats.waitingCustomers);
   
   // Get waiting customers only, ordered by priority then join time
   const waitingCustomers = [...customers]
@@ -28,6 +33,8 @@ const CustomerQueue: React.FC = () => {
       // Then by join time
       return a.joinedAt.getTime() - b.joinedAt.getTime();
     });
+
+  console.log('CustomerQueue - waitingCustomers filtered count:', waitingCustomers.length);
 
   return (
     <Card className="h-full">
