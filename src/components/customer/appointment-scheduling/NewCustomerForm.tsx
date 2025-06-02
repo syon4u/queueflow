@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 import CustomerDetailsFields from './CustomerDetailsFields';
 import LocationServiceSelector from './LocationServiceSelector';
 import DateTimePicker from './DateTimePicker';
@@ -40,6 +42,9 @@ const NewCustomerForm = ({
   isSubmitting
 }: NewCustomerFormProps) => {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<NewCustomerFormValues>();
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const { data: locations } = useQuery({
     queryKey: ['locations'],
@@ -48,6 +53,7 @@ const NewCustomerForm = ({
       const { data, error } = await supabase
         .from('locations')
         .select('*')
+        .eq('queue_status', 'open')
         .order('name');
       if (error) {
         console.error('NewCustomerForm - Error fetching locations:', error);
@@ -87,6 +93,98 @@ const NewCustomerForm = ({
     enabled: !!selectedLocationId,
   });
 
+  // Create appointment for new customer
+  const createAppointment = useMutation({
+    mutationFn: async (formData: NewCustomerFormValues) => {
+      console.log('NewCustomerForm - Creating appointment for new customer:', formData);
+      
+      if (!selectedDate || !selectedTime) {
+        throw new Error('Date and time are required');
+      }
+
+      // Parse the name into first and last name
+      const nameParts = formData.name.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
+
+      // Create customer first
+      const customerUuid = crypto.randomUUID();
+      console.log('Creating customer with ID:', customerUuid);
+      
+      const { error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          id: customerUuid,
+          first_name: firstName,
+          last_name: lastName,
+          phone: formData.phone,
+          email: formData.email
+        });
+
+      if (customerError) {
+        console.error('Error creating customer:', customerError);
+        throw customerError;
+      }
+
+      // Create appointment
+      const appointmentUuid = crypto.randomUUID();
+      const scheduledDateTime = new Date(selectedDate);
+      const [hours, minutes] = selectedTime.split(':');
+      scheduledDateTime.setHours(parseInt(hours), parseInt(minutes));
+
+      console.log('Creating appointment with ID:', appointmentUuid);
+      
+      const { error: appointmentError } = await supabase
+        .from('appointments')
+        .insert({
+          id: appointmentUuid,
+          customer_id: customerUuid,
+          service_id: formData.service_id,
+          location_id: formData.location_id,
+          scheduled_time: scheduledDateTime.toISOString(),
+          reason_for_visit: formData.reason_for_visit,
+          status: 'scheduled'
+        });
+
+      if (appointmentError) {
+        console.error('Error creating appointment:', appointmentError);
+        throw appointmentError;
+      }
+
+      return { customerId: customerUuid, appointmentId: appointmentUuid };
+    },
+    onSuccess: (data) => {
+      console.log('NewCustomerForm - Appointment created successfully:', data);
+      toast({
+        title: t('common.success'),
+        description: t('appointments.created'),
+      });
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      // Call the original onSubmit to handle any additional logic
+      onSubmit({
+        name: '',
+        phone: '',
+        email: '',
+        service_id: '',
+        location_id: '',
+        reason_for_visit: ''
+      });
+    },
+    onError: (error) => {
+      console.error('NewCustomerForm - Error creating appointment:', error);
+      toast({
+        title: t('common.error'),
+        description: error.message || t('appointments.createError'),
+        variant: 'destructive',
+      });
+    }
+  });
+
+  const handleFormSubmit = (data: NewCustomerFormValues) => {
+    console.log('NewCustomerForm - Form submitted:', data);
+    createAppointment.mutate(data);
+  };
+
   // Clear service selection when location changes
   React.useEffect(() => {
     if (selectedLocationId) {
@@ -104,7 +202,7 @@ const NewCustomerForm = ({
         <h3 className="text-lg font-semibold">New Customer Appointment</h3>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
         <CustomerDetailsFields register={register} errors={errors} />
 
         <LocationServiceSelector
@@ -133,8 +231,11 @@ const NewCustomerForm = ({
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Scheduling...' : 'Schedule Appointment'}
+          <Button 
+            type="submit" 
+            disabled={createAppointment.isPending || !selectedDate || !selectedTime}
+          >
+            {createAppointment.isPending ? 'Scheduling...' : 'Schedule Appointment'}
           </Button>
         </div>
       </form>

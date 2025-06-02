@@ -24,17 +24,25 @@ export const useAppointmentCreation = () => {
 
       // Check if customer exists
       let customerId;
-      const { data: existingCustomer } = await supabase
+      const { data: existingCustomer, error: customerSearchError } = await supabase
         .from('customers')
         .select('id')
         .eq('email', user.email)
-        .single();
+        .maybeSingle();
+
+      if (customerSearchError) {
+        console.error('Error searching for customer:', customerSearchError);
+        throw customerSearchError;
+      }
 
       if (existingCustomer) {
         customerId = existingCustomer.id;
+        console.log('Found existing customer:', customerId);
       } else {
         // Create new customer
         const customerUuid = crypto.randomUUID();
+        console.log('Creating new customer with ID:', customerUuid);
+        
         const { error: customerError } = await supabase
           .from('customers')
           .insert({
@@ -45,14 +53,23 @@ export const useAppointmentCreation = () => {
             phone: user.user_metadata?.phone
           });
 
-        if (customerError) throw customerError;
+        if (customerError) {
+          console.error('Error creating customer:', customerError);
+          throw customerError;
+        }
+        
         customerId = customerUuid;
+        console.log('Created new customer:', customerId);
       }
 
       // Create appointment
+      const appointmentUuid = crypto.randomUUID();
+      console.log('Creating appointment with ID:', appointmentUuid);
+      
       const { data, error } = await supabase
         .from('appointments')
         .insert({
+          id: appointmentUuid,
           customer_id: customerId,
           service_id: appointmentData.service_id,
           location_id: appointmentData.location_id,
@@ -64,7 +81,12 @@ export const useAppointmentCreation = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating appointment:', error);
+        throw error;
+      }
+      
+      console.log('Appointment created successfully:', data);
       return data;
     },
     onSuccess: (data) => {
@@ -80,7 +102,7 @@ export const useAppointmentCreation = () => {
       console.error('useAppointmentCreation - Error creating appointment:', error);
       toast({
         title: t('common.error'),
-        description: t('appointments.createError'),
+        description: error.message || t('appointments.createError'),
         variant: 'destructive',
       });
     },
