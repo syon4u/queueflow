@@ -7,17 +7,16 @@ export const useLocations = () => {
   const { data: locations = [], isLoading, error } = useQuery({
     queryKey: ['locations'],
     queryFn: async (): Promise<Location[]> => {
-      console.log('useLocations - Starting location fetch for anonymous user...');
+      console.log('useLocations - Starting location fetch...');
       
       try {
-        // Fetch open locations for anonymous users
+        // Fetch all locations (not just open ones for now to debug)
         const { data, error } = await supabase
           .from('locations')
           .select('id, name, address')
-          .eq('queue_status', 'open')
           .order('name');
         
-        console.log('useLocations - Query result:', { data, error });
+        console.log('useLocations - Raw query result:', { data, error });
         
         if (error) {
           console.error('useLocations - Database error:', error);
@@ -25,7 +24,7 @@ export const useLocations = () => {
         }
         
         const result = data || [];
-        console.log('useLocations - Returning locations:', result.length);
+        console.log('useLocations - Final locations result:', result);
         return result;
         
       } catch (err) {
@@ -33,13 +32,15 @@ export const useLocations = () => {
         throw err;
       }
     },
-    retry: 2,
+    retry: 3,
+    retryDelay: 1000,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
   console.log('useLocations - Hook final state:', {
     locationsCount: locations?.length || 0,
+    locations: locations,
     isLoading,
     error: error?.message || null
   });
