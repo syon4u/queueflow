@@ -13,6 +13,7 @@ import { ServicesTab } from './ServicesTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
+import CustomerManagementTab from './CustomerManagementTab';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminDashboardHeader } from './AdminDashboardHeader';
 import { useAdminDashboardStats } from '@/hooks/admin/use-admin-dashboard-stats';
@@ -52,6 +53,8 @@ const AdminPage = () => {
         return <DashboardTab />;
       case 'users':
         return <UserManagementTab />;
+      case 'customers':
+        return <CustomerManagementTab />;
       case 'staff':
         return <StaffTab />;
       case 'locations':

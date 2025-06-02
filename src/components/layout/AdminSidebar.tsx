@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -25,7 +24,8 @@ import {
   MessageSquare,
   BarChart3,
   Settings,
-  LogOut
+  LogOut,
+  Contact
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -53,6 +53,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       id: 'users',
       label: 'Users',
       icon: Users,
+    },
+    {
+      id: 'customers',
+      label: 'Customers',
+      icon: Contact,
     },
     {
       id: 'staff',
