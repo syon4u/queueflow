@@ -1,23 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Appointment {
-  id: string;
-  customer_id: string;
-  service_id: string;
-  location_id: string;
-  staff_id?: string | null;
-  scheduled_time: string;
-  check_in_time?: string | null;
-  start_time?: string | null;
-  end_time?: string | null;
-  status: string;
-  reason_for_visit?: string | null;
-  notes?: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { Appointment } from '@/hooks/use-appointments';
 
 interface RealtimeAppointmentsReturn {
   appointments: Appointment[];
@@ -52,7 +36,12 @@ export const useRealtimeAppointments = (): RealtimeAppointmentsReturn => {
         setAppointments([]);
       } else {
         console.log('useRealtimeAppointments - Fetched appointments:', data?.length || 0);
-        setAppointments(data || []);
+        // Map the data to ensure staff_id is always present (set to null if undefined)
+        const mappedAppointments = (data || []).map(appointment => ({
+          ...appointment,
+          staff_id: appointment.staff_id || null,
+        })) as Appointment[];
+        setAppointments(mappedAppointments);
         setError(null);
       }
       
