@@ -1,90 +1,87 @@
 
-import type { Customer } from "@/context/QueueContext";
+import { Customer } from '@/context/QueueContext';
 
-// Calculate estimated wait time based on position in queue and average serve time
-export const calculateEstimatedWaitTime = (
-  position: number, 
-  averageServeTime: number = 5
-): number => {
-  return position * averageServeTime;
-};
-
-// Format wait time into minutes/hours
-export const formatWaitTime = (minutes: number): string => {
-  if (minutes < 1) return 'Less than a minute';
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
-  
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  
-  if (remainingMinutes === 0) {
-    return `${hours} hour${hours === 1 ? '' : 's'}`;
-  }
-  
-  return `${hours} hour${hours === 1 ? '' : 's'} ${remainingMinutes} minute${remainingMinutes === 1 ? '' : 's'}`;
-};
-
-// Format timestamp to readable time
 export const formatTime = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  }).format(date);
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
 };
 
-// Calculate queue position for a customer
-export const getQueuePosition = (
-  customerId: string, 
-  customers: Customer[]
-): number => {
-  const waitingCustomers = customers
-    .filter(c => c.status === 'waiting')
-    .sort((a, b) => {
-      // Sort by priority first
-      if (a.priority !== b.priority) {
-        return a.priority === 'priority' ? -1 : 1;
-      }
-      // Then by join time
-      return a.joinedAt.getTime() - b.joinedAt.getTime();
-    });
-  
-  const index = waitingCustomers.findIndex(c => c.id === customerId);
-  return index === -1 ? -1 : index + 1;
-};
-
-// Get status display text
-export const getStatusDisplay = (status: Customer['status']): string => {
-  switch (status) {
-    case 'waiting': return 'Waiting';
-    case 'serving': return 'Now Serving';
-    case 'served': return 'Served';
-    case 'no-show': return 'No Show';
-    default: return status;
+export const formatWaitTime = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${Math.round(minutes)}m`;
   }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = Math.round(minutes % 60);
+  return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
 };
 
-// Get color class for different statuses
+export const calculateWaitTime = (joinedAt: Date): number => {
+  return Math.floor((new Date().getTime() - joinedAt.getTime()) / (1000 * 60));
+};
+
 export const getStatusColor = (status: Customer['status']): string => {
   switch (status) {
-    case 'waiting': return 'text-yellow-600 bg-yellow-100';
-    case 'serving': return 'text-green-700 bg-green-100 animate-pulse-light';
-    case 'served': return 'text-blue-700 bg-blue-100';
-    case 'no-show': return 'text-red-700 bg-red-100';
-    default: return 'text-gray-700 bg-gray-100';
+    case 'waiting':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+    case 'serving':
+      return 'bg-green-100 text-green-800 border-green-300';
+    case 'served':
+      return 'bg-blue-100 text-blue-800 border-blue-300';
+    case 'no_show':
+      return 'bg-red-100 text-red-800 border-red-300';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-300';
   }
 };
 
-// Priority label helper
-export const getPriorityLabel = (priority: Customer['priority']): string => {
-  return priority === 'priority' ? 'Priority' : 'Regular';
+export const getStatusText = (status: Customer['status']): string => {
+  switch (status) {
+    case 'waiting':
+      return 'Waiting';
+    case 'serving':
+      return 'Being Served';
+    case 'served':
+      return 'Served';
+    case 'no_show':
+      return 'No Show';
+    default:
+      return 'Unknown';
+  }
 };
 
-// Calculate service efficiency (% of customers served vs total)
-export const calculateServiceEfficiency = (
-  servedCount: number, 
-  totalCount: number
-): number => {
-  if (totalCount === 0) return 0;
-  return Math.round((servedCount / totalCount) * 100);
+export const sortCustomersByPriority = (customers: Customer[]): Customer[] => {
+  return [...customers].sort((a, b) => {
+    // First, filter to only waiting customers for queue position
+    if (a.status !== 'waiting' && b.status !== 'waiting') {
+      return 0; // Keep original order for non-waiting customers
+    }
+    if (a.status !== 'waiting') return 1;
+    if (b.status !== 'waiting') return -1;
+    
+    // Priority customers first
+    if (a.priority !== b.priority) {
+      return a.priority === 'priority' ? -1 : 1;
+    }
+    // Then by join time (earliest first)
+    return a.joinedAt.getTime() - b.joinedAt.getTime();
+  });
+};
+
+export const getNextInQueue = (customers: Customer[]): Customer | null => {
+  const waitingCustomers = customers.filter(c => c.status === 'waiting');
+  const sorted = sortCustomersByPriority(waitingCustomers);
+  return sorted.length > 0 ? sorted[0] : null;
+};
+
+export const calculateEstimatedWaitTime = (customers: Customer[], customerId: string, avgServiceTime: number = 15): number => {
+  const waitingCustomers = customers.filter(c => c.status === 'waiting');
+  const sorted = sortCustomersByPriority(waitingCustomers);
+  const position = sorted.findIndex(c => c.id === customerId);
+  
+  if (position === -1) return 0;
+  
+  return position * avgServiceTime;
 };

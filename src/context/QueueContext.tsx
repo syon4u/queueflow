@@ -15,10 +15,21 @@ export interface Customer {
   notes?: string;
 }
 
+export interface QueueStats {
+  totalCustomers: number;
+  waitingCustomers: number;
+  servedCustomers: number;
+  noShowCustomers: number;
+  averageWaitTime: number;
+}
+
 interface QueueContextType {
   customers: Customer[];
   currentCustomer: Customer | null;
   isLoading: boolean;
+  stats: QueueStats;
+  queueStatus: 'open' | 'closed';
+  locationId: string;
   addCustomer: (customer: Omit<Customer, 'id' | 'joinedAt' | 'status'>) => void;
   callNextCustomer: () => void;
   markAsServed: () => void;
@@ -27,6 +38,8 @@ interface QueueContextType {
   updateCustomer: (id: string, updates: Partial<Customer>) => void;
   getQueuePosition: (customerId: string) => number;
   getEstimatedWaitTime: (customerId: string) => number;
+  resetQueue: () => void;
+  setQueueStatus: (status: 'open' | 'closed') => void;
 }
 
 const QueueContext = createContext<QueueContextType | undefined>(undefined);
@@ -75,7 +88,34 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [customers, setCustomers] = useState<Customer[]>(sampleCustomers);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [queueStatus, setQueueStatus] = useState<'open' | 'closed'>('open');
+  const [locationId] = useState('default-location');
   const { toast } = useToast();
+
+  // Calculate stats dynamically
+  const stats: QueueStats = React.useMemo(() => {
+    const totalCustomers = customers.length;
+    const waitingCustomers = customers.filter(c => c.status === 'waiting').length;
+    const servedCustomers = customers.filter(c => c.status === 'served').length;
+    const noShowCustomers = customers.filter(c => c.status === 'no_show').length;
+    
+    // Calculate average wait time for served customers
+    const servedWithWaitTime = customers.filter(c => c.status === 'served');
+    const averageWaitTime = servedWithWaitTime.length > 0 
+      ? servedWithWaitTime.reduce((acc, customer) => {
+          const waitTime = Math.floor((new Date().getTime() - customer.joinedAt.getTime()) / 60000);
+          return acc + waitTime;
+        }, 0) / servedWithWaitTime.length
+      : 0;
+
+    return {
+      totalCustomers,
+      waitingCustomers,
+      servedCustomers,
+      noShowCustomers,
+      averageWaitTime
+    };
+  }, [customers]);
 
   const addCustomer = (customerData: Omit<Customer, 'id' | 'joinedAt' | 'status'>) => {
     const newCustomer: Customer = {
@@ -198,6 +238,10 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     if (currentCustomer?.id === id) {
       setCurrentCustomer(null);
     }
+    toast({
+      title: 'Customer Removed',
+      description: 'Customer has been removed from the queue',
+    });
   };
 
   const updateCustomer = (id: string, updates: Partial<Customer>) => {
@@ -231,11 +275,23 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return position === -1 ? 0 : position * 15; // 15 minutes per customer estimate
   };
 
+  const resetQueue = () => {
+    setCustomers([]);
+    setCurrentCustomer(null);
+    toast({
+      title: 'Queue Reset',
+      description: 'All customers have been removed from the queue',
+    });
+  };
+
   return (
     <QueueContext.Provider value={{
       customers,
       currentCustomer,
       isLoading,
+      stats,
+      queueStatus,
+      locationId,
       addCustomer,
       callNextCustomer,
       markAsServed,
@@ -243,7 +299,9 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       removeCustomer,
       updateCustomer,
       getQueuePosition,
-      getEstimatedWaitTime
+      getEstimatedWaitTime,
+      resetQueue,
+      setQueueStatus
     }}>
       {children}
     </QueueContext.Provider>
