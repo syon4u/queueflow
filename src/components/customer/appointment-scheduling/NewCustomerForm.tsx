@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,12 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, ArrowLeft } from 'lucide-react';
+import { CalendarIcon, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export interface NewCustomerFormValues {
   name: string;
@@ -52,32 +52,55 @@ const NewCustomerForm = ({
   const { data: locations } = useQuery({
     queryKey: ['locations'],
     queryFn: async () => {
+      console.log('NewCustomerForm - Fetching locations...');
       const { data, error } = await supabase
         .from('locations')
         .select('*')
         .order('name');
-      if (error) throw error;
+      if (error) {
+        console.error('NewCustomerForm - Error fetching locations:', error);
+        throw error;
+      }
+      console.log('NewCustomerForm - Locations fetched:', data);
       return data;
     },
   });
 
   const selectedLocationId = watch('location_id');
 
-  const { data: services } = useQuery({
+  const { data: services, isLoading: servicesLoading, error: servicesError } = useQuery({
     queryKey: ['services', selectedLocationId],
     queryFn: async () => {
-      if (!selectedLocationId) return [];
+      if (!selectedLocationId) {
+        console.log('NewCustomerForm - No location selected, returning empty array');
+        return [];
+      }
+      
+      console.log('NewCustomerForm - Fetching services for location:', selectedLocationId);
       const { data, error } = await supabase
         .from('services')
         .select('*')
         .eq('location_id', selectedLocationId)
         .eq('is_active', true)
         .order('name');
-      if (error) throw error;
+      
+      if (error) {
+        console.error('NewCustomerForm - Error fetching services:', error);
+        throw error;
+      }
+      
+      console.log('NewCustomerForm - Services fetched:', data);
       return data;
     },
     enabled: !!selectedLocationId,
   });
+
+  // Clear service selection when location changes
+  React.useEffect(() => {
+    if (selectedLocationId) {
+      setValue('service_id', '');
+    }
+  }, [selectedLocationId, setValue]);
 
   return (
     <div className="space-y-6">
@@ -139,14 +162,49 @@ const NewCustomerForm = ({
 
           <div className="space-y-2">
             <Label htmlFor="service">Service *</Label>
-            <Select onValueChange={(value) => setValue('service_id', value)}>
+            
+            {servicesError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Error loading services: {servicesError.message}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {!selectedLocationId && (
+              <Alert>
+                <AlertDescription>
+                  Please select a location first to see available services.
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <Select 
+              onValueChange={(value) => setValue('service_id', value)}
+              disabled={!selectedLocationId || servicesLoading || !services?.length}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Select a service" />
+                <SelectValue placeholder={
+                  !selectedLocationId 
+                    ? "Select a location first"
+                    : servicesLoading 
+                      ? "Loading services..."
+                      : !services?.length 
+                        ? "No services available"
+                        : "Select a service"
+                } />
+                {servicesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               </SelectTrigger>
               <SelectContent>
                 {services?.map((service) => (
                   <SelectItem key={service.id} value={service.id}>
-                    {service.name}
+                    <div className="flex flex-col">
+                      <span>{service.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {service.duration} min
+                      </span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>

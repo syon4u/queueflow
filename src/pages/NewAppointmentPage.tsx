@@ -40,10 +40,21 @@ const NewAppointmentPage = () => {
     currentStep,
     locations,
     services,
+    servicesLoading,
+    servicesError,
     handleSubmit,
     nextStep,
     prevStep
   } = useAppointmentForm();
+  
+  console.log('NewAppointmentPage - Form state:', {
+    selectedLocationId,
+    selectedServiceId,
+    servicesCount: services.length,
+    servicesLoading,
+    servicesError,
+    currentStep
+  });
   
   const handleBackNavigation = () => {
     // Navigate back based on user role
@@ -125,6 +136,8 @@ const NewAppointmentPage = () => {
                     onServiceChange={setSelectedServiceId}
                     locationId={selectedLocationId}
                     services={services}
+                    isLoading={servicesLoading}
+                    error={servicesError}
                   />
                 </div>
               )}
