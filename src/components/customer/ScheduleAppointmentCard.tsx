@@ -1,6 +1,11 @@
-
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentScheduling } from '@/hooks/useAppointmentScheduling';
 import CustomerSearchStep from './appointment-scheduling/CustomerSearchStep';
@@ -8,12 +13,14 @@ import NewCustomerForm from './appointment-scheduling/NewCustomerForm';
 import ExistingCustomerForm from './appointment-scheduling/ExistingCustomerForm';
 
 interface ScheduleAppointmentCardProps {
-  onAppointmentScheduled: (code: string) => void;
+  onAppointmentScheduled: (confirmationCode: string) => void;
 }
 
-const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointmentCardProps) => {
+const ScheduleAppointmentCard: React.FC<ScheduleAppointmentCardProps> = ({
+  onAppointmentScheduled,
+}) => {
   const { t } = useTranslation();
-  
+
   const {
     selectedDate,
     setSelectedDate,
@@ -37,14 +44,15 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
           {t('appointments.scheduleDescription')}
         </CardDescription>
       </CardHeader>
+
       <CardContent>
         {step === 'search' && (
-          <CustomerSearchStep 
-            onSelectCustomer={handleSelectCustomer} 
-            onCreateNew={handleCreateNewCustomer} 
+          <CustomerSearchStep
+            onSelectCustomer={handleSelectCustomer}
+            onCreateNew={handleCreateNewCustomer}
           />
         )}
-        
+
         {step === 'new-customer' && (
           <NewCustomerForm
             selectedDate={selectedDate}
@@ -56,7 +64,7 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
             isSubmitting={isSubmitting}
           />
         )}
-        
+
         {step === 'existing-customer' && selectedCustomer && (
           <ExistingCustomerForm
             selectedCustomer={selectedCustomer}
