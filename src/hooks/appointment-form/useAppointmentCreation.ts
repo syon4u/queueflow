@@ -44,10 +44,14 @@ export const useAppointmentCreation = () => {
         customerId = existingCustomer.id;
         console.log('useAppointmentCreation - Using existing customer:', customerId);
       } else {
-        // Create new customer - use the exact field names from the database schema
+        // Generate a UUID for the new customer
+        const newCustomerId = crypto.randomUUID();
+        
+        // Create new customer with explicit ID
         const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
+            id: newCustomerId,
             first_name: firstName,
             last_name: lastName,
             phone: appointmentData.customerDetails.phone,

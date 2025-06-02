@@ -47,10 +47,14 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      // Create customer first - use the exact field names from the database schema
+      // Generate a UUID for the new customer
+      const newCustomerId = crypto.randomUUID();
+
+      // Create customer first with explicit ID
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
         .insert({
+          id: newCustomerId,
           first_name: firstName,
           last_name: lastName,
           phone: data.phone,
