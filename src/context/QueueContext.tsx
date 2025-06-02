@@ -1,5 +1,8 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Customer {
   id: string;
@@ -52,47 +55,79 @@ export const useQueue = () => {
   return context;
 };
 
-// Sample data for testing
-const sampleCustomers: Customer[] = [
-  {
-    id: '1',
-    name: 'John Smith',
-    phone: '(555) 123-4567',
-    service: 'Business License',
-    priority: 'normal',
-    status: 'waiting',
-    joinedAt: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
-    notes: 'Needs help with renewal paperwork'
-  },
-  {
-    id: '2',
-    name: 'Maria Garcia',
-    phone: '(555) 987-6543',
-    service: 'Code Violation',
-    priority: 'priority',
-    status: 'waiting',
-    joinedAt: new Date(Date.now() - 8 * 60 * 1000), // 8 minutes ago
-    notes: 'Urgent - property inspection needed'
-  },
-  {
-    id: '3',
-    name: 'David Johnson',
-    service: 'General Inquiry',
-    priority: 'normal',
-    status: 'waiting',
-    joinedAt: new Date(Date.now() - 5 * 60 * 1000) // 5 minutes ago
-  }
-];
-
 export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [customers, setCustomers] = useState<Customer[]>(sampleCustomers);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [queueStatus, setQueueStatus] = useState<'open' | 'closed'>('open');
   const [locationId] = useState('default-location');
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Calculate stats dynamically
+  // Fetch today's appointments from the database
+  const { data: appointmentsData = [] } = useQuery({
+    queryKey: ['queue-appointments'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          status,
+          scheduled_time,
+          check_in_time,
+          start_time,
+          end_time,
+          notes,
+          customers!inner(first_name, last_name, phone, email),
+          services!inner(name)
+        `)
+        .gte('scheduled_time', `${today}T00:00:00`)
+        .lt('scheduled_time', `${today}T23:59:59`)
+        .order('check_in_time', { ascending: true, nullsFirst: false })
+        .order('scheduled_time', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching appointments:', error);
+        throw error;
+      }
+
+      // Transform database data to Customer interface
+      return data.map(appointment => ({
+        id: appointment.id,
+        name: `${appointment.customers.first_name} ${appointment.customers.last_name}`,
+        phone: appointment.customers.phone,
+        email: appointment.customers.email,
+        service: appointment.services.name,
+        priority: 'normal' as const, // Default priority
+        status: mapAppointmentStatusToCustomerStatus(appointment.status),
+        joinedAt: appointment.check_in_time ? new Date(appointment.check_in_time) : new Date(appointment.scheduled_time),
+        calledAt: appointment.start_time ? new Date(appointment.start_time) : undefined,
+        notes: appointment.notes
+      }));
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Helper function to map appointment status to customer status
+  const mapAppointmentStatusToCustomerStatus = (appointmentStatus: string): Customer['status'] => {
+    switch (appointmentStatus) {
+      case 'checked_in':
+        return 'waiting';
+      case 'in_progress':
+        return 'serving';
+      case 'completed':
+        return 'served';
+      case 'no_show':
+        return 'no_show';
+      default:
+        return 'waiting';
+    }
+  };
+
+  // Get customers from transformed appointments data
+  const customers: Customer[] = appointmentsData || [];
+
+  // Calculate stats from real data
   const stats: QueueStats = React.useMemo(() => {
     const totalCustomers = customers.length;
     const waitingCustomers = customers.filter(c => c.status === 'waiting').length;
@@ -100,13 +135,24 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const noShowCustomers = customers.filter(c => c.status === 'no_show').length;
     
     // Calculate average wait time for served customers
-    const servedWithWaitTime = customers.filter(c => c.status === 'served');
+    const servedWithWaitTime = customers.filter(c => c.status === 'served' && c.calledAt);
     const averageWaitTime = servedWithWaitTime.length > 0 
       ? servedWithWaitTime.reduce((acc, customer) => {
-          const waitTime = Math.floor((new Date().getTime() - customer.joinedAt.getTime()) / 60000);
-          return acc + waitTime;
+          if (customer.calledAt) {
+            const waitTime = Math.floor((customer.calledAt.getTime() - customer.joinedAt.getTime()) / 60000);
+            return acc + waitTime;
+          }
+          return acc;
         }, 0) / servedWithWaitTime.length
       : 0;
+
+    console.log('QueueStats - Real data calculated:', {
+      totalCustomers,
+      waitingCustomers,
+      servedCustomers,
+      noShowCustomers,
+      averageWaitTime
+    });
 
     return {
       totalCustomers,
@@ -117,18 +163,18 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, [customers]);
 
+  // Find current customer being served
+  useEffect(() => {
+    const servingCustomer = customers.find(c => c.status === 'serving');
+    setCurrentCustomer(servingCustomer || null);
+  }, [customers]);
+
   const addCustomer = (customerData: Omit<Customer, 'id' | 'joinedAt' | 'status'>) => {
-    const newCustomer: Customer = {
-      ...customerData,
-      id: Date.now().toString(),
-      joinedAt: new Date(),
-      status: 'waiting'
-    };
-    
-    setCustomers(prev => [...prev, newCustomer]);
+    // This would need to create a new appointment in the database
     toast({
-      title: 'Customer Added',
-      description: `${newCustomer.name} has been added to the queue`,
+      title: 'Feature Not Implemented',
+      description: 'Adding customers requires appointment creation in the database',
+      variant: 'destructive',
     });
   };
 
@@ -145,11 +191,9 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const waitingCustomers = customers
       .filter(c => c.status === 'waiting')
       .sort((a, b) => {
-        // Priority customers first
         if (a.priority !== b.priority) {
           return a.priority === 'priority' ? -1 : 1;
         }
-        // Then by join time
         return a.joinedAt.getTime() - b.joinedAt.getTime();
       });
 
@@ -164,97 +208,118 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIsLoading(true);
     const nextCustomer = waitingCustomers[0];
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const updatedCustomer = { ...nextCustomer, status: 'serving' as const, calledAt: new Date() };
-      setCurrentCustomer(updatedCustomer);
-      setCustomers(prev => 
-        prev.map(c => 
-          c.id === nextCustomer.id 
-            ? updatedCustomer
-            : c
-        )
-      );
-      setIsLoading(false);
+    try {
+      // Update appointment status to in_progress
+      const { error } = await supabase
+        .from('appointments')
+        .update({ 
+          status: 'in_progress',
+          start_time: new Date().toISOString()
+        })
+        .eq('id', nextCustomer.id);
+
+      if (error) throw error;
+
+      // Refresh the data
+      queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
+      setIsLoading(false);
       toast({
         title: 'Customer Called',
         description: `${nextCustomer.name} is now being served`,
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error calling next customer:', error);
+      setIsLoading(false);
+      toast({
+        title: 'Error',
+        description: 'Failed to call next customer',
+        variant: 'destructive',
+      });
+    }
   };
 
   const markAsServed = async () => {
     if (!currentCustomer) return;
 
     setIsLoading(true);
-    const customerId = currentCustomer.id;
+    try {
+      // Update appointment status to completed
+      const { error } = await supabase
+        .from('appointments')
+        .update({ 
+          status: 'completed',
+          end_time: new Date().toISOString()
+        })
+        .eq('id', currentCustomer.id);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      setCustomers(prev => 
-        prev.map(c => 
-          c.id === customerId 
-            ? { ...c, status: 'served' as const }
-            : c
-        )
-      );
-      setCurrentCustomer(null);
-      setIsLoading(false);
+      if (error) throw error;
+
+      // Refresh the data
+      queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
+      setIsLoading(false);
       toast({
         title: 'Customer Served',
         description: `${currentCustomer.name} has been marked as served`,
       });
-    }, 500);
+    } catch (error) {
+      console.error('Error marking customer as served:', error);
+      setIsLoading(false);
+      toast({
+        title: 'Error',
+        description: 'Failed to mark customer as served',
+        variant: 'destructive',
+      });
+    }
   };
 
   const markAsNoShow = async () => {
     if (!currentCustomer) return;
 
     setIsLoading(true);
-    const customerId = currentCustomer.id;
+    try {
+      // Update appointment status to no_show
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: 'no_show' })
+        .eq('id', currentCustomer.id);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      setCustomers(prev => 
-        prev.map(c => 
-          c.id === customerId 
-            ? { ...c, status: 'no_show' as const }
-            : c
-        )
-      );
-      setCurrentCustomer(null);
-      setIsLoading(false);
+      if (error) throw error;
+
+      // Refresh the data
+      queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
+      setIsLoading(false);
       toast({
         title: 'Marked as No-Show',
         description: `${currentCustomer.name} has been marked as no-show`,
       });
-    }, 500);
+    } catch (error) {
+      console.error('Error marking customer as no-show:', error);
+      setIsLoading(false);
+      toast({
+        title: 'Error',
+        description: 'Failed to mark customer as no-show',
+        variant: 'destructive',
+      });
+    }
   };
 
   const removeCustomer = (id: string) => {
-    setCustomers(prev => prev.filter(c => c.id !== id));
-    if (currentCustomer?.id === id) {
-      setCurrentCustomer(null);
-    }
     toast({
-      title: 'Customer Removed',
-      description: 'Customer has been removed from the queue',
+      title: 'Feature Not Implemented',
+      description: 'Removing customers requires database operations',
+      variant: 'destructive',
     });
   };
 
   const updateCustomer = (id: string, updates: Partial<Customer>) => {
-    setCustomers(prev => 
-      prev.map(c => 
-        c.id === id ? { ...c, ...updates } : c
-      )
-    );
-    
-    if (currentCustomer?.id === id) {
-      setCurrentCustomer(prev => prev ? { ...prev, ...updates } : null);
-    }
+    toast({
+      title: 'Feature Not Implemented',
+      description: 'Updating customers requires database operations',
+      variant: 'destructive',
+    });
   };
 
   const getQueuePosition = (customerId: string) => {
@@ -275,24 +340,18 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const position = getQueuePosition(customerId);
     if (position === -1) return 0;
     
-    // Use average service time from stats, with a minimum of 10 minutes
     const avgServiceTime = Math.max(stats.averageWaitTime || 15, 10);
-    
-    // Calculate based on position and average service time
     const estimatedWait = position * avgServiceTime;
-    
-    // If someone is currently being served, add some buffer time
     const bufferTime = currentCustomer ? 5 : 0;
     
     return estimatedWait + bufferTime;
   };
 
   const resetQueue = () => {
-    setCustomers([]);
-    setCurrentCustomer(null);
     toast({
-      title: 'Queue Reset',
-      description: 'All customers have been removed from the queue',
+      title: 'Feature Not Implemented',
+      description: 'Resetting queue requires database operations',
+      variant: 'destructive',
     });
   };
 

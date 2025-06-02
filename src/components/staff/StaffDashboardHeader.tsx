@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Bell, Settings, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
+import { useQueue } from '@/context/QueueContext';
 
 interface StaffDashboardHeaderProps {
   queueStatus: 'open' | 'closed';
   staffStatus: 'active' | 'on_break' | 'inactive';
   activeAppointments: number;
-  waitingCustomers: number;
   onRefresh: () => void;
   onNotificationClick: () => void;
   onSettingsClick: () => void;
@@ -21,15 +21,18 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
   queueStatus,
   staffStatus,
   activeAppointments,
-  waitingCustomers,
   onRefresh,
   onNotificationClick,
   onSettingsClick
 }) => {
   const { t } = useTranslation();
+  const { stats } = useQueue();
+
+  // Use real waiting customers count from queue context
+  const waitingCustomers = stats.waitingCustomers;
 
   // Debug logging for StaffDashboardHeader
-  console.log('StaffDashboardHeader - waitingCustomers prop:', waitingCustomers);
+  console.log('StaffDashboardHeader - Real waitingCustomers from queue:', waitingCustomers);
 
   const getStatusColor = (status: string) => {
     switch (status) {
