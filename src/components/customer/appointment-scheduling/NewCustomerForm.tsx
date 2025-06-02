@@ -148,7 +148,6 @@ const NewCustomerForm = ({
         <CustomerDetailsFields register={register} errors={errors} />
 
         <LocationServiceSelector
-          locations={locations}
           services={services}
           servicesLoading={servicesLoading}
           servicesError={servicesError ? new Error(servicesError) : null}

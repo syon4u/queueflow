@@ -93,7 +93,6 @@ const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
         <LocationStep 
           locationId={selectedLocationId}
           onLocationChange={setSelectedLocationId}
-          locations={locations}
         />
       )}
       
