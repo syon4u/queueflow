@@ -28,6 +28,13 @@ export const AdminDashboardHeader: React.FC<AdminDashboardHeaderProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Debug logging for AdminDashboardHeader
+  console.log('AdminDashboardHeader - Props received:');
+  console.log('AdminDashboardHeader - systemStatus:', systemStatus);
+  console.log('AdminDashboardHeader - totalUsers:', totalUsers);
+  console.log('AdminDashboardHeader - activeStaff:', activeStaff);
+  console.log('AdminDashboardHeader - todayAppointments:', todayAppointments);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy':

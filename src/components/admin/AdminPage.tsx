@@ -21,20 +21,27 @@ const AdminPage = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  // Debug logging for AdminPage
+  console.log('AdminPage - Component mounted');
+  console.log('AdminPage - Current user:', user);
+  console.log('AdminPage - Active tab:', activeTab);
+
   const handleRefresh = () => {
     // Handle refresh logic
-    console.log('Refreshing admin data...');
+    console.log('AdminPage - Refreshing admin data...');
   };
 
   const handleNotificationClick = () => {
-    console.log('Notification center clicked');
+    console.log('AdminPage - Notification center clicked');
   };
 
   const handleSettingsClick = () => {
-    console.log('Settings clicked');
+    console.log('AdminPage - Settings clicked');
   };
 
   const renderMainContent = () => {
+    console.log('AdminPage - Rendering content for tab:', activeTab);
+    
     switch (activeTab) {
       case 'dashboard':
         return <DashboardTab />;

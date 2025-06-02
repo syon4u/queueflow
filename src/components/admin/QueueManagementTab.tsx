@@ -18,6 +18,14 @@ export const QueueManagementTab: React.FC = () => {
     isLoading
   } = useQueue();
 
+  // Debug logging for Admin QueueManagementTab
+  console.log('Admin QueueManagementTab - customers:', customers);
+  console.log('Admin QueueManagementTab - stats:', stats);
+  console.log('Admin QueueManagementTab - stats.waitingCustomers:', stats.waitingCustomers);
+  console.log('Admin QueueManagementTab - currentCustomer:', currentCustomer);
+  console.log('Admin QueueManagementTab - customers.length:', customers.length);
+  console.log('Admin QueueManagementTab - waiting customers count:', customers.filter(c => c.status === 'waiting').length);
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Queue Management</h1>
