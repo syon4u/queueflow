@@ -12,6 +12,35 @@
     "actions": "Aksyon",
     "cancel": "Anile"
   },
+  "landing": {
+    "headerTitle": "Divizyon Pwoteksyon Konsèmatè",
+    "headerSubtitle": "Pwoteje rezidan Broward County yo nan edikasyon, medyasyon, ak aplikasyon",
+    "hero": {
+      "title": "QueueFlow",
+      "subtitle": "Evite tann nan, pwograme vizit ou, epi jwenn èd ou bezwen an pi vit ak sistèm fil entèlijan nou an.",
+      "scheduleButton": "Pwograme Randevou",
+      "learnMoreButton": "Aprann Plis"
+    },
+    "services": {
+      "title": "Ki Jan Nou Ka Ede Ou Jodi a?",
+      "subtitle": "Jwenn sèvis pwoteksyon konsèmatè ou bezwen yo ak zouti entènèt pratik nou yo.",
+      "schedule": {
+        "title": "Pwograme yon Randevou",
+        "description": "Rezève vizit ou nan devan ak evite tann nan. Chwazi lè ak sèvis ou prefere.",
+        "action": "Kòmanse"
+      },
+      "queue": {
+        "title": "Tcheke Estati Fil",
+        "description": "Gade tan tann kounye a ak anrejistre pou sèvis ki pa gen randevou. Rete enfòme sou pozisyon ou nan fil la.",
+        "action": "Tcheke estati"
+      }
+    },
+    "guide": {
+      "title": "Byenvini nan QueueFlow",
+      "description": "QueueFlow ede ou jere tan ou pi byen nan kite ou pwograme randevou nan devan oswa tcheke tan tann pou sèvis ki pa gen randevou. Pa gen plis fè fil long yo!",
+      "button": "Konprann"
+    }
+  },
   "customer": {
     "viewHistory": "Gade Istorik",
     "history": "Istorik Vizit Kliyan",
