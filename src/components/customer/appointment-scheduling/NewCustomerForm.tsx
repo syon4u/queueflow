@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,7 +93,7 @@ const NewCustomerForm = ({
     enabled: !!selectedLocationId,
   });
 
-  // Create appointment for new customer without the standalone customer creation
+  // Create appointment for new customer
   const createAppointment = useMutation({
     mutationFn: async (formData: NewCustomerFormValues) => {
       console.log('NewCustomerForm - Creating appointment for new customer:', formData);
@@ -121,45 +122,29 @@ const NewCustomerForm = ({
         customerData = existingCustomer;
         console.log('Found existing customer:', customerId);
       } else {
-        // For walk-in customers without authentication, we'll use a different approach
-        // Generate a customer UUID that doesn't conflict with auth.users
+        // For walk-in customers without authentication, generate a UUID
         const customerUuid = crypto.randomUUID();
         
-        // Insert directly without foreign key constraint to auth.users
+        // Try to insert customer directly
         const { data: newCustomer, error: customerError } = await supabase
-          .rpc('create_walk_in_customer', {
-            customer_id: customerUuid,
+          .from('customers')
+          .insert({
+            id: customerUuid,
             first_name: firstName,
             last_name: lastName,
-            phone_number: formData.phone,
-            email_address: formData.email || null
-          });
+            phone: formData.phone,
+            email: formData.email || null
+          })
+          .select('*')
+          .single();
 
         if (customerError) {
           console.error('Error creating walk-in customer:', customerError);
-          // Fallback: try direct insert (this might still fail due to RLS)
-          const { data: fallbackCustomer, error: fallbackError } = await supabase
-            .from('customers')
-            .insert({
-              id: customerUuid,
-              first_name: firstName,
-              last_name: lastName,
-              phone: formData.phone,
-              email: formData.email || null
-            })
-            .select('*')
-            .single();
-
-          if (fallbackError) {
-            throw fallbackError;
-          }
-          customerId = fallbackCustomer.id;
-          customerData = fallbackCustomer;
-        } else {
-          customerId = customerUuid;
-          customerData = newCustomer;
+          throw customerError;
         }
         
+        customerId = newCustomer.id;
+        customerData = newCustomer;
         console.log('Created new walk-in customer:', customerId);
       }
 
