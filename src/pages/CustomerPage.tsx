@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import ScheduleAppointmentCard from '@/components/customer/ScheduleAppointmentCard';
+import SimpleScheduleCard from '@/components/customer/SimpleScheduleCard';
 import CheckInCard from '@/components/customer/CheckInCard';
 import AppointmentStatusCard from '@/components/customer/AppointmentStatusCard';
 import WaitTimesCard from '@/components/customer/WaitTimesCard';
@@ -10,14 +10,27 @@ import AppointmentConfirmationDialog from '@/components/customer/AppointmentConf
 import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
 import PageLayout from '@/components/layout/PageLayout';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
+import { useToast } from '@/hooks/use-toast';
 
 const CustomerPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
+  const { toast } = useToast();
 
-  const handleAppointmentScheduled = (code: string) => {
+  const handleAppointmentRequested = async (customerInfo: any) => {
+    console.log('Customer appointment request:', customerInfo);
+    
+    // Generate a simple confirmation code
+    const code = `REQ-${Date.now().toString().slice(-6)}`;
     setConfirmationCode(code);
     setShowConfirmation(true);
+    
+    // Here you would normally send this data to your backend
+    // For now, we'll just log it and show success
+    toast({
+      title: 'Request Submitted!',
+      description: `Your appointment request has been submitted. Reference: ${code}`,
+    });
   };
 
   return (
@@ -42,19 +55,21 @@ const CustomerPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
               <div>
                 <h1 className="text-gradient text-3xl font-bold">Customer Portal</h1>
-                <p className="text-muted-foreground mt-1">Schedule appointments and manage your visits</p>
+                <p className="text-muted-foreground mt-1">Request appointments and manage your visits</p>
               </div>
               <div className="bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-muted-foreground border border-border/40">
-                Anonymous Customer Portal
+                Customer Services Portal
               </div>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="transition-all hover:translate-y-[-2px] duration-300">
-              <ScheduleAppointmentCard onAppointmentScheduled={handleAppointmentScheduled} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Main appointment form takes up 2 columns */}
+            <div className="lg:col-span-2 transition-all hover:translate-y-[-2px] duration-300">
+              <SimpleScheduleCard onAppointmentRequested={handleAppointmentRequested} />
             </div>
             
+            {/* Side cards */}
             <div className="space-y-6">
               <div className="transition-all hover:translate-y-[-2px] duration-300">
                 <QueuePositionTracker />
