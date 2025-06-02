@@ -173,7 +173,7 @@ export type Database = {
             foreignKeyName: "appointments_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -233,14 +233,14 @@ export type Database = {
             foreignKeyName: "break_requests_handover_staff_id_fkey"
             columns: ["handover_staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "break_requests_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -318,7 +318,15 @@ export type Database = {
           type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "customer_communications_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customer_notes: {
         Row: {
@@ -354,7 +362,15 @@ export type Database = {
           tags?: string[] | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "customer_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customer_surveys: {
         Row: {
@@ -506,7 +522,66 @@ export type Database = {
             foreignKeyName: "performance_metrics_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          break_end_time: string | null
+          break_start_time: string | null
+          break_type: string | null
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          handover_staff_id: string | null
+          id: string
+          last_name: string | null
+          location_id: string | null
+          phone: string | null
+          return_time: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          break_type?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          handover_staff_id?: string | null
+          id: string
+          last_name?: string | null
+          location_id?: string | null
+          phone?: string | null
+          return_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          break_end_time?: string | null
+          break_start_time?: string | null
+          break_type?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          handover_staff_id?: string | null
+          id?: string
+          last_name?: string | null
+          location_id?: string | null
+          phone?: string | null
+          return_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
@@ -872,7 +947,15 @@ export type Database = {
           staff_id?: string
           user_agent?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "staff_audit_log_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       staff_notifications: {
         Row: {
@@ -907,7 +990,7 @@ export type Database = {
             foreignKeyName: "staff_notifications_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

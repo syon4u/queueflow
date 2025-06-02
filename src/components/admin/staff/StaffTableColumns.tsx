@@ -8,7 +8,11 @@ export const useStaffTableColumns = (): Column[] => {
       header: 'Name',
       cell: (row) => `${row.first_name} ${row.last_name}`
     },
-    { key: 'role', header: 'Role' },
+    { 
+      key: 'role', 
+      header: 'Role',
+      cell: (row) => row.user_roles?.role || 'staff'
+    },
     { 
       key: 'location_id', 
       header: 'Location',

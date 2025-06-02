@@ -6,17 +6,25 @@ import { mapStatusToUnionType } from '@/utils/status-mapping';
 export const checkStaffAvailability = async (currentUserId?: string): Promise<StaffAvailability[]> => {
   if (!currentUserId) return [];
 
-  const { data: staff, error } = await supabase
-    .from('staff')
-    .select('id, first_name, last_name, status, location_id')
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select(`
+      id, 
+      first_name, 
+      last_name, 
+      status, 
+      location_id,
+      user_roles!inner(role)
+    `)
     .neq('id', currentUserId)
+    .in('user_roles.role', ['staff', 'admin'])
     .eq('location_id', currentUserId); // Assuming user has location context
 
   if (error) throw error;
 
   // Get current workload for each staff member
   const staffWithWorkload = await Promise.all(
-    (staff || []).map(async (s) => {
+    (profiles || []).map(async (s) => {
       const { data: workload } = await supabase
         .from('appointments')
         .select('id')

@@ -5,13 +5,21 @@ import { mapStatusToUnionType } from '@/utils/status-mapping';
 
 export const fetchWorkloadData = async (): Promise<WorkloadDistribution[]> => {
   // Get all staff members and their current workload
-  const { data: staff, error: staffError } = await supabase
-    .from('staff')
-    .select('id, first_name, last_name, status, location_id');
+  const { data: profiles, error: profileError } = await supabase
+    .from('profiles')
+    .select(`
+      id, 
+      first_name, 
+      last_name, 
+      status, 
+      location_id,
+      user_roles!inner(role)
+    `)
+    .in('user_roles.role', ['staff', 'admin']);
 
-  if (staffError) throw staffError;
+  if (profileError) throw profileError;
 
-  const workloadPromises = (staff || []).map(async (member) => {
+  const workloadPromises = (profiles || []).map(async (member) => {
     // Get current appointments
     const { data: appointments } = await supabase
       .from('appointments')
@@ -33,7 +41,7 @@ export const fetchWorkloadData = async (): Promise<WorkloadDistribution[]> => {
       currentLoad,
       capacity: 8, // Max appointments per staff per day
       utilization: Math.round((currentLoad / 8) * 100),
-      specialties: ['General'], // Would come from staff profile
+      specialties: ['General'], // Would come from profile data
       nextAvailable: currentLoad < 3 ? new Date() : nextSlot,
       status: mapStatusToUnionType(member.status)
     };

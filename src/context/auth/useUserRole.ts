@@ -9,8 +9,12 @@ export const useUserRole = () => {
     try {
       console.log('Fetching role for user:', userId);
       
-      // Use the get_user_role function
-      const { data, error } = await supabase.rpc('get_user_role', { user_id: userId });
+      // Get role from user_roles table
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
 
       if (error) {
         console.error('Error fetching user role:', error);
@@ -18,8 +22,8 @@ export const useUserRole = () => {
         return;
       }
 
-      console.log('Role from database:', data);
-      setRole(data || 'customer');
+      console.log('Role from database:', data?.role);
+      setRole(data?.role || 'customer');
     } catch (error) {
       console.error('Failed to fetch user role:', error);
       setRole('customer');

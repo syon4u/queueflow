@@ -2,7 +2,7 @@
 import React from 'react';
 import { DataTable } from './DataTable';
 import { StaffFormDialog } from './staff/StaffFormDialog';
-import { useStaffManagement } from '@/hooks/admin/use-staff-management';
+import { useProfileManagement } from '@/hooks/admin/use-profile-management';
 import { useStaffTableColumns } from './staff/StaffTableColumns';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 
@@ -20,7 +20,7 @@ export const StaffTab: React.FC = () => {
     handleEditClick,
     handleDeleteClick,
     handleSubmit
-  } = useStaffManagement();
+  } = useProfileManagement();
 
   const columns = useStaffTableColumns();
 

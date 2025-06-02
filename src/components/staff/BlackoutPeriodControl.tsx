@@ -43,15 +43,25 @@ const BlackoutPeriodControl: React.FC<BlackoutPeriodControlProps> = ({ locationI
   
   const checkBlackoutStatus = async (locationId: string) => {
     try {
-      // For now, we'll just simulate the blackout status
-      // In a real app, these columns would need to be added to the locations table
-      // We'll just use local state to simulate the functionality
+      // Check if user has staff/admin role from profiles
+      if (!user) return;
       
-      // Log what we're trying to do
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select(`
+          *,
+          user_roles!inner(role)
+        `)
+        .eq('id', user.id)
+        .in('user_roles.role', ['staff', 'admin'])
+        .single();
+      
+      if (!profile) return;
+      
       console.log('Checking blackout status for location:', locationId);
       
-      // Simulated data
-      // In a real implementation, we would fetch this from the database
+      // For now, we'll just simulate the blackout status
+      // In a real app, these columns would need to be added to the locations table
       setIsBlackoutActive(false);
       setReason('');
       setEstimatedEndTime('');
@@ -70,7 +80,6 @@ const BlackoutPeriodControl: React.FC<BlackoutPeriodControlProps> = ({ locationI
       // In a real app, we would update the locations table
       // For now, we'll just simulate the status change with local state
       
-      // Log the attempted action for debugging
       console.log('Toggling blackout period:', active ? 'Enable' : 'Disable', 'for location:', locationId);
       if (active) {
         console.log('Reason:', reason);

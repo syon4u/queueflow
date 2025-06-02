@@ -61,7 +61,7 @@ serve(async (req) => {
         start_time,
         end_time,
         staff_id,
-        staff:staff_id (id, first_name, last_name)
+        profiles:staff_id (id, first_name, last_name)
       `)
       .gte('scheduled_time', start_date)
       .lte('scheduled_time', end_date);
@@ -89,8 +89,8 @@ serve(async (req) => {
       if (!staffId) return;
       
       // Get staff name
-      const staffName = appointment.staff ? 
-        `${appointment.staff.first_name} ${appointment.staff.last_name}` : 
+      const staffName = appointment.profiles ? 
+        `${appointment.profiles.first_name} ${appointment.profiles.last_name}` : 
         'Unknown';
       
       // Initialize staff record if doesn't exist
