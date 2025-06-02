@@ -15,20 +15,25 @@ import SystemSettingsTab from './SystemSettingsTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminDashboardHeader } from './AdminDashboardHeader';
+import { useAdminDashboardStats } from '@/hooks/admin/use-admin-dashboard-stats';
 
 const AdminPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const { stats, refreshStats, isLoading } = useAdminDashboardStats();
 
   // Debug logging for AdminPage
   console.log('AdminPage - Component mounted');
   console.log('AdminPage - Current user:', user);
   console.log('AdminPage - Active tab:', activeTab);
+  console.log('AdminPage - Real stats from database:', stats);
+  console.log('AdminPage - Stats loading:', isLoading);
 
   const handleRefresh = () => {
-    // Handle refresh logic
+    // Handle refresh logic - now refreshes real data
     console.log('AdminPage - Refreshing admin data...');
+    refreshStats();
   };
 
   const handleNotificationClick = () => {
@@ -79,10 +84,10 @@ const AdminPage = () => {
             {/* Header */}
             <div className="bg-white border-b p-6">
               <AdminDashboardHeader
-                systemStatus="healthy"
-                totalUsers={156}
-                activeStaff={12}
-                todayAppointments={24}
+                systemStatus={stats.systemStatus}
+                totalUsers={stats.totalUsers}
+                activeStaff={stats.activeStaff}
+                todayAppointments={stats.todayAppointments}
                 onRefresh={handleRefresh}
                 onNotificationClick={handleNotificationClick}
                 onSettingsClick={handleSettingsClick}

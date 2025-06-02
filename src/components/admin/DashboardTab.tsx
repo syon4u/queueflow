@@ -5,17 +5,68 @@ import { Button } from '@/components/ui/button';
 import { Users, Calendar, Building2, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export const DashboardTab: React.FC = () => {
   const navigate = useNavigate();
   
-  // Mock data for dashboard overview
-  const stats = {
-    staffCount: 12,
-    locationsCount: 3,
-    appointmentsToday: 24,
-    servicesOffered: 8,
-  };
+  // Fetch real stats data
+  const { data: staffCount = 0 } = useQuery({
+    queryKey: ['dashboard-staff-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('staff')
+        .select('*', { count: 'exact', head: true });
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
+  const { data: locationsCount = 0 } = useQuery({
+    queryKey: ['dashboard-locations-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('locations')
+        .select('*', { count: 'exact', head: true });
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
+  const { data: appointmentsToday = 0 } = useQuery({
+    queryKey: ['dashboard-appointments-today'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .gte('scheduled_time', `${today}T00:00:00`)
+        .lt('scheduled_time', `${today}T23:59:59`);
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
+  const { data: servicesOffered = 0 } = useQuery({
+    queryKey: ['dashboard-services-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('services')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true);
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
+  // Debug logging
+  console.log('DashboardTab - Real data:', {
+    staffCount,
+    locationsCount,
+    appointmentsToday,
+    servicesOffered
+  });
   
   // Handler functions for quick access buttons
   const handleViewSchedule = () => {
@@ -61,8 +112,8 @@ export const DashboardTab: React.FC = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.staffCount}</div>
-            <p className="text-xs text-muted-foreground">Active personnel</p>
+            <div className="text-2xl font-bold">{staffCount}</div>
+            <p className="text-xs text-muted-foreground">Total personnel</p>
           </CardContent>
         </Card>
         
@@ -72,7 +123,7 @@ export const DashboardTab: React.FC = () => {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.locationsCount}</div>
+            <div className="text-2xl font-bold">{locationsCount}</div>
             <p className="text-xs text-muted-foreground">Service centers</p>
           </CardContent>
         </Card>
@@ -83,18 +134,18 @@ export const DashboardTab: React.FC = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.appointmentsToday}</div>
+            <div className="text-2xl font-bold">{appointmentsToday}</div>
             <p className="text-xs text-muted-foreground">Scheduled today</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Services</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Services</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.servicesOffered}</div>
+            <div className="text-2xl font-bold">{servicesOffered}</div>
             <p className="text-xs text-muted-foreground">Available services</p>
           </CardContent>
         </Card>
