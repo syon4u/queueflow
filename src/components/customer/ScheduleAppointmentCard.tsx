@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -50,6 +49,7 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
   const [selectedTime, setSelectedTime] = React.useState('9:00 AM');
   const [step, setStep] = useState<'search' | 'new-customer' | 'existing-customer'>('search');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form for new customers
   const newCustomerForm = useForm<NewCustomerFormValues>({
@@ -99,6 +99,8 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       // Parse selected date and time
       const [hours, minutes] = selectedTime.split(':');
@@ -118,26 +120,54 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
       const [firstName, ...lastNameParts] = data.name.trim().split(' ');
       const lastName = lastNameParts.join(' ') || firstName;
       
-      const appointmentData = {
-        service_id: data.service_id,
-        location_id: data.location_id,
-        scheduled_time: scheduledDate.toISOString(),
-        notes: data.notes,
-        reason_for_visit: data.reason_for_visit,
-        customer_name: data.name,
-        phone_number: data.phone,
-      };
+      // First, create or find the customer
+      let customerId: string;
+      
+      // Check if customer already exists by phone
+      const { data: existingCustomer } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('phone', data.phone)
+        .single();
 
-      // Send the appointment request to the Supabase Edge Function
-      const { data: response, error } = await supabase.functions.invoke('appointments', {
-        method: 'POST',
-        body: JSON.stringify(appointmentData),
-      });
+      if (existingCustomer) {
+        customerId = existingCustomer.id;
+      } else {
+        // Create new customer
+        const { data: newCustomer, error: customerError } = await supabase
+          .from('customers')
+          .insert({
+            first_name: firstName,
+            last_name: lastName,
+            phone: data.phone,
+            email: null // Will be set when they create an account
+          })
+          .select('id')
+          .single();
 
-      if (error) throw error;
+        if (customerError) throw customerError;
+        customerId = newCustomer.id;
+      }
+      
+      // Create the appointment
+      const { data: appointment, error: appointmentError } = await supabase
+        .from('appointments')
+        .insert({
+          customer_id: customerId,
+          service_id: data.service_id,
+          location_id: data.location_id,
+          scheduled_time: scheduledDate.toISOString(),
+          notes: data.notes,
+          reason_for_visit: data.reason_for_visit,
+          status: 'scheduled'
+        })
+        .select('id')
+        .single();
 
-      // Generate a confirmation code (this would normally come from the server)
-      const confirmationCode = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
+      if (appointmentError) throw appointmentError;
+      
+      // Use the appointment ID as the confirmation code
+      const confirmationCode = appointment.id;
       
       // Call the callback with the confirmation code
       onAppointmentScheduled(confirmationCode);
@@ -153,6 +183,8 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
         description: t('appointments.createError'),
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -165,6 +197,8 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
       });
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       // Parse selected date and time
@@ -182,27 +216,25 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
       const scheduledDate = new Date(selectedDate);
       scheduledDate.setHours(hour, parseInt(minutesValue));
       
-      const appointmentData = {
-        service_id: data.service_id,
-        location_id: data.location_id,
-        scheduled_time: scheduledDate.toISOString(),
-        notes: data.notes,
-        reason_for_visit: data.reason_for_visit,
-        customer_id: selectedCustomer.id,
-        customer_name: `${selectedCustomer.first_name} ${selectedCustomer.last_name}`,
-        phone_number: selectedCustomer.phone,
-      };
-
-      // Send the appointment request to the Supabase Edge Function
-      const { data: response, error } = await supabase.functions.invoke('appointments', {
-        method: 'POST',
-        body: JSON.stringify(appointmentData),
-      });
+      // Create the appointment
+      const { data: appointment, error } = await supabase
+        .from('appointments')
+        .insert({
+          customer_id: selectedCustomer.id,
+          service_id: data.service_id,
+          location_id: data.location_id,
+          scheduled_time: scheduledDate.toISOString(),
+          notes: data.notes,
+          reason_for_visit: data.reason_for_visit,
+          status: 'scheduled'
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      // Generate a confirmation code (this would normally come from the server)
-      const confirmationCode = `APT-${Math.floor(1000 + Math.random() * 9000)}`;
+      // Use the appointment ID as the confirmation code
+      const confirmationCode = appointment.id;
       
       // Call the callback with the confirmation code
       onAppointmentScheduled(confirmationCode);
@@ -218,6 +250,8 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
         description: t('appointments.createError'),
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -285,7 +319,8 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
                 render={({ field }) => (
                   <ServiceSelector 
                     value={field.value} 
-                    onChange={field.onChange} 
+                    onChange={field.onChange}
+                    locationId={newCustomerForm.watch('location_id')}
                   />
                 )}
               />
@@ -332,11 +367,11 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
               />
               
               <div className="flex justify-between pt-2">
-                <Button type="button" variant="outline" onClick={handleBackToSearch}>
+                <Button type="button" variant="outline" onClick={handleBackToSearch} disabled={isSubmitting}>
                   {t('common.back')}
                 </Button>
-                <Button type="submit">
-                  {t('appointments.schedule')}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Scheduling...' : t('appointments.schedule')}
                 </Button>
               </div>
             </form>
@@ -369,7 +404,8 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
                 render={({ field }) => (
                   <ServiceSelector 
                     value={field.value} 
-                    onChange={field.onChange} 
+                    onChange={field.onChange}
+                    locationId={existingCustomerForm.watch('location_id')}
                   />
                 )}
               />
@@ -416,11 +452,11 @@ const ScheduleAppointmentCard = ({ onAppointmentScheduled }: ScheduleAppointment
               />
               
               <div className="flex justify-between pt-2">
-                <Button type="button" variant="outline" onClick={handleBackToSearch}>
+                <Button type="button" variant="outline" onClick={handleBackToSearch} disabled={isSubmitting}>
                   {t('common.back')}
                 </Button>
-                <Button type="submit">
-                  {t('appointments.schedule')}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Scheduling...' : t('appointments.schedule')}
                 </Button>
               </div>
             </form>

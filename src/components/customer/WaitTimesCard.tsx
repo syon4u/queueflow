@@ -1,11 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQueue, Customer } from '@/context/QueueContext';
+import { supabase } from '@/integrations/supabase/client';
 import { formatWaitTime } from '@/lib/queue';
 
 interface ServiceWaitTime {
   service_name: string;
+  location_name: string;
   wait_time: number;
   queue_length: number;
 }
@@ -13,40 +14,58 @@ interface ServiceWaitTime {
 const WaitTimesCard = () => {
   const [waitTimes, setWaitTimes] = useState<ServiceWaitTime[]>([]);
   const [loading, setLoading] = useState(true);
-  const { customers, stats } = useQueue();
 
   useEffect(() => {
-    const calculateWaitTimes = () => {
+    const fetchWaitTimes = async () => {
       try {
         setLoading(true);
         
-        // Get waiting customers and group by service
-        const waitingCustomers = customers.filter(c => c.status === 'waiting');
-        const serviceGroups: { [key: string]: Customer[] } = {};
+        // Get current checked-in appointments with service and location info
+        const { data: appointments, error } = await supabase
+          .from('appointments')
+          .select(`
+            id,
+            status,
+            check_in_time,
+            services (name),
+            locations (name)
+          `)
+          .in('status', ['checked_in', 'in_progress'])
+          .order('check_in_time', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching appointments:', error);
+          return;
+        }
+
+        // Group by service and location
+        const serviceGroups: { [key: string]: any[] } = {};
         
-        waitingCustomers.forEach(customer => {
-          const service = customer.service || 'General Service';
-          if (!serviceGroups[service]) {
-            serviceGroups[service] = [];
+        (appointments || []).forEach(appointment => {
+          const key = `${appointment.services?.name || 'Unknown'} - ${appointment.locations?.name || 'Unknown'}`;
+          if (!serviceGroups[key]) {
+            serviceGroups[key] = [];
           }
-          serviceGroups[service].push(customer);
+          serviceGroups[key].push(appointment);
         });
 
-        // Calculate wait times for each service
-        const waitTimesData: ServiceWaitTime[] = Object.entries(serviceGroups).map(([serviceName, customers]) => {
-          const queueLength = customers.length;
+        // Calculate wait times
+        const waitTimesData: ServiceWaitTime[] = Object.entries(serviceGroups).map(([key, apps]) => {
+          const [serviceName, locationName] = key.split(' - ');
+          const queueLength = apps.length;
           
           // Calculate average wait time based on queue position
-          const totalWaitTime = customers.reduce((acc, customer, index) => {
-            // Position in queue (1-based) * estimated service time per customer
-            const positionWaitTime = (index + 1) * 15; // 15 minutes per customer
-            return acc + positionWaitTime;
+          const totalWaitTime = apps.reduce((acc, app, index) => {
+            const position = index + 1;
+            const estimatedWaitTime = position * 15; // 15 minutes per person estimate
+            return acc + estimatedWaitTime;
           }, 0);
           
           const avgWaitTime = queueLength > 0 ? Math.round(totalWaitTime / queueLength) : 0;
           
           return {
             service_name: serviceName,
+            location_name: locationName,
             wait_time: avgWaitTime,
             queue_length: queueLength
           };
@@ -64,8 +83,27 @@ const WaitTimesCard = () => {
       }
     };
 
-    calculateWaitTimes();
-  }, [customers]); // Recalculate when customers change
+    fetchWaitTimes();
+
+    // Set up realtime subscription for appointment changes
+    const channel = supabase
+      .channel('appointments-wait-times')
+      .on('postgres_changes', 
+        {
+          event: '*', 
+          schema: 'public',
+          table: 'appointments'
+        }, 
+        () => {
+          fetchWaitTimes(); // Refetch when appointments change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return (
     <Card>
@@ -82,12 +120,12 @@ const WaitTimesCard = () => {
           </div>
         ) : waitTimes.length > 0 ? (
           <div className="space-y-3">
-            {waitTimes.map((service) => (
-              <div key={service.service_name} className="flex justify-between items-center p-2 rounded bg-muted/50">
+            {waitTimes.map((service, index) => (
+              <div key={index} className="flex justify-between items-center p-2 rounded bg-muted/50">
                 <div>
                   <div className="font-medium">{service.service_name}</div>
                   <div className="text-xs text-muted-foreground">
-                    {service.queue_length} {service.queue_length === 1 ? 'person' : 'people'} waiting
+                    {service.location_name} • {service.queue_length} {service.queue_length === 1 ? 'person' : 'people'} waiting
                   </div>
                 </div>
                 <div className="text-right">
@@ -98,15 +136,6 @@ const WaitTimesCard = () => {
                 </div>
               </div>
             ))}
-            
-            {stats.waitingCustomers > 0 && (
-              <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
-                <div className="text-sm text-blue-700 text-center">
-                  <strong>Overall:</strong> {stats.waitingCustomers} customers waiting, 
-                  avg {Math.round(stats.averageWaitTime)}m wait time
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           <div className="text-center py-4 text-muted-foreground">

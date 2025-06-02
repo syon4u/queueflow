@@ -21,10 +21,21 @@ type FormValues = z.infer<typeof formSchema>;
 interface AppointmentStatus {
   id: string;
   status: string;
-  service_name: string;
   scheduled_time: string;
-  estimated_wait: number | null;
-  position: number | null;
+  check_in_time: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  services: {
+    name: string;
+    duration: number;
+  } | null;
+  locations: {
+    name: string;
+  } | null;
+  customers: {
+    first_name: string;
+    last_name: string;
+  } | null;
 }
 
 const AppointmentStatusCard = () => {
@@ -43,23 +54,28 @@ const AppointmentStatusCard = () => {
     setIsSubmitting(true);
     
     try {
-      // Here we would call an API to get appointment status
-      const { data: appointmentData, error } = await supabase.functions.invoke('appointments', {
-        method: 'GET',
-        body: JSON.stringify({ appointment_code: data.appointment_code }),
-      });
+      const { data: appointmentData, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          services (name, duration),
+          locations (name),
+          customers (first_name, last_name)
+        `)
+        .eq('id', data.appointment_code)
+        .single();
 
-      if (error) throw error;
-
-      if (appointmentData) {
-        setAppointment(appointmentData);
-      } else {
+      if (error || !appointmentData) {
         toast({
           title: "Appointment Not Found",
           description: "No appointment found with that confirmation code",
           variant: "destructive",
         });
+        setAppointment(null);
+        return;
       }
+
+      setAppointment(appointmentData);
     } catch (error) {
       console.error('Error checking appointment status:', error);
       toast({
@@ -72,7 +88,6 @@ const AppointmentStatusCard = () => {
     }
   };
 
-  // Function to get the appropriate badge color based on status
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'scheduled':
@@ -89,6 +104,19 @@ const AppointmentStatusCard = () => {
       default:
         return 'secondary';
     }
+  };
+
+  const getEstimatedWait = () => {
+    if (!appointment || appointment.status === 'completed') return null;
+    
+    if (appointment.check_in_time) {
+      const checkInTime = new Date(appointment.check_in_time);
+      const now = new Date();
+      const waitTimeMinutes = Math.floor((now.getTime() - checkInTime.getTime()) / (1000 * 60));
+      return waitTimeMinutes;
+    }
+    
+    return null;
   };
 
   return (
@@ -132,25 +160,33 @@ const AppointmentStatusCard = () => {
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
+                <span className="text-muted-foreground">Customer:</span>
+                <span>{appointment.customers?.first_name} {appointment.customers?.last_name}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-muted-foreground">Service:</span>
-                <span>{appointment.service_name}</span>
+                <span>{appointment.services?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Location:</span>
+                <span>{appointment.locations?.name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Scheduled Time:</span>
                 <span>{new Date(appointment.scheduled_time).toLocaleString()}</span>
               </div>
               
-              {appointment.position && (
+              {appointment.check_in_time && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Queue Position:</span>
-                  <span>#{appointment.position} in line</span>
+                  <span className="text-muted-foreground">Check-in Time:</span>
+                  <span>{new Date(appointment.check_in_time).toLocaleString()}</span>
                 </div>
               )}
               
-              {appointment.estimated_wait !== null && (
+              {getEstimatedWait() !== null && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Estimated Wait:</span>
-                  <span>{formatWaitTime(appointment.estimated_wait)}</span>
+                  <span className="text-muted-foreground">Wait Time:</span>
+                  <span>{formatWaitTime(getEstimatedWait()!)}</span>
                 </div>
               )}
             </div>

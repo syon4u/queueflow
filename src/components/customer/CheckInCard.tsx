@@ -31,16 +31,34 @@ const CheckInCard = () => {
     setIsSubmitting(true);
     
     try {
-      // Here we would normally call an API to check in the appointment
-      const { error } = await supabase.functions.invoke('appointments', {
-        method: 'PATCH',
-        body: JSON.stringify({ 
-          appointment_code: data.appointment_code,
-          status: 'checked_in'
-        }),
-      });
+      // Find appointment by confirmation code (using ID as confirmation code for now)
+      const { data: appointments, error: fetchError } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('id', data.appointment_code)
+        .single();
 
-      if (error) throw error;
+      if (fetchError || !appointments) {
+        toast({
+          title: "Invalid Confirmation Code",
+          description: "Please verify your confirmation code and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update appointment status to checked_in
+      const { error: updateError } = await supabase
+        .from('appointments')
+        .update({ 
+          status: 'checked_in',
+          check_in_time: new Date().toISOString()
+        })
+        .eq('id', data.appointment_code);
+
+      if (updateError) {
+        throw updateError;
+      }
 
       toast({
         title: "Check-In Successful",
@@ -52,7 +70,7 @@ const CheckInCard = () => {
       console.error('Error checking in:', error);
       toast({
         title: "Check-In Failed",
-        description: "Please verify your confirmation code and try again.",
+        description: "An error occurred while checking in. Please try again.",
         variant: "destructive",
       });
     } finally {
