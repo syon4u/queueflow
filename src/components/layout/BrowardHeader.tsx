@@ -4,6 +4,15 @@ import { Link } from 'react-router-dom';
 import { ShieldCheckmarkAnimation } from '@/components/ui/broward-icons';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Menu, User, Settings, BarChart3 } from 'lucide-react';
 
 interface BrowardHeaderProps {
   title?: string;
@@ -97,19 +106,62 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                 <ThemeToggle />
               </div>
               
-              {user ? (
-                <div className="text-sm bg-white/10 rounded-lg px-3 py-2 backdrop-blur-sm">
-                  <span className="text-white/95 font-medium drop-shadow">
-                    {user.email}
-                  </span>
-                </div>
-              ) : (
-                <Link 
-                  to="/login" 
-                  className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg backdrop-blur-sm transition-all duration-200 border border-white/20 hover:border-white/40 drop-shadow-lg hover:scale-105"
-                >
-                  Sign In
-                </Link>
+              {/* Hamburger menu for admin/staff portals */}
+              {(role === 'staff' || role === 'admin') && (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
+                    >
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle>Staff Portal</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6 space-y-4">
+                      <Link
+                        to="/staff"
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                      >
+                        <User className="h-5 w-5" />
+                        <div>
+                          <p className="font-medium">Staff Dashboard</p>
+                          <p className="text-sm text-muted-foreground">Manage appointments and queue</p>
+                        </div>
+                      </Link>
+                      
+                      {role === 'admin' && (
+                        <>
+                          <Link
+                            to="/admin"
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <Settings className="h-5 w-5" />
+                            <div>
+                              <p className="font-medium">Admin Dashboard</p>
+                              <p className="text-sm text-muted-foreground">System administration</p>
+                            </div>
+                          </Link>
+                          
+                          <Link
+                            to="/performance"
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <BarChart3 className="h-5 w-5" />
+                            <div>
+                              <p className="font-medium">Performance Reports</p>
+                              <p className="text-sm text-muted-foreground">Analytics and insights</p>
+                            </div>
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  </SheetContent>
+                </Sheet>
               )}
             </div>
           </div>
