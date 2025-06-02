@@ -7,14 +7,14 @@ interface Appointment {
   customer_id: string;
   service_id: string;
   location_id: string;
-  staff_id?: string;
+  staff_id?: string | null;
   scheduled_time: string;
-  check_in_time?: string;
-  start_time?: string;
-  end_time?: string;
+  check_in_time?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
   status: string;
-  reason_for_visit?: string;
-  notes?: string;
+  reason_for_visit?: string | null;
+  notes?: string | null;
   created_at: string;
   updated_at: string;
 }
