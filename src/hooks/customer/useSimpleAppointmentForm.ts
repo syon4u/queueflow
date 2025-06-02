@@ -45,7 +45,7 @@ export const useSimpleAppointmentForm = () => {
   });
 
   // Use the existing useLocations hook for debugging
-  const { data: locationsFromHook, error: locationsHookError, isLoading: locationsHookLoading } = useLocations();
+  const { locations: locationsFromHook, error: locationsHookError, isLoading: locationsHookLoading } = useLocations();
 
   useEffect(() => {
     console.log('🧭 Location Data:', locationsFromHook);
