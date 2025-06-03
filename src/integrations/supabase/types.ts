@@ -1184,6 +1184,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          created_at: string
+          device_info: string
+          expires_at: string
+          id: string
+          ip_address: string | null
+          is_remembered: boolean
+          last_active: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_info: string
+          expires_at: string
+          id?: string
+          ip_address?: string | null
+          is_remembered?: boolean
+          last_active?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_info?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          is_remembered?: boolean
+          last_active?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
