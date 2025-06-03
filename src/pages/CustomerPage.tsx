@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -10,26 +11,38 @@ import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
 import PageLayout from '@/components/layout/PageLayout';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { useToast } from '@/hooks/use-toast';
+import { useCustomerAppointmentFlow } from '@/hooks/customer/useCustomerAppointmentFlow';
+import { CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentForm';
 
 const CustomerPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
   const { toast } = useToast();
+  const { createAppointment, isSubmitting } = useCustomerAppointmentFlow();
 
-  const handleAppointmentRequested = async (customerInfo: any) => {
-    console.log('Customer appointment request:', customerInfo);
+  const handleAppointmentRequested = async (customerInfo: CustomerAppointmentData) => {
+    console.log('CustomerPage - Processing appointment request:', customerInfo);
     
-    // Generate a simple confirmation code
-    const code = `REQ-${Date.now().toString().slice(-6)}`;
-    setConfirmationCode(code);
-    setShowConfirmation(true);
-    
-    // Here you would normally send this data to your backend
-    // For now, we'll just log it and show success
-    toast({
-      title: 'Request Submitted!',
-      description: `Your appointment request has been submitted. Reference: ${code}`,
-    });
+    try {
+      const code = await createAppointment(customerInfo);
+      
+      if (code) {
+        setConfirmationCode(code);
+        setShowConfirmation(true);
+        
+        toast({
+          title: 'Appointment Scheduled!',
+          description: `Your appointment has been scheduled successfully. Confirmation code: ${code}`,
+        });
+      }
+    } catch (error) {
+      console.error('CustomerPage - Error creating appointment:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to schedule appointment. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

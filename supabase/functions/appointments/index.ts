@@ -28,17 +28,76 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
 
-      // For now, since JWT is disabled, we'll do a simple check-in simulation
-      // In a real implementation, you'd look up the appointment by confirmation code
-      // and update its status to 'checked_in'
-      
       console.log(`Check-in attempt with code: ${confirmation_code}`);
       
-      // Simulate successful check-in
+      // Extract appointment ID from confirmation code (format: APT-XXXXXXXX)
+      if (!confirmation_code.startsWith('APT-')) {
+        return new Response(JSON.stringify({ 
+          error: 'Invalid confirmation code format' 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase();
+      
+      // Find appointment that starts with this prefix
+      const { data: appointments, error: searchError } = await supabaseClient
+        .from('appointments')
+        .select('id, status, scheduled_time, customers(first_name, last_name)')
+        .ilike('id', `${appointmentIdPrefix}%`)
+        .eq('status', 'scheduled');
+
+      if (searchError) {
+        console.error('Error searching for appointment:', searchError);
+        return new Response(JSON.stringify({ 
+          error: 'Database error occurred' 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (!appointments || appointments.length === 0) {
+        return new Response(JSON.stringify({ 
+          error: 'Invalid confirmation code or appointment not found' 
+        }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Use the first matching appointment
+      const appointment = appointments[0];
+      
+      // Update appointment status to checked_in
+      const { error: updateError } = await supabaseClient
+        .from('appointments')
+        .update({ 
+          status: 'checked_in',
+          check_in_time: new Date().toISOString()
+        })
+        .eq('id', appointment.id);
+
+      if (updateError) {
+        console.error('Error updating appointment:', updateError);
+        return new Response(JSON.stringify({ 
+          error: 'Failed to check in' 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log(`Successfully checked in appointment: ${appointment.id}`);
+      
       return new Response(JSON.stringify({ 
         success: true, 
         message: 'Check-in successful',
-        confirmation_code 
+        confirmation_code,
+        appointment_id: appointment.id,
+        customer_name: `${appointment.customers?.first_name} ${appointment.customers?.last_name}`.trim()
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

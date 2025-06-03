@@ -24,10 +24,20 @@ export const useRealtimeAppointments = (): RealtimeAppointmentsReturn => {
       console.log('useRealtimeAppointments - Starting fetch...');
       setIsLoading(true);
       
-      // Fetch all appointments for anonymous users
+      // Fetch appointments for today with customer and service details
+      const today = new Date().toISOString().split('T')[0];
+      
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          customers(first_name, last_name, phone),
+          services(name, duration),
+          locations(name)
+        `)
+        .gte('scheduled_time', `${today}T00:00:00`)
+        .lt('scheduled_time', `${today}T23:59:59`)
+        .in('status', ['scheduled', 'checked_in', 'in_progress'])
         .order('scheduled_time', { ascending: true });
 
       if (error) {
@@ -36,18 +46,36 @@ export const useRealtimeAppointments = (): RealtimeAppointmentsReturn => {
         setAppointments([]);
       } else {
         console.log('useRealtimeAppointments - Fetched appointments:', data?.length || 0);
+        
         // Map the data to ensure staff_id is always present (set to null if undefined)
         const mappedAppointments = (data || []).map(appointment => ({
           ...appointment,
           staff_id: appointment.staff_id || null,
         })) as Appointment[];
+        
         setAppointments(mappedAppointments);
+        
+        // Calculate queue positions for checked-in appointments
+        const checkedInAppointments = mappedAppointments.filter(apt => apt.status === 'checked_in');
+        
+        if (checkedInAppointments.length > 0) {
+          // For demo purposes, simulate that the first checked-in appointment is "user's"
+          // In a real app, you'd match by user authentication or phone number
+          const userAppointment = checkedInAppointments[0];
+          const position = checkedInAppointments.findIndex(apt => apt.id === userAppointment.id) + 1;
+          
+          setUserPosition(position);
+          
+          // Estimate wait time: 15 minutes per person ahead in queue
+          const waitTime = Math.max(0, (position - 1) * 15);
+          setEstimatedWaitTime(waitTime);
+        } else {
+          setUserPosition(null);
+          setEstimatedWaitTime(null);
+        }
+        
         setError(null);
       }
-      
-      // For anonymous users, no specific position or wait time
-      setUserPosition(null);
-      setEstimatedWaitTime(null);
       
     } catch (err) {
       console.error('useRealtimeAppointments - Error fetching appointments:', err);
@@ -63,13 +91,14 @@ export const useRealtimeAppointments = (): RealtimeAppointmentsReturn => {
     
     let subscription: any = null;
 
-    // Set up realtime subscription for general queue updates
+    // Set up realtime subscription for appointment updates
     const setupSubscription = () => {
       subscription = supabase
         .channel('appointments_updates')
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'appointments' }, 
-          () => {
+          (payload) => {
+            console.log('useRealtimeAppointments - Real-time update:', payload);
             // Refresh data when appointments change
             fetchAppointments();
           }
