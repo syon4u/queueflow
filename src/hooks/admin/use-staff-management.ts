@@ -10,7 +10,7 @@ interface Staff {
   last_name: string;
   phone: string | null;
   role: 'admin' | 'staff';
-  location_id: string | null;
+  status: string;
 }
 
 interface StaffFormData {
@@ -35,13 +35,14 @@ export const useStaffManagement = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch staff
+  // Fetch staff using user_profiles view
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ['staff'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('staff')
-        .select('*, locations(name)');
+        .from('user_profiles')
+        .select('*')
+        .in('role', ['staff', 'admin']);
       
       if (error) throw error;
       return data || [];
@@ -66,18 +67,28 @@ export const useStaffManagement = () => {
     mutationFn: async (data: StaffFormData) => {
       const id = crypto.randomUUID();
       
-      const { error } = await supabase
-        .from('staff')
+      // Insert into profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
         .insert([{ 
           id,
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone || null,
-          role: data.role,
-          location_id: data.location_id || null
+          status: 'active'
         }]);
       
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Insert user role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert([{
+          user_id: id,
+          role: data.role
+        }]);
+
+      if (roleError) throw roleError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staff'] });
@@ -96,18 +107,27 @@ export const useStaffManagement = () => {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: StaffFormData) => {
-      const { error } = await supabase
-        .from('staff')
+      // Update profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
         .update({ 
           first_name: data.first_name,
           last_name: data.last_name,
-          phone: data.phone || null,
-          role: data.role,
-          location_id: data.location_id || null
+          phone: data.phone || null
         })
         .eq('id', data.id);
       
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Update user role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert({
+          user_id: data.id!,
+          role: data.role
+        });
+
+      if (roleError) throw roleError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staff'] });
@@ -127,7 +147,7 @@ export const useStaffManagement = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('staff')
+        .from('profiles')
         .delete()
         .eq('id', id);
       
@@ -167,7 +187,7 @@ export const useStaffManagement = () => {
       last_name: staff.last_name,
       phone: staff.phone || '',
       role: staff.role,
-      location_id: staff.location_id || ''
+      location_id: ''
     });
     setIsEditing(true);
     setIsDialogOpen(true);

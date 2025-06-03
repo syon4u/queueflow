@@ -32,14 +32,15 @@ export const useAdminDashboardStats = () => {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  // Fetch active staff count
+  // Fetch active staff count using user_profiles view
   const { data: staffData } = useQuery({
     queryKey: ['admin-active-staff-count'],
     queryFn: async () => {
       const { count, error } = await supabase
-        .from('staff')
+        .from('user_profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .in('role', ['staff', 'admin']);
       
       if (error) throw error;
       return count || 0;

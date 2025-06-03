@@ -16,7 +16,7 @@ export const useUserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
 
-  // Fetch all users with their roles from the database
+  // Fetch all users with their roles from the database using user_profiles view
   const { 
     data: users = [], 
     isLoading, 
@@ -95,30 +95,40 @@ export const useUserManagement = () => {
     }
   });
 
-  // Add test data using existing staff table
+  // Add test data using existing profiles table
   const addTemporaryDataMutation = useMutation({
     mutationFn: async () => {
       console.log('Adding temporary test data...');
       
-      // Add some temporary staff for testing using the staff table
-      const staffData = [
-        { id: crypto.randomUUID(), first_name: 'John', last_name: 'Doe', email: 'john.doe@example.com', role: 'staff' as const },
-        { id: crypto.randomUUID(), first_name: 'Jane', last_name: 'Smith', email: 'jane.smith@example.com', role: 'staff' as const },
-        { id: crypto.randomUUID(), first_name: 'Alex', last_name: 'Johnson', email: 'alex.johnson@example.com', role: 'admin' as const }
+      // Add some temporary profiles for testing using the profiles table
+      const profilesData = [
+        { id: crypto.randomUUID(), first_name: 'John', last_name: 'Doe', email: 'john.doe@example.com' },
+        { id: crypto.randomUUID(), first_name: 'Jane', last_name: 'Smith', email: 'jane.smith@example.com' },
+        { id: crypto.randomUUID(), first_name: 'Alex', last_name: 'Johnson', email: 'alex.johnson@example.com' }
       ];
 
-      // Insert staff data if they don't exist
-      for (const staff of staffData) {
-        const { error: checkError, data: existingStaff } = await supabase
-          .from('staff')
+      // Insert profiles data if they don't exist
+      for (const profile of profilesData) {
+        const { error: checkError, data: existingProfile } = await supabase
+          .from('profiles')
           .select('id')
-          .eq('email', staff.email);
+          .eq('email', profile.email);
 
-        if (!checkError && (!existingStaff || existingStaff.length === 0)) {
-          const { error } = await supabase.from('staff').insert(staff);
+        if (!checkError && (!existingProfile || existingProfile.length === 0)) {
+          const { error } = await supabase.from('profiles').insert(profile);
           if (error) {
-            console.error('Error inserting staff:', error);
+            console.error('Error inserting profile:', error);
             throw error;
+          }
+
+          // Add corresponding user roles
+          const { error: roleError } = await supabase.from('user_roles').insert({
+            user_id: profile.id,
+            role: 'staff'
+          });
+          if (roleError) {
+            console.error('Error inserting user role:', roleError);
+            throw roleError;
           }
         }
       }
@@ -129,7 +139,7 @@ export const useUserManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
         title: 'Test data added',
-        description: 'Temporary staff data has been created for testing',
+        description: 'Temporary profile data has been created for testing',
       });
     },
     onError: (error: any) => {

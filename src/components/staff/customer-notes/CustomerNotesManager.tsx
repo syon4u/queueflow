@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -67,7 +66,7 @@ export const CustomerNotesManager: React.FC<CustomerNotesManagerProps> = ({
 
       if (notesError) throw notesError;
 
-      // Then fetch staff information for each note
+      // Then fetch staff information for each note using profiles table
       const notesWithStaff: CustomerNote[] = [];
       
       for (const note of notesData || []) {
@@ -75,7 +74,7 @@ export const CustomerNotesManager: React.FC<CustomerNotesManagerProps> = ({
         
         if (note.staff_id) {
           const { data: staffData } = await supabase
-            .from('staff')
+            .from('profiles')
             .select('first_name, last_name')
             .eq('id', note.staff_id)
             .single();
