@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { useStaffMetrics, useServiceMetrics, useDailyMetrics } from '@/hooks/admin/use-performance-metrics';
-import { Clock, Users, TrendingUp, Target } from 'lucide-react';
+import { Clock, Users, TrendingUp, Target, BarChart3 } from 'lucide-react';
 import { useQueue } from '@/context/QueueContext';
 
 // Import enhanced components
@@ -117,20 +118,40 @@ const StaffPerformanceReport: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with time range selector and export button */}
-      <PerformanceHeader 
-        timeRange={timeRange} 
-        setTimeRange={setTimeRange} 
-        isLoading={isLoading} 
-        onDownload={downloadReportCSV} 
-      />
+      {/* Header Card */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-bc-blue flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-bold text-gray-900">Performance Analytics</CardTitle>
+                <CardDescription>
+                  Real-time insights and historical performance data
+                </CardDescription>
+              </div>
+            </div>
+            
+            <PerformanceHeader 
+              timeRange={timeRange} 
+              setTimeRange={setTimeRange} 
+              isLoading={isLoading} 
+              onDownload={downloadReportCSV} 
+            />
+          </div>
+        </CardHeader>
+      </Card>
 
       {isLoading ? (
-        <div className="flex justify-center p-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
+        <Card>
+          <CardContent className="flex justify-center p-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-bc-blue"></div>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Enhanced Performance Metrics */}
           <PerformanceMetricsCard metrics={enhancedMetrics} />
 
