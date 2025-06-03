@@ -28,10 +28,8 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
   const { t } = useTranslation();
   const { stats } = useQueue();
 
-  // Use real waiting customers count from queue context
   const waitingCustomers = stats.waitingCustomers;
 
-  // Debug logging for StaffDashboardHeader
   console.log('StaffDashboardHeader - Real waitingCustomers from queue:', waitingCustomers);
 
   const getStatusColor = (status: string) => {
@@ -46,6 +44,19 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
         return 'bg-red-100 text-red-800 border-red-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Active';
+      case 'on_break':
+        return 'On Break';
+      case 'inactive':
+        return 'Inactive';
+      default:
+        return 'Unknown';
     }
   };
 
@@ -80,7 +91,7 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
         </div>
       </div>
 
-      {/* Status Cards Row - Consistent with Admin */}
+      {/* Status Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -102,7 +113,7 @@ export const StaffDashboardHeader: React.FC<StaffDashboardHeaderProps> = ({
               <div>
                 <p className="text-sm font-medium text-gray-600">Your Status</p>
                 <Badge className={`mt-1 ${getStatusColor(staffStatus)}`}>
-                  {staffStatus.replace('_', ' ').toUpperCase()}
+                  {getStatusText(staffStatus)}
                 </Badge>
               </div>
               <UserCheck className="h-4 w-4 text-muted-foreground" />

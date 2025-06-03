@@ -24,11 +24,15 @@ import { StaffSidebar } from '@/components/layout/StaffSidebar';
 import { StaffDashboardHeader } from '@/components/staff/StaffDashboardHeader';
 import StaffStatusSection from '@/components/staff/StaffStatusSection';
 import StaffShortcuts from '@/components/staff/StaffShortcuts';
+import { useStaffPerformance } from '@/hooks/use-staff-performance';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const StaffPageContent = () => {
   const { user, role } = useAuth();
-  const { appointments, isLoading: loading, refreshAppointments } = useRealtimeAppointments();
-  const { stats } = useQueue();
+  const { appointments, isLoading: appointmentsLoading, refreshAppointments } = useRealtimeAppointments();
+  const { stats, currentCustomer, queueStatus } = useQueue();
+  const { metrics, isLoading: performanceLoading } = useStaffPerformance();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState('basic-queue');
@@ -37,23 +41,36 @@ const StaffPageContent = () => {
   // Enable staff notifications
   useStaffNotifications();
 
-  // Debug logging for StaffPage
-  console.log('StaffPage - appointments from useRealtimeAppointments:', appointments);
-  console.log('StaffPage - appointments count:', appointments.length);
-  console.log('StaffPage - stats from useQueue:', stats);
-  console.log('StaffPage - stats.waitingCustomers:', stats.waitingCustomers);
+  // Get staff status from database
+  const { data: staffData } = useQuery({
+    queryKey: ['staff-status', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('staff')
+        .select('status, break_type, return_time')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching staff status:', error);
+        return { status: 'inactive', break_type: null, return_time: null };
+      }
+      return data;
+    },
+    enabled: !!user?.id,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const staffStatus = staffData?.status || 'inactive';
   
   // Filter to only show active appointments (not completed or cancelled)
   const activeAppointments = appointments.filter(
-    (appointment) => {
-      const isActive = !['completed', 'cancelled', 'no_show'].includes(appointment.status);
-      console.log(`StaffPage - Appointment ${appointment.id} status: ${appointment.status}, isActive: ${isActive}`);
-      return isActive;
-    }
+    (appointment) => !['completed', 'cancelled', 'no_show'].includes(appointment.status)
   );
 
-  console.log('StaffPage - activeAppointments:', activeAppointments);
   console.log('StaffPage - activeAppointments count:', activeAppointments.length);
+  console.log('StaffPage - queue stats:', stats);
   
   const handleStatusChange = () => {
     console.log('StaffPage - handleStatusChange called');
@@ -101,8 +118,10 @@ const StaffPageContent = () => {
           <div className="space-y-6">
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Active Appointments ({activeAppointments.length})</h2>
-                {loading ? (
+                <h2 className="text-xl font-semibold mb-4">
+                  {t('appointments.title')} ({activeAppointments.length})
+                </h2>
+                {appointmentsLoading ? (
                   <div className="flex justify-center p-8">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-label={t('common.loading')}></div>
                   </div>
@@ -144,8 +163,8 @@ const StaffPageContent = () => {
               <>
                 <div className="bg-white border-b p-6">
                   <StaffDashboardHeader
-                    queueStatus="open"
-                    staffStatus="active"
+                    queueStatus={queueStatus}
+                    staffStatus={staffStatus as 'active' | 'on_break' | 'inactive'}
                     activeAppointments={activeAppointments.length}
                     onRefresh={handleRefresh}
                     onNotificationClick={handleNotificationClick}
