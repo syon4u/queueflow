@@ -95,27 +95,27 @@ export const useUserManagement = () => {
     }
   });
 
-  // Add temporary data for testing (this adds mock users to the temp_staff table)
+  // Add test data using existing staff table
   const addTemporaryDataMutation = useMutation({
     mutationFn: async () => {
       console.log('Adding temporary test data...');
       
-      // Add some temporary staff for testing
+      // Add some temporary staff for testing using the staff table
       const staffData = [
-        { id: 'temp-staff-1', first_name: 'John', last_name: 'Doe', role: 'staff' as const },
-        { id: 'temp-staff-2', first_name: 'Jane', last_name: 'Smith', role: 'staff' as const },
-        { id: 'temp-staff-3', first_name: 'Alex', last_name: 'Johnson', role: 'admin' as const }
+        { id: crypto.randomUUID(), first_name: 'John', last_name: 'Doe', email: 'john.doe@example.com', role: 'staff' as const },
+        { id: crypto.randomUUID(), first_name: 'Jane', last_name: 'Smith', email: 'jane.smith@example.com', role: 'staff' as const },
+        { id: crypto.randomUUID(), first_name: 'Alex', last_name: 'Johnson', email: 'alex.johnson@example.com', role: 'admin' as const }
       ];
 
       // Insert staff data if they don't exist
       for (const staff of staffData) {
         const { error: checkError, data: existingStaff } = await supabase
-          .from('temp_staff')
+          .from('staff')
           .select('id')
-          .eq('id', staff.id);
+          .eq('email', staff.email);
 
         if (!checkError && (!existingStaff || existingStaff.length === 0)) {
-          const { error } = await supabase.from('temp_staff').insert(staff);
+          const { error } = await supabase.from('staff').insert(staff);
           if (error) {
             console.error('Error inserting staff:', error);
             throw error;

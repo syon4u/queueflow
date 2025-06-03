@@ -11,13 +11,13 @@ const { screen, waitFor } = reactTesting as any;
 
 // Mock component to test the hook
 const AuthConsumer = () => {
-  const { user, isLoading, role, signInWithEmail } = useAuth();
+  const { user, loading, role, signIn } = useAuth();
   return (
     <div>
-      <div data-testid="loading">{isLoading.toString()}</div>
+      <div data-testid="loading">{loading.toString()}</div>
       <div data-testid="user">{user ? JSON.stringify(user) : 'null'}</div>
       <div data-testid="role">{role || 'null'}</div>
-      <button data-testid="login-button" onClick={() => signInWithEmail('test@example.com', 'password')}>Login</button>
+      <button data-testid="login-button" onClick={() => signIn('test@example.com', 'password')}>Login</button>
     </div>
   );
 };
@@ -87,7 +87,7 @@ describe('AuthProvider', () => {
     });
   });
 
-  it('should call signInWithPassword when signInWithEmail is called', async () => {
+  it('should call signInWithPassword when signIn is called', async () => {
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
       data: {},
       error: null,

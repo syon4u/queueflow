@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -59,15 +60,21 @@ const AppointmentsPage = () => {
             check_in_time,
             start_time,
             end_time,
-            service:service_id (name, duration),
-            location:location_id (name)
+            services!appointments_service_id_fkey (name, duration),
+            locations!appointments_location_id_fkey (name)
           `)
           .eq('customer_id', user.id)
           .order('scheduled_time', { ascending: false });
           
         if (error) throw error;
         
-        setAppointments(data || []);
+        const formattedAppointments = (data || []).map(appointment => ({
+          ...appointment,
+          service: appointment.services || { name: 'Unknown Service', duration: 0 },
+          location: appointment.locations || { name: 'Unknown Location' }
+        }));
+        
+        setAppointments(formattedAppointments);
       } catch (error) {
         console.error('Error fetching appointments:', error);
         toast({

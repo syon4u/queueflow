@@ -29,7 +29,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { user, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   
@@ -64,9 +64,9 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       if (activeTab === 'login') {
-        await signInWithEmail(data.email, data.password);
+        await signIn(data.email, data.password);
       } else {
-        await signUpWithEmail(data.email, data.password);
+        await signUp(data.email, data.password);
       }
     } catch (error) {
       console.error(`${activeTab === 'login' ? 'Login' : 'Registration'} failed:`, error);

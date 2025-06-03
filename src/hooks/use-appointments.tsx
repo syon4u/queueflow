@@ -59,22 +59,22 @@ export function useAppointments(serviceId?: string) {
         .from('appointments')
         .select(`
           *,
-          customers:customer_id (
+          customers!appointments_customer_id_fkey (
             first_name,
             last_name,
             email,
             phone
           ),
-          services:service_id (
+          services!appointments_service_id_fkey (
             name,
             duration,
             description
           ),
-          locations:location_id (
+          locations!appointments_location_id_fkey (
             name,
             address
           ),
-          staff:staff_id (
+          staff!appointments_staff_id_fkey (
             first_name,
             last_name
           )

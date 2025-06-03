@@ -78,8 +78,8 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           start_time,
           end_time,
           notes,
-          customers!inner(first_name, last_name, phone, email),
-          services!inner(name)
+          customers!appointments_customer_id_fkey(first_name, last_name, phone, email),
+          services!appointments_service_id_fkey(name)
         `)
         .gte('scheduled_time', `${today}T00:00:00`)
         .lt('scheduled_time', `${today}T23:59:59`)
@@ -94,10 +94,10 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Transform database data to Customer interface
       return data.map(appointment => ({
         id: appointment.id,
-        name: `${appointment.customers.first_name} ${appointment.customers.last_name}`,
-        phone: appointment.customers.phone,
-        email: appointment.customers.email,
-        service: appointment.services.name,
+        name: `${appointment.customers?.first_name || ''} ${appointment.customers?.last_name || ''}`.trim(),
+        phone: appointment.customers?.phone,
+        email: appointment.customers?.email,
+        service: appointment.services?.name || 'Unknown Service',
         priority: 'normal' as const, // Default priority
         status: mapAppointmentStatusToCustomerStatus(appointment.status),
         joinedAt: appointment.check_in_time ? new Date(appointment.check_in_time) : new Date(appointment.scheduled_time),
