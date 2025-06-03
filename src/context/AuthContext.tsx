@@ -28,33 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     console.log('AuthProvider: Initializing authentication state');
     
-    // Get initial session
-    const initializeAuth = async (): Promise<void> => {
-      try {
-        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('AuthProvider: Error getting initial session:', error);
-        } else {
-          console.log('AuthProvider: Initial session:', initialSession?.user?.id || 'No session');
-          setSession(initialSession);
-          setUser(initialSession?.user ?? null);
-          
-          if (initialSession?.user) {
-            await fetchUserRole(initialSession.user.id);
-          }
-        }
-      } catch (error) {
-        console.error('AuthProvider: Error initializing auth:', error);
-      } finally {
-        setLoading(false);
-        setInitialized(true);
-      }
-    };
-
-    initializeAuth();
-
-    // Listen for auth state changes
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         console.log('AuthProvider: Auth state changed:', event, currentSession?.user?.id || 'No user');
@@ -63,17 +37,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(currentSession?.user ?? null);
 
         if (currentSession?.user) {
+          // Fetch role for authenticated user
           await fetchUserRole(currentSession.user.id);
         } else {
+          // Clear role for unauthenticated user
           clearRole();
         }
 
-        // Only set loading to false after initial session check
-        if (event === 'INITIAL_SESSION') {
-          setLoading(false);
-        }
+        // Set loading to false after processing
+        setLoading(false);
       }
     );
+
+    // Get initial session
+    const initializeAuth = async (): Promise<void> => {
+      try {
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('AuthProvider: Error getting initial session:', error);
+          setLoading(false);
+        } else {
+          console.log('AuthProvider: Initial session:', initialSession?.user?.id || 'No session');
+          setSession(initialSession);
+          setUser(initialSession?.user ?? null);
+          
+          if (initialSession?.user) {
+            await fetchUserRole(initialSession.user.id);
+          }
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('AuthProvider: Error initializing auth:', error);
+        setLoading(false);
+      } finally {
+        setInitialized(true);
+      }
+    };
+
+    initializeAuth();
 
     return () => {
       subscription.unsubscribe();

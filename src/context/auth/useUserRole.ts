@@ -10,7 +10,7 @@ export const useUserRole = () => {
     try {
       console.log('Fetching role for user:', userId);
       
-      // Use the new security definer function to get user role safely
+      // Use the security definer function to get user role safely
       const { data: roleData, error: roleError } = await supabase.rpc('get_current_user_role');
       
       if (roleError) {
@@ -24,6 +24,7 @@ export const useUserRole = () => {
       
       if (roleData && isValidUserRole(roleData)) {
         setRole(roleData);
+        console.log('Role set to:', roleData);
         return;
       }
 
@@ -39,7 +40,22 @@ export const useUserRole = () => {
 
   const ensureUserHasRole = async (userId: string): Promise<void> => {
     try {
-      // First try to insert a staff role for this user
+      console.log('Ensuring user has role:', userId);
+      
+      // First check if user already has a role
+      const { data: existingRole, error: checkError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (!checkError && existingRole && isValidUserRole(existingRole.role)) {
+        console.log('Found existing role:', existingRole.role);
+        setRole(existingRole.role);
+        return;
+      }
+
+      // If no role exists, try to insert a staff role
       const { error: insertError } = await supabase
         .from('user_roles')
         .insert({
@@ -50,21 +66,25 @@ export const useUserRole = () => {
       if (!insertError) {
         setRole('staff');
         console.log('Default staff role assigned successfully');
-      } else {
-        // If insert failed, the user might already have a role, try to get it
-        const { data: existingRole } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .single();
         
-        if (existingRole && isValidUserRole(existingRole.role)) {
-          setRole(existingRole.role);
-          console.log('Found existing role:', existingRole.role);
-        } else {
-          setRole('customer'); // Ultimate fallback
-          console.log('Fallback to customer role');
+        // Also try to create a staff record
+        const { error: staffError } = await supabase
+          .from('staff')
+          .insert({
+            id: userId,
+            first_name: '',
+            last_name: '',
+            email: '',
+            role: 'staff',
+            status: 'inactive'
+          });
+
+        if (staffError && !staffError.message?.includes('duplicate key')) {
+          console.warn('Could not create staff record:', staffError);
         }
+      } else {
+        console.error('Failed to assign default role:', insertError);
+        setRole('customer'); // Ultimate fallback
       }
     } catch (error) {
       console.error('Failed to ensure user has role:', error);
@@ -73,6 +93,7 @@ export const useUserRole = () => {
   };
 
   const clearRole = (): void => {
+    console.log('Clearing user role');
     setRole(null);
   };
 
