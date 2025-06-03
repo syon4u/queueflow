@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,11 +21,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { role, fetchUserRole, clearRole } = useUserRole();
 
   useEffect(() => {
-    console.log('AuthProvider: Setting up authentication listener');
+    console.log('AuthProvider: Initializing authentication state');
+    
+    let mounted = true;
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        if (!mounted) return;
+        
         console.log('AuthProvider: Auth state changed:', event, currentSession?.user?.id || 'No user');
         
         setSession(currentSession);
@@ -34,13 +37,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (currentSession?.user) {
           console.log('AuthProvider: User found, fetching role');
-          await fetchUserRole(currentSession.user.id);
+          try {
+            await fetchUserRole(currentSession.user.id);
+          } catch (error) {
+            console.error('AuthProvider: Error fetching role:', error);
+          }
         } else {
           console.log('AuthProvider: No user, clearing role');
           clearRole();
         }
 
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     );
 
@@ -49,24 +58,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         
+        if (!mounted) return;
+        
         if (error) {
           console.error('AuthProvider: Error getting initial session:', error);
         } else {
-          console.log('AuthProvider: Initial session check:', initialSession?.user?.id || 'No session');
+          console.log('AuthProvider: Initial session:', initialSession?.user?.id || 'No session');
           
-          if (initialSession) {
-            setSession(initialSession);
-            setUser(initialSession.user);
-            
-            if (initialSession.user) {
+          setSession(initialSession);
+          setUser(initialSession?.user ?? null);
+          
+          if (initialSession?.user) {
+            try {
               await fetchUserRole(initialSession.user.id);
+            } catch (error) {
+              console.error('AuthProvider: Error fetching initial role:', error);
             }
           }
         }
       } catch (error) {
         console.error('AuthProvider: Error initializing auth:', error);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -74,9 +89,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       console.log('AuthProvider: Cleaning up auth listener');
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchUserRole, clearRole]);
+  }, []); // Remove fetchUserRole and clearRole from deps to prevent re-initialization
 
   const signIn = async (email: string, password: string): Promise<{ error?: AuthError }> => {
     try {
