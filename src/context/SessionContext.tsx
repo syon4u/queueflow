@@ -22,6 +22,7 @@ interface SessionContextType {
   timeUntilExpiry: number | null;
   refreshSessions: () => Promise<void>;
   invalidateSession: (sessionId: string) => Promise<void>;
+  invalidateAllSessions: () => Promise<void>;
   extendSession: () => Promise<void>;
 }
 
@@ -157,6 +158,29 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const invalidateAllSessions = async (): Promise<void> => {
+    try {
+      // Invalidate all sessions except current
+      for (const session of activeSessions) {
+        if (session.id !== sessionManager.getCurrentSession()?.id) {
+          await sessionManager.invalidateSession(session.id);
+        }
+      }
+      await refreshSessions();
+      toast({
+        title: 'All Sessions Terminated',
+        description: 'All other sessions have been terminated.'
+      });
+    } catch (error) {
+      console.error('Failed to invalidate all sessions:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to terminate all sessions.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const extendSession = async (): Promise<void> => {
     try {
       await sessionManager.updateLastActive();
@@ -182,6 +206,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     timeUntilExpiry,
     refreshSessions,
     invalidateSession,
+    invalidateAllSessions,
     extendSession
   };
 

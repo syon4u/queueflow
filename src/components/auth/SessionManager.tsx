@@ -150,39 +150,39 @@ export const SessionManager: React.FC = () => {
                 <div 
                   key={session.id}
                   className={`flex items-center justify-between p-4 border rounded-lg ${
-                    isCurrentSession(session.deviceInfo) 
+                    isCurrentSession(session.device_info) 
                       ? 'border-green-200 bg-green-50' 
                       : 'border-gray-200'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    {getDeviceIcon(session.deviceInfo)}
+                    {getDeviceIcon(session.device_info)}
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">
-                          {session.deviceInfo.split(' - ')[0]}
+                          {session.device_info.split(' - ')[0]}
                         </span>
-                        {isCurrentSession(session.deviceInfo) && (
+                        {isCurrentSession(session.device_info) && (
                           <Badge variant="secondary" className="text-xs">
                             Current Session
                           </Badge>
                         )}
-                        {session.isRemembered && (
+                        {session.is_remembered && (
                           <Badge variant="outline" className="text-xs">
                             Remembered
                           </Badge>
                         )}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {session.ipAddress && (
+                        {session.ip_address && (
                           <span className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            {session.ipAddress}
+                            {session.ip_address}
                           </span>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Last active: {formatDistanceToNow(session.lastActive)} ago
+                        Last active: {formatDistanceToNow(new Date(session.last_active))} ago
                       </div>
                     </div>
                   </div>
@@ -190,14 +190,14 @@ export const SessionManager: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <div className="text-sm font-medium">
-                        Expires in {formatTimeUntilExpiry(session.expiresAt)}
+                        Expires in {formatTimeUntilExpiry(new Date(session.expires_at))}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {session.expiresAt.toLocaleString()}
+                        {new Date(session.expires_at).toLocaleString()}
                       </div>
                     </div>
                     
-                    {!isCurrentSession(session.deviceInfo) && (
+                    {!isCurrentSession(session.device_info) && (
                       <Button
                         onClick={() => handleInvalidateSession(session.id)}
                         disabled={isLoading}
