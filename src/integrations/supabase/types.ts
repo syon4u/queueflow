@@ -176,6 +176,34 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_appointments_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_appointments_location"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_appointments_service"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_appointments_staff"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
         ]
       }
       break_requests: {
@@ -241,6 +269,20 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_break_requests_handover_staff"
+            columns: ["handover_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_break_requests_staff"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]
@@ -326,6 +368,20 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_customer_communications_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_customer_communications_staff"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
         ]
       }
       customer_notes: {
@@ -368,6 +424,20 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_customer_notes_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_customer_notes_staff"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]
@@ -519,6 +589,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_performance_metrics_staff"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "performance_metrics_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
@@ -618,6 +695,20 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_queue_positions_appointment"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_queue_positions_location"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "queue_positions_appointment_id_fkey"
             columns: ["appointment_id"]
@@ -836,6 +927,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_services_location"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "services_location_id_fkey"
             columns: ["location_id"]
             isOneToOne: false
@@ -987,6 +1085,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_staff_notifications_staff"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "staff_notifications_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
@@ -1022,128 +1127,6 @@ export type Database = {
         }
         Relationships: []
       }
-      temp_appointments: {
-        Row: {
-          check_in_time: string | null
-          created_at: string
-          customer_name: string
-          end_time: string | null
-          id: string
-          location_name: string
-          notes: string | null
-          reason_for_visit: string | null
-          scheduled_time: string
-          service_name: string
-          staff_name: string | null
-          start_time: string | null
-          status: Database["public"]["Enums"]["appointment_status"]
-          updated_at: string
-        }
-        Insert: {
-          check_in_time?: string | null
-          created_at?: string
-          customer_name: string
-          end_time?: string | null
-          id?: string
-          location_name: string
-          notes?: string | null
-          reason_for_visit?: string | null
-          scheduled_time: string
-          service_name: string
-          staff_name?: string | null
-          start_time?: string | null
-          status?: Database["public"]["Enums"]["appointment_status"]
-          updated_at?: string
-        }
-        Update: {
-          check_in_time?: string | null
-          created_at?: string
-          customer_name?: string
-          end_time?: string | null
-          id?: string
-          location_name?: string
-          notes?: string | null
-          reason_for_visit?: string | null
-          scheduled_time?: string
-          service_name?: string
-          staff_name?: string | null
-          start_time?: string | null
-          status?: Database["public"]["Enums"]["appointment_status"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      temp_customers: {
-        Row: {
-          created_at: string
-          email: string | null
-          first_name: string
-          id: string
-          last_name: string
-          phone: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          email?: string | null
-          first_name: string
-          id?: string
-          last_name: string
-          phone?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string | null
-          first_name?: string
-          id?: string
-          last_name?: string
-          phone?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      temp_staff: {
-        Row: {
-          created_at: string
-          first_name: string
-          id: string
-          last_name: string
-          location_id: string | null
-          phone: string | null
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          first_name: string
-          id?: string
-          last_name: string
-          location_id?: string | null
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          first_name?: string
-          id?: string
-          last_name?: string
-          location_id?: string | null
-          phone?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "temp_staff_location_id_fkey"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
           created_at: string
@@ -1173,6 +1156,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_customer: {
+        Args: { customer_uuid: string }
+        Returns: boolean
+      }
+      can_manage_appointments: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       get_admin_dashboard_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json

@@ -1,23 +1,91 @@
 
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { Spinner } from '@/components/ui/spinner';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: string[];
+  requiredRole?: string | string[];
+  redirectTo?: string;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRoles }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requiredRole,
+  redirectTo = '/auth'
+}) => {
+  const { user, role, loading } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    console.log("🚫 ProtectedRoute: JWT verification globally disabled for development");
-    console.log("✅ Allowing access to:", location.pathname);
-    console.log("Required roles (ignored):", requiredRoles);
-  }, [location.pathname, requiredRoles]);
+  console.log('ProtectedRoute: Checking access', {
+    hasUser: !!user,
+    userRole: role,
+    requiredRole,
+    loading,
+    path: location.pathname
+  });
 
-  // JWT GLOBALLY DISABLED - Allow all access without any checks
+  // Show loading spinner while authentication state is being determined
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Spinner className="mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to auth if no user
+  if (!user) {
+    console.log('ProtectedRoute: No user, redirecting to auth');
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
+  }
+
+  // If role is required, check if user has the required role
+  if (requiredRole) {
+    const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    
+    if (!role) {
+      console.log('ProtectedRoute: No role found, redirecting to auth');
+      return <Navigate to={redirectTo} state={{ from: location }} replace />;
+    }
+
+    if (!requiredRoles.includes(role)) {
+      console.log('ProtectedRoute: Insufficient role', { userRole: role, requiredRoles });
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
+  console.log('ProtectedRoute: Access granted');
   return <>{children}</>;
 };
+
+// Higher-order component for role-based protection
+export const withRoleProtection = (
+  Component: React.ComponentType, 
+  requiredRole?: string | string[]
+) => {
+  return (props: any) => (
+    <ProtectedRoute requiredRole={requiredRole}>
+      <Component {...props} />
+    </ProtectedRoute>
+  );
+};
+
+// Specific role guards for common use cases
+export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ProtectedRoute requiredRole="admin">{children}</ProtectedRoute>
+);
+
+export const StaffRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ProtectedRoute requiredRole={['staff', 'admin']}>{children}</ProtectedRoute>
+);
+
+export const CustomerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ProtectedRoute requiredRole={['customer', 'staff', 'admin']}>{children}</ProtectedRoute>
+);
 
 export default ProtectedRoute;
