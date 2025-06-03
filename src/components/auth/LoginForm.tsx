@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { LoginFormData } from '@/types/auth';
+import { RememberMeCheckbox } from './RememberMeCheckbox';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -21,11 +22,13 @@ const loginSchema = z.object({
 });
 
 interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>;
+  onSubmit: (data: LoginFormData & { rememberMe: boolean }) => Promise<void>;
   isLoading: boolean;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
+  const [rememberMe, setRememberMe] = useState(false);
+  
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,9 +37,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => 
     },
   });
 
+  const handleSubmit = async (data: LoginFormData) => {
+    await onSubmit({ ...data, rememberMe });
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -63,6 +70,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => 
             </FormItem>
           )}
         />
+        
+        <RememberMeCheckbox
+          checked={rememberMe}
+          onCheckedChange={setRememberMe}
+          disabled={isLoading}
+        />
+        
         <Button type="submit" className="w-full" disabled={isLoading}>
           Sign In
         </Button>

@@ -22,8 +22,8 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const onSignIn = async (data: { email: string; password: string }) => {
-    await handleSignIn(data.email, data.password);
+  const onSignIn = async (data: { email: string; password: string; rememberMe: boolean }) => {
+    await handleSignIn(data.email, data.password, data.rememberMe);
   };
 
   const onSignUp = async (data: { email: string; password: string }) => {

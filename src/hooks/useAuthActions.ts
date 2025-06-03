@@ -3,20 +3,25 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { handleAuthError, handleAuthSuccess } from '@/utils/auth-helpers';
 import { UseAuthActionsReturn } from '@/types/auth';
+import { sessionManager } from '@/services/session-manager';
 
 export const useAuthActions = (): UseAuthActionsReturn => {
   const { signIn, signUp, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleSignIn = async (email: string, password: string): Promise<void> => {
+  const handleSignIn = async (email: string, password: string, rememberMe: boolean = false): Promise<void> => {
     setIsLoading(true);
     try {
+      // Store remember me preference
+      localStorage.setItem('rememberMe', rememberMe.toString());
+      
       const { error } = await signIn(email, password);
       
       if (error) {
         handleAuthError(error, 'login');
       } else {
         handleAuthSuccess('login');
+        // Session will be initialized by SessionContext
       }
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -61,10 +66,22 @@ export const useAuthActions = (): UseAuthActionsReturn => {
     }
   };
 
+  const handleSignOut = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      await sessionManager.invalidateCurrentSession();
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     handleSignIn,
     handleSignUp,
     handleGoogleSignIn,
+    handleSignOut,
     isLoading
   };
 };

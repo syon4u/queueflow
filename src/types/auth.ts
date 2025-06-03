@@ -54,9 +54,10 @@ export interface RegisterFormData {
 
 // Auth hook return types
 export interface UseAuthActionsReturn {
-  handleSignIn: (email: string, password: string) => Promise<void>;
+  handleSignIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   handleSignUp: (email: string, password: string) => Promise<void>;
   handleGoogleSignIn: () => Promise<void>;
+  handleSignOut: () => Promise<void>;
   isLoading: boolean;
 }
 
