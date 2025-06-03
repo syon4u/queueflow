@@ -139,22 +139,26 @@ const StaffPageContent = () => {
         
         <SidebarInset className="flex-1">
           <div className="flex flex-col min-h-screen">
-            {/* Header */}
-            <div className="bg-white border-b p-6">
-              <StaffDashboardHeader
-                queueStatus="open"
-                staffStatus="active"
-                activeAppointments={activeAppointments.length}
-                onRefresh={handleRefresh}
-                onNotificationClick={handleNotificationClick}
-                onSettingsClick={handleSettingsClick}
-              />
-            </div>
+            {/* Header - Only show on basic-queue tab (main staff dashboard) */}
+            {activeSection === 'basic-queue' && (
+              <>
+                <div className="bg-white border-b p-6">
+                  <StaffDashboardHeader
+                    queueStatus="open"
+                    staffStatus="active"
+                    activeAppointments={activeAppointments.length}
+                    onRefresh={handleRefresh}
+                    onNotificationClick={handleNotificationClick}
+                    onSettingsClick={handleSettingsClick}
+                  />
+                </div>
 
-            {/* Status Section */}
-            <div className="bg-white border-b px-6 py-4">
-              <StaffStatusSection onStatusChange={handleStatusChange} />
-            </div>
+                {/* Status Section - Only show on basic-queue tab */}
+                <div className="bg-white border-b px-6 py-4">
+                  <StaffStatusSection onStatusChange={handleStatusChange} />
+                </div>
+              </>
+            )}
             
             {/* Main Content */}
             <main className="flex-1 p-6">
