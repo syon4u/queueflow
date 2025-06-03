@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Card,
@@ -39,10 +40,17 @@ const ScheduleAppointmentCard: React.FC<ScheduleAppointmentCardProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('appointments.newAppointment')}</CardTitle>
-        <CardDescription>
-          {t('appointments.scheduleDescription')}
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>{t('appointments.newAppointment')}</CardTitle>
+            <CardDescription>
+              {t('appointments.scheduleDescription')}
+            </CardDescription>
+          </div>
+          <div className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+            No Auth Required
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent>

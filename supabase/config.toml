@@ -37,4 +37,4 @@ port = 54330
 port = 54331
 
 [functions.customer-history]
-verify_jwt = true
+verify_jwt = false

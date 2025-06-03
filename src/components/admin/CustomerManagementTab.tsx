@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,7 +28,7 @@ const CustomerManagementTab = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      console.log('CustomerManagementTab - Starting to fetch customers...');
+      console.log('🚫 CustomerManagementTab - JWT disabled, fetching customers without auth...');
       
       // First, get all customers with a simpler approach
       const { data: customersData, error: customersError } = await supabase
@@ -190,7 +189,7 @@ const CustomerManagementTab = () => {
   };
 
   useEffect(() => {
-    console.log('CustomerManagementTab - Component mounted, fetching customers');
+    console.log('🚫 CustomerManagementTab - Component mounted, JWT disabled, fetching customers');
     fetchCustomers();
   }, []);
 
@@ -224,6 +223,13 @@ const CustomerManagementTab = () => {
 
   return (
     <div className="space-y-6">
+      {/* JWT Disabled Notice */}
+      <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+        <p className="text-sm text-yellow-800">
+          🚫 <strong>Development Mode:</strong> JWT verification disabled - all data accessible without authentication
+        </p>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Customer Management</h2>

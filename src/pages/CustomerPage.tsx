@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -40,6 +39,13 @@ const CustomerPage = () => {
     >
       <div className="min-h-screen bg-pattern-grid bg-gradient-overlay-teal">
         <div className="container mx-auto px-4 py-6">
+          {/* JWT Disabled Notice */}
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              🚫 <strong>Development Mode:</strong> Authentication is globally disabled
+            </p>
+          </div>
+
           {/* Breadcrumb Navigation */}
           <div className="mb-6">
             <Breadcrumb 
