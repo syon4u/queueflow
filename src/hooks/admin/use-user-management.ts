@@ -41,25 +41,10 @@ export const useUserManagement = () => {
         
         if (error) {
           console.error('Error fetching users:', error);
-          // If we get a permission error, try a different approach
+          // If we get a permission error, show a more user-friendly message
           if (error.message?.includes('Access denied') || error.message?.includes('infinite recursion')) {
-            console.log('Permission error detected, falling back to direct query...');
-            
-            // Fallback: Get users from auth.users directly
-            const { data: authUsers, error: authError } = await supabase
-              .from('auth.users')
-              .select('id, email, created_at, last_sign_in_at');
-            
-            if (authError) {
-              console.error('Fallback auth query failed:', authError);
-              throw authError;
-            }
-            
-            console.log('Fallback query successful:', authUsers);
-            return authUsers?.map(user => ({
-              ...user,
-              role: 'customer' // Default role when we can't access role table
-            })) || [];
+            console.log('Permission error detected, returning empty array...');
+            throw new Error('Admin permissions required to view user management');
           }
           throw error;
         }
