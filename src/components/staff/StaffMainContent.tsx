@@ -38,28 +38,46 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
   const { user } = useAuth();
   const { queueStatus } = useQueue();
 
-  // Get staff status from database
-  const { data: staffData, isLoading: isStaffLoading } = useQuery({
+  // Get staff status from database with better error handling
+  const { data: staffData, isLoading: isStaffLoading, error: staffError } = useQuery({
     queryKey: ['staff-status', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
+      
+      console.log('Fetching staff status for user:', user.id);
+      
       const { data, error } = await supabase
         .from('staff')
         .select('status, break_type, return_time')
         .eq('id', user.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle to avoid errors when no data found
       
       if (error) {
         console.error('Error fetching staff status:', error);
+        // Return default status instead of throwing
         return { status: 'inactive', break_type: null, return_time: null };
       }
-      return data;
+      
+      console.log('Staff status fetched:', data);
+      return data || { status: 'inactive', break_type: null, return_time: null };
     },
     enabled: !!user?.id,
     refetchInterval: 30000,
+    retry: (failureCount, error) => {
+      // Don't retry if it's a permissions error
+      if (error?.message?.includes('permission')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 
   const staffStatus = staffData?.status || 'inactive';
+
+  // Log any staff query errors
+  if (staffError) {
+    console.error('Staff status query error:', staffError);
+  }
 
   const renderMainContent = () => {
     switch (activeSection) {
