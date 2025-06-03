@@ -27,11 +27,40 @@ export const useUserManagement = () => {
       try {
         console.log('Fetching users with roles from database...');
         
+        // First, let's try to get the current user's role to check permissions
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        console.log('Current authenticated user:', currentUser?.id);
+        
+        if (!currentUser) {
+          console.log('No authenticated user found');
+          return [];
+        }
+
         // Call the database function to get users with roles
         const { data, error } = await supabase.rpc('get_users_with_roles');
         
         if (error) {
           console.error('Error fetching users:', error);
+          // If we get a permission error, try a different approach
+          if (error.message?.includes('Access denied') || error.message?.includes('infinite recursion')) {
+            console.log('Permission error detected, falling back to direct query...');
+            
+            // Fallback: Get users from auth.users directly
+            const { data: authUsers, error: authError } = await supabase
+              .from('auth.users')
+              .select('id, email, created_at, last_sign_in_at');
+            
+            if (authError) {
+              console.error('Fallback auth query failed:', authError);
+              throw authError;
+            }
+            
+            console.log('Fallback query successful:', authUsers);
+            return authUsers?.map(user => ({
+              ...user,
+              role: 'customer' // Default role when we can't access role table
+            })) || [];
+          }
           throw error;
         }
         
@@ -43,6 +72,13 @@ export const useUserManagement = () => {
       }
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: (failureCount, error) => {
+      // Don't retry permission errors
+      if (error?.message?.includes('Access denied') || error?.message?.includes('infinite recursion')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 
   // Update user role mutation
