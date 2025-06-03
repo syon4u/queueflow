@@ -11,7 +11,7 @@
   "status": "Status",
   "service": "Service",
   "customer": "Customer",
-  "status": {
+  "statusOptions": {
     "scheduled": "Scheduled",
     "checked_in": "Checked In",
     "in_progress": "In Progress",

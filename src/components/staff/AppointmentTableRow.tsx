@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -95,7 +94,7 @@ export const AppointmentTableRow: React.FC<AppointmentTableRowProps> = ({
       <TableCell className="py-4 px-6">
         <Badge className={`${statusConfig.className} cursor-pointer transform group-hover:scale-105 transition-transform duration-200`}>
           <statusConfig.icon className="w-3 h-3 mr-1" />
-          {t(`appointments.status.${appointment.status}`)}
+          {t(`appointments.statusOptions.${appointment.status}`)}
         </Badge>
       </TableCell>
       
