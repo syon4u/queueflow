@@ -27,6 +27,27 @@ export const useUserRole = () => {
         }
       }
 
+      // If no explicit role found, check if this is a new user and assign default role
+      if (userRoleError && userRoleError.code === 'PGRST116') { // No rows returned
+        console.log('No role found, assigning default staff role');
+        
+        // Assign default staff role to new user
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            role: 'staff'
+          });
+
+        if (!insertError) {
+          setRole('staff');
+          console.log('Default staff role assigned successfully');
+          return;
+        } else {
+          console.error('Failed to assign default role:', insertError);
+        }
+      }
+
       console.log('No role found in user_roles, checking staff table:', userRoleError);
       
       // Check staff table as fallback
@@ -64,12 +85,12 @@ export const useUserRole = () => {
 
       console.log('User not found in staff table or is inactive non-admin:', staffError);
       
-      // Default to customer only if no role found anywhere
-      console.log('Defaulting to customer role');
-      setRole('customer');
+      // Default to staff for authenticated users
+      console.log('Defaulting to staff role');
+      setRole('staff');
     } catch (error) {
       console.error('Failed to fetch user role:', error);
-      setRole('customer');
+      setRole('staff'); // Default to staff instead of customer
     }
   };
 

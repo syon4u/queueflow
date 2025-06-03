@@ -1,34 +1,33 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Session, User } from '@supabase/supabase-js';
+import { toast } from '@/hooks/use-toast';
 
-export interface SessionInfo {
+interface SessionData {
   id: string;
-  userId: string;
-  deviceInfo: string;
-  ipAddress?: string;
-  lastActive: Date;
-  expiresAt: Date;
-  isRemembered: boolean;
+  user_id: string;
+  device_info: string;
+  ip_address: string | null;
+  last_active: string;
+  expires_at: string;
+  is_remembered: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface SessionSettings {
-  timeoutMinutes: number;
-  maxConcurrentSessions: number;
-  rememberMeDays: number;
-  extendOnActivity: boolean;
+interface CreateSessionOptions {
+  rememberMe?: boolean;
+  deviceInfo?: string;
 }
 
 class SessionManager {
   private static instance: SessionManager;
+  private currentSession: SessionData | null = null;
   private sessionCheckInterval: NodeJS.Timeout | null = null;
-  private activityListeners: Array<() => void> = [];
-  private settings: SessionSettings = {
-    timeoutMinutes: 30, // 30 minutes default timeout
-    maxConcurrentSessions: 3,
-    rememberMeDays: 30,
-    extendOnActivity: true
-  };
+  private readonly SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+  private readonly DEFAULT_SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly REMEMBER_ME_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+  private constructor() {}
 
   static getInstance(): SessionManager {
     if (!SessionManager.instance) {
@@ -37,148 +36,139 @@ class SessionManager {
     return SessionManager.instance;
   }
 
-  private constructor() {
-    this.setupActivityDetection();
+  private async getClientIP(): Promise<string> {
+    // Fallback to a safe default instead of making external requests
+    // In production, this would typically be handled server-side
+    return 'unknown';
   }
 
-  // Initialize session management
-  async initialize(user: User | null, rememberMe: boolean = false): Promise<void> {
-    if (!user) return;
+  private getDeviceInfo(): string {
+    const userAgent = navigator.userAgent;
+    const platform = navigator.platform || 'Unknown';
+    const language = navigator.language || 'Unknown';
+    
+    // Create a simplified device fingerprint
+    return `${platform} - ${language} - ${userAgent.substring(0, 50)}`;
+  }
 
-    const sessionData = {
-      user_id: user.id,
-      device_info: this.getDeviceInfo(),
-      ip_address: await this.getClientIP(),
-      last_active: new Date().toISOString(),
-      expires_at: this.calculateExpiration(rememberMe),
-      is_remembered: rememberMe
-    };
-
+  async initialize(): Promise<void> {
+    console.log('SessionManager: Initializing...');
+    
     try {
-      // Store session in database
-      const { error } = await supabase
-        .from('user_sessions')
-        .insert(sessionData);
-
-      if (error && !error.message.includes('duplicate')) {
-        console.error('Failed to store session:', error);
-      }
-
-      // Clean up old sessions for this user
-      await this.cleanupOldSessions(user.id);
-
       // Start session monitoring
       this.startSessionMonitoring();
       
-      console.log('Session initialized for user:', user.id);
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('SessionManager: No authenticated user');
+        return;
+      }
+
+      // Create or update session
+      const rememberMe = localStorage.getItem('rememberMe') === 'true';
+      await this.createSession(user.id, { rememberMe });
+      
+      console.log('SessionManager: Initialized successfully');
     } catch (error) {
-      console.error('Session initialization error:', error);
+      console.error('SessionManager: Failed to initialize:', error);
+      // Don't throw error, just log it to prevent blocking the app
     }
   }
 
-  // Start monitoring session timeout
-  private startSessionMonitoring(): void {
-    if (this.sessionCheckInterval) {
-      clearInterval(this.sessionCheckInterval);
-    }
-
-    this.sessionCheckInterval = setInterval(async () => {
-      await this.checkSessionValidity();
-    }, 60000); // Check every minute
-  }
-
-  // Check if current session is still valid
-  private async checkSessionValidity(): Promise<boolean> {
+  async createSession(userId: string, options: CreateSessionOptions = {}): Promise<SessionData | null> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return false;
+      const { rememberMe = false, deviceInfo = this.getDeviceInfo() } = options;
+      const ipAddress = await this.getClientIP();
+      
+      const duration = rememberMe ? this.REMEMBER_ME_DURATION : this.DEFAULT_SESSION_DURATION;
+      const expiresAt = new Date(Date.now() + duration).toISOString();
 
-      const { data: sessionRecord, error } = await supabase
+      const sessionData = {
+        user_id: userId,
+        device_info: deviceInfo,
+        ip_address: ipAddress,
+        last_active: new Date().toISOString(),
+        expires_at: expiresAt,
+        is_remembered: rememberMe,
+      };
+
+      const { data, error } = await supabase
         .from('user_sessions')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .eq('device_info', this.getDeviceInfo())
+        .insert(sessionData)
+        .select()
         .single();
 
-      if (error || !sessionRecord) {
-        console.log('Session not found in database, logging out');
-        await this.invalidateCurrentSession();
+      if (error) {
+        console.error('SessionManager: Failed to create session:', error);
+        return null;
+      }
+
+      this.currentSession = data;
+      console.log('SessionManager: Session created successfully');
+      return data;
+    } catch (error) {
+      console.error('SessionManager: Error creating session:', error);
+      return null;
+    }
+  }
+
+  async validateSession(): Promise<boolean> {
+    if (!this.currentSession) {
+      return false;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('user_sessions')
+        .select('*')
+        .eq('id', this.currentSession.id)
+        .single();
+
+      if (error || !data) {
+        console.log('SessionManager: Session not found or error:', error);
+        this.currentSession = null;
         return false;
       }
 
-      const expiresAt = new Date(sessionRecord.expires_at);
+      // Check if session has expired
       const now = new Date();
-
+      const expiresAt = new Date(data.expires_at);
+      
       if (now > expiresAt) {
-        console.log('Session expired, logging out');
-        await this.invalidateCurrentSession();
+        console.log('SessionManager: Session expired');
+        await this.invalidateSession(this.currentSession.id);
         return false;
-      }
-
-      // Update last active if session is still valid
-      if (this.settings.extendOnActivity) {
-        await this.updateLastActive();
       }
 
       return true;
     } catch (error) {
-      console.error('Session validity check failed:', error);
+      console.error('SessionManager: Error validating session:', error);
       return false;
     }
   }
 
-  // Update last active timestamp
   async updateLastActive(): Promise<void> {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      await supabase
-        .from('user_sessions')
-        .update({ 
-          last_active: new Date().toISOString(),
-          expires_at: this.calculateExpiration(false) // Extend session
-        })
-        .eq('user_id', session.user.id)
-        .eq('device_info', this.getDeviceInfo());
-    } catch (error) {
-      console.error('Failed to update last active:', error);
+    if (!this.currentSession) {
+      return;
     }
-  }
 
-  // Get active sessions for current user
-  async getUserSessions(): Promise<SessionInfo[]> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return [];
-
-      const { data: sessions, error } = await supabase
+      const { error } = await supabase
         .from('user_sessions')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .order('last_active', { ascending: false });
+        .update({
+          last_active: new Date().toISOString(),
+        })
+        .eq('id', this.currentSession.id);
 
       if (error) {
-        console.error('Failed to get user sessions:', error);
-        return [];
+        console.error('SessionManager: Failed to update last active:', error);
       }
-
-      return sessions.map(s => ({
-        id: s.id,
-        userId: s.user_id,
-        deviceInfo: s.device_info,
-        ipAddress: s.ip_address,
-        lastActive: new Date(s.last_active),
-        expiresAt: new Date(s.expires_at),
-        isRemembered: s.is_remembered
-      }));
     } catch (error) {
-      console.error('Error getting user sessions:', error);
-      return [];
+      console.error('SessionManager: Error updating last active:', error);
     }
   }
 
-  // Invalidate a specific session
   async invalidateSession(sessionId: string): Promise<void> {
     try {
       const { error } = await supabase
@@ -187,167 +177,95 @@ class SessionManager {
         .eq('id', sessionId);
 
       if (error) {
-        console.error('Failed to invalidate session:', error);
+        console.error('SessionManager: Failed to invalidate session:', error);
+      } else {
+        console.log('SessionManager: Session invalidated successfully');
+      }
+
+      if (this.currentSession?.id === sessionId) {
+        this.currentSession = null;
       }
     } catch (error) {
-      console.error('Session invalidation error:', error);
+      console.error('SessionManager: Error invalidating session:', error);
     }
   }
 
-  // Invalidate current session and logout
   async invalidateCurrentSession(): Promise<void> {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        // Remove from database
-        await supabase
-          .from('user_sessions')
-          .delete()
-          .eq('user_id', session.user.id)
-          .eq('device_info', this.getDeviceInfo());
-      }
-
-      // Sign out from Supabase
-      await supabase.auth.signOut();
-      
-      // Clear monitoring
-      this.stopSessionMonitoring();
-      
-      console.log('Current session invalidated');
-    } catch (error) {
-      console.error('Failed to invalidate current session:', error);
+    if (this.currentSession) {
+      await this.invalidateSession(this.currentSession.id);
     }
+    
+    // Also sign out from Supabase
+    await supabase.auth.signOut();
+    this.cleanup();
   }
 
-  // Invalidate all sessions for current user
-  async invalidateAllSessions(): Promise<void> {
+  async getUserSessions(userId: string): Promise<SessionData[]> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      // Remove all sessions from database
-      await supabase
+      const { data, error } = await supabase
         .from('user_sessions')
-        .delete()
-        .eq('user_id', session.user.id);
-
-      // Sign out from Supabase
-      await supabase.auth.signOut();
-      
-      // Clear monitoring
-      this.stopSessionMonitoring();
-      
-      console.log('All sessions invalidated');
-    } catch (error) {
-      console.error('Failed to invalidate all sessions:', error);
-    }
-  }
-
-  // Clean up old/expired sessions
-  private async cleanupOldSessions(userId: string): Promise<void> {
-    try {
-      const now = new Date().toISOString();
-      
-      // Remove expired sessions
-      await supabase
-        .from('user_sessions')
-        .delete()
-        .eq('user_id', userId)
-        .lt('expires_at', now);
-
-      // Enforce max concurrent sessions
-      const { data: sessions } = await supabase
-        .from('user_sessions')
-        .select('id, last_active')
+        .select('*')
         .eq('user_id', userId)
         .order('last_active', { ascending: false });
 
-      if (sessions && sessions.length > this.settings.maxConcurrentSessions) {
-        const sessionsToRemove = sessions.slice(this.settings.maxConcurrentSessions);
-        const idsToRemove = sessionsToRemove.map(s => s.id);
-        
-        await supabase
-          .from('user_sessions')
-          .delete()
-          .in('id', idsToRemove);
+      if (error) {
+        console.error('SessionManager: Failed to get user sessions:', error);
+        return [];
       }
+
+      return data.map(session => ({
+        ...session,
+        user_id: session.user_id,
+        device_info: session.device_info,
+        ip_address: session.ip_address,
+        last_active: session.last_active,
+        expires_at: session.expires_at,
+        is_remembered: session.is_remembered,
+        created_at: session.created_at,
+        updated_at: session.updated_at,
+        id: session.id,
+      }));
     } catch (error) {
-      console.error('Session cleanup error:', error);
+      console.error('SessionManager: Error getting user sessions:', error);
+      return [];
     }
   }
 
-  // Setup activity detection
-  private setupActivityDetection(): void {
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-    
-    const onActivity = () => {
-      this.activityListeners.forEach(listener => listener());
-    };
+  private startSessionMonitoring(): void {
+    if (this.sessionCheckInterval) {
+      clearInterval(this.sessionCheckInterval);
+    }
 
-    events.forEach(event => {
-      document.addEventListener(event, onActivity, true);
-    });
-  }
-
-  // Add activity listener
-  onActivity(callback: () => void): () => void {
-    this.activityListeners.push(callback);
-    
-    // Return cleanup function
-    return () => {
-      const index = this.activityListeners.indexOf(callback);
-      if (index > -1) {
-        this.activityListeners.splice(index, 1);
+    this.sessionCheckInterval = setInterval(async () => {
+      const isValid = await this.validateSession();
+      if (!isValid) {
+        toast({
+          title: 'Session Expired',
+          description: 'Your session has expired. Please sign in again.',
+          variant: 'destructive',
+        });
+        await this.invalidateCurrentSession();
+      } else {
+        await this.updateLastActive();
       }
-    };
+    }, this.SESSION_CHECK_INTERVAL);
   }
 
-  // Stop session monitoring
-  private stopSessionMonitoring(): void {
+  cleanup(): void {
     if (this.sessionCheckInterval) {
       clearInterval(this.sessionCheckInterval);
       this.sessionCheckInterval = null;
     }
+    this.currentSession = null;
+    localStorage.removeItem('rememberMe');
   }
 
-  // Calculate session expiration
-  private calculateExpiration(isRemembered: boolean): string {
-    const now = new Date();
-    const minutes = isRemembered 
-      ? this.settings.rememberMeDays * 24 * 60 
-      : this.settings.timeoutMinutes;
-    
-    now.setMinutes(now.getMinutes() + minutes);
-    return now.toISOString();
+  getCurrentSession(): SessionData | null {
+    return this.currentSession;
   }
 
-  // Get device information
-  private getDeviceInfo(): string {
-    const userAgent = navigator.userAgent;
-    const platform = navigator.platform;
-    return `${platform} - ${userAgent.substring(0, 100)}`;
-  }
-
-  // Get client IP (simplified - in production you'd use a service)
-  private async getClientIP(): Promise<string> {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip;
-    } catch {
-      return 'unknown';
-    }
-  }
-
-  // Update session settings
-  updateSettings(newSettings: Partial<SessionSettings>): void {
-    this.settings = { ...this.settings, ...newSettings };
-  }
-
-  // Cleanup on app unload
-  cleanup(): void {
-    this.stopSessionMonitoring();
-    this.activityListeners = [];
+  isSessionValid(): boolean {
+    return this.currentSession !== null;
   }
 }
 
