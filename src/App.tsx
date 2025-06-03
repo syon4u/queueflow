@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
-import { SessionProvider } from "@/context/SessionContext";
+// import { SessionProvider } from "@/context/SessionContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -33,7 +33,8 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <SessionProvider>
+            {/* Temporarily disabled SessionProvider to debug infinite recursion */}
+            {/* <SessionProvider> */}
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
@@ -112,7 +113,7 @@ const App = () => {
                 {/* Fallback routes */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </SessionProvider>
+            {/* </SessionProvider> */}
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
