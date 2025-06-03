@@ -9,9 +9,11 @@ import { QueueManagementTab } from './QueueManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { StatsTab } from './StatsTab';
 import SystemSettingsTab from './SystemSettingsTab';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useTranslation } from 'react-i18next';
 import SecurityMetricsTab from './SecurityMetricsTab';
+import { AdminSidebar } from '@/components/layout/AdminSidebar';
+import { AdminTopNavigation } from './AdminTopNavigation';
+import { useTranslation } from 'react-i18next';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -45,25 +47,25 @@ export const AdminPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="m-4">
-          <TabsTrigger value="dashboard">{t('admin.dashboard')}</TabsTrigger>
-          <TabsTrigger value="users">{t('admin.users')}</TabsTrigger>
-          <TabsTrigger value="customers">{t('admin.customers')}</TabsTrigger>
-          <TabsTrigger value="locations">{t('admin.locations')}</TabsTrigger>
-          <TabsTrigger value="services">{t('admin.services')}</TabsTrigger>
-          <TabsTrigger value="queue">{t('admin.queue')}</TabsTrigger>
-          <TabsTrigger value="templates">{t('admin.templates')}</TabsTrigger>
-          <TabsTrigger value="stats">{t('admin.stats')}</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="settings">{t('admin.settings')}</TabsTrigger>
-        </TabsList>
-        {renderContent()}
-      </Tabs>
-    </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-50">
+        <AdminSidebar 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+        />
+        
+        <SidebarInset className="flex-1">
+          <AdminTopNavigation />
+          
+          <main className="flex-1 p-6 bg-gray-50">
+            <div className="max-w-7xl mx-auto">
+              {renderContent()}
+            </div>
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 
-// Add default export
 export default AdminPage;

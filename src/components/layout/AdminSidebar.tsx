@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -25,7 +26,8 @@ import {
   Settings,
   LogOut,
   Contact,
-  Shield
+  Shield,
+  Activity
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -43,56 +45,91 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  const navigationItems = [
+  const navigationGroups = [
     {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
+      label: 'Overview',
+      items: [
+        {
+          id: 'dashboard',
+          label: 'Dashboard',
+          icon: LayoutDashboard,
+          description: 'System overview and metrics'
+        }
+      ]
     },
     {
-      id: 'users',
-      label: 'Users',
-      icon: Users,
-    },
-    {
-      id: 'customers',
-      label: 'Customers',
-      icon: Contact,
-    },
-    {
-      id: 'locations',
-      label: 'Locations',
-      icon: Building2,
-    },
-    {
-      id: 'services',
-      label: 'Services',
-      icon: FileText,
-    },
-    {
-      id: 'queue',
       label: 'Queue Management',
-      icon: UsersRound,
+      items: [
+        {
+          id: 'queue',
+          label: 'Queue Configuration',
+          icon: UsersRound,
+          description: 'Manage active queues'
+        },
+        {
+          id: 'locations',
+          label: 'Location Management',
+          icon: Building2,
+          description: 'Service centers and facilities'
+        },
+        {
+          id: 'services',
+          label: 'Services & Appointments',
+          icon: FileText,
+          description: 'Available services configuration'
+        }
+      ]
     },
     {
-      id: 'templates',
-      label: 'Templates',
-      icon: MessageSquare,
+      label: 'User Management',
+      items: [
+        {
+          id: 'users',
+          label: 'Staff Management',
+          icon: Users,
+          description: 'Staff accounts and permissions'
+        },
+        {
+          id: 'customers',
+          label: 'Customer Management',
+          icon: Contact,
+          description: 'Customer profiles and history'
+        }
+      ]
     },
     {
-      id: 'stats',
-      label: 'Analytics',
-      icon: BarChart3,
+      label: 'Communication & Reports',
+      items: [
+        {
+          id: 'templates',
+          label: 'Notifications & Templates',
+          icon: MessageSquare,
+          description: 'Message templates and settings'
+        },
+        {
+          id: 'stats',
+          label: 'Reports & Analytics',
+          icon: BarChart3,
+          description: 'Performance insights and reports'
+        }
+      ]
     },
     {
-      id: 'security',
-      label: 'Security',
-      icon: Shield,
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
+      label: 'System',
+      items: [
+        {
+          id: 'security',
+          label: 'Security & Monitoring',
+          icon: Shield,
+          description: 'System security metrics'
+        },
+        {
+          id: 'settings',
+          label: 'System Settings',
+          icon: Settings,
+          description: 'Global configuration'
+        }
+      ]
     }
   ];
 
@@ -107,62 +144,83 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   return (
-    <Sidebar className="border-r bg-white">
-      <SidebarHeader className="p-4 border-b">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-red-600 flex items-center justify-center text-white text-sm font-semibold">
-            {getInitials(user?.email || '')}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.email}</p>
-            <p className="text-xs text-muted-foreground">
-              {t('admin.role')}
-            </p>
-          </div>
-          <Badge variant="destructive" className="text-xs">
-            Admin
-          </Badge>
+    <Sidebar className="border-r bg-white w-72">
+      <SidebarHeader className="p-6 border-b bg-gradient-to-r from-bc-blue to-bc-teal">
+        <div className="text-white">
+          <h2 className="text-lg font-semibold mb-1">Admin Control Center</h2>
+          <p className="text-sm text-blue-100">Broward QueuePro Management</p>
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    onClick={() => onTabChange(item.id)}
-                    isActive={activeTab === item.id}
-                    className="w-full justify-start"
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <SidebarContent className="p-4">
+        {navigationGroups.map((group, groupIndex) => (
+          <SidebarGroup key={groupIndex} className="mb-6">
+            <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              {group.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="space-y-1">
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => onTabChange(item.id)}
+                      isActive={activeTab === item.id}
+                      className={`
+                        w-full justify-start p-3 rounded-lg transition-all duration-200
+                        ${activeTab === item.id 
+                          ? 'bg-bc-blue text-white shadow-md' 
+                          : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                        }
+                      `}
+                    >
+                      <item.icon className={`h-5 w-5 mr-3 ${
+                        activeTab === item.id ? 'text-white' : 'text-gray-500'
+                      }`} />
+                      <div className="flex-1 text-left">
+                        <div className={`font-medium text-sm ${
+                          activeTab === item.id ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {item.label}
+                        </div>
+                        <div className={`text-xs mt-0.5 ${
+                          activeTab === item.id ? 'text-blue-100' : 'text-gray-500'
+                        }`}>
+                          {item.description}
+                        </div>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
+        <SidebarGroup className="mt-8">
+          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            Quick Actions
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2">
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link to="/staff" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>Staff Portal</span>
+                  <Link 
+                    to="/staff" 
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Activity className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-gray-700">Staff Portal</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link to="/admin/health" className="flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    <span>System Health</span>
+                  <Link 
+                    to="/admin/health" 
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <BarChart3 className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm text-gray-700">System Health</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -171,11 +229,24 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t">
+      <SidebarFooter className="p-4 border-t bg-gray-50">
+        <div className="flex items-center gap-3 mb-3 p-3 bg-white rounded-lg border">
+          <div className="h-8 w-8 rounded-full bg-bc-blue flex items-center justify-center text-white text-sm font-semibold">
+            {getInitials(user?.email || '')}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
+            <p className="text-xs text-gray-500">Administrator</p>
+          </div>
+          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+            Online
+          </Badge>
+        </div>
+        
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
         >
           <LogOut className="h-4 w-4 mr-2" />
           {t('auth.logout')}
