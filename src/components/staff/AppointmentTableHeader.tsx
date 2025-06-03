@@ -8,21 +8,31 @@ export const AppointmentTableHeader: React.FC = () => {
 
   return (
     <TableHeader>
-      <TableRow className="bg-gray-50 hover:bg-gray-50 border-b border-gray-200">
-        <TableHead className="font-semibold text-gray-700 py-4 px-6">
-          {t('appointments.scheduledTime')}
+      <TableRow className="bg-gradient-to-r from-gray-50 to-blue-50 hover:from-gray-100 hover:to-blue-100 border-b-2 border-blue-200 transition-all duration-200">
+        <TableHead className="font-semibold text-gray-800 py-4 px-6 hover:text-blue-700 transition-colors cursor-pointer select-none relative">
+          <div className="flex items-center space-x-2">
+            <span>{t('appointments.scheduledTime')}</span>
+          </div>
         </TableHead>
-        <TableHead className="font-semibold text-gray-700 py-4 px-6">
-          {t('appointments.status')}
+        <TableHead className="font-semibold text-gray-800 py-4 px-6 hover:text-blue-700 transition-colors cursor-pointer select-none relative">
+          <div className="flex items-center space-x-2">
+            <span>{t('appointments.status')}</span>
+          </div>
         </TableHead>
-        <TableHead className="font-semibold text-gray-700 py-4 px-6">
-          {t('appointments.service')}
+        <TableHead className="font-semibold text-gray-800 py-4 px-6 hover:text-blue-700 transition-colors cursor-pointer select-none relative">
+          <div className="flex items-center space-x-2">
+            <span>{t('appointments.service')}</span>
+          </div>
         </TableHead>
-        <TableHead className="hidden md:table-cell font-semibold text-gray-700 py-4 px-6">
-          {t('appointments.customer')}
+        <TableHead className="hidden md:table-cell font-semibold text-gray-800 py-4 px-6 hover:text-blue-700 transition-colors cursor-pointer select-none relative">
+          <div className="flex items-center space-x-2">
+            <span>{t('appointments.customer')}</span>
+          </div>
         </TableHead>
-        <TableHead className="font-semibold text-gray-700 py-4 px-6 text-center">
-          {t('common.actions')}
+        <TableHead className="font-semibold text-gray-800 py-4 px-6 text-center hover:text-blue-700 transition-colors cursor-pointer select-none relative">
+          <div className="flex items-center justify-center space-x-2">
+            <span>{t('common.actions')}</span>
+          </div>
         </TableHead>
       </TableRow>
     </TableHeader>
