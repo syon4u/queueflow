@@ -9,15 +9,22 @@ import { QueueManagementTab } from './QueueManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { StatsTab } from './StatsTab';
 import SystemSettingsTab from './SystemSettingsTab';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useTranslation } from 'react-i18next';
 import SecurityMetricsTab from './SecurityMetricsTab';
+import { ModernAdminLayout } from './ModernAdminLayout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { useTranslation } from 'react-i18next';
 
 export const AdminPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('modern-dashboard');
+  const [useModernUI, setUseModernUI] = useState(true);
   const { t } = useTranslation();
 
   const renderContent = () => {
+    if (activeTab === 'modern-dashboard' && useModernUI) {
+      return <ModernAdminLayout />;
+    }
+
     switch (activeTab) {
       case 'dashboard':
         return <DashboardTab />;
@@ -40,12 +47,41 @@ export const AdminPage: React.FC = () => {
       case 'settings':
         return <SystemSettingsTab />;
       default:
-        return <DashboardTab />;
+        return <ModernAdminLayout />;
     }
   };
 
+  // If using modern UI for main dashboard, don't wrap in tabs
+  if (activeTab === 'modern-dashboard' && useModernUI) {
+    return (
+      <div className="relative">
+        <div className="absolute top-4 right-4 z-50">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setActiveTab('dashboard')}
+            className="bg-white/90 backdrop-blur-sm"
+          >
+            Switch to Classic View
+          </Button>
+        </div>
+        {renderContent()}
+      </div>
+    );
+  }
+
   return (
     <div>
+      <div className="flex justify-between items-center p-4 border-b">
+        <h1 className="text-2xl font-bold">Admin Portal</h1>
+        <Button
+          variant="outline"
+          onClick={() => setActiveTab('modern-dashboard')}
+        >
+          Switch to Modern View
+        </Button>
+      </div>
+      
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="m-4">
           <TabsTrigger value="dashboard">{t('admin.dashboard')}</TabsTrigger>
@@ -59,11 +95,39 @@ export const AdminPage: React.FC = () => {
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="settings">{t('admin.settings')}</TabsTrigger>
         </TabsList>
-        {renderContent()}
+        <TabsContent value="dashboard">
+          <DashboardTab />
+        </TabsContent>
+        <TabsContent value="users">
+          <UserManagementTab />
+        </TabsContent>
+        <TabsContent value="customers">
+          <CustomerManagementTab />
+        </TabsContent>
+        <TabsContent value="locations">
+          <LocationsTab />
+        </TabsContent>
+        <TabsContent value="services">
+          <ServicesTab />
+        </TabsContent>
+        <TabsContent value="queue">
+          <QueueManagementTab />
+        </TabsContent>
+        <TabsContent value="templates">
+          <CommunicationTemplatesTab />
+        </TabsContent>
+        <TabsContent value="stats">
+          <StatsTab />
+        </TabsContent>
+        <TabsContent value="security">
+          <SecurityMetricsTab />
+        </TabsContent>
+        <TabsContent value="settings">
+          <SystemSettingsTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
 };
 
-// Add default export
 export default AdminPage;
