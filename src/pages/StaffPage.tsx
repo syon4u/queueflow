@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -59,7 +58,7 @@ const StaffPageContent = () => {
       return data;
     },
     enabled: !!user?.id,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
   });
 
   const staffStatus = staffData?.status || 'inactive';
@@ -83,7 +82,6 @@ const StaffPageContent = () => {
   };
 
   const handleNotificationClick = () => {
-    // Handle notification center
     console.log('Notification center clicked');
   };
 
@@ -114,27 +112,7 @@ const StaffPageContent = () => {
         return <QueueManagementTab />;
 
       case 'appointments':
-        return (
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  {t('appointments.title')} ({activeAppointments.length})
-                </h2>
-                {appointmentsLoading ? (
-                  <div className="flex justify-center p-8">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" aria-label={t('common.loading')}></div>
-                  </div>
-                ) : (
-                  <StaffAppointmentTable 
-                    appointments={activeAppointments} 
-                    onStatusChange={handleStatusChange}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        );
+        return <EnhancedAppointmentTable />;
 
       case 'analytics':
         return <StaffPerformanceReport />;

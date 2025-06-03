@@ -46,7 +46,6 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
     filters[key as keyof AppointmentFilterOptions] !== ''
   );
 
-  // Get the current status value, ensuring it's never an empty string
   const getCurrentStatusValue = () => {
     const status = filters.status;
     if (!status || status === '') {
@@ -55,15 +54,12 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
     return status;
   };
 
-  console.log('AppointmentFilters - Current filters:', filters);
-  console.log('AppointmentFilters - Current status value:', getCurrentStatusValue());
-
   return (
     <Card className="mb-6">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
           <Filter className="h-4 w-4" />
-          {t('appointments.filters')}
+          Filter Appointments
         </CardTitle>
         <Button
           variant="ghost"
@@ -80,32 +76,32 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Status Filter */}
             <div className="space-y-2">
-              <Label htmlFor="status-filter">{t('appointments.status')}</Label>
+              <Label htmlFor="status-filter">Status</Label>
               <Select
                 value={getCurrentStatusValue()}
                 onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}
               >
                 <SelectTrigger id="status-filter">
-                  <SelectValue placeholder={t('appointments.allStatuses')} />
+                  <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('appointments.allStatuses')}</SelectItem>
-                  <SelectItem value="scheduled">{t('appointments.scheduled')}</SelectItem>
-                  <SelectItem value="checked_in">{t('appointments.checkedIn')}</SelectItem>
-                  <SelectItem value="in_progress">{t('appointments.inProgress')}</SelectItem>
-                  <SelectItem value="completed">{t('appointments.completed')}</SelectItem>
-                  <SelectItem value="cancelled">{t('appointments.cancelled')}</SelectItem>
-                  <SelectItem value="no_show">{t('appointments.noShow')}</SelectItem>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="checked_in">Checked In</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="no_show">No Show</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Customer Name Filter */}
             <div className="space-y-2">
-              <Label htmlFor="customer-filter">{t('appointments.customer')}</Label>
+              <Label htmlFor="customer-filter">Customer</Label>
               <Input
                 id="customer-filter"
-                placeholder={t('appointments.searchCustomer')}
+                placeholder="Search customer name..."
                 value={filters.customerName || ''}
                 onChange={(e) => handleFilterChange('customerName', e.target.value)}
               />
@@ -113,10 +109,10 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
 
             {/* Service Filter */}
             <div className="space-y-2">
-              <Label htmlFor="service-filter">{t('appointments.service')}</Label>
+              <Label htmlFor="service-filter">Service</Label>
               <Input
                 id="service-filter"
-                placeholder={t('appointments.searchService')}
+                placeholder="Search service..."
                 value={filters.service || ''}
                 onChange={(e) => handleFilterChange('service', e.target.value)}
               />
@@ -124,7 +120,7 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
 
             {/* Date Range Filter */}
             <div className="space-y-2">
-              <Label>{t('appointments.dateRange')}</Label>
+              <Label>Date Range</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -142,7 +138,7 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
                         format(filters.dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>{t('appointments.pickDateRange')}</span>
+                      <span>Pick a date range</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -170,7 +166,7 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
                 className="flex items-center gap-2"
               >
                 <X className="h-3 w-3" />
-                {t('common.clearFilters')}
+                Clear Filters
               </Button>
             </div>
           )}
