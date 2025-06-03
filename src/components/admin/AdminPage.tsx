@@ -1,13 +1,14 @@
+
 import React, { useState } from 'react';
 import { DashboardTab } from './DashboardTab';
 import { UserManagementTab } from './UserManagementTab';
-import { CustomerManagementTab } from './CustomerManagementTab';
+import CustomerManagementTab from './CustomerManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { StatsTab } from './StatsTab';
-import { SystemSettingsTab } from './SystemSettingsTab';
+import SystemSettingsTab from './SystemSettingsTab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useTranslation } from 'react-i18next';
 import SecurityMetricsTab from './SecurityMetricsTab';
@@ -63,3 +64,6 @@ export const AdminPage: React.FC = () => {
     </div>
   );
 };
+
+// Add default export
+export default AdminPage;

@@ -42,9 +42,9 @@ export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') =
             break;
         }
 
-        // Fetch security audit logs using type assertion
+        // Fetch security audit logs with proper error handling
         const { data: auditLogs, error: auditError } = await supabase
-          .from('security_audit_log' as any)
+          .from('security_audit_log')
           .select('*')
           .gte('created_at', startTime.toISOString())
           .order('created_at', { ascending: false });
@@ -55,7 +55,7 @@ export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') =
           return;
         }
 
-        if (!auditLogs) {
+        if (!auditLogs || auditLogs.length === 0) {
           setMetrics({
             failedAttempts: 0,
             successfulAttempts: 0,
@@ -66,8 +66,8 @@ export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') =
           return;
         }
 
-        // Cast to proper type
-        const logs = auditLogs as SecurityAuditLogRecord[];
+        // Cast to proper type with proper null check
+        const logs = auditLogs as unknown as SecurityAuditLogRecord[];
 
         // Process metrics
         const failedAttempts = logs.filter(log => !log.success).length;
