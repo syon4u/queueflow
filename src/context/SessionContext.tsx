@@ -1,16 +1,27 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { sessionManager, SessionInfo } from '@/services/session-manager';
+import { sessionManager } from '@/services/session-manager';
 import { useAuth } from './AuthContext';
 import { toast } from '@/hooks/use-toast';
 
+interface SessionData {
+  id: string;
+  user_id: string;
+  device_info: string;
+  ip_address: string | null;
+  last_active: string;
+  expires_at: string;
+  is_remembered: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface SessionContextType {
-  activeSessions: SessionInfo[];
+  activeSessions: SessionData[];
   isSessionValid: boolean;
   timeUntilExpiry: number | null;
   refreshSessions: () => Promise<void>;
   invalidateSession: (sessionId: string) => Promise<void>;
-  invalidateAllSessions: () => Promise<void>;
   extendSession: () => Promise<void>;
 }
 
@@ -26,29 +37,21 @@ export const useSession = (): SessionContextType => {
 
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, session } = useAuth();
-  const [activeSessions, setActiveSessions] = useState<SessionInfo[]>([]);
+  const [activeSessions, setActiveSessions] = useState<SessionData[]>([]);
   const [isSessionValid, setIsSessionValid] = useState(true);
   const [timeUntilExpiry, setTimeUntilExpiry] = useState<number | null>(null);
 
   // Initialize session management when user logs in
   useEffect(() => {
     if (user && session) {
-      const rememberMe = localStorage.getItem('rememberMe') === 'true';
-      sessionManager.initialize(user, rememberMe);
+      sessionManager.initialize();
       refreshSessions();
     }
   }, [user, session]);
 
-  // Setup activity monitoring
+  // Setup session monitoring
   useEffect(() => {
     if (!user) return;
-
-    let lastActivity = Date.now();
-    
-    const cleanup = sessionManager.onActivity(() => {
-      lastActivity = Date.now();
-      sessionManager.updateLastActive();
-    });
 
     // Check session every 30 seconds
     const interval = setInterval(async () => {
@@ -61,7 +64,6 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }, 30000);
 
     return () => {
-      cleanup();
       clearInterval(interval);
     };
   }, [user]);
@@ -77,15 +79,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) return false;
     
     try {
-      const sessions = await sessionManager.getUserSessions();
-      const currentSession = sessions.find(s => 
-        s.deviceInfo === getDeviceInfo()
-      );
+      const valid = await sessionManager.validateSession();
       
-      if (!currentSession) return false;
-      
-      const now = new Date();
-      if (now > currentSession.expiresAt) {
+      if (!valid) {
         toast({
           title: 'Session Expired',
           description: 'Your session has expired. Please log in again.',
@@ -104,14 +100,11 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateTimeUntilExpiry = async (): Promise<void> => {
     try {
-      const sessions = await sessionManager.getUserSessions();
-      const currentSession = sessions.find(s => 
-        s.deviceInfo === getDeviceInfo()
-      );
+      const currentSession = sessionManager.getCurrentSession();
       
       if (currentSession) {
         const now = new Date();
-        const expiry = currentSession.expiresAt;
+        const expiry = new Date(currentSession.expires_at);
         const timeLeft = Math.max(0, expiry.getTime() - now.getTime());
         setTimeUntilExpiry(timeLeft);
         
@@ -138,7 +131,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const refreshSessions = async (): Promise<void> => {
     try {
-      const sessions = await sessionManager.getUserSessions();
+      if (!user) return;
+      const sessions = await sessionManager.getUserSessions(user.id);
       setActiveSessions(sessions);
     } catch (error) {
       console.error('Failed to refresh sessions:', error);
@@ -163,27 +157,11 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const invalidateAllSessions = async (): Promise<void> => {
-    try {
-      await sessionManager.invalidateAllSessions();
-      toast({
-        title: 'All Sessions Terminated',
-        description: 'All active sessions have been terminated.'
-      });
-    } catch (error) {
-      console.error('Failed to invalidate all sessions:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to terminate all sessions.',
-        variant: 'destructive'
-      });
-    }
-  };
-
   const extendSession = async (): Promise<void> => {
     try {
       await sessionManager.updateLastActive();
       await refreshSessions();
+      updateTimeUntilExpiry();
       toast({
         title: 'Session Extended',
         description: 'Your session has been extended.'
@@ -198,19 +176,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const getDeviceInfo = (): string => {
-    const userAgent = navigator.userAgent;
-    const platform = navigator.platform;
-    return `${platform} - ${userAgent.substring(0, 100)}`;
-  };
-
   const value: SessionContextType = {
     activeSessions,
     isSessionValid,
     timeUntilExpiry,
     refreshSessions,
     invalidateSession,
-    invalidateAllSessions,
     extendSession
   };
 
