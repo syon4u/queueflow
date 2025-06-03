@@ -99,13 +99,25 @@ export function useAppointments(serviceId?: string) {
         return;
       }
 
-      const formattedAppointments = (data || []).map(appointment => ({
-        ...appointment,
-        customer: appointment.customers,
-        service: appointment.services,
-        location: appointment.locations,
-        staff: appointment.staff
-      }));
+      const formattedAppointments = (data || []).map(appointment => {
+        // Handle the case where staff might be an array or a single object
+        let staffData = null;
+        if (appointment.staff) {
+          if (Array.isArray(appointment.staff)) {
+            staffData = appointment.staff.length > 0 ? appointment.staff[0] : null;
+          } else {
+            staffData = appointment.staff;
+          }
+        }
+
+        return {
+          ...appointment,
+          customer: appointment.customers,
+          service: appointment.services,
+          location: appointment.locations,
+          staff: staffData
+        };
+      });
 
       setAppointments(formattedAppointments);
       calculateUserPosition(formattedAppointments);
