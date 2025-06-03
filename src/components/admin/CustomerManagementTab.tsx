@@ -16,6 +16,8 @@ interface Customer {
   created_at: string;
   appointment_count?: number;
   last_appointment?: string;
+  most_used_location?: string;
+  most_used_service?: string;
 }
 
 const CustomerManagementTab = () => {
@@ -27,9 +29,9 @@ const CustomerManagementTab = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      console.log('CustomerManagementTab - Fetching customers...');
+      console.log('CustomerManagementTab - Fetching customers with enhanced data...');
       
-      // Fetch customers first
+      // First, get all customers
       const { data: customersData, error: customersError } = await supabase
         .from('customers')
         .select('*')
@@ -53,8 +55,8 @@ const CustomerManagementTab = () => {
         return;
       }
 
-      // Get appointment counts for each customer
-      const customersWithStats = await Promise.all(
+      // Enhance customer data with appointment statistics and location/service info
+      const customersWithEnhancedData = await Promise.all(
         customersData.map(async (customer) => {
           try {
             // Get appointment count
@@ -67,10 +69,14 @@ const CustomerManagementTab = () => {
               console.error('Error fetching appointment count for customer:', customer.id, countError);
             }
 
-            // Get last appointment date
-            const { data: lastAppointment, error: lastError } = await supabase
+            // Get last appointment with location and service details
+            const { data: lastAppointmentData, error: lastError } = await supabase
               .from('appointments')
-              .select('scheduled_time')
+              .select(`
+                scheduled_time,
+                locations!inner(name),
+                services!inner(name)
+              `)
               .eq('customer_id', customer.id)
               .order('scheduled_time', { ascending: false })
               .limit(1);
@@ -79,10 +85,63 @@ const CustomerManagementTab = () => {
               console.error('Error fetching last appointment for customer:', customer.id, lastError);
             }
 
+            // Get most frequently used location and service
+            const { data: locationStats, error: locationError } = await supabase
+              .from('appointments')
+              .select(`
+                locations!inner(name),
+                count
+              `)
+              .eq('customer_id', customer.id);
+
+            const { data: serviceStats, error: serviceError } = await supabase
+              .from('appointments')
+              .select(`
+                services!inner(name),
+                count
+              `)
+              .eq('customer_id', customer.id);
+
+            // Process most used location and service
+            let mostUsedLocation = null;
+            let mostUsedService = null;
+
+            if (locationStats && locationStats.length > 0) {
+              const locationCounts = locationStats.reduce((acc: any, apt: any) => {
+                const locationName = apt.locations?.name;
+                if (locationName) {
+                  acc[locationName] = (acc[locationName] || 0) + 1;
+                }
+                return acc;
+              }, {});
+              
+              mostUsedLocation = Object.keys(locationCounts).reduce((a, b) => 
+                locationCounts[a] > locationCounts[b] ? a : b
+              );
+            }
+
+            if (serviceStats && serviceStats.length > 0) {
+              const serviceCounts = serviceStats.reduce((acc: any, apt: any) => {
+                const serviceName = apt.services?.name;
+                if (serviceName) {
+                  acc[serviceName] = (acc[serviceName] || 0) + 1;
+                }
+                return acc;
+              }, {});
+              
+              mostUsedService = Object.keys(serviceCounts).reduce((a, b) => 
+                serviceCounts[a] > serviceCounts[b] ? a : b
+              );
+            }
+
             return {
               ...customer,
               appointment_count: appointmentCount || 0,
-              last_appointment: lastAppointment && lastAppointment.length > 0 ? lastAppointment[0].scheduled_time : null,
+              last_appointment: lastAppointmentData && lastAppointmentData.length > 0 
+                ? lastAppointmentData[0].scheduled_time 
+                : null,
+              most_used_location: mostUsedLocation,
+              most_used_service: mostUsedService,
             };
           } catch (error) {
             console.error('Error processing customer stats:', error);
@@ -90,13 +149,15 @@ const CustomerManagementTab = () => {
               ...customer,
               appointment_count: 0,
               last_appointment: null,
+              most_used_location: null,
+              most_used_service: null,
             };
           }
         })
       );
 
-      console.log('CustomerManagementTab - Customers with stats:', customersWithStats);
-      setCustomers(customersWithStats);
+      console.log('CustomerManagementTab - Enhanced customers data:', customersWithEnhancedData);
+      setCustomers(customersWithEnhancedData);
     } catch (error) {
       console.error('Unexpected error:', error);
       toast({
@@ -120,7 +181,9 @@ const CustomerManagementTab = () => {
       customer.first_name.toLowerCase().includes(searchLower) ||
       customer.last_name.toLowerCase().includes(searchLower) ||
       (customer.email && customer.email.toLowerCase().includes(searchLower)) ||
-      (customer.phone && customer.phone.includes(searchTerm))
+      (customer.phone && customer.phone.includes(searchTerm)) ||
+      (customer.most_used_location && customer.most_used_location.toLowerCase().includes(searchLower)) ||
+      (customer.most_used_service && customer.most_used_service.toLowerCase().includes(searchLower))
     );
   });
 
@@ -146,7 +209,7 @@ const CustomerManagementTab = () => {
         <div>
           <h2 className="text-2xl font-bold">Customer Management</h2>
           <p className="text-muted-foreground">
-            View and manage customers who have created appointments
+            View and manage customers with comprehensive appointment history and preferences
           </p>
         </div>
         <Button onClick={fetchCustomers} variant="outline">
