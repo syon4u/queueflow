@@ -29,9 +29,9 @@ const CustomerManagementTab = () => {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      console.log('CustomerManagementTab - Fetching customers with enhanced data...');
+      console.log('CustomerManagementTab - Starting to fetch customers...');
       
-      // First, get all customers
+      // First, get all customers with a simpler approach
       const { data: customersData, error: customersError } = await supabase
         .from('customers')
         .select('*')
@@ -44,10 +44,11 @@ const CustomerManagementTab = () => {
           description: 'Failed to load customers: ' + customersError.message,
           variant: 'destructive',
         });
+        setCustomers([]);
         return;
       }
 
-      console.log('CustomerManagementTab - Customers data:', customersData);
+      console.log('CustomerManagementTab - Raw customers data:', customersData);
 
       if (!customersData || customersData.length === 0) {
         console.log('CustomerManagementTab - No customers found');
@@ -55,111 +56,129 @@ const CustomerManagementTab = () => {
         return;
       }
 
-      // Enhance customer data with appointment statistics and location/service info
-      const customersWithEnhancedData = await Promise.all(
-        customersData.map(async (customer) => {
-          try {
-            // Get appointment count
-            const { count: appointmentCount, error: countError } = await supabase
-              .from('appointments')
-              .select('*', { count: 'exact', head: true })
-              .eq('customer_id', customer.id);
+      // Use a more efficient approach with a single query for appointment counts
+      try {
+        const { data: appointmentCounts, error: countError } = await supabase
+          .from('appointments')
+          .select('customer_id')
+          .in('customer_id', customersData.map(c => c.id));
 
-            if (countError) {
-              console.error('Error fetching appointment count for customer:', customer.id, countError);
-            }
+        if (countError) {
+          console.error('Error fetching appointment counts:', countError);
+        }
 
-            // Get last appointment with location and service details
-            const { data: lastAppointmentData, error: lastError } = await supabase
-              .from('appointments')
-              .select(`
-                scheduled_time,
-                locations!inner(name),
-                services!inner(name)
-              `)
-              .eq('customer_id', customer.id)
-              .order('scheduled_time', { ascending: false })
-              .limit(1);
+        // Process appointment counts
+        const appointmentCountMap = (appointmentCounts || []).reduce((acc: Record<string, number>, apt) => {
+          acc[apt.customer_id] = (acc[apt.customer_id] || 0) + 1;
+          return acc;
+        }, {});
 
-            if (lastError) {
-              console.error('Error fetching last appointment for customer:', customer.id, lastError);
-            }
+        // Get last appointment dates with a single query
+        const { data: lastAppointments, error: lastError } = await supabase
+          .from('appointments')
+          .select('customer_id, scheduled_time')
+          .in('customer_id', customersData.map(c => c.id))
+          .order('scheduled_time', { ascending: false });
 
-            // Get most frequently used location and service
-            const { data: locationStats, error: locationError } = await supabase
-              .from('appointments')
-              .select(`
-                locations!inner(name),
-                count
-              `)
-              .eq('customer_id', customer.id);
+        if (lastError) {
+          console.error('Error fetching last appointments:', lastError);
+        }
 
-            const { data: serviceStats, error: serviceError } = await supabase
-              .from('appointments')
-              .select(`
-                services!inner(name),
-                count
-              `)
-              .eq('customer_id', customer.id);
-
-            // Process most used location and service
-            let mostUsedLocation = null;
-            let mostUsedService = null;
-
-            if (locationStats && locationStats.length > 0) {
-              const locationCounts = locationStats.reduce((acc: any, apt: any) => {
-                const locationName = apt.locations?.name;
-                if (locationName) {
-                  acc[locationName] = (acc[locationName] || 0) + 1;
-                }
-                return acc;
-              }, {});
-              
-              mostUsedLocation = Object.keys(locationCounts).reduce((a, b) => 
-                locationCounts[a] > locationCounts[b] ? a : b
-              );
-            }
-
-            if (serviceStats && serviceStats.length > 0) {
-              const serviceCounts = serviceStats.reduce((acc: any, apt: any) => {
-                const serviceName = apt.services?.name;
-                if (serviceName) {
-                  acc[serviceName] = (acc[serviceName] || 0) + 1;
-                }
-                return acc;
-              }, {});
-              
-              mostUsedService = Object.keys(serviceCounts).reduce((a, b) => 
-                serviceCounts[a] > serviceCounts[b] ? a : b
-              );
-            }
-
-            return {
-              ...customer,
-              appointment_count: appointmentCount || 0,
-              last_appointment: lastAppointmentData && lastAppointmentData.length > 0 
-                ? lastAppointmentData[0].scheduled_time 
-                : null,
-              most_used_location: mostUsedLocation,
-              most_used_service: mostUsedService,
-            };
-          } catch (error) {
-            console.error('Error processing customer stats:', error);
-            return {
-              ...customer,
-              appointment_count: 0,
-              last_appointment: null,
-              most_used_location: null,
-              most_used_service: null,
-            };
+        // Process last appointments
+        const lastAppointmentMap = (lastAppointments || []).reduce((acc: Record<string, string>, apt) => {
+          if (!acc[apt.customer_id]) {
+            acc[apt.customer_id] = apt.scheduled_time;
           }
-        })
-      );
+          return acc;
+        }, {});
 
-      console.log('CustomerManagementTab - Enhanced customers data:', customersWithEnhancedData);
-      setCustomers(customersWithEnhancedData);
+        // Get location and service preferences with joins
+        const { data: appointmentDetails, error: detailsError } = await supabase
+          .from('appointments')
+          .select(`
+            customer_id,
+            locations!inner(name),
+            services!inner(name)
+          `)
+          .in('customer_id', customersData.map(c => c.id));
+
+        if (detailsError) {
+          console.error('Error fetching appointment details:', detailsError);
+        }
+
+        // Process location and service preferences
+        const locationMap: Record<string, Record<string, number>> = {};
+        const serviceMap: Record<string, Record<string, number>> = {};
+
+        (appointmentDetails || []).forEach((apt: any) => {
+          const customerId = apt.customer_id;
+          const locationName = apt.locations?.name;
+          const serviceName = apt.services?.name;
+
+          if (locationName) {
+            if (!locationMap[customerId]) locationMap[customerId] = {};
+            locationMap[customerId][locationName] = (locationMap[customerId][locationName] || 0) + 1;
+          }
+
+          if (serviceName) {
+            if (!serviceMap[customerId]) serviceMap[customerId] = {};
+            serviceMap[customerId][serviceName] = (serviceMap[customerId][serviceName] || 0) + 1;
+          }
+        });
+
+        // Combine all data
+        const enhancedCustomers = customersData.map((customer) => {
+          const customerId = customer.id;
+          
+          // Find most used location
+          const customerLocations = locationMap[customerId];
+          let mostUsedLocation = null;
+          if (customerLocations) {
+            mostUsedLocation = Object.keys(customerLocations).reduce((a, b) => 
+              customerLocations[a] > customerLocations[b] ? a : b
+            );
+          }
+
+          // Find most used service
+          const customerServices = serviceMap[customerId];
+          let mostUsedService = null;
+          if (customerServices) {
+            mostUsedService = Object.keys(customerServices).reduce((a, b) => 
+              customerServices[a] > customerServices[b] ? a : b
+            );
+          }
+
+          return {
+            ...customer,
+            appointment_count: appointmentCountMap[customerId] || 0,
+            last_appointment: lastAppointmentMap[customerId] || null,
+            most_used_location: mostUsedLocation,
+            most_used_service: mostUsedService,
+          };
+        });
+
+        console.log('CustomerManagementTab - Enhanced customers data:', enhancedCustomers);
+        setCustomers(enhancedCustomers);
+      } catch (enhancementError) {
+        console.error('Error enhancing customer data:', enhancementError);
+        // Fall back to basic customer data if enhancement fails
+        const basicCustomers = customersData.map(customer => ({
+          ...customer,
+          appointment_count: 0,
+          last_appointment: null,
+          most_used_location: null,
+          most_used_service: null,
+        }));
+        setCustomers(basicCustomers);
+        toast({
+          title: 'Warning',
+          description: 'Customer data loaded with limited information due to processing error',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       console.error('Unexpected error:', error);
+      setCustomers([]);
       toast({
         title: 'Error',
         description: 'An unexpected error occurred while loading customers',
