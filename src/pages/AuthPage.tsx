@@ -19,7 +19,7 @@ interface LocationState {
 }
 
 const AuthPage: React.FC = () => {
-  const { user, loading, signIn, signUp, signInWithGoogle } = useAuth();
+  const { user, role, loading, signIn, signUp, signInWithGoogle } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,6 @@ const AuthPage: React.FC = () => {
   });
 
   const state = location.state as LocationState;
-  const redirectTo = state?.from?.pathname || '/customer';
 
   // Handle OAuth callback
   useEffect(() => {
@@ -63,11 +62,31 @@ const AuthPage: React.FC = () => {
     handleOAuthCallback();
   }, [searchParams]);
 
-  // Redirect if already authenticated
-  if (!loading && user) {
-    console.log('AuthPage: User authenticated, redirecting to:', redirectTo);
-    return <Navigate to={redirectTo} replace />;
-  }
+  // Redirect logic
+  useEffect(() => {
+    if (!loading && user && role) {
+      console.log('AuthPage: User authenticated with role, redirecting...', { user: user.email, role });
+      
+      // Determine redirect path based on role and previous location
+      let redirectTo = '/customer'; // default
+      
+      if (role === 'admin') {
+        redirectTo = '/admin';
+      } else if (role === 'staff') {
+        redirectTo = '/staff';
+      } else {
+        redirectTo = '/customer';
+      }
+      
+      // Use previous location if it was trying to access a protected route
+      if (state?.from?.pathname && state.from.pathname !== '/auth') {
+        redirectTo = state.from.pathname;
+      }
+      
+      console.log('AuthPage: Redirecting to:', redirectTo);
+      window.location.href = redirectTo; // Force navigation
+    }
+  }, [user, role, loading, state]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +108,7 @@ const AuthPage: React.FC = () => {
           title: 'Welcome back!',
           description: 'You have been successfully signed in',
         });
+        // Redirect will be handled by the useEffect above
       }
     } catch (error) {
       console.error('Sign in error:', error);
@@ -168,12 +188,25 @@ const AuthPage: React.FC = () => {
     }
   };
 
+  // Show loading while auth state is being determined
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is authenticated but role is still loading, show loading
+  if (user && !role) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Setting up your account...</p>
         </div>
       </div>
     );
