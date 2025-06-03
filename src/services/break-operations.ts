@@ -37,15 +37,26 @@ export const createBreakRequest = async (
 };
 
 export const startBreak = async (breakRequest: BreakRequest, userEmail?: string) => {
-  // Update staff status
+  // Update staff status in profiles table
   await supabase
-    .from('staff')
+    .from('profiles')
     .update({ 
-      status: 'break',
-      return_time: new Date(Date.now() + breakRequest.duration * 60000).toISOString(),
-      handover_staff_id: breakRequest.handoverStaffId
+      status: 'break'
     })
     .eq('id', breakRequest.staffId);
+
+  // Create break request record
+  await supabase
+    .from('break_requests')
+    .insert({
+      staff_id: breakRequest.staffId,
+      break_type: breakRequest.breakType,
+      status: 'approved',
+      requested_start: new Date().toISOString(),
+      requested_end: new Date(Date.now() + breakRequest.duration * 60000).toISOString(),
+      handover_staff_id: breakRequest.handoverStaffId,
+      notes: breakRequest.reason
+    });
 
   // Notify handover staff if applicable
   if (breakRequest.handoverStaffId) {
@@ -61,14 +72,22 @@ export const startBreak = async (breakRequest: BreakRequest, userEmail?: string)
 };
 
 export const endBreak = async (breakRequest: BreakRequest, userEmail?: string) => {
+  // Update staff status in profiles table
   await supabase
-    .from('staff')
+    .from('profiles')
     .update({ 
-      status: 'active',
-      return_time: null,
-      handover_staff_id: null
+      status: 'active'
     })
     .eq('id', breakRequest.staffId);
+
+  // Update break request to completed
+  await supabase
+    .from('break_requests')
+    .update({
+      status: 'completed'
+    })
+    .eq('staff_id', breakRequest.staffId)
+    .eq('status', 'approved');
 
   // Notify handover staff that break is over
   if (breakRequest.handoverStaffId) {

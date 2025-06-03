@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -119,14 +120,14 @@ export const useStaffPerformance = () => {
 
       if (queueError) throw queueError;
 
-      // Get staff status
-      const { data: staffData, error: staffError } = await supabase
-        .from('staff')
+      // Get staff status from profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
         .select('status')
         .eq('id', user.id)
         .single();
 
-      if (staffError) throw staffError;
+      if (profileError) throw profileError;
 
       setMetrics({
         todayStats: {
@@ -145,7 +146,7 @@ export const useStaffPerformance = () => {
           activeCustomers: currentQueue?.filter(a => a.status === 'in_progress').length || 0,
           queueLength: currentQueue?.filter(a => a.status === 'checked_in').length || 0,
           estimatedBacklog: (currentQueue?.length || 0) * 15, // 15 min per customer
-          status: mapStatusToUnionType(staffData?.status)
+          status: mapStatusToUnionType(profileData?.status)
         }
       });
 
