@@ -3,11 +3,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from './auth/useUserRole';
-import { AuthContextType, UserRole, AuthError } from '@/types/auth';
+import { AuthContextType, UserRoleType, AuthError } from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -18,14 +18,14 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const { role, fetchUserRole, clearRole } = useUserRole();
 
   useEffect(() => {
     console.log('AuthProvider: Initializing authentication state');
     
     // Get initial session
-    const initializeAuth = async () => {
+    const initializeAuth = async (): Promise<void> => {
       try {
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         

@@ -14,21 +14,20 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { RegisterFormData } from '@/types/auth';
 
 const registerSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
-
 interface RegisterFormProps {
-  onSubmit: (data: RegisterFormValues) => Promise<void>;
+  onSubmit: (data: RegisterFormData) => Promise<void>;
   isLoading: boolean;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, isLoading }) => {
-  const form = useForm<RegisterFormValues>({
+  const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',

@@ -1,10 +1,18 @@
 
 import { User, Session } from '@supabase/supabase-js';
 
-export type UserRole = 'admin' | 'staff' | 'customer';
+// Define role enum for better type safety
+export enum UserRole {
+  ADMIN = 'admin',
+  STAFF = 'staff',
+  CUSTOMER = 'customer'
+}
+
+// Union type for roles - provides flexibility while maintaining type safety
+export type UserRoleType = 'admin' | 'staff' | 'customer';
 
 export interface AuthUser extends User {
-  role?: UserRole;
+  role?: UserRoleType;
 }
 
 export interface AuthSession extends Session {
@@ -20,7 +28,7 @@ export interface AuthError {
 export interface AuthState {
   user: User | null;
   session: Session | null;
-  role: UserRole | null;
+  role: UserRoleType | null;
   loading: boolean;
 }
 
@@ -32,3 +40,66 @@ export interface AuthActions {
 }
 
 export interface AuthContextType extends AuthState, AuthActions {}
+
+// Form validation types
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface RegisterFormData {
+  email: string;
+  password: string;
+}
+
+// Auth hook return types
+export interface UseAuthActionsReturn {
+  handleSignIn: (email: string, password: string) => Promise<void>;
+  handleSignUp: (email: string, password: string) => Promise<void>;
+  handleGoogleSignIn: () => Promise<void>;
+  isLoading: boolean;
+}
+
+// User role utility types
+export interface RolePermissions {
+  canManageUsers: boolean;
+  canManageStaff: boolean;
+  canViewAdmin: boolean;
+  canManageAppointments: boolean;
+  canViewReports: boolean;
+}
+
+// Type guards for better type safety
+export const isValidUserRole = (role: string): role is UserRoleType => {
+  return ['admin', 'staff', 'customer'].includes(role);
+};
+
+export const getUserRolePermissions = (role: UserRoleType | null): RolePermissions => {
+  switch (role) {
+    case 'admin':
+      return {
+        canManageUsers: true,
+        canManageStaff: true,
+        canViewAdmin: true,
+        canManageAppointments: true,
+        canViewReports: true,
+      };
+    case 'staff':
+      return {
+        canManageUsers: false,
+        canManageStaff: false,
+        canViewAdmin: false,
+        canManageAppointments: true,
+        canViewReports: true,
+      };
+    case 'customer':
+    default:
+      return {
+        canManageUsers: false,
+        canManageStaff: false,
+        canViewAdmin: false,
+        canManageAppointments: false,
+        canViewReports: false,
+      };
+  }
+};

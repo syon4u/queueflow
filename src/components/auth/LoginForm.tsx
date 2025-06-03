@@ -13,21 +13,20 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { LoginFormData } from '@/types/auth';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
-
 interface LoginFormProps {
-  onSubmit: (data: LoginFormValues) => Promise<void>;
+  onSubmit: (data: LoginFormData) => Promise<void>;
   isLoading: boolean;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
-  const form = useForm<LoginFormValues>({
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',

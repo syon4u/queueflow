@@ -3,10 +3,11 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Spinner } from '@/components/ui/spinner';
+import { UserRoleType } from '@/types/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: string | string[];
+  requiredRole?: UserRoleType | UserRoleType[];
   redirectTo?: string;
 }
 
@@ -46,7 +47,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If role is required, check if user has the required role
   if (requiredRole) {
-    const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+    const requiredRoles: UserRoleType[] = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
     
     if (!role) {
       console.log('ProtectedRoute: No role found, redirecting to auth');
@@ -66,7 +67,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 // Higher-order component for role-based protection
 export const withRoleProtection = (
   Component: React.ComponentType, 
-  requiredRole?: string | string[]
+  requiredRole?: UserRoleType | UserRoleType[]
 ) => {
   return (props: any) => (
     <ProtectedRoute requiredRole={requiredRole}>

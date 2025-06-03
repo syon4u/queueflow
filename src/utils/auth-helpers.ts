@@ -1,19 +1,15 @@
 
 import { toast } from '@/components/ui/use-toast';
+import { AuthError } from '@/types/auth';
 
-export interface AuthError {
-  message: string;
-  code?: string;
-}
-
-export const handleAuthError = (error: AuthError, action: 'login' | 'register' | 'google') => {
-  const actionMap = {
+export const handleAuthError = (error: AuthError, action: 'login' | 'register' | 'google'): void => {
+  const actionMap: Record<string, string> = {
     login: 'Sign In',
     register: 'Registration', 
     google: 'Google Sign In'
   };
 
-  const defaultMessages = {
+  const defaultMessages: Record<string, string> = {
     login: 'Please check your credentials and try again',
     register: 'Please try again with different credentials',
     google: 'Please try again'
@@ -26,8 +22,8 @@ export const handleAuthError = (error: AuthError, action: 'login' | 'register' |
   });
 };
 
-export const handleAuthSuccess = (action: 'login' | 'register') => {
-  const messages = {
+export const handleAuthSuccess = (action: 'login' | 'register'): void => {
+  const messages: Record<string, { title: string; description: string }> = {
     login: {
       title: 'Welcome back!',
       description: 'You have been successfully signed in'

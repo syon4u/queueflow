@@ -1,12 +1,12 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { UserRole } from '@/types/auth';
+import { UserRoleType, isValidUserRole } from '@/types/auth';
 
 export const useUserRole = () => {
-  const [role, setRole] = useState<UserRole | null>(null);
+  const [role, setRole] = useState<UserRoleType | null>(null);
 
-  const fetchUserRole = async (userId: string) => {
+  const fetchUserRole = async (userId: string): Promise<void> => {
     try {
       console.log('Fetching role for user:', userId);
       
@@ -18,11 +18,13 @@ export const useUserRole = () => {
         .maybeSingle();
 
       // If user has an explicit role in user_roles, use it (this takes priority)
-      if (userRoleData && !userRoleError) {
+      if (userRoleData && !userRoleError && userRoleData.role) {
         console.log('Role found in user_roles table:', userRoleData.role);
-        const validRole = userRoleData.role as UserRole;
-        setRole(validRole);
-        return; // Exit early with the explicit role
+        
+        if (isValidUserRole(userRoleData.role)) {
+          setRole(userRoleData.role);
+          return; // Exit early with the explicit role
+        }
       }
 
       console.log('No role found in user_roles, checking staff table:', userRoleError);
@@ -34,24 +36,29 @@ export const useUserRole = () => {
         .eq('id', userId)
         .maybeSingle();
 
-      if (staffData && !staffError) {
+      if (staffData && !staffError && staffData.role) {
         console.log('Staff data from database:', staffData);
         
         // For staff members, use their role regardless of status
         // (admins/staff should retain access even if status is not active)
         if (staffData.role === 'admin' || staffData.role === 'staff') {
           console.log('Staff/Admin role from staff table:', staffData.role);
-          const validRole = staffData.role as UserRole;
-          setRole(validRole);
-          return;
+          
+          if (isValidUserRole(staffData.role)) {
+            setRole(staffData.role);
+            return;
+          }
         }
         
         // Only check status for non-admin/non-staff roles
         if (staffData.status === 'active') {
           console.log('Active staff member, using role:', staffData.role);
-          const validRole = (staffData.role || 'staff') as UserRole;
-          setRole(validRole);
-          return;
+          const roleToUse = staffData.role || 'staff';
+          
+          if (isValidUserRole(roleToUse)) {
+            setRole(roleToUse);
+            return;
+          }
         }
       }
 
@@ -66,7 +73,7 @@ export const useUserRole = () => {
     }
   };
 
-  const clearRole = () => {
+  const clearRole = (): void => {
     setRole(null);
   };
 
