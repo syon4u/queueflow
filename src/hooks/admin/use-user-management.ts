@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
-import { type Database } from '@/integrations/supabase/types';
 
 export interface UserData {
   id: string;
@@ -13,14 +12,11 @@ export interface UserData {
   last_sign_in_at?: string;
 }
 
-// Define a type for user roles that matches the Supabase enum
-type UserRole = Database['public']['Enums']['user_role'];
-
 export const useUserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
 
-  // Fetch all users with their roles
+  // Fetch all users with their roles from the database
   const { 
     data: users = [], 
     isLoading, 
@@ -29,92 +25,39 @@ export const useUserManagement = () => {
     queryKey: ['users'],
     queryFn: async () => {
       try {
-        // First get all users from auth (this is a mock since we can't access auth.users directly)
-        const { data: authUsers, error: authError } = await supabase
-          .from('temp_staff') // Using temp_staff for demo purposes
-          .select('id, first_name, last_name');
+        console.log('Fetching users with roles from database...');
         
-        if (authError) throw authError;
+        // Call the database function to get users with roles
+        const { data, error } = await supabase.rpc('get_users_with_roles');
         
-        // Then get all user_roles entries
-        const { data: userRoles, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('*');
+        if (error) {
+          console.error('Error fetching users:', error);
+          throw error;
+        }
         
-        if (rolesError) throw rolesError;
-        
-        // Create a unified list with user details and their roles
-        const mockUsers: UserData[] = authUsers.map(user => {
-          const roleRecord = userRoles?.find(r => r.user_id === user.id);
-          return {
-            id: user.id,
-            email: `${user.first_name.toLowerCase()}.${user.last_name.toLowerCase()}@example.com`,
-            role: roleRecord?.role || 'customer',
-            created_at: new Date().toISOString(),
-            last_sign_in_at: new Date().toISOString()
-          };
-        });
-        
-        // Add some more mock users for testing
-        mockUsers.push(
-          {
-            id: 'mock-admin-1',
-            email: 'admin@example.com',
-            role: 'admin',
-            created_at: new Date().toISOString(),
-            last_sign_in_at: new Date().toISOString()
-          },
-          {
-            id: 'mock-staff-1',
-            email: 'staff@example.com',
-            role: 'staff',
-            created_at: new Date().toISOString(),
-            last_sign_in_at: new Date().toISOString()
-          },
-          {
-            id: 'mock-customer-1',
-            email: 'customer@example.com',
-            role: 'customer',
-            created_at: new Date().toISOString(),
-            last_sign_in_at: new Date().toISOString()
-          }
-        );
-        
-        return mockUsers;
+        console.log('Fetched users from database:', data);
+        return data as UserData[];
       } catch (error) {
-        console.error('Error in user management:', error);
+        console.error('Error in user management query:', error);
         throw error;
       }
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  // Update user role
+  // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string, role: string }) => {
-      // First check if the user has a role record
-      const { data: existingRole, error: checkError } = await supabase
-        .from('user_roles')
-        .select('*')
-        .eq('user_id', userId);
+      console.log(`Updating user ${userId} role to ${role}`);
       
-      if (checkError) throw checkError;
+      const { data, error } = await supabase.rpc('update_user_role', {
+        target_user_id: userId,
+        new_role: role
+      });
       
-      if (existingRole && existingRole.length > 0) {
-        // Update existing role
-        const { error } = await supabase
-          .from('user_roles')
-          .update({ role })
-          .eq('user_id', userId);
-          
-        if (error) throw error;
-      } else {
-        // Insert new role
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role });
-          
-        if (error) throw error;
+      if (error) {
+        console.error('Error updating user role:', error);
+        throw error;
       }
       
       return { userId, role };
@@ -126,24 +69,26 @@ export const useUserManagement = () => {
         description: `User role has been updated to ${data.role}`,
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating role:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update user role',
+        description: error.message || 'Failed to update user role',
         variant: 'destructive',
       });
     }
   });
 
-  // Add temporary data for analytics
+  // Add temporary data for testing (this adds mock users to the temp_staff table)
   const addTemporaryDataMutation = useMutation({
     mutationFn: async () => {
-      // Add some temporary staff for analytics
+      console.log('Adding temporary test data...');
+      
+      // Add some temporary staff for testing
       const staffData = [
-        { id: 'temp-staff-1', first_name: 'John', last_name: 'Doe', role: 'staff' as UserRole, location_id: null },
-        { id: 'temp-staff-2', first_name: 'Jane', last_name: 'Smith', role: 'staff' as UserRole, location_id: null },
-        { id: 'temp-staff-3', first_name: 'Alex', last_name: 'Johnson', role: 'admin' as UserRole, location_id: null }
+        { id: 'temp-staff-1', first_name: 'John', last_name: 'Doe', role: 'staff' as const },
+        { id: 'temp-staff-2', first_name: 'Jane', last_name: 'Smith', role: 'staff' as const },
+        { id: 'temp-staff-3', first_name: 'Alex', last_name: 'Johnson', role: 'admin' as const }
       ];
 
       // Insert staff data if they don't exist
@@ -155,26 +100,10 @@ export const useUserManagement = () => {
 
         if (!checkError && (!existingStaff || existingStaff.length === 0)) {
           const { error } = await supabase.from('temp_staff').insert(staff);
-          if (error) throw error;
-        }
-      }
-      
-      // Add user roles for analytics
-      const roleData = [
-        { user_id: 'temp-staff-1', role: 'staff' },
-        { user_id: 'temp-staff-2', role: 'staff' },
-        { user_id: 'temp-staff-3', role: 'admin' }
-      ];
-
-      for (const role of roleData) {
-        const { error: checkError, data: existingRole } = await supabase
-          .from('user_roles')
-          .select('*')
-          .eq('user_id', role.user_id);
-
-        if (!checkError && (!existingRole || existingRole.length === 0)) {
-          const { error } = await supabase.from('user_roles').insert(role);
-          if (error) throw error;
+          if (error) {
+            console.error('Error inserting staff:', error);
+            throw error;
+          }
         }
       }
 
@@ -184,14 +113,14 @@ export const useUserManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
         title: 'Test data added',
-        description: 'Temporary data for analytics has been created',
+        description: 'Temporary staff data has been created for testing',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error adding temporary data:', error);
       toast({
         title: 'Error',
-        description: 'Failed to add temporary data',
+        description: error.message || 'Failed to add temporary data',
         variant: 'destructive',
       });
     }
@@ -203,6 +132,7 @@ export const useUserManagement = () => {
   ) || [];
 
   const handleRoleChange = (userId: string, role: string) => {
+    console.log(`Role change requested: ${userId} -> ${role}`);
     updateRoleMutation.mutate({ userId, role });
   };
 

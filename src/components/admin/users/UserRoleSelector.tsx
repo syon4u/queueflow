@@ -12,20 +12,28 @@ interface UserRoleSelectorProps {
   currentRole: string;
   userId: string;
   onRoleChange: (userId: string, role: string) => void;
+  disabled?: boolean;
 }
 
 export const UserRoleSelector = ({ 
   currentRole, 
   userId, 
-  onRoleChange 
+  onRoleChange,
+  disabled = false
 }: UserRoleSelectorProps) => {
   // Ensure currentRole is never an empty string
   const roleValue = (!currentRole || currentRole === '') ? 'customer' : currentRole;
 
+  const handleValueChange = (value: string) => {
+    console.log(`UserRoleSelector: Changing role for ${userId} from ${currentRole} to ${value}`);
+    onRoleChange(userId, value);
+  };
+
   return (
     <Select
       value={roleValue}
-      onValueChange={(value) => onRoleChange(userId, value)}
+      onValueChange={handleValueChange}
+      disabled={disabled}
     >
       <SelectTrigger className="w-[130px]">
         <SelectValue placeholder="Select role" />

@@ -47,10 +47,12 @@ export const MergedUsersTab: React.FC = () => {
     addTemporaryData
   } = useUserManagement();
 
+  // Show loading spinner only for the roles tab when it's active and loading
   if (usersLoading && activeTab === 'roles') {
     return <LoadingSpinner />;
   }
 
+  // Show error only for the roles tab when it's active and has an error
   if (error && activeTab === 'roles') {
     return <ErrorAlert error={error} />;
   }
@@ -75,7 +77,7 @@ export const MergedUsersTab: React.FC = () => {
             User Management
           </CardTitle>
           <CardDescription>
-            Manage staff members and user roles
+            Manage staff members and user roles with live database integration
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -125,7 +127,7 @@ export const MergedUsersTab: React.FC = () => {
                 <div>
                   <h2 className="text-lg font-semibold">User Role Management</h2>
                   <p className="text-sm text-muted-foreground">
-                    Assign and manage user roles and permissions
+                    Assign and manage user roles and permissions with live database updates
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -154,7 +156,8 @@ export const MergedUsersTab: React.FC = () => {
 
               <UsersTable 
                 users={users} 
-                onRoleChange={handleRoleChange} 
+                onRoleChange={handleRoleChange}
+                isLoading={usersLoading}
               />
             </TabsContent>
           </Tabs>
