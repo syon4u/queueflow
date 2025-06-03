@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
   Users, 
-  UserCheck,
   Building2,
   FileText,
   UsersRound,
@@ -58,11 +57,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       id: 'customers',
       label: 'Customers',
       icon: Contact,
-    },
-    {
-      id: 'staff',
-      label: 'Staff',
-      icon: UserCheck,
     },
     {
       id: 'locations',
@@ -153,7 +147,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="/staff" className="flex items-center gap-2">
-                    <UserCheck className="h-4 w-4" />
+                    <Users className="h-4 w-4" />
                     <span>Staff Portal</span>
                   </Link>
                 </SidebarMenuButton>

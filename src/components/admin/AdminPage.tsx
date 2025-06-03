@@ -6,14 +6,13 @@ import { useAuth } from '@/context/AuthContext';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { DashboardTab } from './DashboardTab';
 import { StatsTab } from './StatsTab';
-import { StaffTab } from './StaffTab';
-import { UserManagementTab } from './UserManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import CustomerManagementTab from './CustomerManagementTab';
+import { MergedUsersTab } from './MergedUsersTab';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminDashboardHeader } from './AdminDashboardHeader';
 import { useAdminDashboardStats } from '@/hooks/admin/use-admin-dashboard-stats';
@@ -52,11 +51,9 @@ const AdminPage = () => {
       case 'dashboard':
         return <DashboardTab />;
       case 'users':
-        return <UserManagementTab />;
+        return <MergedUsersTab />;
       case 'customers':
         return <CustomerManagementTab />;
-      case 'staff':
-        return <StaffTab />;
       case 'locations':
         return <LocationsTab />;
       case 'services':
