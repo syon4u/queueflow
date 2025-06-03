@@ -24,7 +24,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Contact
+  Contact,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -82,6 +83,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       id: 'stats',
       label: 'Analytics',
       icon: BarChart3,
+    },
+    {
+      id: 'security',
+      label: 'Security',
+      icon: Shield,
     },
     {
       id: 'settings',

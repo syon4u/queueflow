@@ -3,6 +3,18 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SecurityMetrics } from '@/types/security';
 
+// Temporary interface for security audit log until types are regenerated
+interface SecurityAuditLogRecord {
+  id: string;
+  event_type: string;
+  client_identifier: string;
+  success: boolean;
+  details: any;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
 export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') => {
   const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,9 +42,9 @@ export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') =
             break;
         }
 
-        // Fetch security audit logs
+        // Fetch security audit logs using type assertion
         const { data: auditLogs, error: auditError } = await supabase
-          .from('security_audit_log')
+          .from('security_audit_log' as any)
           .select('*')
           .gte('created_at', startTime.toISOString())
           .order('created_at', { ascending: false });
@@ -54,23 +66,26 @@ export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') =
           return;
         }
 
+        // Cast to proper type
+        const logs = auditLogs as SecurityAuditLogRecord[];
+
         // Process metrics
-        const failedAttempts = auditLogs.filter(log => !log.success).length;
-        const successfulAttempts = auditLogs.filter(log => log.success).length;
-        const blockedAttempts = auditLogs.filter(log => 
+        const failedAttempts = logs.filter(log => !log.success).length;
+        const successfulAttempts = logs.filter(log => log.success).length;
+        const blockedAttempts = logs.filter(log => 
           log.event_type === 'rate_limit_exceeded'
         ).length;
         
-        const uniqueClients = new Set(auditLogs.map(log => log.client_identifier)).size;
+        const uniqueClients = new Set(logs.map(log => log.client_identifier)).size;
 
         // Calculate top failure reasons
         const failureReasons = new Map<string, number>();
-        auditLogs
+        logs
           .filter(log => !log.success)
           .forEach(log => {
             try {
-              const details = JSON.parse(log.details);
-              const reason = details.error || log.event_type;
+              const details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+              const reason = details?.error || log.event_type;
               failureReasons.set(reason, (failureReasons.get(reason) || 0) + 1);
             } catch {
               failureReasons.set('Unknown error', (failureReasons.get('Unknown error') || 0) + 1);
@@ -101,5 +116,10 @@ export const useSecurityMetrics = (timeRange: 'hour' | 'day' | 'week' = 'day') =
     fetchMetrics();
   }, [timeRange]);
 
-  return { metrics, isLoading, error, refetch: () => setIsLoading(true) };
+  const refetch = () => {
+    setIsLoading(true);
+    setError(null);
+  };
+
+  return { metrics, isLoading, error, refetch };
 };

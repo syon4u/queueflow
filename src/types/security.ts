@@ -40,3 +40,15 @@ export interface SecureAuthContext {
   timestamp: string;
   sessionId?: string;
 }
+
+// Security audit log record interface for internal use
+export interface SecurityAuditLogRecord {
+  id: string;
+  event_type: string;
+  client_identifier: string;
+  success: boolean;
+  details: any;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
