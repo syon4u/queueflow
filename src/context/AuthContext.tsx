@@ -19,9 +19,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [initialized, setInitialized] = useState<boolean>(false);
   const { role, fetchUserRole, clearRole } = useUserRole();
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (initialized) return;
+    
     console.log('AuthProvider: Initializing authentication state');
     
     // Get initial session
@@ -44,6 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('AuthProvider: Error initializing auth:', error);
       } finally {
         setLoading(false);
+        setInitialized(true);
       }
     };
 
@@ -73,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchUserRole, clearRole]);
+  }, [initialized, fetchUserRole, clearRole]);
 
   const signIn = async (email: string, password: string): Promise<{ error?: AuthError }> => {
     try {
@@ -176,7 +181,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     hasUser: !!user,
     hasSession: !!session,
     role,
-    loading
+    loading,
+    initialized
   });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

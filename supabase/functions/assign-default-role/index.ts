@@ -22,9 +22,11 @@ Deno.serve(async (req: Request) => {
 
     // Get the user data from the webhook payload
     const payload = await req.json()
-    const { user } = payload.record
+    console.log('Received payload:', JSON.stringify(payload, null, 2))
+    
+    const userId = payload.record?.id || payload.user?.id
 
-    if (!user?.id) {
+    if (!userId) {
       console.error('No user ID found in payload')
       return new Response(
         JSON.stringify({ error: 'No user ID found' }),
@@ -32,48 +34,75 @@ Deno.serve(async (req: Request) => {
       )
     }
 
+    console.log('Processing user:', userId)
+
     // Check if user already has a role assigned
     const { data: existingRole } = await supabase
       .from('user_roles')
-      .select('id')
-      .eq('user_id', user.id)
+      .select('id, role')
+      .eq('user_id', userId)
       .single()
 
     if (existingRole) {
-      console.log(`User ${user.id} already has a role assigned`)
+      console.log(`User ${userId} already has role: ${existingRole.role}`)
       return new Response(
-        JSON.stringify({ message: 'Role already assigned' }),
+        JSON.stringify({ message: 'Role already assigned', role: existingRole.role }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     // Assign default 'staff' role to new user
-    const { error: roleError } = await supabase
+    const { data: newRole, error: roleError } = await supabase
       .from('user_roles')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         role: 'staff'
       })
+      .select()
 
     if (roleError) {
       console.error('Error assigning role:', roleError)
       return new Response(
-        JSON.stringify({ error: 'Failed to assign role' }),
+        JSON.stringify({ error: 'Failed to assign role', details: roleError }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    console.log(`Successfully assigned 'staff' role to user ${user.id}`)
+    console.log(`Successfully assigned 'staff' role to user ${userId}`)
+    
+    // Also create a staff record if it doesn't exist
+    const userData = payload.record || payload.user
+    const { error: staffError } = await supabase
+      .from('staff')
+      .insert({
+        id: userId,
+        first_name: userData?.raw_user_meta_data?.first_name || userData?.user_metadata?.first_name || '',
+        last_name: userData?.raw_user_meta_data?.last_name || userData?.user_metadata?.last_name || '',
+        email: userData?.email || '',
+        role: 'staff',
+        status: 'inactive'
+      })
+      .select()
+
+    if (staffError && !staffError.message?.includes('duplicate key')) {
+      console.error('Error creating staff record:', staffError)
+    } else {
+      console.log(`Staff record created for user ${userId}`)
+    }
     
     return new Response(
-      JSON.stringify({ message: 'Role assigned successfully' }),
+      JSON.stringify({ 
+        message: 'Role assigned successfully', 
+        role: 'staff',
+        staff_created: !staffError 
+      }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
     console.error('Error in assign-default-role function:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

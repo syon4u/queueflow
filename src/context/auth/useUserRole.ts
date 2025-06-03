@@ -15,8 +15,8 @@ export const useUserRole = () => {
       
       if (roleError) {
         console.error('Error fetching user role:', roleError);
-        // Default to staff for authenticated users
-        setRole('staff');
+        // For existing users, let's check if they need a role assigned
+        await ensureUserHasRole(userId);
         return;
       }
 
@@ -27,9 +27,19 @@ export const useUserRole = () => {
         return;
       }
 
-      // If no role found, check if this is a new user and assign default role
+      // If no role found, assign default role
       console.log('No role found, assigning default staff role');
+      await ensureUserHasRole(userId);
       
+    } catch (error) {
+      console.error('Failed to fetch user role:', error);
+      await ensureUserHasRole(userId);
+    }
+  };
+
+  const ensureUserHasRole = async (userId: string): Promise<void> => {
+    try {
+      // First try to insert a staff role for this user
       const { error: insertError } = await supabase
         .from('user_roles')
         .insert({
@@ -41,12 +51,24 @@ export const useUserRole = () => {
         setRole('staff');
         console.log('Default staff role assigned successfully');
       } else {
-        console.error('Failed to assign default role:', insertError);
-        setRole('staff'); // Default fallback
+        // If insert failed, the user might already have a role, try to get it
+        const { data: existingRole } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .single();
+        
+        if (existingRole && isValidUserRole(existingRole.role)) {
+          setRole(existingRole.role);
+          console.log('Found existing role:', existingRole.role);
+        } else {
+          setRole('customer'); // Ultimate fallback
+          console.log('Fallback to customer role');
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch user role:', error);
-      setRole('staff'); // Default to staff instead of customer
+      console.error('Failed to ensure user has role:', error);
+      setRole('customer'); // Ultimate fallback
     }
   };
 
