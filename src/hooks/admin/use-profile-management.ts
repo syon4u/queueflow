@@ -10,13 +10,7 @@ export interface Profile {
   last_name: string;
   phone: string | null;
   email: string | null;
-  location_id: string | null;
   status: string;
-  break_start_time: string | null;
-  break_end_time: string | null;
-  return_time: string | null;
-  break_type: string | null;
-  handover_staff_id: string | null;
   created_at: string;
   updated_at: string;
   locations?: {
@@ -34,7 +28,7 @@ interface ProfileFormData {
   last_name: string;
   phone: string;
   role: 'admin' | 'staff' | 'customer';
-  location_id: string;
+  email: string;
 }
 
 export const useProfileManagement = () => {
@@ -46,22 +40,18 @@ export const useProfileManagement = () => {
     last_name: '',
     phone: '',
     role: 'staff',
-    location_id: ''
+    email: ''
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch profiles with staff/admin roles
+  // Fetch profiles with staff/admin roles using the new view
   const { data: profiles, isLoading } = useQuery({
     queryKey: ['profiles'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          *,
-          locations(id, name),
-          user_roles!inner(role)
-        `)
-        .in('user_roles.role', ['staff', 'admin']);
+        .from('user_profiles')
+        .select('*')
+        .in('role', ['staff', 'admin']);
       
       if (error) throw error;
       return data || [];
@@ -94,8 +84,8 @@ export const useProfileManagement = () => {
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone || null,
-          location_id: data.location_id || null,
-          status: 'inactive'
+          email: data.email || null,
+          status: 'active'
         }]);
       
       if (profileError) throw profileError;
@@ -134,7 +124,7 @@ export const useProfileManagement = () => {
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone || null,
-          location_id: data.location_id || null
+          email: data.email || null
         })
         .eq('id', data.id);
       
@@ -188,14 +178,12 @@ export const useProfileManagement = () => {
   });
 
   const handleAddClick = () => {
-    const defaultLocationId = locations && locations.length > 0 ? locations[0].id : '';
-    
     setFormData({
       first_name: '',
       last_name: '',
       phone: '',
       role: 'staff',
-      location_id: defaultLocationId
+      email: ''
     });
     setIsEditing(false);
     setIsDialogOpen(true);
@@ -208,7 +196,7 @@ export const useProfileManagement = () => {
       last_name: profile.last_name,
       phone: profile.phone || '',
       role: (profile.user_roles?.role as 'admin' | 'staff' | 'customer') || 'staff',
-      location_id: profile.location_id || ''
+      email: profile.email || ''
     });
     setIsEditing(true);
     setIsDialogOpen(true);

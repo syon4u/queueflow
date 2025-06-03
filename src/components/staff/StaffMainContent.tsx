@@ -38,28 +38,28 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
   const { user } = useAuth();
   const { queueStatus } = useQueue();
 
-  // Get staff status from database with better error handling
-  const { data: staffData, isLoading: isStaffLoading, error: staffError } = useQuery({
-    queryKey: ['staff-status', user?.id],
+  // Get staff status from profiles table with better error handling
+  const { data: profileData, isLoading: isProfileLoading, error: profileError } = useQuery({
+    queryKey: ['profile-status', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       
-      console.log('Fetching staff status for user:', user.id);
+      console.log('Fetching profile status for user:', user.id);
       
       const { data, error } = await supabase
-        .from('staff')
-        .select('status, break_type, return_time')
+        .from('profiles')
+        .select('status')
         .eq('id', user.id)
         .maybeSingle(); // Use maybeSingle to avoid errors when no data found
       
       if (error) {
-        console.error('Error fetching staff status:', error);
+        console.error('Error fetching profile status:', error);
         // Return default status instead of throwing
-        return { status: 'inactive', break_type: null, return_time: null };
+        return { status: 'active' };
       }
       
-      console.log('Staff status fetched:', data);
-      return data || { status: 'inactive', break_type: null, return_time: null };
+      console.log('Profile status fetched:', data);
+      return data || { status: 'active' };
     },
     enabled: !!user?.id,
     refetchInterval: 30000,
@@ -72,11 +72,11 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
     },
   });
 
-  const staffStatus = staffData?.status || 'inactive';
+  const staffStatus = profileData?.status || 'active';
 
-  // Log any staff query errors
-  if (staffError) {
-    console.error('Staff status query error:', staffError);
+  // Log any profile query errors
+  if (profileError) {
+    console.error('Profile status query error:', profileError);
   }
 
   const renderMainContent = () => {
@@ -115,8 +115,8 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
     }
   };
 
-  // Show skeleton loading for staff dashboard when staff data is loading
-  if (activeSection === 'basic-queue' && isStaffLoading) {
+  // Show skeleton loading for staff dashboard when profile data is loading
+  if (activeSection === 'basic-queue' && isProfileLoading) {
     return (
       <div className="flex flex-col min-h-screen">
         <div className="bg-white border-b p-6">
@@ -142,7 +142,7 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
           <div className="bg-white border-b p-6">
             <StaffDashboardHeader
               queueStatus={queueStatus}
-              staffStatus={staffStatus as 'active' | 'on_break' | 'inactive'}
+              staffStatus={staffStatus as 'active' | 'inactive'}
               activeAppointments={activeAppointments.length}
               onRefresh={onRefresh}
               onNotificationClick={onNotificationClick}

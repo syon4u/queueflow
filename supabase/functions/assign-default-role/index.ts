@@ -70,31 +70,30 @@ Deno.serve(async (req: Request) => {
 
     console.log(`Successfully assigned 'staff' role to user ${userId}`)
     
-    // Also create a staff record if it doesn't exist
+    // Also create a profile record if it doesn't exist
     const userData = payload.record || payload.user
-    const { error: staffError } = await supabase
-      .from('staff')
+    const { error: profileError } = await supabase
+      .from('profiles')
       .insert({
         id: userId,
         first_name: userData?.raw_user_meta_data?.first_name || userData?.user_metadata?.first_name || '',
         last_name: userData?.raw_user_meta_data?.last_name || userData?.user_metadata?.last_name || '',
         email: userData?.email || '',
-        role: 'staff',
-        status: 'inactive'
+        status: 'active'
       })
       .select()
 
-    if (staffError && !staffError.message?.includes('duplicate key')) {
-      console.error('Error creating staff record:', staffError)
+    if (profileError && !profileError.message?.includes('duplicate key')) {
+      console.error('Error creating profile record:', profileError)
     } else {
-      console.log(`Staff record created for user ${userId}`)
+      console.log(`Profile record created for user ${userId}`)
     }
     
     return new Response(
       JSON.stringify({ 
         message: 'Role assigned successfully', 
         role: 'staff',
-        staff_created: !staffError 
+        profile_created: !profileError 
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

@@ -1,38 +1,26 @@
 
 import React from 'react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-interface StaffFormData {
-  id?: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  role: 'admin' | 'staff' | 'customer';
-  location_id: string;
-}
-
-interface Location {
-  id: string;
-  name: string;
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface StaffFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  formData: StaffFormData;
-  onFormDataChange: (data: StaffFormData) => void;
+  formData: {
+    id?: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    role: 'admin' | 'staff' | 'customer';
+    email: string;
+  };
+  onFormDataChange: (data: any) => void;
   onSubmit: (e: React.FormEvent) => void;
   isEditing: boolean;
-  locations: Location[];
+  locations: Array<{ id: string; name: string }> | null;
 }
 
 export const StaffFormDialog: React.FC<StaffFormDialogProps> = ({
@@ -44,96 +32,80 @@ export const StaffFormDialog: React.FC<StaffFormDialogProps> = ({
   isEditing,
   locations
 }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    onFormDataChange({ ...formData, [name]: value });
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Staff Member' : 'Add New Staff Member'}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Edit Staff Member' : 'Add New Staff Member'}
+          </DialogTitle>
         </DialogHeader>
-        
-        <form onSubmit={onSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="first_name">First Name</Label>
-                <Input
-                  id="first_name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="last_name">Last Name</Label>
-                <Input
-                  id="last_name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone</Label>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name">First Name</Label>
               <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
+                id="first_name"
+                value={formData.first_name}
+                onChange={(e) => onFormDataChange({ ...formData, first_name: e.target.value })}
+                required
               />
             </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="role">Role</Label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Last Name</Label>
+              <Input
+                id="last_name"
+                value={formData.last_name}
+                onChange={(e) => onFormDataChange({ ...formData, last_name: e.target.value })}
                 required
-              >
-                <option value="staff">Staff</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="location_id">Location</Label>
-              <select
-                id="location_id"
-                name="location_id"
-                value={formData.location_id}
-                onChange={handleInputChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                <option value="">Unassigned</option>
-                {locations?.map(location => (
-                  <option key={location.id} value={location.id}>
-                    {location.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
           
-          <DialogFooter>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => onFormDataChange({ ...formData, email: e.target.value })}
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => onFormDataChange({ ...formData, phone: e.target.value })}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <Select
+              value={formData.role}
+              onValueChange={(value) => onFormDataChange({ ...formData, role: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="staff">Staff</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit">
               {isEditing ? 'Update' : 'Create'}
             </Button>
-            </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

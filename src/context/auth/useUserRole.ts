@@ -10,7 +10,7 @@ export const useUserRole = () => {
     try {
       console.log('Fetching role for user:', userId);
       
-      // Query the user_roles table directly instead of using RPC
+      // Query the user_roles table directly
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
@@ -68,7 +68,7 @@ export const useUserRole = () => {
             first_name: '',
             last_name: '',
             email: '',
-            status: 'inactive'
+            status: 'active'
           }, {
             onConflict: 'id'
           });

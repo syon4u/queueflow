@@ -48,13 +48,6 @@ export type Database = {
             referencedRelation: "appointments"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "appointment_history_changed_by_fkey"
-            columns: ["changed_by"]
-            isOneToOne: false
-            referencedRelation: "staff"
-            referencedColumns: ["id"]
-          },
         ]
       }
       appointment_reminders: {
@@ -177,6 +170,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_appointments_customer"
             columns: ["customer_id"]
             isOneToOne: false
@@ -195,13 +195,6 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_appointments_staff"
-            columns: ["staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]
@@ -251,17 +244,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "break_requests_approved_by_fkey"
-            columns: ["approved_by"]
+            foreignKeyName: "break_requests_handover_staff_id_fkey"
+            columns: ["handover_staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "break_requests_handover_staff_id_fkey"
             columns: ["handover_staff_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -272,17 +265,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_break_requests_handover_staff"
-            columns: ["handover_staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_break_requests_staff"
+            foreignKeyName: "break_requests_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -369,17 +355,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "customer_communications_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_customer_communications_customer"
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_customer_communications_staff"
-            columns: ["staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]
@@ -427,17 +413,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "customer_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_customer_notes_customer"
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_customer_notes_staff"
-            columns: ["staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]
@@ -589,79 +575,53 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_performance_metrics_staff"
-            columns: ["staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "performance_metrics_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "performance_metrics_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
         Row: {
-          break_end_time: string | null
-          break_start_time: string | null
-          break_type: string | null
           created_at: string | null
           email: string | null
           first_name: string | null
-          handover_staff_id: string | null
           id: string
           last_name: string | null
-          location_id: string | null
           phone: string | null
-          return_time: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
-          break_end_time?: string | null
-          break_start_time?: string | null
-          break_type?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string | null
-          handover_staff_id?: string | null
           id: string
           last_name?: string | null
-          location_id?: string | null
           phone?: string | null
-          return_time?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
-          break_end_time?: string | null
-          break_start_time?: string | null
-          break_type?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string | null
-          handover_staff_id?: string | null
           id?: string
           last_name?: string | null
-          location_id?: string | null
           phone?: string | null
-          return_time?: string | null
           status?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_location_id_fkey"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       queue_positions: {
         Row: {
@@ -975,75 +935,6 @@ export type Database = {
           },
         ]
       }
-      staff: {
-        Row: {
-          break_end_time: string | null
-          break_start_time: string | null
-          break_type: string | null
-          created_at: string
-          email: string | null
-          first_name: string
-          handover_staff_id: string | null
-          id: string
-          last_name: string
-          location_id: string | null
-          phone: string | null
-          return_time: string | null
-          role: Database["public"]["Enums"]["user_role"]
-          status: string | null
-          updated_at: string
-        }
-        Insert: {
-          break_end_time?: string | null
-          break_start_time?: string | null
-          break_type?: string | null
-          created_at?: string
-          email?: string | null
-          first_name: string
-          handover_staff_id?: string | null
-          id: string
-          last_name: string
-          location_id?: string | null
-          phone?: string | null
-          return_time?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          status?: string | null
-          updated_at?: string
-        }
-        Update: {
-          break_end_time?: string | null
-          break_start_time?: string | null
-          break_type?: string | null
-          created_at?: string
-          email?: string | null
-          first_name?: string
-          handover_staff_id?: string | null
-          id?: string
-          last_name?: string
-          location_id?: string | null
-          phone?: string | null
-          return_time?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
-          status?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "staff_handover_staff_id_fkey"
-            columns: ["handover_staff_id"]
-            isOneToOne: false
-            referencedRelation: "staff"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "staff_location_id_fkey"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       staff_audit_log: {
         Row: {
           action: string
@@ -1086,6 +977,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "staff_audit_log_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       staff_notifications: {
@@ -1118,17 +1016,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_staff_notifications_staff"
+            foreignKeyName: "staff_notifications_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "staff"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "staff_notifications_staff_id_fkey"
             columns: ["staff_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1171,7 +1069,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          role: string
+          role?: string
           updated_at?: string | null
           user_id: string
         }
@@ -1222,7 +1120,20 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          last_name: string | null
+          phone: string | null
+          role: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_access_customer: {
@@ -1241,12 +1152,8 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      get_staff_location_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
       get_user_role: {
-        Args: Record<PropertyKey, never> | { user_id: string }
+        Args: { user_id: string }
         Returns: string
       }
       get_users_with_roles: {
