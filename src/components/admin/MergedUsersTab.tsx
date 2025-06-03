@@ -62,7 +62,7 @@ export const MergedUsersTab: React.FC = () => {
   const staffStats = {
     total: staffMembers?.length || 0,
     active: staffMembers?.filter(s => s.status === 'active').length || 0,
-    locations: new Set(staffMembers?.map(s => s.location_id)).size || 0
+    locations: locations?.length || 0 // Use actual locations count instead of trying to access location_id
   };
 
   const userStats = {
