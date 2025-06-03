@@ -62,21 +62,21 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       items: [
         {
           id: 'queue',
-          label: 'Queue Configuration',
+          label: 'Queue Control',
           icon: UsersRound,
           description: 'Manage active queues'
         },
         {
           id: 'locations',
-          label: 'Location Management',
+          label: 'Locations',
           icon: Building2,
-          description: 'Service centers and facilities'
+          description: 'Service centers'
         },
         {
           id: 'services',
-          label: 'Services & Appointments',
+          label: 'Services',
           icon: FileText,
-          description: 'Available services configuration'
+          description: 'Available services'
         }
       ]
     },
@@ -85,32 +85,32 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       items: [
         {
           id: 'users',
-          label: 'Staff Management',
+          label: 'Staff & Users',
           icon: Users,
-          description: 'Staff accounts and permissions'
+          description: 'Staff and user management'
         },
         {
           id: 'customers',
-          label: 'Customer Management',
+          label: 'Customers',
           icon: Contact,
-          description: 'Customer profiles and history'
+          description: 'Customer profiles'
         }
       ]
     },
     {
-      label: 'Communication & Reports',
+      label: 'Analytics & Communication',
       items: [
         {
-          id: 'templates',
-          label: 'Notifications & Templates',
-          icon: MessageSquare,
-          description: 'Message templates and settings'
+          id: 'stats',
+          label: 'Reports',
+          icon: BarChart3,
+          description: 'Performance analytics'
         },
         {
-          id: 'stats',
-          label: 'Reports & Analytics',
-          icon: BarChart3,
-          description: 'Performance insights and reports'
+          id: 'templates',
+          label: 'Templates',
+          icon: MessageSquare,
+          description: 'Message templates'
         }
       ]
     },
@@ -119,15 +119,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       items: [
         {
           id: 'security',
-          label: 'Security & Monitoring',
+          label: 'Security',
           icon: Shield,
-          description: 'System security metrics'
+          description: 'Security monitoring'
         },
         {
           id: 'settings',
-          label: 'System Settings',
+          label: 'Settings',
           icon: Settings,
-          description: 'Global configuration'
+          description: 'System configuration'
         }
       ]
     }
@@ -144,18 +144,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   return (
-    <Sidebar className="border-r bg-white w-72">
-      <SidebarHeader className="p-6 border-b bg-gradient-to-r from-bc-blue to-bc-teal">
+    <Sidebar className="border-r bg-white">
+      <SidebarHeader className="p-4 border-b bg-gradient-to-r from-bc-blue to-bc-teal">
         <div className="text-white">
-          <h2 className="text-lg font-semibold mb-1">Admin Control Center</h2>
-          <p className="text-sm text-blue-100">Broward QueuePro Management</p>
+          <h2 className="text-lg font-semibold mb-1">Admin Portal</h2>
+          <p className="text-sm text-blue-100">Broward QueuePro</p>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-4">
+      <SidebarContent className="p-2">
         {navigationGroups.map((group, groupIndex) => (
-          <SidebarGroup key={groupIndex} className="mb-6">
-            <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+          <SidebarGroup key={groupIndex} className="mb-4">
+            <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
               {group.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -166,23 +166,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       onClick={() => onTabChange(item.id)}
                       isActive={activeTab === item.id}
                       className={`
-                        w-full justify-start p-3 rounded-lg transition-all duration-200
+                        w-full justify-start p-3 rounded-lg transition-all duration-200 group
                         ${activeTab === item.id 
-                          ? 'bg-bc-blue text-white shadow-md' 
-                          : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                          ? 'bg-bc-blue text-white shadow-sm' 
+                          : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900'
                         }
                       `}
                     >
-                      <item.icon className={`h-5 w-5 mr-3 ${
-                        activeTab === item.id ? 'text-white' : 'text-gray-500'
+                      <item.icon className={`h-4 w-4 mr-3 flex-shrink-0 ${
+                        activeTab === item.id ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'
                       }`} />
-                      <div className="flex-1 text-left">
-                        <div className={`font-medium text-sm ${
+                      <div className="flex-1 text-left min-w-0">
+                        <div className={`font-medium text-sm truncate ${
                           activeTab === item.id ? 'text-white' : 'text-gray-900'
                         }`}>
                           {item.label}
                         </div>
-                        <div className={`text-xs mt-0.5 ${
+                        <div className={`text-xs mt-0.5 truncate ${
                           activeTab === item.id ? 'text-blue-100' : 'text-gray-500'
                         }`}>
                           {item.description}
@@ -196,31 +196,31 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </SidebarGroup>
         ))}
 
-        <SidebarGroup className="mt-8">
-          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        <SidebarGroup className="mt-6">
+          <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
             Quick Actions
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2">
+            <SidebarMenu className="space-y-1">
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link 
                     to="/staff" 
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
                   >
-                    <Activity className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-gray-700">Staff Portal</span>
+                    <Activity className="h-4 w-4 text-green-600 flex-shrink-0" />
+                    <span className="text-sm">Staff Portal</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link 
-                    to="/admin/health" 
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    to="/performance"
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
                   >
-                    <BarChart3 className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-gray-700">System Health</span>
+                    <BarChart3 className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                    <span className="text-sm">Performance</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -230,15 +230,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t bg-gray-50">
-        <div className="flex items-center gap-3 mb-3 p-3 bg-white rounded-lg border">
-          <div className="h-8 w-8 rounded-full bg-bc-blue flex items-center justify-center text-white text-sm font-semibold">
+        <div className="flex items-center gap-3 mb-3 p-3 bg-white rounded-lg border shadow-sm">
+          <div className="h-8 w-8 rounded-full bg-bc-blue flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
             {getInitials(user?.email || '')}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
             <p className="text-xs text-gray-500">Administrator</p>
           </div>
-          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 border-green-200">
             Online
           </Badge>
         </div>
@@ -246,7 +246,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
         >
           <LogOut className="h-4 w-4 mr-2" />
           {t('auth.logout')}
