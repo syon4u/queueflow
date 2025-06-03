@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { UserRole } from '@/types/auth';
 
 export const useUserRole = () => {
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   const fetchUserRole = async (userId: string) => {
     try {
@@ -19,7 +20,8 @@ export const useUserRole = () => {
       // If user has an explicit role in user_roles, use it (this takes priority)
       if (userRoleData && !userRoleError) {
         console.log('Role found in user_roles table:', userRoleData.role);
-        setRole(userRoleData.role);
+        const validRole = userRoleData.role as UserRole;
+        setRole(validRole);
         return; // Exit early with the explicit role
       }
 
@@ -39,14 +41,16 @@ export const useUserRole = () => {
         // (admins/staff should retain access even if status is not active)
         if (staffData.role === 'admin' || staffData.role === 'staff') {
           console.log('Staff/Admin role from staff table:', staffData.role);
-          setRole(staffData.role);
+          const validRole = staffData.role as UserRole;
+          setRole(validRole);
           return;
         }
         
         // Only check status for non-admin/non-staff roles
         if (staffData.status === 'active') {
           console.log('Active staff member, using role:', staffData.role);
-          setRole(staffData.role || 'staff');
+          const validRole = (staffData.role || 'staff') as UserRole;
+          setRole(validRole);
           return;
         }
       }
