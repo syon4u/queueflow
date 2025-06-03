@@ -79,7 +79,7 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
           ) : (
-            <quickActions[0].icon className="h-4 w-4 mr-2" />
+            React.createElement(quickActions[0].icon, { className: "h-4 w-4 mr-2" })
           )}
           {isLoading ? 'Loading...' : quickActions[0].label}
         </Button>
