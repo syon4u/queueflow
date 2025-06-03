@@ -84,18 +84,20 @@ const AdminPage = () => {
         
         <SidebarInset className="flex-1">
           <div className="flex flex-col min-h-screen">
-            {/* Header */}
-            <div className="bg-white border-b p-6">
-              <AdminDashboardHeader
-                systemStatus={stats.systemStatus}
-                totalUsers={stats.totalUsers}
-                activeStaff={stats.activeStaff}
-                todayAppointments={stats.todayAppointments}
-                onRefresh={handleRefresh}
-                onNotificationClick={handleNotificationClick}
-                onSettingsClick={handleSettingsClick}
-              />
-            </div>
+            {/* Header - Only show on dashboard tab */}
+            {activeTab === 'dashboard' && (
+              <div className="bg-white border-b p-6">
+                <AdminDashboardHeader
+                  systemStatus={stats.systemStatus}
+                  totalUsers={stats.totalUsers}
+                  activeStaff={stats.activeStaff}
+                  todayAppointments={stats.todayAppointments}
+                  onRefresh={handleRefresh}
+                  onNotificationClick={handleNotificationClick}
+                  onSettingsClick={handleSettingsClick}
+                />
+              </div>
+            )}
             
             {/* Main Content */}
             <main className="flex-1 p-6">
