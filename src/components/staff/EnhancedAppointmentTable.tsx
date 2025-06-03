@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw, Download, Calendar } from 'lucide-react';
+import { Plus, RefreshCw, Download, Calendar, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useFilteredAppointments } from '@/hooks/use-filtered-appointments';
@@ -29,6 +29,7 @@ const EnhancedAppointmentTable: React.FC = () => {
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
   const { isLoading, updateAppointmentStatus } = useAppointmentActions(refreshAppointments);
   
   const handleOpenReminderDialog = (appointment: Appointment) => {
@@ -59,124 +60,145 @@ const EnhancedAppointmentTable: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <div className="space-y-6">
-        {/* Header with Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{statusCounts.scheduled}</div>
-                <div className="text-sm text-muted-foreground">Scheduled</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-amber-600">{statusCounts.checked_in}</div>
-                <div className="text-sm text-muted-foreground">Checked In</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{statusCounts.in_progress}</div>
-                <div className="text-sm text-muted-foreground">In Progress</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">{statusCounts.completed}</div>
-                <div className="text-sm text-muted-foreground">Completed</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{statusCounts.cancelled}</div>
-                <div className="text-sm text-muted-foreground">Cancelled</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{statusCounts.no_show}</div>
-                <div className="text-sm text-muted-foreground">No Show</div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
+        {/* Page Header */}
+        <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Appointment Management</h1>
+              <p className="text-gray-600">
+                Manage and track all appointments across your locations
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                onClick={() => setShowFilters(!showFilters)} 
+                variant="outline" 
+                size="sm"
+                className="bg-white"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+              <Button onClick={refreshAppointments} variant="outline" size="sm" className="bg-white">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
+              <Button variant="outline" size="sm" className="bg-white">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+              <Button onClick={() => setCreateDialogOpen(true)} size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="mr-2 h-4 w-4" />
+                New Appointment
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Filters */}
-        <AppointmentFilters onFiltersChange={handleFiltersChange} />
+        {/* Status Overview Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { label: 'Scheduled', count: statusCounts.scheduled, color: 'blue', bgColor: 'bg-blue-50', textColor: 'text-blue-700', borderColor: 'border-blue-200' },
+            { label: 'Checked In', count: statusCounts.checked_in, color: 'amber', bgColor: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200' },
+            { label: 'In Progress', count: statusCounts.in_progress, color: 'green', bgColor: 'bg-green-50', textColor: 'text-green-700', borderColor: 'border-green-200' },
+            { label: 'Completed', count: statusCounts.completed, color: 'gray', bgColor: 'bg-gray-50', textColor: 'text-gray-700', borderColor: 'border-gray-200' },
+            { label: 'Cancelled', count: statusCounts.cancelled, color: 'red', bgColor: 'bg-red-50', textColor: 'text-red-700', borderColor: 'border-red-200' },
+            { label: 'No Show', count: statusCounts.no_show, color: 'purple', bgColor: 'bg-purple-50', textColor: 'text-purple-700', borderColor: 'border-purple-200' },
+          ].map((status) => (
+            <Card key={status.label} className={`${status.bgColor} ${status.borderColor} border-2 hover:shadow-md transition-shadow`}>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className={`text-3xl font-bold ${status.textColor} mb-1`}>{status.count}</div>
+                  <div className="text-sm font-medium text-gray-600">{status.label}</div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Filters Section */}
+        {showFilters && (
+          <div className="animate-fade-in">
+            <AppointmentFilters onFiltersChange={handleFiltersChange} />
+          </div>
+        )}
 
         {/* Main Appointments Table */}
-        <Card>
-          <CardHeader>
+        <Card className="shadow-sm border-0 bg-white rounded-xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 p-6">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                <CardTitle>
-                  Appointments ({appointments.length})
-                </CardTitle>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900">
+                    Appointments ({appointments.length})
+                  </CardTitle>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {allAppointments.length > appointments.length 
+                      ? `Showing ${appointments.length} of ${allAppointments.length} total appointments`
+                      : 'All appointments displayed'
+                    }
+                  </p>
+                </div>
                 {appointmentsLoading && (
-                  <Badge variant="outline" className="animate-pulse">
-                    Loading...
+                  <Badge variant="outline" className="animate-pulse bg-blue-50 text-blue-600 border-blue-200">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                      Loading...
+                    </div>
                   </Badge>
                 )}
               </div>
-              <div className="flex gap-2">
-                <Button onClick={refreshAppointments} variant="outline" size="sm">
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Refresh
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-                <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Appointment
-                </Button>
-              </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {appointmentsLoading ? (
-              <div className="flex justify-center p-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" />
+              <div className="flex flex-col items-center justify-center p-12">
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 absolute top-0 left-0"></div>
+                </div>
+                <p className="text-gray-500 mt-4 font-medium">Loading appointments...</p>
               </div>
             ) : appointments.length === 0 ? (
-              <div className="text-center p-8 text-muted-foreground">
-                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">No appointments found</p>
-                <p className="text-sm mt-2">
-                  {allAppointments.length > 0 
-                    ? "Try adjusting your filters to see more results"
-                    : "Create your first appointment to get started"
-                  }
-                </p>
+              <div className="text-center p-12 bg-gray-50">
+                <div className="max-w-md mx-auto">
+                  <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <Calendar className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No appointments found</h3>
+                  <p className="text-gray-500 mb-6">
+                    {allAppointments.length > 0 
+                      ? "Try adjusting your filters to see more results"
+                      : "Create your first appointment to get started"
+                    }
+                  </p>
+                  <Button onClick={() => setCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Appointment
+                  </Button>
+                </div>
               </div>
             ) : (
-              <Table>
-                <AppointmentTableHeader />
-                <TableBody>
-                  {appointments.map((appointment) => (
-                    <AppointmentTableRow
-                      key={appointment.id}
-                      appointment={appointment}
-                      isLoading={isLoading[appointment.id]}
-                      onUpdateStatus={updateAppointmentStatus}
-                      onOpenReminderDialog={handleOpenReminderDialog}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="overflow-hidden">
+                <Table>
+                  <AppointmentTableHeader />
+                  <TableBody>
+                    {appointments.map((appointment, index) => (
+                      <AppointmentTableRow
+                        key={appointment.id}
+                        appointment={appointment}
+                        isLoading={isLoading[appointment.id]}
+                        onUpdateStatus={updateAppointmentStatus}
+                        onOpenReminderDialog={handleOpenReminderDialog}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
