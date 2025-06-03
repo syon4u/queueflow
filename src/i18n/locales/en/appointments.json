@@ -7,6 +7,10 @@
   "upcomingAppointments": "Upcoming Appointments",
   "pastAppointments": "Past Appointments",
   "noAppointments": "No appointments found",
+  "scheduledTime": "Scheduled Time",
+  "status": "Status",
+  "service": "Service",
+  "customer": "Customer",
   "status": {
     "scheduled": "Scheduled",
     "checked_in": "Checked In",
