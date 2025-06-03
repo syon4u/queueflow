@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { sessionManager } from '@/services/session-manager';
 import { useAuth } from './AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface SessionData {
   id: string;
@@ -38,6 +38,7 @@ export const useSession = (): SessionContextType => {
 
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, session } = useAuth();
+  const navigate = useNavigate();
   const [activeSessions, setActiveSessions] = useState<SessionData[]>([]);
   const [isSessionValid, setIsSessionValid] = useState(true);
   const [timeUntilExpiry, setTimeUntilExpiry] = useState<number | null>(null);
@@ -61,13 +62,16 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       if (valid) {
         updateTimeUntilExpiry();
+      } else {
+        // Redirect to login when session expires
+        navigate('/auth');
       }
     }, 30000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [user]);
+  }, [user, navigate]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -89,6 +93,10 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
           variant: 'destructive'
         });
         await sessionManager.invalidateCurrentSession();
+        // Redirect to login page
+        setTimeout(() => {
+          navigate('/auth');
+        }, 1000);
         return false;
       }
       

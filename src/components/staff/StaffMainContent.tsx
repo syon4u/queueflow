@@ -14,6 +14,8 @@ import EnhancedAppointmentTable from '@/components/staff/EnhancedAppointmentTabl
 import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import { AdvancedStaffTab } from '@/components/staff/AdvancedStaffTab';
 import { StaffDashboardHeader } from '@/components/staff/StaffDashboardHeader';
+import { StaffDashboardSkeleton } from '@/components/staff/StaffDashboardSkeleton';
+import { StaffStatusSkeleton } from '@/components/staff/StaffStatusSkeleton';
 import StaffStatusSection from '@/components/staff/StaffStatusSection';
 
 interface StaffMainContentProps {
@@ -37,7 +39,7 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
   const { queueStatus } = useQueue();
 
   // Get staff status from database
-  const { data: staffData } = useQuery({
+  const { data: staffData, isLoading: isStaffLoading } = useQuery({
     queryKey: ['staff-status', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -94,6 +96,25 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
         return null;
     }
   };
+
+  // Show skeleton loading for staff dashboard when staff data is loading
+  if (activeSection === 'basic-queue' && isStaffLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <div className="bg-white border-b p-6">
+          <StaffDashboardSkeleton />
+        </div>
+        <div className="bg-white border-b px-6 py-4">
+          <StaffStatusSkeleton />
+        </div>
+        <main className="flex-1 p-6">
+          <div className="max-w-7xl mx-auto">
+            {renderMainContent()}
+          </div>
+        </main>
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col min-h-screen">
