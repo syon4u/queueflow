@@ -41,11 +41,6 @@ export const useUserManagement = () => {
         
         if (error) {
           console.error('Error fetching users:', error);
-          // If we get a permission error, show a more user-friendly message
-          if (error.message?.includes('Access denied') || error.message?.includes('infinite recursion')) {
-            console.log('Permission error detected, returning empty array...');
-            throw new Error('Admin permissions required to view user management');
-          }
           throw error;
         }
         
@@ -59,7 +54,7 @@ export const useUserManagement = () => {
     refetchInterval: 30000, // Refresh every 30 seconds
     retry: (failureCount, error) => {
       // Don't retry permission errors
-      if (error?.message?.includes('Access denied') || error?.message?.includes('infinite recursion')) {
+      if (error?.message?.includes('Access denied')) {
         return false;
       }
       return failureCount < 3;

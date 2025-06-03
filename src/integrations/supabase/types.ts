@@ -1177,6 +1177,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_staff_location_id: {
         Args: Record<PropertyKey, never>
         Returns: string
