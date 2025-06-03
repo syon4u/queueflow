@@ -25,17 +25,18 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
     if (!user) return;
     
     try {
-      // We need to use any type here until Supabase types are updated
+      // Use profiles table instead of staff table
       const { data, error } = await supabase
-        .from('staff')
-        .select('status, return_time')
+        .from('profiles')
+        .select('status')
         .eq('id', user.id)
-        .single() as any;
+        .single();
       
       if (error) throw error;
       
       setCurrentStatus(data?.status || 'inactive');
-      setReturnTime(data?.return_time || null);
+      // Note: return_time is no longer stored in profiles, would need separate table for breaks
+      setReturnTime(null);
     } catch (error) {
       console.error('Error fetching staff status:', error);
       toast({
@@ -54,14 +55,13 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
     if (!user) return;
     
     try {
-      // Using any type until Supabase types are updated
+      // Update profiles table instead of staff table
       const { error } = await supabase
-        .from('staff')
+        .from('profiles')
         .update({ 
-          status: newStatus, 
-          return_time: null, 
-          handover_staff_id: null 
-        } as any)
+          status: newStatus,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user.id);
       
       if (error) throw error;

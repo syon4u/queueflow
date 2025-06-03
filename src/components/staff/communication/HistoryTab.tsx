@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -49,13 +48,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
       if (error) throw error;
 
-      // Fetch staff details for each communication
+      // Fetch staff details for each communication using profiles table
       const historyWithStaff: CommunicationHistory[] = [];
       for (const comm of data || []) {
         let staff = null;
         if (comm.staff_id) {
           const { data: staffData } = await supabase
-            .from('staff')
+            .from('profiles')
             .select('first_name, last_name')
             .eq('id', comm.staff_id)
             .single();

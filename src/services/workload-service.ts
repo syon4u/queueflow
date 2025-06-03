@@ -4,18 +4,11 @@ import { WorkloadDistribution } from '@/types/workload-distribution';
 import { mapStatusToUnionType } from '@/utils/status-mapping';
 
 export const fetchWorkloadData = async (): Promise<WorkloadDistribution[]> => {
-  // Get all staff members and their current workload
+  // Get all staff members and their current workload using user_profiles view
   const { data: profiles, error: profileError } = await supabase
-    .from('profiles')
-    .select(`
-      id, 
-      first_name, 
-      last_name, 
-      status, 
-      location_id,
-      user_roles!inner(role)
-    `)
-    .in('user_roles.role', ['staff', 'admin']);
+    .from('user_profiles')
+    .select('*')
+    .in('role', ['staff', 'admin']);
 
   if (profileError) throw profileError;
 

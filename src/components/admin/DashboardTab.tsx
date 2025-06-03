@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,13 +10,14 @@ import { supabase } from '@/integrations/supabase/client';
 export const DashboardTab: React.FC = () => {
   const navigate = useNavigate();
   
-  // Fetch real stats data
+  // Fetch real stats data - Updated to use profiles instead of staff
   const { data: staffCount = 0 } = useQuery({
     queryKey: ['dashboard-staff-count'],
     queryFn: async () => {
       const { count, error } = await supabase
-        .from('staff')
-        .select('*', { count: 'exact', head: true });
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true })
+        .in('role', ['staff', 'admin']);
       if (error) throw error;
       return count || 0;
     }

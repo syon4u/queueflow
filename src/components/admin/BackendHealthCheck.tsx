@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,11 +58,11 @@ const BackendHealthCheck: React.FC = () => {
       updateResult('Authentication', 'error', `Auth check failed: ${error.message}`);
     }
 
-    // 3. Test Tables Access - Individual calls to satisfy TypeScript
+    // 3. Test Tables Access - Updated to use new table structure
     const tableChecks = [
       { name: 'locations', table: 'locations' as const },
       { name: 'services', table: 'services' as const },
-      { name: 'staff', table: 'staff' as const },
+      { name: 'profiles', table: 'profiles' as const },
       { name: 'customers', table: 'customers' as const },
       { name: 'appointments', table: 'appointments' as const },
       { name: 'user_roles', table: 'user_roles' as const }
@@ -97,7 +96,7 @@ const BackendHealthCheck: React.FC = () => {
     // 5. Test Database Functions
     updateResult('Database Functions', 'loading', 'Testing stored procedures...');
     try {
-      const { data, error } = await supabase.rpc('get_user_role');
+      const { data, error } = await supabase.rpc('get_current_user_role');
       if (error) throw error;
       updateResult('Database Functions', 'success', `User role function works: ${data}`);
     } catch (error: any) {
@@ -120,17 +119,17 @@ const BackendHealthCheck: React.FC = () => {
       updateResult('RLS Policies', 'error', `RLS test failed: ${error.message}`);
     }
 
-    // 7. Test Data Integrity
+    // 7. Test Data Integrity - Updated to check new structure
     updateResult('Data Integrity', 'loading', 'Checking data consistency...');
     try {
       const { data: locations } = await supabase.from('locations').select('id, name');
       const { data: services } = await supabase.from('services').select('id, location_id');
-      const { data: staff } = await supabase.from('staff').select('id, location_id');
+      const { data: profiles } = await supabase.from('profiles').select('id');
       
       let issues = [];
       if (locations?.length === 0) issues.push('No locations found');
       if (services?.length === 0) issues.push('No services found');
-      if (staff?.length === 0) issues.push('No staff found');
+      if (profiles?.length === 0) issues.push('No user profiles found');
       
       if (issues.length > 0) {
         updateResult('Data Integrity', 'warning', `Issues found: ${issues.join(', ')}`);
