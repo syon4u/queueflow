@@ -1,128 +1,149 @@
+
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
 import { DashboardTab } from './DashboardTab';
-import { QueueManagementTab } from './QueueManagementTab';
-import { StaffTab } from './StaffTab';
-import CustomerManagementTab from './CustomerManagementTab';
+import { StatsTab } from './StatsTab';
+import { UserManagementTab } from './UserManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
-import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
-import { UserManagementTab } from './UserManagementTab';
+import { StaffTab } from './StaffTab';
 import { EmployeeTab } from './EmployeeTab';
-import { MergedUsersTab } from './MergedUsersTab';
-import { QueueFlow2Tab } from './QueueFlow2Tab';
-import { StatsTab } from './StatsTab';
-import SecurityMetricsTab from './SecurityMetricsTab';
-import SystemSettingsTab from './SystemSettingsTab';
+import { CustomerManagementTab } from './CustomerManagementTab';
+import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
+import { QueueManagementTab } from './QueueManagementTab';
+import { SystemSettingsTab } from './SystemSettingsTab';
+import { SecurityMetricsTab } from './SecurityMetricsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
+import { MergedUsersTab } from './MergedUsersTab';
+import { AdvancedAnalyticsTab } from './AdvancedAnalyticsTab';
 import { CapacityManagementTab } from './CapacityManagementTab';
-import {
-  BarChart3,
-  Users,
-  UserCheck,
-  UserPlus,
-  MapPin,
-  Settings,
-  MessageSquare,
-  Shield,
-  Briefcase,
-  UserX,
-  Zap,
-  MessageCircle,
-  TrendingUp,
-  Gauge
-} from 'lucide-react';
+import { CapacityThrottlingTab } from './CapacityThrottlingTab';
+import { QueueFlow2Tab } from './QueueFlow2Tab';
+import { AdminDashboardHeader } from './AdminDashboardHeader';
+import { AdminTopNavigation } from './AdminTopNavigation';
+import { BackendHealthCheck } from './BackendHealthCheck';
 
-const AdminPage: React.FC = () => {
+export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const tabItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'queue-management', label: 'Queue Management', icon: Users },
-    { id: 'capacity-management', label: 'Capacity Management', icon: Gauge },
-    { id: 'staff', label: 'Staff Management', icon: UserCheck },
-    { id: 'customers', label: 'Customer Management', icon: UserPlus },
-    { id: 'locations', label: 'Locations', icon: MapPin },
-    { id: 'services', label: 'Services', icon: Settings },
-    { id: 'templates', label: 'Communication Templates', icon: MessageSquare },
-    { id: 'users', label: 'User Management', icon: Shield },
-    { id: 'employees', label: 'Employee Management', icon: Briefcase },
-    { id: 'merged-users', label: 'Merged Users', icon: UserX },
-    { id: 'queueflow2', label: 'QueueFlow 2.0', icon: Zap },
-    { id: 'sms-commands', label: 'SMS Commands', icon: MessageCircle },
-    { id: 'stats', label: 'Statistics', icon: TrendingUp },
-    { id: 'security', label: 'Security Metrics', icon: Shield },
-    { id: 'system-settings', label: 'System Settings', icon: Settings }
-  ];
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardTab />;
-      case 'queue-management':
-        return <QueueManagementTab />;
-      case 'capacity-management':
-        return <CapacityManagementTab />;
-      case 'staff':
-        return <StaffTab />;
-      case 'customers':
-        return <CustomerManagementTab />;
-      case 'locations':
-        return <LocationsTab />;
-      case 'services':
-        return <ServicesTab />;
-      case 'templates':
-        return <CommunicationTemplatesTab />;
-      case 'users':
-        return <UserManagementTab />;
-      case 'employees':
-        return <EmployeeTab />;
-      case 'merged-users':
-        return <MergedUsersTab />;
-      case 'queueflow2':
-        return <QueueFlow2Tab />;
-      case 'sms-commands':
-        return <SMSCommandsTab />;
-      case 'stats':
-        return <StatsTab />;
-      case 'security':
-        return <SecurityMetricsTab />;
-      case 'system-settings':
-        return <SystemSettingsTab />;
-      default:
-        return <DashboardTab />;
+  // Get current user's role to verify admin access
+  const { data: userRole, isLoading } = useQuery({
+    queryKey: ['user-role'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+      
+      const { data: role } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+      
+      return role?.role || 'customer';
     }
-  };
+  });
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (userRole !== 'admin') {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p>You need admin privileges to access this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Admin Panel
-          </h1>
-        </div>
-        <div className="px-6 overflow-x-auto">
-          {tabItems.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="p-6">
-        {renderTabContent()}
-      </div>
+      <AdminDashboardHeader />
+      <AdminTopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsContent value="dashboard">
+            <DashboardTab />
+          </TabsContent>
+          
+          <TabsContent value="stats">
+            <StatsTab />
+          </TabsContent>
+          
+          <TabsContent value="users">
+            <UserManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="locations">
+            <LocationsTab />
+          </TabsContent>
+          
+          <TabsContent value="services">
+            <ServicesTab />
+          </TabsContent>
+          
+          <TabsContent value="staff">
+            <StaffTab />
+          </TabsContent>
+          
+          <TabsContent value="employees">
+            <EmployeeTab />
+          </TabsContent>
+          
+          <TabsContent value="customers">
+            <CustomerManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="communication">
+            <CommunicationTemplatesTab />
+          </TabsContent>
+          
+          <TabsContent value="queue">
+            <QueueManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="settings">
+            <SystemSettingsTab />
+          </TabsContent>
+          
+          <TabsContent value="security">
+            <SecurityMetricsTab />
+          </TabsContent>
+          
+          <TabsContent value="sms-commands">
+            <SMSCommandsTab />
+          </TabsContent>
+          
+          <TabsContent value="merged-users">
+            <MergedUsersTab />
+          </TabsContent>
+          
+          <TabsContent value="advanced-analytics">
+            <AdvancedAnalyticsTab />
+          </TabsContent>
+          
+          <TabsContent value="capacity-management">
+            <CapacityManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="capacity-throttling">
+            <CapacityThrottlingTab />
+          </TabsContent>
+          
+          <TabsContent value="queue-flow-2">
+            <QueueFlow2Tab />
+          </TabsContent>
+          
+          <TabsContent value="backend-health">
+            <BackendHealthCheck />
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };
-
-export default AdminPage;

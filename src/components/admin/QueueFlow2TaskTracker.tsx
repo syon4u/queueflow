@@ -1,300 +1,202 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/components/ui/progress';
-import { CheckCircle, Circle, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle, Circle, Clock, AlertTriangle } from 'lucide-react';
 
 interface Task {
   id: string;
-  title: string;
-  description: string;
+  name: string;
+  status: 'completed' | 'in-progress' | 'not-started';
   priority: 'P0' | 'P1' | 'P2';
-  phase: 'Phase 1' | 'Phase 2' | 'Phase 3';
-  estimatedHours: number;
-  status: 'not-started' | 'in-progress' | 'completed';
+  description: string;
   dependencies?: string[];
 }
 
-const queueFlow2Tasks: Task[] = [
-  // Phase 1 - Critical (P0)
-  {
-    id: 'virtual-queue',
-    title: 'Virtual Queue & PWA',
-    description: 'Implement Progressive Web App with virtual queue functionality',
-    priority: 'P0',
-    phase: 'Phase 1',
-    estimatedHours: 16,
-    status: 'completed'
-  },
-  {
-    id: 'qr-codes',
-    title: 'QR Code Generation & Scanning',
-    description: 'Generate QR codes for tickets and implement scanning functionality',
-    priority: 'P0',
-    phase: 'Phase 1',
-    estimatedHours: 8,
-    status: 'completed'
-  },
-  {
-    id: 'two-way-sms',
-    title: 'Two-Way SMS Commands',
-    description: 'Parse SMS commands: R (status), LATE X (delay), CANCEL',
-    priority: 'P0',
-    phase: 'Phase 1',
-    estimatedHours: 12,
-    status: 'not-started'
-  },
-  {
-    id: 'capacity-engine',
-    title: 'Capacity Throttling Engine',
-    description: 'Implement capacity rules per service×location×date with auto-throttling',
-    priority: 'P0',
-    phase: 'Phase 1',
-    estimatedHours: 16,
-    status: 'not-started'
-  },
-  {
-    id: 'digital-signage',
-    title: 'Digital Signage Feed',
-    description: 'WebSocket feed for "Now Serving" displays',
-    priority: 'P0',
-    phase: 'Phase 1',
-    estimatedHours: 8,
-    status: 'not-started'
-  },
-  // Phase 2 - Medium Priority (P1)
-  {
-    id: 'ai-predictions',
-    title: 'AI Wait-Time Prediction',
-    description: 'Simple ML model for wait time and staffing predictions',
-    priority: 'P1',
-    phase: 'Phase 2',
-    estimatedHours: 20,
-    status: 'not-started',
-    dependencies: ['capacity-engine']
-  },
-  {
-    id: 'csat-surveys',
-    title: 'CSAT/NPS Survey System',
-    description: 'Post-visit customer satisfaction surveys',
-    priority: 'P1',
-    phase: 'Phase 2',
-    estimatedHours: 12,
-    status: 'not-started'
-  },
-  {
-    id: 'kiosk-interface',
-    title: 'Walk-in Kiosk Interface',
-    description: 'Self-service kiosk for walk-in customers',
-    priority: 'P1',
-    phase: 'Phase 2',
-    estimatedHours: 16,
-    status: 'not-started'
-  },
-  {
-    id: 'enhanced-rbac',
-    title: 'Enhanced RBAC',
-    description: 'Implement Power User role with granular permissions',
-    priority: 'P1',
-    phase: 'Phase 2',
-    estimatedHours: 8,
-    status: 'not-started'
-  },
-  // Phase 3 - Enhancements (P2)
-  {
-    id: 'advanced-analytics',
-    title: 'Advanced Analytics & BI',
-    description: 'Real-time widgets, BI integration, scheduled reports',
-    priority: 'P2',
-    phase: 'Phase 3',
-    estimatedHours: 24,
-    status: 'not-started',
-    dependencies: ['ai-predictions']
-  },
-  {
-    id: 'openapi-spec',
-    title: 'OpenAPI Specification',
-    description: 'Publish OpenAPI 3.1 spec with webhooks',
-    priority: 'P2',
-    phase: 'Phase 3',
-    estimatedHours: 8,
-    status: 'not-started'
-  },
-  {
-    id: 'performance-monitoring',
-    title: 'Performance Monitoring',
-    description: 'SLA monitoring, performance dashboards',
-    priority: 'P2',
-    phase: 'Phase 3',
-    estimatedHours: 12,
-    status: 'not-started'
-  },
-  {
-    id: 'wcag-compliance',
-    title: 'WCAG 2.2 AA Compliance',
-    description: 'Full accessibility compliance audit and fixes',
-    priority: 'P2',
-    phase: 'Phase 3',
-    estimatedHours: 16,
-    status: 'not-started'
-  }
-];
+const QueueFlow2TaskTracker: React.FC = () => {
+  const tasks: Task[] = [
+    {
+      id: 'advanced-analytics',
+      name: 'Advanced Analytics Dashboard',
+      status: 'completed',
+      priority: 'P0',
+      description: 'Comprehensive analytics with predictive insights, customer satisfaction tracking, and operational metrics'
+    },
+    {
+      id: 'capacity-management',
+      name: 'Capacity Management System',
+      status: 'completed',
+      priority: 'P0',
+      description: 'Real-time capacity monitoring, overflow handling, and emergency overrides'
+    },
+    {
+      id: 'workload-distribution',
+      name: 'Smart Workload Distribution',
+      status: 'completed',
+      priority: 'P0',
+      description: 'Intelligent routing based on staff availability, specialties, and current workload'
+    },
+    {
+      id: 'break-management',
+      name: 'Smart Break Management',
+      status: 'completed',
+      priority: 'P1',
+      description: 'Automated break scheduling with coverage recommendations and handover protocols'
+    },
+    {
+      id: 'customer-communication',
+      name: 'Enhanced Customer Communication',
+      status: 'completed',
+      priority: 'P1',
+      description: 'Multi-channel communication system with templates and automated workflows'
+    },
+    {
+      id: 'sms-commands',
+      name: 'Two-Way SMS Commands',
+      status: 'completed',
+      priority: 'P0',
+      description: 'SMS webhook integration with customer commands (RESCHEDULE, LATE, CANCEL)'
+    },
+    {
+      id: 'capacity-throttling',
+      name: 'Capacity Throttling Engine',
+      status: 'in-progress',
+      priority: 'P0',
+      description: 'Enhanced capacity rules, auto-throttling, waitlist integration, and dynamic adjustments',
+      dependencies: ['capacity-management']
+    },
+    {
+      id: 'notification-system',
+      name: 'Smart Notification System',
+      status: 'not-started',
+      priority: 'P0',
+      description: 'Intelligent notification timing, escalation, and multi-channel delivery',
+      dependencies: ['customer-communication']
+    },
+    {
+      id: 'predictive-scheduling',
+      name: 'Predictive Scheduling Engine',
+      status: 'not-started',
+      priority: 'P1',
+      description: 'AI-powered appointment scheduling with demand forecasting',
+      dependencies: ['advanced-analytics', 'capacity-throttling']
+    },
+    {
+      id: 'queue-optimization',
+      name: 'Dynamic Queue Optimization',
+      status: 'not-started',
+      priority: 'P1',
+      description: 'Real-time queue reordering and optimization algorithms',
+      dependencies: ['workload-distribution']
+    },
+    {
+      id: 'mobile-optimization',
+      name: 'Mobile Experience Enhancement',
+      status: 'not-started',
+      priority: 'P2',
+      description: 'Responsive design improvements and mobile-specific features'
+    },
+    {
+      id: 'integration-api',
+      name: 'External System Integration',
+      status: 'not-started',
+      priority: 'P2',
+      description: 'API endpoints for third-party system integration'
+    }
+  ];
 
-export const QueueFlow2TaskTracker: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>(queueFlow2Tasks);
-  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
-
-  const toggleTaskStatus = (taskId: string) => {
-    setTasks(prev => prev.map(task => {
-      if (task.id === taskId) {
-        const newStatus = task.status === 'completed' ? 'not-started' : 
-                         task.status === 'not-started' ? 'in-progress' : 'completed';
-        return { ...task, status: newStatus };
-      }
-      return task;
-    }));
+  const getStatusIcon = (status: Task['status']) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'in-progress':
+        return <Clock className="h-5 w-5 text-blue-600" />;
+      case 'not-started':
+        return <Circle className="h-5 w-5 text-gray-400" />;
+    }
   };
 
-  const getNextTask = () => {
-    const availableTasks = tasks.filter(task => {
-      if (task.status === 'completed') return false;
-      if (!task.dependencies) return true;
-      return task.dependencies.every(depId => 
-        tasks.find(t => t.id === depId)?.status === 'completed'
-      );
-    });
-    
-    return availableTasks.sort((a, b) => {
-      const priorityOrder = { 'P0': 0, 'P1': 1, 'P2': 2 };
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    })[0];
+  const getStatusBadge = (status: Task['status']) => {
+    switch (status) {
+      case 'completed':
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">Completed</Badge>;
+      case 'in-progress':
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">In Progress</Badge>;
+      case 'not-started':
+        return <Badge variant="outline">Not Started</Badge>;
+    }
   };
 
-  const nextTask = getNextTask();
+  const getPriorityBadge = (priority: Task['priority']) => {
+    switch (priority) {
+      case 'P0':
+        return <Badge variant="destructive">P0 - Critical</Badge>;
+      case 'P1':
+        return <Badge variant="default">P1 - High</Badge>;
+      case 'P2':
+        return <Badge variant="outline">P2 - Medium</Badge>;
+    }
+  };
+
   const completedTasks = tasks.filter(t => t.status === 'completed').length;
   const totalTasks = tasks.length;
-  const progressPercent = (completedTasks / totalTasks) * 100;
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'P0': return 'bg-red-500';
-      case 'P1': return 'bg-orange-500';
-      case 'P2': return 'bg-blue-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'in-progress': return <Clock className="h-4 w-4 text-orange-600" />;
-      default: return <Circle className="h-4 w-4 text-gray-400" />;
-    }
-  };
+  const progressPercentage = Math.round((completedTasks / totalTasks) * 100);
 
   return (
     <div className="space-y-6">
-      {/* Progress Overview */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            QueueFlow 2.0 Implementation Progress
+          <CardTitle className="flex items-center justify-between">
+            Queue Flow 2.0 - Task Tracker
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-normal">
+                {completedTasks}/{totalTasks} tasks completed
+              </span>
+              <Badge variant="secondary">{progressPercentage}%</Badge>
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Overall Progress</span>
-            <span className="text-sm text-gray-600">{completedTasks}/{totalTasks} tasks</span>
-          </div>
-          <Progress value={progressPercent} className="w-full" />
-          
-          {nextTask && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="h-4 w-4 text-blue-600" />
-                <span className="font-medium text-blue-900">Next Recommended Task:</span>
-              </div>
-              <div className="text-blue-800">
-                <div className="font-medium">{nextTask.title}</div>
-                <div className="text-sm">{nextTask.description}</div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge className={getPriorityColor(nextTask.priority)}>{nextTask.priority}</Badge>
-                  <span className="text-xs">Est: {nextTask.estimatedHours}h</span>
-                </div>
-              </div>
-              <Button 
-                onClick={() => setCurrentTaskId(nextTask.id)}
-                className="mt-2"
-                size="sm"
+        <CardContent>
+          <div className="grid gap-4">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className={`p-4 rounded-lg border ${
+                  task.status === 'in-progress' 
+                    ? 'border-blue-200 bg-blue-50' 
+                    : task.status === 'completed'
+                    ? 'border-green-200 bg-green-50'
+                    : 'border-gray-200'
+                }`}
               >
-                Start This Task
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Task List by Phase */}
-      {['Phase 1', 'Phase 2', 'Phase 3'].map(phase => (
-        <Card key={phase}>
-          <CardHeader>
-            <CardTitle className="text-lg">{phase}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {tasks.filter(task => task.phase === phase).map(task => (
-                <div 
-                  key={task.id}
-                  className={`flex items-start gap-3 p-3 border rounded-lg transition-colors ${
-                    currentTaskId === task.id ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <Checkbox
-                    checked={task.status === 'completed'}
-                    onCheckedChange={() => toggleTaskStatus(task.id)}
-                    className="mt-1"
-                  />
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      {getStatusIcon(task.status)}
-                      <span className={`font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : ''}`}>
-                        {task.title}
-                      </span>
-                      <Badge className={getPriorityColor(task.priority)} variant="secondary">
-                        {task.priority}
-                      </Badge>
-                    </div>
-                    
-                    <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                    
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <span>Est: {task.estimatedHours}h</span>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3 flex-1">
+                    {getStatusIcon(task.status)}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium">{task.name}</h4>
+                        {getPriorityBadge(task.priority)}
+                        {getStatusBadge(task.status)}
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{task.description}</p>
                       {task.dependencies && (
-                        <span>Depends on: {task.dependencies.join(', ')}</span>
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3 text-amber-500" />
+                          <span className="text-xs text-amber-700">
+                            Depends on: {task.dependencies.join(', ')}
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
-
-                  {task.status !== 'completed' && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentTaskId(task.id === currentTaskId ? null : task.id)}
-                    >
-                      {currentTaskId === task.id ? 'Working...' : 'Work on This'}
-                    </Button>
-                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+export default QueueFlow2TaskTracker;

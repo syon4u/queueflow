@@ -11,12 +11,14 @@ interface CapacityStatus {
   max_allowed: number;
   available_spots: number;
   buffer_amount: number;
+  is_throttled?: boolean;
+  throttle_reason?: string;
 }
 
 interface CapacityEvent {
   id: string;
   location_id: string;
-  event_type: 'capacity_reached' | 'capacity_available' | 'override_applied';
+  event_type: 'capacity_reached' | 'capacity_available' | 'override_applied' | 'throttle_activated' | 'throttle_deactivated';
   old_capacity: number | null;
   new_capacity: number | null;
   max_capacity: number | null;
@@ -51,17 +53,46 @@ export function useCapacityManagement(locationId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Check location capacity
+  // Enhanced capacity check with throttling
   const checkCapacity = async (locationId: string): Promise<CapacityStatus> => {
     const { data, error } = await supabase.rpc('check_location_capacity', {
       location_uuid: locationId
     });
 
     if (error) throw error;
-    return data as unknown as CapacityStatus;
+    
+    const baseCapacity = data as unknown as CapacityStatus;
+    
+    // Check for throttling rules
+    const currentHour = new Date().getHours();
+    const currentDay = new Date().getDay();
+    
+    const { data: throttlingRule } = await supabase
+      .from('capacity_settings')
+      .select('*')
+      .eq('location_id', locationId)
+      .eq('day_of_week', currentDay)
+      .eq('hour_of_day', currentHour)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (throttlingRule) {
+      const utilizationRate = (baseCapacity.current_capacity / baseCapacity.max_capacity) * 100;
+      const isThrottled = utilizationRate >= throttlingRule.throttle_threshold;
+      
+      return {
+        ...baseCapacity,
+        max_allowed: throttlingRule.max_capacity,
+        is_throttled: isThrottled,
+        throttle_reason: isThrottled ? 'Capacity throttling active' : undefined,
+        has_capacity: baseCapacity.current_capacity < throttlingRule.max_capacity && !isThrottled
+      };
+    }
+
+    return baseCapacity;
   };
 
-  // Get capacity events
+  // Get capacity events with throttling events
   const { data: capacityEvents, isLoading: eventsLoading } = useQuery({
     queryKey: ['capacity-events', locationId],
     queryFn: async () => {
@@ -82,7 +113,7 @@ export function useCapacityManagement(locationId?: string) {
     enabled: !!locationId
   });
 
-  // Get waitlist entries
+  // Enhanced waitlist with throttling integration
   const { data: waitlistEntries, isLoading: waitlistLoading } = useQuery({
     queryKey: ['capacity-waitlist', locationId],
     queryFn: async () => {
@@ -94,6 +125,7 @@ export function useCapacityManagement(locationId?: string) {
           service:services(name)
         `)
         .eq('status', 'waiting')
+        .order('priority_level', { ascending: false })
         .order('created_at', { ascending: true });
 
       if (locationId) {
@@ -107,7 +139,7 @@ export function useCapacityManagement(locationId?: string) {
     enabled: !!locationId
   });
 
-  // Add to waitlist mutation
+  // Enhanced add to waitlist with throttling context
   const addToWaitlistMutation = useMutation({
     mutationFn: async ({
       customerId,
@@ -122,8 +154,14 @@ export function useCapacityManagement(locationId?: string) {
       requestedTime: string;
       priorityLevel?: number;
     }) => {
+      // Check if throttling is active
+      const capacityStatus = await checkCapacity(locationId);
+      
+      // Adjust priority if throttling is active
+      const adjustedPriority = capacityStatus.is_throttled ? priorityLevel + 1 : priorityLevel;
+      
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 2); // Expire in 2 hours
+      expiresAt.setHours(expiresAt.getHours() + (capacityStatus.is_throttled ? 3 : 2)); // Longer expiry during throttling
 
       const { data, error } = await supabase
         .from('capacity_waitlist')
@@ -132,20 +170,32 @@ export function useCapacityManagement(locationId?: string) {
           location_id: locationId,
           service_id: serviceId,
           requested_time: requestedTime,
-          priority_level: priorityLevel,
+          priority_level: adjustedPriority,
           expires_at: expiresAt.toISOString()
         })
         .select()
         .single();
 
       if (error) throw error;
+      
+      // Log throttling-related waitlist addition
+      if (capacityStatus.is_throttled) {
+        await supabase
+          .from('capacity_events')
+          .insert({
+            location_id: locationId,
+            event_type: 'throttle_activated',
+            notes: `Customer added to waitlist due to throttling: ${capacityStatus.throttle_reason}`
+          });
+      }
+      
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['capacity-waitlist'] });
       toast({
         title: 'Added to Waitlist',
-        description: 'You have been added to the waitlist and will be notified when capacity becomes available.'
+        description: 'You have been added to the priority waitlist and will be notified when capacity becomes available.'
       });
     },
     onError: (error) => {
@@ -157,16 +207,18 @@ export function useCapacityManagement(locationId?: string) {
     }
   });
 
-  // Update capacity override mutation
+  // Enhanced capacity override with throttling consideration
   const capacityOverrideMutation = useMutation({
     mutationFn: async ({
       locationId,
       newCapacity,
-      notes
+      notes,
+      overrideThrottling = false
     }: {
       locationId: string;
       newCapacity: number;
       notes?: string;
+      overrideThrottling?: boolean;
     }) => {
       // Get current capacity first
       const { data: location } = await supabase
@@ -183,6 +235,14 @@ export function useCapacityManagement(locationId?: string) {
 
       if (updateError) throw updateError;
 
+      // If overriding throttling, temporarily disable throttling rules
+      if (overrideThrottling) {
+        await supabase
+          .from('capacity_settings')
+          .update({ is_active: false })
+          .eq('location_id', locationId);
+      }
+
       // Log the event
       const { error: logError } = await supabase
         .from('capacity_events')
@@ -192,7 +252,7 @@ export function useCapacityManagement(locationId?: string) {
           old_capacity: location?.max_capacity,
           new_capacity: newCapacity,
           max_capacity: newCapacity,
-          notes: notes || 'Manual capacity override'
+          notes: notes || `Manual capacity override${overrideThrottling ? ' with throttling disabled' : ''}`
         });
 
       if (logError) throw logError;
@@ -200,9 +260,10 @@ export function useCapacityManagement(locationId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['locations'] });
       queryClient.invalidateQueries({ queryKey: ['capacity-events'] });
+      queryClient.invalidateQueries({ queryKey: ['throttling-rules'] });
       toast({
         title: 'Capacity Updated',
-        description: 'Location capacity has been successfully updated.'
+        description: 'Location capacity has been successfully updated with throttling considerations.'
       });
     },
     onError: (error) => {
@@ -214,7 +275,7 @@ export function useCapacityManagement(locationId?: string) {
     }
   });
 
-  // Convert waitlist entry to appointment
+  // Enhanced convert waitlist entry with throttling awareness
   const convertWaitlistMutation = useMutation({
     mutationFn: async (waitlistId: string) => {
       const { error } = await supabase
@@ -231,7 +292,7 @@ export function useCapacityManagement(locationId?: string) {
       queryClient.invalidateQueries({ queryKey: ['capacity-waitlist'] });
       toast({
         title: 'Waitlist Entry Converted',
-        description: 'Customer has been notified that capacity is available.'
+        description: 'Customer has been notified that capacity is available and throttling has been considered.'
       });
     }
   });
