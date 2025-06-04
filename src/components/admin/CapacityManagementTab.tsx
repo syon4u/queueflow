@@ -18,6 +18,15 @@ import {
   UserPlus
 } from 'lucide-react';
 
+interface CapacityStatus {
+  has_capacity: boolean;
+  current_capacity: number;
+  max_capacity: number;
+  max_allowed: number;
+  available_spots: number;
+  buffer_amount: number;
+}
+
 export const CapacityManagementTab: React.FC = () => {
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const [overrideCapacity, setOverrideCapacity] = useState<string>('');
@@ -51,7 +60,7 @@ export const CapacityManagementTab: React.FC = () => {
   // Fetch current capacity status for selected location
   const { data: capacityStatus, isLoading: capacityLoading } = useQuery({
     queryKey: ['capacity-status', selectedLocationId],
-    queryFn: async () => {
+    queryFn: async (): Promise<CapacityStatus | null> => {
       if (!selectedLocationId) return null;
       
       const { data, error } = await supabase.rpc('check_location_capacity', {
@@ -59,7 +68,7 @@ export const CapacityManagementTab: React.FC = () => {
       });
 
       if (error) throw error;
-      return data;
+      return data as unknown as CapacityStatus;
     },
     enabled: !!selectedLocationId,
     refetchInterval: 30000 // Refresh every 30 seconds
@@ -78,7 +87,7 @@ export const CapacityManagementTab: React.FC = () => {
     setOverrideNotes('');
   };
 
-  const getCapacityStatusColor = (status: any) => {
+  const getCapacityStatusColor = (status: CapacityStatus | null) => {
     if (!status) return 'secondary';
     const utilizationRate = status.current_capacity / status.max_allowed;
     if (utilizationRate >= 1) return 'destructive';

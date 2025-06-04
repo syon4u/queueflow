@@ -39,7 +39,7 @@ export const useAppointmentForm = () => {
 
   const { locations } = useLocations();
   const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
-  const { createAppointment, isSubmitting } = useAppointmentCreation();
+  const { createAppointment, isCreatingAppointment } = useAppointmentCreation();
 
   const handleSubmit = async () => {
     console.log('useAppointmentForm - Submitting appointment for anonymous user...');
@@ -97,7 +97,7 @@ export const useAppointmentForm = () => {
     services,
     servicesLoading,
     servicesError,
-    isSubmitting,
+    isSubmitting: isCreatingAppointment,
     nextStep,
     prevStep,
     handleSubmit,

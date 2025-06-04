@@ -1,9 +1,31 @@
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { AppointmentFormData } from '@/components/customer/appointment-scheduling/AppointmentForm';
-import { useCapacityCheck } from '@/hooks/use-capacity-check';
 import { useCapacityManagement } from '@/hooks/use-capacity-management';
+
+export interface AppointmentFormData {
+  customer_id?: string;
+  location_id: string;
+  service_id: string;
+  scheduled_time: string;
+  reason_for_visit: string;
+  notes: string;
+  customerDetails?: {
+    name: string;
+    phone: string;
+    email?: string;
+  };
+}
+
+interface CapacityCheckResult {
+  has_capacity: boolean;
+  current_capacity: number;
+  max_capacity: number;
+  max_allowed: number;
+  available_spots: number;
+  buffer_amount: number;
+}
 
 export function useAppointmentCreation() {
   const { toast } = useToast();
@@ -40,8 +62,10 @@ export function useAppointmentCreation() {
         throw new Error('Failed to check location capacity');
       }
 
+      const capacityResult = capacityCheck as unknown as CapacityCheckResult;
+
       // If no capacity available, offer waitlist
-      if (!capacityCheck.has_capacity) {
+      if (!capacityResult.has_capacity) {
         throw new Error('CAPACITY_FULL');
       }
 
@@ -159,12 +183,12 @@ export function useAppointmentCreation() {
 
   return {
     createCustomer: createCustomerMutation.mutateAsync,
-    isCreatingCustomer: createCustomerMutation.isLoading,
+    isCreatingCustomer: createCustomerMutation.isPending,
     createAppointment: createAppointmentMutation.mutateAsync,
-    isCreatingAppointment: createAppointmentMutation.isLoading,
+    isCreatingAppointment: createAppointmentMutation.isPending,
     updateAppointment: updateAppointmentMutation.mutateAsync,
-    isUpdatingAppointment: updateAppointmentMutation.isLoading,
+    isUpdatingAppointment: updateAppointmentMutation.isPending,
     cancelAppointment: cancelAppointmentMutation.mutateAsync,
-    isCancellingAppointment: cancelAppointmentMutation.isLoading,
+    isCancellingAppointment: cancelAppointmentMutation.isPending,
   };
 }

@@ -20,7 +20,7 @@ export function useCapacityCheck(locationId: string, enabled: boolean = true) {
       });
 
       if (error) throw error;
-      return data as CapacityCheckResult;
+      return data as unknown as CapacityCheckResult;
     },
     enabled: enabled && !!locationId,
     refetchInterval: 30000, // Check every 30 seconds

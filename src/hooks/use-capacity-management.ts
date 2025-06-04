@@ -58,7 +58,7 @@ export function useCapacityManagement(locationId?: string) {
     });
 
     if (error) throw error;
-    return data as CapacityStatus;
+    return data as unknown as CapacityStatus;
   };
 
   // Get capacity events

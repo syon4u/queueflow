@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -154,8 +155,14 @@ export const LocationsTab: React.FC = () => {
     { key: 'email', header: 'Email' },
     { 
       key: 'capacity_status', 
-      header: 'Capacity Status',
-      render: (location: Location) => (
+      header: 'Capacity Status'
+    }
+  ];
+
+  const formatLocationData = (locations: Location[]) => {
+    return locations.map(location => ({
+      ...location,
+      capacity_status: (
         <div className="space-y-1">
           <div className="text-sm">
             Current: {location.current_capacity || 0}/{location.max_capacity || 50}
@@ -172,8 +179,8 @@ export const LocationsTab: React.FC = () => {
           </Badge>
         </div>
       )
-    }
-  ];
+    }));
+  };
 
   const handleAddClick = () => {
     setFormData({
@@ -231,7 +238,7 @@ export const LocationsTab: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">Locations</h1>
       
       <DataTable
-        data={locations || []}
+        data={formatLocationData(locations || [])}
         columns={columns}
         isLoading={isLoading}
         onAddClick={handleAddClick}
