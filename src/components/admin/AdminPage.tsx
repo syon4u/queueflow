@@ -1,45 +1,87 @@
-
 import React, { useState } from 'react';
 import { DashboardTab } from './DashboardTab';
-import { UserManagementTab } from './UserManagementTab';
-import CustomerManagementTab from './CustomerManagementTab';
+import { QueueManagementTab } from './QueueManagementTab';
+import { StaffTab } from './StaffTab';
+import { CustomerManagementTab } from './CustomerManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
-import { QueueManagementTab } from './QueueManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
+import { UserManagementTab } from './UserManagementTab';
+import { EmployeeTab } from './EmployeeTab';
+import { MergedUsersTab } from './MergedUsersTab';
+import { QueueFlow2Tab } from './QueueFlow2Tab';
 import { StatsTab } from './StatsTab';
-import SystemSettingsTab from './SystemSettingsTab';
-import SecurityMetricsTab from './SecurityMetricsTab';
-import { AdminSidebar } from '@/components/layout/AdminSidebar';
-import { AdminTopNavigation } from './AdminTopNavigation';
-import { useTranslation } from 'react-i18next';
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SecurityMetricsTab } from './SecurityMetricsTab';
+import { SystemSettingsTab } from './SystemSettingsTab';
+import { SMSCommandsTab } from './SMSCommandsTab';
+import {
+  BarChart3,
+  Users,
+  UserCheck,
+  UserPlus,
+  MapPin,
+  Settings,
+  MessageSquare,
+  Shield,
+  Briefcase,
+  UserX,
+  Zap,
+  MessageCircle,
+  TrendingUp
+} from 'lucide-react';
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { t } = useTranslation();
 
-  const renderContent = () => {
+  const tabItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'queue-management', label: 'Queue Management', icon: Users },
+    { id: 'staff', label: 'Staff Management', icon: UserCheck },
+    { id: 'customers', label: 'Customer Management', icon: UserPlus },
+    { id: 'locations', label: 'Locations', icon: MapPin },
+    { id: 'services', label: 'Services', icon: Settings },
+    { id: 'templates', label: 'Communication Templates', icon: MessageSquare },
+    { id: 'users', label: 'User Management', icon: Shield },
+    { id: 'employees', label: 'Employee Management', icon: Briefcase },
+    { id: 'merged-users', label: 'Merged Users', icon: UserX },
+    { id: 'queueflow2', label: 'QueueFlow 2.0', icon: Zap },
+    { id: 'sms-commands', label: 'SMS Commands', icon: MessageCircle },
+    { id: 'stats', label: 'Statistics', icon: TrendingUp },
+    { id: 'security', label: 'Security Metrics', icon: Shield },
+    { id: 'system-settings', label: 'System Settings', icon: Settings }
+  ];
+
+  const renderTabContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return <DashboardTab />;
-      case 'users':
-        return <UserManagementTab />;
+      case 'queue-management':
+        return <QueueManagementTab />;
+      case 'staff':
+        return <StaffTab />;
       case 'customers':
         return <CustomerManagementTab />;
       case 'locations':
         return <LocationsTab />;
       case 'services':
         return <ServicesTab />;
-      case 'queue':
-        return <QueueManagementTab />;
       case 'templates':
         return <CommunicationTemplatesTab />;
+      case 'users':
+        return <UserManagementTab />;
+      case 'employees':
+        return <EmployeeTab />;
+      case 'merged-users':
+        return <MergedUsersTab />;
+      case 'queueflow2':
+        return <QueueFlow2Tab />;
+      case 'sms-commands':
+        return <SMSCommandsTab />;
       case 'stats':
         return <StatsTab />;
       case 'security':
         return <SecurityMetricsTab />;
-      case 'settings':
+      case 'system-settings':
         return <SystemSettingsTab />;
       default:
         return <DashboardTab />;
@@ -47,25 +89,24 @@ export const AdminPage: React.FC = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50">
-        <AdminSidebar 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab} 
-        />
+    
+      
         
-        <SidebarInset className="flex-1">
-          <AdminTopNavigation />
-          
-          <main className="flex-1 p-6 bg-gray-50">
-            <div className="max-w-7xl mx-auto">
-              {renderContent()}
-            </div>
-          </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+          Admin Panel
+        
+        
+          {tabItems.map((tab) => (
+            
+              
+                {tab.label}
+              
+            
+          ))}
+        
+      
+      
+        {renderTabContent()}
+      
+    
   );
 };
-
-export default AdminPage;
