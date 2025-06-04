@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { QueueFlow2TaskTracker } from './QueueFlow2TaskTracker';
+import QueueFlow2TaskTracker from './QueueFlow2TaskTracker';
 
 export const QueueFlow2Tab: React.FC = () => {
   return (

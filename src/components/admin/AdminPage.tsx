@@ -10,11 +10,11 @@ import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
 import { StaffTab } from './StaffTab';
 import { EmployeeTab } from './EmployeeTab';
-import { CustomerManagementTab } from './CustomerManagementTab';
+import CustomerManagementTab from './CustomerManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { QueueManagementTab } from './QueueManagementTab';
-import { SystemSettingsTab } from './SystemSettingsTab';
-import { SecurityMetricsTab } from './SecurityMetricsTab';
+import SystemSettingsTab from './SystemSettingsTab';
+import SecurityMetricsTab from './SecurityMetricsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
 import { MergedUsersTab } from './MergedUsersTab';
 import { AdvancedAnalyticsTab } from './AdvancedAnalyticsTab';
@@ -23,7 +23,7 @@ import { CapacityThrottlingTab } from './CapacityThrottlingTab';
 import { QueueFlow2Tab } from './QueueFlow2Tab';
 import { AdminDashboardHeader } from './AdminDashboardHeader';
 import { AdminTopNavigation } from './AdminTopNavigation';
-import { BackendHealthCheck } from './BackendHealthCheck';
+import BackendHealthCheck from './BackendHealthCheck';
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -62,7 +62,15 @@ export const AdminPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminDashboardHeader />
+      <AdminDashboardHeader 
+        systemStatus="operational"
+        totalUsers={0}
+        activeStaff={0}
+        todayAppointments={0}
+        recentAlerts={[]}
+        capacityUtilization={0}
+        avgWaitTime={0}
+      />
       <AdminTopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -147,3 +155,5 @@ export const AdminPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminPage;

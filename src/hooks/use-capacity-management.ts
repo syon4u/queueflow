@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -78,7 +77,8 @@ export function useCapacityManagement(locationId?: string) {
 
     if (throttlingRule) {
       const utilizationRate = (baseCapacity.current_capacity / baseCapacity.max_capacity) * 100;
-      const isThrottled = utilizationRate >= throttlingRule.throttle_threshold;
+      const throttleThreshold = 80; // Default threshold since it's not in the schema yet
+      const isThrottled = utilizationRate >= throttleThreshold;
       
       return {
         ...baseCapacity,

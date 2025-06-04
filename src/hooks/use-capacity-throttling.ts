@@ -14,6 +14,8 @@ interface ThrottlingRule {
   throttle_threshold: number; // Percentage at which to start throttling
   waitlist_enabled: boolean;
   dynamic_adjustment: boolean;
+  is_active: boolean;
+  staff_multiplier: number;
   created_at: string;
   updated_at: string;
 }
@@ -62,7 +64,14 @@ export function useCapacityThrottling(locationId?: string, serviceId?: string) {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as ThrottlingRule[];
+      
+      // Map the database schema to our interface
+      return (data || []).map(item => ({
+        ...item,
+        throttle_threshold: 80, // Default threshold
+        waitlist_enabled: true,
+        dynamic_adjustment: false
+      })) as ThrottlingRule[];
     },
     enabled: !!locationId
   });
@@ -98,11 +107,13 @@ export function useCapacityThrottling(locationId?: string, serviceId?: string) {
       const isThrottled = currentUtilization >= throttleThreshold;
 
       // Get waitlist count
-      const { data: waitlistCount } = await supabase
+      const { data: waitlistData } = await supabase
         .from('capacity_waitlist')
         .select('id', { count: 'exact' })
         .eq('location_id', locationId)
         .eq('status', 'waiting');
+
+      const waitlistCount = waitlistData?.length || 0;
 
       // Calculate estimated wait time based on historical data
       const { data: avgServiceTime } = await supabase
@@ -135,7 +146,7 @@ export function useCapacityThrottling(locationId?: string, serviceId?: string) {
         throttle_threshold: throttleThreshold,
         is_throttled: isThrottled,
         throttle_reason: throttleReason,
-        waitlist_count: waitlistCount?.count || 0,
+        waitlist_count: waitlistCount,
         estimated_wait_time: estimatedWaitTime,
         next_available_slot: nextAvailableSlot
       }];
@@ -231,9 +242,13 @@ export function useCapacityThrottling(locationId?: string, serviceId?: string) {
       const { data, error } = await supabase
         .from('capacity_settings')
         .upsert({
-          ...rule,
-          staff_multiplier: 1.0,
-          is_active: true
+          location_id: rule.location_id,
+          service_id: rule.service_id,
+          day_of_week: rule.day_of_week,
+          hour_of_day: rule.hour_of_day,
+          max_capacity: rule.max_capacity,
+          staff_multiplier: rule.staff_multiplier,
+          is_active: rule.is_active
         })
         .select()
         .single();
@@ -274,9 +289,6 @@ export function useCapacityThrottling(locationId?: string, serviceId?: string) {
           day_of_week: dayOfWeek,
           hour_of_day: hourOfDay,
           max_capacity: prediction.recommended_capacity,
-          throttle_threshold: 80,
-          waitlist_enabled: true,
-          dynamic_adjustment: true,
           staff_multiplier: 1.0,
           is_active: true
         });
