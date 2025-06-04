@@ -273,6 +273,182 @@ export type Database = {
           },
         ]
       }
+      capacity_events: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          location_id: string
+          max_capacity: number | null
+          new_capacity: number | null
+          notes: string | null
+          old_capacity: number | null
+          staff_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          location_id: string
+          max_capacity?: number | null
+          new_capacity?: number | null
+          notes?: string | null
+          old_capacity?: number | null
+          staff_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          location_id?: string
+          max_capacity?: number | null
+          new_capacity?: number | null
+          notes?: string | null
+          old_capacity?: number | null
+          staff_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_events_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_events_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_events_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      capacity_settings: {
+        Row: {
+          created_at: string | null
+          day_of_week: number
+          hour_of_day: number
+          id: string
+          is_active: boolean | null
+          location_id: string
+          max_capacity: number
+          service_id: string | null
+          staff_multiplier: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week: number
+          hour_of_day: number
+          id?: string
+          is_active?: boolean | null
+          location_id: string
+          max_capacity?: number
+          service_id?: string | null
+          staff_multiplier?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number
+          hour_of_day?: number
+          id?: string
+          is_active?: boolean | null
+          location_id?: string
+          max_capacity?: number
+          service_id?: string | null
+          staff_multiplier?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_settings_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_settings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      capacity_waitlist: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          expires_at: string | null
+          id: string
+          location_id: string
+          notification_sent_at: string | null
+          priority_level: number | null
+          requested_time: string
+          service_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          expires_at?: string | null
+          id?: string
+          location_id: string
+          notification_sent_at?: string | null
+          priority_level?: number | null
+          requested_time: string
+          service_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          expires_at?: string | null
+          id?: string
+          location_id?: string
+          notification_sent_at?: string | null
+          priority_level?: number | null
+          requested_time?: string
+          service_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_waitlist_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_waitlist_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_waitlist_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       communication_templates: {
         Row: {
           content: string
@@ -506,9 +682,12 @@ export type Database = {
       locations: {
         Row: {
           address: string | null
+          capacity_buffer: number | null
           created_at: string
+          current_capacity: number | null
           email: string | null
           id: string
+          max_capacity: number | null
           name: string
           operating_hours: Json | null
           phone: string | null
@@ -517,9 +696,12 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          capacity_buffer?: number | null
           created_at?: string
+          current_capacity?: number | null
           email?: string | null
           id?: string
+          max_capacity?: number | null
           name: string
           operating_hours?: Json | null
           phone?: string | null
@@ -528,9 +710,12 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          capacity_buffer?: number | null
           created_at?: string
+          current_capacity?: number | null
           email?: string | null
           id?: string
+          max_capacity?: number | null
           name?: string
           operating_hours?: Json | null
           phone?: string | null
@@ -1143,6 +1328,10 @@ export type Database = {
       can_manage_appointments: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      check_location_capacity: {
+        Args: { location_uuid: string; requested_time?: string }
+        Returns: Json
       }
       get_admin_dashboard_stats: {
         Args: Record<PropertyKey, never>

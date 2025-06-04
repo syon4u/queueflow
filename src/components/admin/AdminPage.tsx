@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DashboardTab } from './DashboardTab';
 import { QueueManagementTab } from './QueueManagementTab';
@@ -15,6 +14,7 @@ import { StatsTab } from './StatsTab';
 import SecurityMetricsTab from './SecurityMetricsTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
+import { CapacityManagementTab } from './CapacityManagementTab';
 import {
   BarChart3,
   Users,
@@ -28,7 +28,8 @@ import {
   UserX,
   Zap,
   MessageCircle,
-  TrendingUp
+  TrendingUp,
+  Gauge
 } from 'lucide-react';
 
 const AdminPage: React.FC = () => {
@@ -37,6 +38,7 @@ const AdminPage: React.FC = () => {
   const tabItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'queue-management', label: 'Queue Management', icon: Users },
+    { id: 'capacity-management', label: 'Capacity Management', icon: Gauge },
     { id: 'staff', label: 'Staff Management', icon: UserCheck },
     { id: 'customers', label: 'Customer Management', icon: UserPlus },
     { id: 'locations', label: 'Locations', icon: MapPin },
@@ -58,6 +60,8 @@ const AdminPage: React.FC = () => {
         return <DashboardTab />;
       case 'queue-management':
         return <QueueManagementTab />;
+      case 'capacity-management':
+        return <CapacityManagementTab />;
       case 'staff':
         return <StaffTab />;
       case 'customers':

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { DataTable, Column } from './DataTable';
 
 interface Location {
@@ -21,6 +21,9 @@ interface Location {
   address: string | null;
   phone: string | null;
   email: string | null;
+  max_capacity: number | null;
+  current_capacity: number | null;
+  capacity_buffer: number | null;
 }
 
 interface LocationFormData {
@@ -29,6 +32,8 @@ interface LocationFormData {
   address: string;
   phone: string;
   email: string;
+  max_capacity: string;
+  capacity_buffer: string;
 }
 
 export const LocationsTab: React.FC = () => {
@@ -39,7 +44,9 @@ export const LocationsTab: React.FC = () => {
     name: '',
     address: '',
     phone: '',
-    email: ''
+    email: '',
+    max_capacity: '50',
+    capacity_buffer: '5'
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -65,7 +72,9 @@ export const LocationsTab: React.FC = () => {
           name: data.name,
           address: data.address || null,
           phone: data.phone || null,
-          email: data.email || null
+          email: data.email || null,
+          max_capacity: parseInt(data.max_capacity),
+          capacity_buffer: parseInt(data.capacity_buffer)
         }]);
       
       if (error) throw error;
@@ -93,7 +102,9 @@ export const LocationsTab: React.FC = () => {
           name: data.name,
           address: data.address || null,
           phone: data.phone || null,
-          email: data.email || null
+          email: data.email || null,
+          max_capacity: parseInt(data.max_capacity),
+          capacity_buffer: parseInt(data.capacity_buffer)
         })
         .eq('id', data.id);
       
@@ -140,7 +151,28 @@ export const LocationsTab: React.FC = () => {
     { key: 'name', header: 'Name' },
     { key: 'address', header: 'Address' },
     { key: 'phone', header: 'Phone' },
-    { key: 'email', header: 'Email' }
+    { key: 'email', header: 'Email' },
+    { 
+      key: 'capacity_status', 
+      header: 'Capacity Status',
+      render: (location: Location) => (
+        <div className="space-y-1">
+          <div className="text-sm">
+            Current: {location.current_capacity || 0}/{location.max_capacity || 50}
+          </div>
+          <Badge variant={
+            (location.current_capacity || 0) >= ((location.max_capacity || 50) - (location.capacity_buffer || 5))
+              ? 'destructive' 
+              : 'secondary'
+          }>
+            {(location.current_capacity || 0) >= ((location.max_capacity || 50) - (location.capacity_buffer || 5))
+              ? 'At Capacity' 
+              : 'Available'
+            }
+          </Badge>
+        </div>
+      )
+    }
   ];
 
   const handleAddClick = () => {
@@ -148,7 +180,9 @@ export const LocationsTab: React.FC = () => {
       name: '',
       address: '',
       phone: '',
-      email: ''
+      email: '',
+      max_capacity: '50',
+      capacity_buffer: '5'
     });
     setIsEditing(false);
     setIsDialogOpen(true);
@@ -160,7 +194,9 @@ export const LocationsTab: React.FC = () => {
       name: location.name,
       address: location.address || '',
       phone: location.phone || '',
-      email: location.email || ''
+      email: location.email || '',
+      max_capacity: (location.max_capacity || 50).toString(),
+      capacity_buffer: (location.capacity_buffer || 5).toString()
     });
     setIsEditing(true);
     setIsDialogOpen(true);
@@ -252,6 +288,34 @@ export const LocationsTab: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                 />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="max_capacity">Max Capacity</Label>
+                  <Input
+                    id="max_capacity"
+                    name="max_capacity"
+                    type="number"
+                    value={formData.max_capacity}
+                    onChange={handleInputChange}
+                    min="1"
+                    required
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="capacity_buffer">Capacity Buffer</Label>
+                  <Input
+                    id="capacity_buffer"
+                    name="capacity_buffer"
+                    type="number"
+                    value={formData.capacity_buffer}
+                    onChange={handleInputChange}
+                    min="0"
+                    required
+                  />
+                </div>
               </div>
             </div>
             

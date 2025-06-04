@@ -1,116 +1,170 @@
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { AppointmentFormData } from '@/components/customer/appointment-scheduling/AppointmentForm';
+import { useCapacityCheck } from '@/hooks/use-capacity-check';
+import { useCapacityManagement } from '@/hooks/use-capacity-management';
 
-interface CustomerDetails {
-  name: string;
-  phone: string;
-  email?: string;
-}
+export function useAppointmentCreation() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { addToWaitlist } = useCapacityManagement();
 
-interface AppointmentData {
-  location_id: string;
-  service_id: string;
-  scheduled_time: string;
-  reason_for_visit?: string;
-  notes?: string;
-  customerDetails: CustomerDetails;
-}
-
-export const useAppointmentCreation = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-
-  const createAppointment = async (appointmentData: AppointmentData) => {
-    setIsSubmitting(true);
-    console.log('useAppointmentCreation - Creating appointment for anonymous user:', appointmentData);
-
-    try {
-      // First, create or find the customer
-      const [firstName, ...lastNameParts] = appointmentData.customerDetails.name.split(' ');
-      const lastName = lastNameParts.join(' ') || '';
-
-      // Check if customer exists by phone
-      let customerId: string;
-      const { data: existingCustomer } = await supabase
+  const createCustomerMutation = useMutation({
+    mutationFn: async (customerData: { first_name: string; last_name: string; phone: string; email?: string }) => {
+      const { data, error } = await supabase
         .from('customers')
-        .select('id')
-        .eq('phone', appointmentData.customerDetails.phone)
-        .maybeSingle();
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
-        console.log('useAppointmentCreation - Using existing customer:', customerId);
-      } else {
-        // Generate a UUID for the new customer
-        const newCustomerId = crypto.randomUUID();
-        
-        // Create new customer with explicit ID
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert({
-            id: newCustomerId,
-            first_name: firstName,
-            last_name: lastName,
-            phone: appointmentData.customerDetails.phone,
-            email: appointmentData.customerDetails.email || null,
-          })
-          .select('id')
-          .single();
-
-        if (customerError) {
-          console.error('useAppointmentCreation - Customer creation error:', customerError);
-          throw new Error(`Failed to create customer: ${customerError.message}`);
-        }
-
-        customerId = newCustomer.id;
-        console.log('useAppointmentCreation - Created new customer:', customerId);
-      }
-
-      // Create the appointment
-      const { data: appointment, error: appointmentError } = await supabase
-        .from('appointments')
-        .insert({
-          customer_id: customerId,
-          location_id: appointmentData.location_id,
-          service_id: appointmentData.service_id,
-          scheduled_time: appointmentData.scheduled_time,
-          reason_for_visit: appointmentData.reason_for_visit || null,
-          notes: appointmentData.notes || null,
-          status: 'scheduled',
-        })
-        .select('id')
+        .insert([customerData])
+        .select()
         .single();
 
-      if (appointmentError) {
-        console.error('useAppointmentCreation - Appointment creation error:', appointmentError);
-        throw new Error(`Failed to create appointment: ${appointmentError.message}`);
+      if (error) {
+        console.error('Customer creation error:', error);
+        throw new Error(error.message || 'Failed to create customer');
+      }
+      return data;
+    },
+  });
+
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (appointmentData: AppointmentFormData) => {
+      console.log('Creating appointment with data:', appointmentData);
+
+      // Check capacity before creating appointment
+      const { data: capacityCheck, error: capacityError } = await supabase.rpc('check_location_capacity', {
+        location_uuid: appointmentData.location_id
+      });
+
+      if (capacityError) {
+        console.error('Capacity check error:', capacityError);
+        throw new Error('Failed to check location capacity');
       }
 
-      console.log('useAppointmentCreation - Appointment created successfully:', appointment.id);
+      // If no capacity available, offer waitlist
+      if (!capacityCheck.has_capacity) {
+        throw new Error('CAPACITY_FULL');
+      }
 
-      toast({
-        title: 'Success!',
-        description: 'Your appointment has been scheduled successfully.',
-      });
+      // Proceed with appointment creation if capacity is available
+      const { data, error } = await supabase
+        .from('appointments')
+        .insert([
+          {
+            customer_id: appointmentData.customer_id,
+            service_id: appointmentData.service_id,
+            location_id: appointmentData.location_id,
+            scheduled_time: appointmentData.scheduled_time,
+            notes: appointmentData.notes,
+            reason_for_visit: appointmentData.reason_for_visit,
+            status: 'scheduled',
+          },
+        ])
+        .select()
+        .single();
 
-      navigate('/appointments');
-    } catch (error: any) {
-      console.error('useAppointmentCreation - Error:', error);
+      if (error) {
+        console.error('Appointment creation error:', error);
+        throw new Error(error.message || 'Failed to create appointment');
+      }
+      return data;
+    },
+    onSuccess: (data) => {
+      console.log('Appointment created successfully:', data);
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['capacity-status'] });
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to create appointment. Please try again.',
-        variant: 'destructive',
+        title: "Success!",
+        description: "Your appointment has been scheduled successfully.",
       });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+    onError: (error: Error) => {
+      console.error('Appointment creation error:', error);
+      
+      if (error.message === 'CAPACITY_FULL') {
+        // Handle capacity full scenario in the component
+        throw error;
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create appointment. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  const updateAppointmentMutation = useMutation({
+    mutationFn: async (appointmentData: { id: string; notes: string }) => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ notes: appointmentData.notes })
+        .eq('id', appointmentData.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Appointment update error:', error);
+        throw new Error(error.message || 'Failed to update appointment');
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast({
+        title: "Success!",
+        description: "Appointment updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Appointment update error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update appointment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const cancelAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: 'cancelled' })
+        .eq('id', appointmentId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Appointment cancellation error:', error);
+        throw new Error(error.message || 'Failed to cancel appointment');
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast({
+        title: "Success!",
+        description: "Appointment cancelled successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Appointment cancellation error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to cancel appointment. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   return {
-    createAppointment,
-    isSubmitting,
+    createCustomer: createCustomerMutation.mutateAsync,
+    isCreatingCustomer: createCustomerMutation.isLoading,
+    createAppointment: createAppointmentMutation.mutateAsync,
+    isCreatingAppointment: createAppointmentMutation.isLoading,
+    updateAppointment: updateAppointmentMutation.mutateAsync,
+    isUpdatingAppointment: updateAppointmentMutation.isLoading,
+    cancelAppointment: cancelAppointmentMutation.mutateAsync,
+    isCancellingAppointment: cancelAppointmentMutation.isLoading,
   };
-};
+}
