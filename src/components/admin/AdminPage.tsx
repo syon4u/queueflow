@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { DashboardTab } from './DashboardTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import { StaffTab } from './StaffTab';
-import { CustomerManagementTab } from './CustomerManagementTab';
+import CustomerManagementTab from './CustomerManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
@@ -12,8 +12,8 @@ import { EmployeeTab } from './EmployeeTab';
 import { MergedUsersTab } from './MergedUsersTab';
 import { QueueFlow2Tab } from './QueueFlow2Tab';
 import { StatsTab } from './StatsTab';
-import { SecurityMetricsTab } from './SecurityMetricsTab';
-import { SystemSettingsTab } from './SystemSettingsTab';
+import SecurityMetricsTab from './SecurityMetricsTab';
+import SystemSettingsTab from './SystemSettingsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
 import {
   BarChart3,
@@ -31,7 +31,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 
-export const AdminPage: React.FC = () => {
+const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const tabItems = [
@@ -120,3 +120,5 @@ export const AdminPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminPage;
