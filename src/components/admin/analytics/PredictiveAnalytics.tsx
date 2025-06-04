@@ -208,7 +208,7 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ data }) => {
                 dataKey="appointments" 
                 stroke="#3b82f6" 
                 strokeWidth={2}
-                strokeDasharray={(dataKey) => dataKey === 'predicted' ? "5 5" : "0"}
+                strokeDasharray={combinedData.map(item => item.type === 'predicted' ? "5 5" : "0").join(',')}
                 name="Appointments"
               />
             </LineChart>

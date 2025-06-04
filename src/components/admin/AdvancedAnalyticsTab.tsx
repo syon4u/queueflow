@@ -140,7 +140,6 @@ export const AdvancedAnalyticsTab: React.FC = () => {
             <div className="flex items-end">
               <Button 
                 onClick={() => {
-                  // Trigger refetch of all data
                   window.location.reload();
                 }} 
                 className="w-full"
