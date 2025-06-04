@@ -63,7 +63,7 @@ export const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminDashboardHeader 
-        systemStatus="operational"
+        systemStatus="healthy"
         totalUsers={0}
         activeStaff={0}
         todayAppointments={0}

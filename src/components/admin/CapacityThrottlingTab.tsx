@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/dialog"
 import { useCapacityThrottling } from '@/hooks/use-capacity-throttling';
 import { Separator } from "@/components/ui/separator"
+import { supabase } from '@/integrations/supabase/client';
 
 interface ThrottlingRule {
   id: string;
