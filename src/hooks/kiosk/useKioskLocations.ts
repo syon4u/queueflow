@@ -20,22 +20,15 @@ export const useKioskLocations = () => {
 
       if (error) throw error;
 
-      // Explicitly type the raw data to avoid deep type inference
-      const rawLocations = data as Array<{
-        id: string;
-        name: string;
-        current_capacity: number | null;
-        max_capacity: number | null;
-      }> | null;
+      // Simplify the type handling to avoid deep instantiation
+      if (!data) return [];
 
-      const locations: Location[] = (rawLocations ?? []).map((item) => ({
+      return data.map((item) => ({
         id: item.id,
         name: item.name,
         current_capacity: item.current_capacity ?? 0,
         max_capacity: item.max_capacity ?? 50,
       }));
-
-      return locations;
     },
   });
 };
