@@ -21,13 +21,13 @@ export const useKioskLocations = () => {
       if (error) throw error;
       if (!data) return [];
 
-      // Map with explicit typing to avoid inference issues
-      return data.map((item) => ({
-        id: String(item.id),
-        name: String(item.name),
-        current_capacity: Number(item.current_capacity) || 0,
-        max_capacity: Number(item.max_capacity) || 50,
-      })) as Location[];
+      // Simple mapping without complex type inference
+      return data.map((item): Location => ({
+        id: item.id,
+        name: item.name,
+        current_capacity: item.current_capacity || 0,
+        max_capacity: item.max_capacity || 50,
+      }));
     },
   });
 };
