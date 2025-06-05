@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Users, UserCheck, Plus, Building2 } from 'lucide-react';
+import { Shield, Users, UserCheck, Plus, Building2, UserCog } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -58,17 +58,20 @@ export const MergedUsersTab: React.FC = () => {
     return <ErrorAlert error={error} />;
   }
 
-  // Calculate stats for header cards
+  // Calculate comprehensive stats for header cards
   const staffStats = {
     total: staffMembers?.length || 0,
     active: staffMembers?.filter(s => s.status === 'active').length || 0,
-    locations: locations?.length || 0 // Use actual locations count instead of trying to access location_id
+    admin: staffMembers?.filter(s => s.user_roles?.role === 'admin').length || 0,
+    staff: staffMembers?.filter(s => s.user_roles?.role === 'staff').length || 0,
+    locations: locations?.length || 0
   };
 
   const userStats = {
     admin: users.filter(u => u.role === 'admin').length,
     staff: users.filter(u => u.role === 'staff').length,
-    customer: users.filter(u => u.role === 'customer').length
+    customer: users.filter(u => u.role === 'customer').length,
+    total: users.length
   };
 
   return (
@@ -77,7 +80,7 @@ export const MergedUsersTab: React.FC = () => {
       <Breadcrumb 
         items={[
           { label: 'Admin Dashboard', href: '/admin' },
-          { label: 'User Management', isActive: true }
+          { label: 'User & Staff Management', isActive: true }
         ]}
         className="mb-6"
       />
@@ -85,8 +88,8 @@ export const MergedUsersTab: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-1">Manage staff members and user roles with live database integration</p>
+          <h1 className="text-3xl font-bold text-gray-900">User & Staff Management</h1>
+          <p className="text-gray-600 mt-1">Comprehensive management of staff profiles, user roles, and permissions</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -96,49 +99,60 @@ export const MergedUsersTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Enhanced Stats Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">Total Staff</CardTitle>
+            <CardTitle className="text-sm font-medium text-blue-800">Active Staff</CardTitle>
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-900">{staffStats.total}</div>
-            <p className="text-xs text-blue-600 mt-1">{staffStats.active} active members</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">Locations</CardTitle>
-            <Building2 className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-900">{staffStats.locations}</div>
-            <p className="text-xs text-green-600 mt-1">Service centers</p>
+            <div className="text-2xl font-bold text-blue-900">{staffStats.active}</div>
+            <p className="text-xs text-blue-600 mt-1">of {staffStats.total} total</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-purple-800">Administrators</CardTitle>
+            <CardTitle className="text-sm font-medium text-purple-800">Staff Admins</CardTitle>
             <Shield className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-900">{userStats.admin}</div>
-            <p className="text-xs text-purple-600 mt-1">Full access users</p>
+            <div className="text-2xl font-bold text-purple-900">{staffStats.admin}</div>
+            <p className="text-xs text-purple-600 mt-1">Admin privileges</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-green-800">Service Locations</CardTitle>
+            <Building2 className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-900">{staffStats.locations}</div>
+            <p className="text-xs text-green-600 mt-1">Active centers</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-orange-800">Total Users</CardTitle>
-            <UserCheck className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-sm font-medium text-orange-800">All Users</CardTitle>
+            <UserCog className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-900">{users.length}</div>
-            <p className="text-xs text-orange-600 mt-1">All role types</p>
+            <div className="text-2xl font-bold text-orange-900">{userStats.total}</div>
+            <p className="text-xs text-orange-600 mt-1">System-wide</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-teal-800">Customers</CardTitle>
+            <UserCheck className="h-4 w-4 text-teal-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-teal-900">{userStats.customer}</div>
+            <p className="text-xs text-teal-600 mt-1">Service users</p>
           </CardContent>
         </Card>
       </div>
@@ -148,10 +162,10 @@ export const MergedUsersTab: React.FC = () => {
         <CardHeader>
           <CardTitle className="text-xl flex items-center gap-2">
             <Users className="h-5 w-5" />
-            User Management
+            Comprehensive User Management
           </CardTitle>
           <CardDescription>
-            Manage staff members and user roles with live database integration
+            Manage staff profiles, user roles, permissions, and location assignments with live database integration
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -159,19 +173,19 @@ export const MergedUsersTab: React.FC = () => {
             <TabsList className="grid w-full grid-cols-2 bg-gray-100">
               <TabsTrigger value="staff" className="flex items-center gap-2">
                 <UserCheck className="h-4 w-4" />
-                Staff Members
+                Staff Profiles & Roles
               </TabsTrigger>
               <TabsTrigger value="roles" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
-                User Roles
+                User Role Management
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="staff" className="space-y-6 mt-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Staff Members</h2>
-                  <p className="text-sm text-gray-500">Manage staff profiles, roles, and location assignments</p>
+                  <h2 className="text-lg font-semibold text-gray-900">Staff Members & Role Assignments</h2>
+                  <p className="text-sm text-gray-500">Manage staff profiles, role assignments, and location access permissions</p>
                 </div>
                 <Button onClick={handleAddClick} className="bg-blue-600 hover:bg-blue-700">
                   <Plus className="h-4 w-4 mr-2" />
@@ -202,15 +216,15 @@ export const MergedUsersTab: React.FC = () => {
             <TabsContent value="roles" className="space-y-6 mt-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">User Role Management</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">System-Wide User Role Management</h2>
                   <p className="text-sm text-gray-500">
-                    Assign and manage user roles and permissions with live database updates
+                    Assign and modify user permissions and access levels across the entire system
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="text-gray-500 flex items-center">
                     <Shield className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{users.length} users</span>
+                    <span className="text-sm">{userStats.total} users</span>
                   </div>
                   <Button 
                     variant="outline" 
