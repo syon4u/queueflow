@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 export const PowerUserAppointmentsTab: React.FC = () => {
-  const { appointments, customers, isLoading } = useAppData();
+  const { appointments, customers, isLoading, refetch } = useAppData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -85,6 +85,8 @@ export const PowerUserAppointmentsTab: React.FC = () => {
         title: "Success",
         description: "Customer checked in successfully",
       });
+      
+      refetch();
     } catch (error) {
       toast({
         title: "Error",
@@ -110,6 +112,8 @@ export const PowerUserAppointmentsTab: React.FC = () => {
         title: "Success",
         description: "Service started successfully",
       });
+      
+      refetch();
     } catch (error) {
       toast({
         title: "Error",
@@ -135,6 +139,8 @@ export const PowerUserAppointmentsTab: React.FC = () => {
         title: "Success",
         description: "Service completed successfully",
       });
+      
+      refetch();
     } catch (error) {
       toast({
         title: "Error",
@@ -448,7 +454,7 @@ export const PowerUserAppointmentsTab: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="w-full justify-start h-12"
-                onClick={handleCheckIn}
+                onClick={handleViewFullQueue}
               >
                 <Calendar className="h-4 w-4 mr-3" />
                 Check In Customer
