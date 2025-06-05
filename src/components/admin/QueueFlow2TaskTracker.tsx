@@ -89,9 +89,9 @@ const QueueFlow2TaskTracker: React.FC = () => {
     {
       id: 'voice-notifications',
       name: 'Voice Call Notifications',
-      status: 'not-started',
+      status: 'completed',
       priority: 'P0',
-      description: 'Automated voice call system for customer notifications and confirmations',
+      description: 'Automated voice call system for customer notifications and confirmations using AI-generated speech',
       dependencies: ['notification-system']
     },
     {
@@ -198,7 +198,7 @@ const QueueFlow2TaskTracker: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-amber-700">All P0 tasks completed! 🎉</p>
+                <p className="text-sm text-amber-700">All P0 tasks completed! 🎉 Moving to P1 tasks.</p>
               )}
             </div>
 

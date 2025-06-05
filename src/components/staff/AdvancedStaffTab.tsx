@@ -7,12 +7,14 @@ import { SmartBreakManagement } from './SmartBreakManagement';
 import { WorkloadDistribution } from './WorkloadDistribution';
 import { SmartNotificationSystem } from './SmartNotificationSystem';
 import { AutomatedAppointmentReminders } from './AutomatedAppointmentReminders';
+import { VoiceNotificationSystem } from './VoiceNotificationSystem';
 import { 
   BarChart3, 
   Coffee, 
   Users, 
   Bell,
-  Calendar 
+  Calendar,
+  Phone
 } from 'lucide-react';
 
 export const AdvancedStaffTab: React.FC = () => {
@@ -23,12 +25,12 @@ export const AdvancedStaffTab: React.FC = () => {
       <div>
         <h2 className="text-2xl font-bold mb-2">Advanced Staff Tools</h2>
         <p className="text-muted-foreground">
-          Enhanced tools for performance tracking, break management, workload optimization, notifications, and automated reminders
+          Enhanced tools for performance tracking, break management, workload optimization, notifications, reminders, and voice calls
         </p>
       </div>
 
       <Tabs defaultValue="performance" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="performance" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Performance</span>
@@ -48,6 +50,10 @@ export const AdvancedStaffTab: React.FC = () => {
           <TabsTrigger value="reminders" className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             <span className="hidden sm:inline">Reminders</span>
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            <span className="hidden sm:inline">Voice Calls</span>
           </TabsTrigger>
         </TabsList>
         
@@ -69,6 +75,10 @@ export const AdvancedStaffTab: React.FC = () => {
         
         <TabsContent value="reminders" className="space-y-4">
           <AutomatedAppointmentReminders />
+        </TabsContent>
+        
+        <TabsContent value="voice" className="space-y-4">
+          <VoiceNotificationSystem />
         </TabsContent>
       </Tabs>
     </div>
