@@ -37,8 +37,8 @@ const CustomerQueue: React.FC = () => {
   console.log('CustomerQueue - waitingCustomers filtered count:', waitingCustomers.length);
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
+    <Card className="flex flex-col h-full">
+      <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-semibold">Waiting List</CardTitle>
           <Badge variant="outline" className="ml-2">
@@ -46,15 +46,15 @@ const CustomerQueue: React.FC = () => {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col min-h-0">
         {waitingCustomers.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-muted-foreground flex-1 flex flex-col justify-center">
             <p>No customers waiting</p>
             <p className="text-sm">Add customers to the queue to get started</p>
           </div>
         ) : (
-          <ScrollArea className="h-[390px] pr-4">
-            <div className="space-y-3">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-3 pb-4">
               {waitingCustomers.map((customer) => {
                 const position = getQueuePosition(customer.id, customers);
                 const estimatedWait = getEstimatedWaitTime(customer.id);
