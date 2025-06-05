@@ -1,0 +1,201 @@
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Bell, Smartphone, Mail, MessageSquare } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+interface NotificationPreferences {
+  push: boolean;
+  sms: boolean;
+  email: boolean;
+  positionUpdates: boolean;
+  statusChanges: boolean;
+  reminderBeforeCall: boolean;
+}
+
+interface MobileQueueNotificationsProps {
+  onPreferencesChange?: (preferences: NotificationPreferences) => void;
+}
+
+export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> = ({
+  onPreferencesChange
+}) => {
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    push: true,
+    sms: false,
+    email: false,
+    positionUpdates: true,
+    statusChanges: true,
+    reminderBeforeCall: true,
+  });
+  const [pushSupported, setPushSupported] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if push notifications are supported
+    setPushSupported('Notification' in window && 'serviceWorker' in navigator);
+  }, []);
+
+  const handlePreferenceChange = (key: keyof NotificationPreferences, value: boolean) => {
+    const newPreferences = { ...preferences, [key]: value };
+    setPreferences(newPreferences);
+    onPreferencesChange?.(newPreferences);
+  };
+
+  const requestPushPermission = async () => {
+    if (!pushSupported) {
+      toast({
+        title: 'Not Supported',
+        description: 'Push notifications are not supported on this device.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        handlePreferenceChange('push', true);
+        toast({
+          title: 'Notifications Enabled',
+          description: 'You\'ll receive push notifications for queue updates.',
+        });
+      } else {
+        toast({
+          title: 'Permission Denied',
+          description: 'Push notifications were not enabled.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to enable push notifications.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notification Preferences
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Notification Methods */}
+          <div className="space-y-4">
+            <h4 className="font-medium text-gray-900">Notification Methods</h4>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Smartphone className="h-4 w-4 text-gray-600" />
+                <Label htmlFor="push-notifications" className="text-sm">
+                  Push Notifications
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                {!preferences.push && pushSupported && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={requestPushPermission}
+                  >
+                    Enable
+                  </Button>
+                )}
+                <Switch
+                  id="push-notifications"
+                  checked={preferences.push}
+                  onCheckedChange={(checked) => handlePreferenceChange('push', checked)}
+                  disabled={!pushSupported}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <MessageSquare className="h-4 w-4 text-gray-600" />
+                <Label htmlFor="sms-notifications" className="text-sm">
+                  SMS Notifications
+                </Label>
+              </div>
+              <Switch
+                id="sms-notifications"
+                checked={preferences.sms}
+                onCheckedChange={(checked) => handlePreferenceChange('sms', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-gray-600" />
+                <Label htmlFor="email-notifications" className="text-sm">
+                  Email Notifications
+                </Label>
+              </div>
+              <Switch
+                id="email-notifications"
+                checked={preferences.email}
+                onCheckedChange={(checked) => handlePreferenceChange('email', checked)}
+              />
+            </div>
+          </div>
+
+          {/* Notification Types */}
+          <div className="space-y-4 border-t pt-4">
+            <h4 className="font-medium text-gray-900">What to notify me about</h4>
+            
+            <div className="flex items-center justify-between">
+              <Label htmlFor="position-updates" className="text-sm">
+                Position changes in queue
+              </Label>
+              <Switch
+                id="position-updates"
+                checked={preferences.positionUpdates}
+                onCheckedChange={(checked) => handlePreferenceChange('positionUpdates', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="status-changes" className="text-sm">
+                When I'm being called
+              </Label>
+              <Switch
+                id="status-changes"
+                checked={preferences.statusChanges}
+                onCheckedChange={(checked) => handlePreferenceChange('statusChanges', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="reminder-before-call" className="text-sm">
+                Reminder 5 minutes before my turn
+              </Label>
+              <Switch
+                id="reminder-before-call"
+                checked={preferences.reminderBeforeCall}
+                onCheckedChange={(checked) => handlePreferenceChange('reminderBeforeCall', checked)}
+              />
+            </div>
+          </div>
+
+          {!pushSupported && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-sm text-yellow-800">
+                Push notifications are not supported on this device. You can still receive SMS and email notifications.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
