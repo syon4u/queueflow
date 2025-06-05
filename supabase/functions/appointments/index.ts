@@ -42,10 +42,10 @@ const handler = async (req: Request): Promise<Response> => {
 
       const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase();
       
-      // Find appointment that starts with this prefix - convert UUID to text for pattern matching
+      // Find appointment that starts with this prefix - use explicit relationship hint
       const { data: appointments, error: searchError } = await supabaseClient
         .from('appointments')
-        .select('id, status, scheduled_time, customers(first_name, last_name)')
+        .select('id, status, scheduled_time, customers!appointments_customer_id_fkey(first_name, last_name)')
         .filter('id::text', 'ilike', `${appointmentIdPrefix}%`)
         .eq('status', 'scheduled');
 
