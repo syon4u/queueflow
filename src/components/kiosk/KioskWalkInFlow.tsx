@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,7 @@ export const KioskWalkInFlow: React.FC = () => {
   const queryClient = useQueryClient();
 
   // Fetch locations
-  const { data: locations, isLoading: locationsLoading } = useQuery({
+  const { data: locations, isLoading: locationsLoading } = useQuery<Location[]>({
     queryKey: ['kiosk-locations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -65,7 +64,7 @@ export const KioskWalkInFlow: React.FC = () => {
   });
 
   // Fetch services for selected location
-  const { data: services, isLoading: servicesLoading } = useQuery({
+  const { data: services, isLoading: servicesLoading } = useQuery<Service[]>({
     queryKey: ['kiosk-services', selectedLocation?.id],
     queryFn: async () => {
       if (!selectedLocation) return [] as Service[];
