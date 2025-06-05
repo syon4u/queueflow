@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -34,7 +33,7 @@ const Index: React.FC = () => {
                 <Link to="/customer">Get Started</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-700" asChild>
-                <Link to="/appointments">View Schedule</Link>
+                <Link to="/queue">Join Queue</Link>
               </Button>
             </div>
           </div>
@@ -43,7 +42,7 @@ const Index: React.FC = () => {
         {/* Main Service Cards */}
         <section className="py-16 -mt-8">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
               {/* Customer Portal Card */}
               <Card className="hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white">
                 <CardHeader className="text-center pb-4">
@@ -76,24 +75,6 @@ const Index: React.FC = () => {
                 <CardContent className="text-center">
                   <Button className="w-full bg-green-600 hover:bg-green-700" size="lg" asChild>
                     <Link to="/queue">Join Queue</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Appointments Card */}
-              <Card className="hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white">
-                <CardHeader className="text-center pb-4">
-                  <div className="mx-auto mb-4 w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Calendar className="h-8 w-8 text-purple-600" />
-                  </div>
-                  <CardTitle className="text-xl font-bold text-gray-900">Appointments</CardTitle>
-                  <CardDescription className="text-gray-600">
-                    View and manage all your scheduled appointments
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700" size="lg" asChild>
-                    <Link to="/appointments">View Schedule</Link>
                   </Button>
                 </CardContent>
               </Card>

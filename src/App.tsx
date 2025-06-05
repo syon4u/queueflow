@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { RoleDashboardWrapper } from "./components/staff/RoleDashboardWrapper";
 import Index from "./pages/Index";
 import CustomerPage from "./pages/CustomerPage";
-import AppointmentsPage from "./pages/AppointmentsPage";
 import StaffPage from "./pages/StaffPage";
 import AdminPage from "./components/admin/AdminPage";
 import { VirtualQueuePage } from "./pages/VirtualQueuePage";
@@ -99,7 +98,6 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/customer" element={<CustomerPage />} />
-                <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/power-user" element={<PowerUserPage />} />
