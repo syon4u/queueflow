@@ -33,7 +33,7 @@ const HeroSection: React.FC = () => {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50 px-8" asChild>
-              <Link to="/queue">Check Status</Link>
+              <Link to="/queue-status">Check Status</Link>
             </Button>
             <Button size="lg" variant="ghost" className="w-full sm:w-auto text-gray-600 hover:bg-gray-100 px-8" asChild>
               <Link to="/kiosk">I'm Here, Check In</Link>

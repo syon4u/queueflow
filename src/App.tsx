@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +14,7 @@ import CustomerPage from "./pages/CustomerPage";
 import StaffPage from "./pages/StaffPage";
 import AdminPage from "./components/admin/AdminPage";
 import { VirtualQueuePage } from "./pages/VirtualQueuePage";
+import QueueStatusPage from "./pages/QueueStatusPage";
 import AuthPage from "./pages/AuthPage";
 import KioskPage from "./pages/KioskPage";
 import DigitalSignagePage from "./pages/DigitalSignagePage";
