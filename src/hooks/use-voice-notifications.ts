@@ -42,11 +42,7 @@ export function useVoiceNotifications() {
     queryFn: async (): Promise<VoiceNotification[]> => {
       const { data, error } = await supabase
         .from('voice_notifications' as any)
-        .select(`
-          *,
-          customers!voice_notifications_customer_id_fkey(first_name, last_name),
-          appointments!voice_notifications_appointment_id_fkey(scheduled_time)
-        `)
+        .select('*')
         .order('scheduled_for', { ascending: true });
 
       if (error) throw error;
@@ -64,11 +60,7 @@ export function useVoiceNotifications() {
       
       const { data, error } = await supabase
         .from('voice_notifications' as any)
-        .select(`
-          *,
-          customers!voice_notifications_customer_id_fkey(first_name, last_name, phone),
-          appointments!voice_notifications_appointment_id_fkey(scheduled_time)
-        `)
+        .select('*')
         .in('status', ['pending', 'failed'])
         .lte('scheduled_for', now)
         .lt('retry_count', 3); // Only get notifications that haven't exceeded max retries
