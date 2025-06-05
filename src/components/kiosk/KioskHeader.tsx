@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Home, ArrowLeft } from 'lucide-react';
-import type { KioskStep } from '@/pages/KioskPage';
+import type { KioskStep } from './types';
 
 interface KioskHeaderProps {
   currentStep: KioskStep;
@@ -14,7 +14,7 @@ export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOv
     switch (step) {
       case 'location': return 'Select Location';
       case 'service': return 'Choose Service';
-      case 'customer': return 'Enter Information';
+      case 'customer_info': return 'Enter Information';
       case 'ticket': return 'Your Ticket';
       default: return 'QueueFlow Kiosk';
     }
@@ -24,7 +24,7 @@ export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOv
     switch (step) {
       case 'location': return 1;
       case 'service': return 2;
-      case 'customer': return 3;
+      case 'customer_info': return 3;
       case 'ticket': return 4;
       default: return 1;
     }

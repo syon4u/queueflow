@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Printer, QrCode, Clock, Users, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Printer, Clock, Users, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
+import { KIOSK_STEPS, type KioskStep } from './types';
 
 interface Location {
   id: string;
@@ -23,7 +23,7 @@ interface Service {
   id: string;
   name: string;
   description: string;
-  estimated_duration_minutes: number;
+  duration: number;
 }
 
 interface KioskTicket {
@@ -34,16 +34,6 @@ interface KioskTicket {
   estimated_wait_time: number;
   qr_code_data: string;
 }
-
-const KIOSK_STEPS = {
-  LOCATION: 'location',
-  SERVICE: 'service',
-  CUSTOMER_INFO: 'customer_info',
-  CONFIRMATION: 'confirmation',
-  TICKET: 'ticket'
-} as const;
-
-type KioskStep = typeof KIOSK_STEPS[keyof typeof KIOSK_STEPS];
 
 export const KioskWalkInFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<KioskStep>(KIOSK_STEPS.LOCATION);
@@ -82,7 +72,7 @@ export const KioskWalkInFlow: React.FC = () => {
       
       const { data, error } = await supabase
         .from('services')
-        .select('id, name, description, estimated_duration_minutes')
+        .select('id, name, description, duration')
         .eq('location_id', selectedLocation.id)
         .eq('is_active', true);
       
@@ -288,7 +278,7 @@ export const KioskWalkInFlow: React.FC = () => {
                       <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <Clock className="h-4 w-4" />
-                        <span className="text-sm">~{service.estimated_duration_minutes} minutes</span>
+                        <span className="text-sm">~{service.duration} minutes</span>
                       </div>
                     </div>
                     <ArrowRight className="h-5 w-5" />
@@ -380,7 +370,7 @@ export const KioskWalkInFlow: React.FC = () => {
               <div><strong>Name:</strong> {customerInfo.name}</div>
               {customerInfo.phone && <div><strong>Phone:</strong> {customerInfo.phone}</div>}
               {customerInfo.email && <div><strong>Email:</strong> {customerInfo.email}</div>}
-              <div><strong>Estimated Duration:</strong> {selectedService?.estimated_duration_minutes} minutes</div>
+              <div><strong>Estimated Duration:</strong> {selectedService?.duration} minutes</div>
             </div>
             <div className="flex gap-4 pt-4">
               <Button variant="outline" onClick={goBack} className="flex-1">
