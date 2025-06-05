@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Shield, Users, UserCheck, Plus, Building2 } from 'lucide-react';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTable } from './DataTable';
 import { StaffFormDialog } from './staff/StaffFormDialog';
 import { useProfileManagement } from '@/hooks/admin/use-profile-management';
-import { useStaffTableColumns } from './staff/StaffTableColumns';
+import { useUserTableColumns } from '@/components/shared/UserTableColumns';
 import { useUserManagement } from '@/hooks/admin/use-user-management';
 import { UsersTable } from './users/UsersTable';
 import { UserSearchBox } from './users/UserSearchBox';
@@ -35,7 +34,7 @@ export const MergedUsersTab: React.FC = () => {
     handleSubmit
   } = useProfileManagement();
 
-  const staffColumns = useStaffTableColumns();
+  const staffColumns = useUserTableColumns('staff');
 
   // User roles management hooks
   const {
