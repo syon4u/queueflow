@@ -3,7 +3,6 @@ import React from 'react';
 import { 
   Users, 
   Calendar,
-  BarChart3,
   Settings,
   Activity,
   Wrench,
@@ -58,14 +57,8 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
       ]
     },
     {
-      label: 'Analytics & Tools',
+      label: 'Tools',
       items: [
-        {
-          id: 'analytics',
-          label: 'Performance',
-          icon: BarChart3,
-          description: 'Staff performance metrics'
-        },
         {
           id: 'advanced-tools',
           label: 'Advanced Tools',
@@ -78,16 +71,10 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
 
   const quickActions = [
     {
-      label: 'Admin Portal',
+      label: 'Power User Portal',
       icon: Settings,
-      onClick: () => window.open('/admin', '_blank'),
-      iconColor: 'text-blue-600'
-    },
-    {
-      label: 'Performance Report',
-      icon: BarChart3,
-      onClick: () => window.open('/performance', '_blank'),
-      iconColor: 'text-green-600'
+      onClick: () => window.open('/power-user', '_blank'),
+      iconColor: 'text-purple-600'
     }
   ];
 
