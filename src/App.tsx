@@ -106,6 +106,11 @@ function App() {
                 <Route path="/kiosk" element={<KioskPage />} />
                 <Route path="/signage" element={<DigitalSignagePage />} />
                 <Route path="/mobile-queue" element={<MobileQueuePage />} />
+                <Route path="/staff-roles" element={
+                  <div>
+                    <RoleDashboardWrapper />
+                  </div>
+                } />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>

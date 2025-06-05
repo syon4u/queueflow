@@ -1062,6 +1062,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          location_id: string | null
           phone: string | null
           status: string | null
           updated_at: string | null
@@ -1072,6 +1073,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          location_id?: string | null
           phone?: string | null
           status?: string | null
           updated_at?: string | null
@@ -1082,11 +1084,20 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          location_id?: string | null
           phone?: string | null
           status?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       queue_positions: {
         Row: {
