@@ -1,76 +1,118 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BaseSidebar } from './BaseSidebar';
 import { 
   Users, 
   MapPin, 
-  Wrench, 
   MessageSquare, 
   BarChart3, 
   Calendar,
-  UserCog,
   ClipboardList,
   Settings,
-  Home
+  Home,
+  Plus,
+  Bell
 } from 'lucide-react';
 
-const navigationItems = [
+const navigationGroups = [
   {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: Home,
-    href: '/power-user'
+    label: 'Operations',
+    items: [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: Home,
+        description: 'Overview and today\'s activities'
+      },
+      {
+        id: 'appointments',
+        label: 'Appointments',
+        icon: Calendar,
+        description: 'Manage today\'s schedule'
+      }
+    ]
   },
   {
-    id: 'appointments',
-    label: 'Appointments',
-    icon: Calendar,
-    href: '/power-user#appointments'
+    label: 'Administration',
+    items: [
+      {
+        id: 'users',
+        label: 'User Administration',
+        icon: Users,
+        description: 'Manage user accounts and roles'
+      },
+      {
+        id: 'locations',
+        label: 'Locations & Services',
+        icon: MapPin,
+        description: 'Configure locations and services'
+      },
+      {
+        id: 'communications',
+        label: 'SMS & Notifications',
+        icon: MessageSquare,
+        description: 'Manage communication templates'
+      }
+    ]
   },
   {
-    id: 'users',
-    label: 'User Administration',
-    icon: Users,
-    href: '/power-user#users'
+    label: 'Analytics & Management',
+    items: [
+      {
+        id: 'reports',
+        label: 'Reports & Analytics',
+        icon: BarChart3,
+        description: 'View performance metrics'
+      },
+      {
+        id: 'overrides',
+        label: 'Appointment Overrides',
+        icon: ClipboardList,
+        description: 'Special appointment management'
+      },
+      {
+        id: 'settings',
+        label: 'Settings',
+        icon: Settings,
+        description: 'Power user preferences'
+      }
+    ]
+  }
+];
+
+const quickActions = [
+  {
+    label: 'New Appointment',
+    icon: Plus,
+    onClick: () => {
+      console.log('Create new appointment');
+      // TODO: Implement new appointment creation
+    },
+    iconColor: 'text-blue-600'
   },
   {
-    id: 'locations',
-    label: 'Locations & Services',
-    icon: MapPin,
-    href: '/power-user#locations'
-  },
-  {
-    id: 'communications',
-    label: 'SMS & Notifications',
-    icon: MessageSquare,
-    href: '/power-user#communications'
-  },
-  {
-    id: 'reports',
-    label: 'Reports & Analytics',
-    icon: BarChart3,
-    href: '/power-user#reports'
-  },
-  {
-    id: 'overrides',
-    label: 'Appointment Overrides',
-    icon: ClipboardList,
-    href: '/power-user#overrides'
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    href: '/power-user#settings'
+    label: 'Send Notification',
+    icon: Bell,
+    onClick: () => {
+      console.log('Send bulk notification');
+      // TODO: Implement bulk notification
+    },
+    iconColor: 'text-green-600'
   }
 ];
 
 export const PowerUserSidebar: React.FC = () => {
+  const [activeItem, setActiveItem] = useState('dashboard');
+
   return (
     <BaseSidebar
       title="Power User Portal"
-      navigationItems={navigationItems}
+      subtitle="Comprehensive Management Tools"
       userRole="power_user"
+      navigationGroups={navigationGroups}
+      quickActions={quickActions}
+      activeItem={activeItem}
+      onItemChange={setActiveItem}
     />
   );
 };

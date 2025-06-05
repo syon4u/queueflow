@@ -22,8 +22,14 @@ import { ReportsAnalyticsTab } from './tabs/ReportsAnalyticsTab';
 import { AppointmentOverridesTab } from './tabs/AppointmentOverridesTab';
 import { PowerUserAppointmentsTab } from './tabs/PowerUserAppointmentsTab';
 
-export const PowerUserDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+interface PowerUserDashboardProps {
+  activeTab?: string;
+}
+
+export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({ 
+  activeTab = 'dashboard' 
+}) => {
+  const [currentTab, setCurrentTab] = useState(activeTab);
 
   return (
     <div className="space-y-6 p-6">
@@ -64,7 +70,7 @@ export const PowerUserDashboard: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <TabsList className="grid w-full grid-cols-7 bg-gray-100">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
