@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { 
   Dialog, 
@@ -14,45 +13,27 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin, User, FileText } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Appointment } from '@/hooks/use-appointments';
+import { useAppData } from '@/hooks/useAppData';
 
 interface CustomerHistoryProps {
   trigger: React.ReactNode;
   customerId?: string;
 }
 
-interface HistoryAppointment extends Appointment {}
-
 const CustomerHistoryModal: React.FC<CustomerHistoryProps> = ({ trigger, customerId }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { appointments, isLoading } = useAppData();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<HistoryAppointment[]>([]);
   
-  const fetchCustomerHistory = async (id: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('customer-history', {
-        body: { customerId: id }
-      });
-      
-      if (error) {
-        throw new Error(error.message);
-      }
-      
-      setHistory(data || []);
-    } catch (error) {
-      console.error('Error fetching customer history:', error);
-      toast({
-        title: t('common.error'),
-        description: t('customer.historyError'),
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter appointments for the specific customer
+  const customerHistory = useMemo(() => {
+    if (!customerId) return [];
+    
+    return appointments
+      .filter(appointment => appointment.customer_id === customerId)
+      .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime());
+  }, [appointments, customerId]);
   
   const getStatusVariant = (status: string): "default" | "secondary" | "outline" | "destructive" => {
     switch (status) {
@@ -66,15 +47,8 @@ const CustomerHistoryModal: React.FC<CustomerHistoryProps> = ({ trigger, custome
     }
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (open && customerId) {
-      fetchCustomerHistory(customerId);
-    }
-  };
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
@@ -90,11 +64,11 @@ const CustomerHistoryModal: React.FC<CustomerHistoryProps> = ({ trigger, custome
             {t('customer.historyDescription')}
           </p>
 
-          {loading ? (
+          {isLoading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
-          ) : history.length === 0 ? (
+          ) : customerHistory.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               {t('customer.noAppointmentHistory')}
             </div>
@@ -109,13 +83,13 @@ const CustomerHistoryModal: React.FC<CustomerHistoryProps> = ({ trigger, custome
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {history.map((appointment) => (
+                {customerHistory.map((appointment) => (
                   <TableRow key={appointment.id}>
                     <TableCell>
                       {format(new Date(appointment.scheduled_time), 'PPp')}
                     </TableCell>
                     <TableCell>
-                      {appointment.service_id}
+                      {appointment.service?.name || 'Unknown Service'}
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(appointment.status)}>
