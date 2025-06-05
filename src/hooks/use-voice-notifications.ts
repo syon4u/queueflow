@@ -47,7 +47,7 @@ export function useVoiceNotifications() {
 
       if (error) throw error;
       
-      return (data || []) as VoiceNotification[];
+      return (data || []) as unknown as VoiceNotification[];
     },
     refetchInterval: 30000 // Refetch every 30 seconds
   });
@@ -67,7 +67,7 @@ export function useVoiceNotifications() {
 
       if (error) throw error;
       
-      return (data || []) as VoiceNotification[];
+      return (data || []) as unknown as VoiceNotification[];
     },
     refetchInterval: 15000 // Check every 15 seconds
   });
