@@ -3,7 +3,7 @@ import React from 'react';
 import { DataTable } from './DataTable';
 import { EmployeeFormDialog } from './employee/EmployeeFormDialog';
 import { useEmployeeManagement } from '@/hooks/admin/use-employee-management';
-import { useUserTableColumns } from './shared/UserTableColumns';
+import { useEmployeeTableColumns } from './employee/EmployeeTableColumns';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 export const EmployeeTab: React.FC = () => {
@@ -22,12 +22,7 @@ export const EmployeeTab: React.FC = () => {
     handleSubmit
   } = useEmployeeManagement();
 
-  const columns = useUserTableColumns({ 
-    userType: 'employee',
-    showLocation: true,
-    showStatus: true,
-    showEmail: true
-  });
+  const columns = useEmployeeTableColumns();
 
   return (
     <div>
