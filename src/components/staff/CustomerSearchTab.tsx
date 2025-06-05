@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, User, Calendar, Phone, Mail, History, FileText } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, User, Calendar, Phone, Mail, History, FileText, MapPin, Settings } from 'lucide-react';
 import { useAppData } from '@/hooks/useAppData';
 import { CustomerHistoryDialog } from './CustomerHistoryDialog';
 import { format } from 'date-fns';
@@ -18,15 +19,19 @@ interface Customer {
   appointmentCount: number;
   lastAppointment: string | null;
   mostRecentStatus: string;
+  locations: string[];
+  services: string[];
 }
 
 export const CustomerSearchTab: React.FC = () => {
-  const { appointments, isLoading } = useAppData();
+  const { appointments, locations, services, isLoading } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
+  const [selectedService, setSelectedService] = useState<string>('all');
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
 
-  // Extract unique customers from appointments data
+  // Extract unique customers from appointments data with location and service info
   const customers = useMemo(() => {
     const customerMap = new Map<string, Customer>();
 
@@ -34,6 +39,9 @@ export const CustomerSearchTab: React.FC = () => {
       if (appointment.customer) {
         const customerId = appointment.customer_id;
         const existing = customerMap.get(customerId);
+
+        const locationName = appointment.location?.name || 'Unknown Location';
+        const serviceName = appointment.service?.name || 'Unknown Service';
 
         if (existing) {
           // Update existing customer with latest info
@@ -45,6 +53,14 @@ export const CustomerSearchTab: React.FC = () => {
             existing.lastAppointment = appointment.scheduled_time;
             existing.mostRecentStatus = appointment.status;
           }
+
+          // Add unique locations and services
+          if (!existing.locations.includes(locationName)) {
+            existing.locations.push(locationName);
+          }
+          if (!existing.services.includes(serviceName)) {
+            existing.services.push(serviceName);
+          }
         } else {
           // Create new customer entry
           customerMap.set(customerId, {
@@ -55,7 +71,9 @@ export const CustomerSearchTab: React.FC = () => {
             phone: appointment.customer.phone,
             appointmentCount: 1,
             lastAppointment: appointment.scheduled_time,
-            mostRecentStatus: appointment.status
+            mostRecentStatus: appointment.status,
+            locations: [locationName],
+            services: [serviceName]
           });
         }
       }
@@ -68,18 +86,37 @@ export const CustomerSearchTab: React.FC = () => {
     });
   }, [appointments]);
 
-  // Filter customers based on search term
+  // Filter customers based on search term, location, and service
   const filteredCustomers = useMemo(() => {
-    if (!searchTerm.trim()) return customers;
+    let filtered = customers;
 
-    const search = searchTerm.toLowerCase();
-    return customers.filter(customer =>
-      customer.first_name.toLowerCase().includes(search) ||
-      customer.last_name.toLowerCase().includes(search) ||
-      customer.email?.toLowerCase().includes(search) ||
-      customer.phone?.includes(search)
-    );
-  }, [customers, searchTerm]);
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(customer =>
+        customer.first_name.toLowerCase().includes(search) ||
+        customer.last_name.toLowerCase().includes(search) ||
+        customer.email?.toLowerCase().includes(search) ||
+        customer.phone?.includes(search)
+      );
+    }
+
+    // Filter by location
+    if (selectedLocation !== 'all') {
+      filtered = filtered.filter(customer =>
+        customer.locations.includes(selectedLocation)
+      );
+    }
+
+    // Filter by service
+    if (selectedService !== 'all') {
+      filtered = filtered.filter(customer =>
+        customer.services.includes(selectedService)
+      );
+    }
+
+    return filtered;
+  }, [customers, searchTerm, selectedLocation, selectedService]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -128,7 +165,7 @@ export const CustomerSearchTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search Header */}
+      {/* Search Header with Filters */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -147,9 +184,74 @@ export const CustomerSearchTab: React.FC = () => {
                 className="pl-10"
               />
             </div>
+
+            {/* Filter Tabs */}
+            <Tabs defaultValue="all" className="w-full">
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Location:</span>
+                  <TabsList className="h-8">
+                    <TabsTrigger 
+                      value="all" 
+                      className="text-xs px-3 py-1"
+                      onClick={() => setSelectedLocation('all')}
+                    >
+                      All
+                    </TabsTrigger>
+                    {locations.map((location) => (
+                      <TabsTrigger
+                        key={location.id}
+                        value={location.name}
+                        className="text-xs px-3 py-1"
+                        onClick={() => setSelectedLocation(location.name)}
+                      >
+                        {location.name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Settings className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Service:</span>
+                  <TabsList className="h-8">
+                    <TabsTrigger 
+                      value="all" 
+                      className="text-xs px-3 py-1"
+                      onClick={() => setSelectedService('all')}
+                    >
+                      All
+                    </TabsTrigger>
+                    {services.map((service) => (
+                      <TabsTrigger
+                        key={service.id}
+                        value={service.name}
+                        className="text-xs px-3 py-1"
+                        onClick={() => setSelectedService(service.name)}
+                      >
+                        {service.name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
+              </div>
+            </Tabs>
             
-            <div className="text-sm text-muted-foreground">
-              Found {filteredCustomers.length} customers from appointment records
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>Found {filteredCustomers.length} customers from appointment records</span>
+              {(selectedLocation !== 'all' || selectedService !== 'all') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedLocation('all');
+                    setSelectedService('all');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -162,11 +264,14 @@ export const CustomerSearchTab: React.FC = () => {
             <CardContent className="p-8 text-center">
               <User className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {searchTerm ? 'No customers found' : 'No customers available'}
+                {searchTerm || selectedLocation !== 'all' || selectedService !== 'all' 
+                  ? 'No customers found' 
+                  : 'No customers available'
+                }
               </h3>
               <p className="text-gray-500">
-                {searchTerm 
-                  ? 'Try adjusting your search terms'
+                {searchTerm || selectedLocation !== 'all' || selectedService !== 'all'
+                  ? 'Try adjusting your search terms or filters'
                   : 'Customers will appear here once they create appointments'
                 }
               </p>
@@ -221,6 +326,22 @@ export const CustomerSearchTab: React.FC = () => {
                             </Badge>
                           </div>
                         )}
+                      </div>
+
+                      {/* Location and Service Tags */}
+                      <div className="flex flex-wrap gap-2">
+                        {customer.locations.map((location, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            <MapPin className="h-3 w-3 mr-1" />
+                            {location}
+                          </Badge>
+                        ))}
+                        {customer.services.map((service, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            <Settings className="h-3 w-3 mr-1" />
+                            {service}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
                   </div>
