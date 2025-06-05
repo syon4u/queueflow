@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, User } from 'lucide-react';
+import { ArrowLeft, User, Phone, Mail, UserCheck } from 'lucide-react';
 
 interface CustomerData {
   firstName: string;
@@ -70,28 +70,40 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="outline" onClick={onBack} size="sm">
-          <ArrowLeft className="h-4 w-4 mr-2" />
+    <div className="bg-white rounded-2xl shadow-xl p-10 max-w-4xl mx-auto border border-blue-100">
+      <div className="flex items-center gap-6 mb-8">
+        <Button 
+          variant="outline" 
+          onClick={onBack} 
+          className="flex items-center gap-3 px-6 py-3 text-lg border-2 border-gray-300 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 rounded-xl"
+        >
+          <ArrowLeft className="h-5 w-5" />
           Back
         </Button>
-        <h3 className="text-2xl font-bold text-gray-800">
-          Enter Your Information
-        </h3>
+        <div>
+          <h3 className="text-4xl font-bold text-gray-900 mb-2">
+            Enter Your Information
+          </h3>
+          <p className="text-xl text-gray-600">
+            We need a few details to generate your service ticket
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-3 mb-6 p-4 bg-blue-50 rounded-lg">
-        <User className="h-6 w-6 text-blue-600" />
-        <p className="text-blue-800">
+      <div className="flex items-center gap-4 mb-10 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <UserCheck className="h-6 w-6 text-blue-600" />
+        </div>
+        <p className="text-xl text-blue-800 font-medium">
           Please provide your contact information to generate your service ticket.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-lg">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <Label htmlFor="firstName" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+              <User className="h-5 w-5" />
               First Name *
             </Label>
             <Input
@@ -99,16 +111,21 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
               type="text"
               value={formData.firstName}
               onChange={(e) => handleInputChange('firstName', e.target.value)}
-              className={`text-lg p-4 ${errors.firstName ? 'border-red-500' : ''}`}
+              className={`text-xl p-6 rounded-xl border-2 transition-all duration-200 ${
+                errors.firstName 
+                  ? 'border-red-500 bg-red-50' 
+                  : 'border-gray-300 hover:border-blue-300 focus:border-blue-500'
+              }`}
               placeholder="Enter your first name"
             />
             {errors.firstName && (
-              <p className="text-red-500 text-sm">{errors.firstName}</p>
+              <p className="text-red-500 text-lg font-medium">{errors.firstName}</p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="lastName" className="text-lg">
+          <div className="space-y-3">
+            <Label htmlFor="lastName" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+              <User className="h-5 w-5" />
               Last Name *
             </Label>
             <Input
@@ -116,17 +133,22 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
               type="text"
               value={formData.lastName}
               onChange={(e) => handleInputChange('lastName', e.target.value)}
-              className={`text-lg p-4 ${errors.lastName ? 'border-red-500' : ''}`}
+              className={`text-xl p-6 rounded-xl border-2 transition-all duration-200 ${
+                errors.lastName 
+                  ? 'border-red-500 bg-red-50' 
+                  : 'border-gray-300 hover:border-blue-300 focus:border-blue-500'
+              }`}
               placeholder="Enter your last name"
             />
             {errors.lastName && (
-              <p className="text-red-500 text-sm">{errors.lastName}</p>
+              <p className="text-red-500 text-lg font-medium">{errors.lastName}</p>
             )}
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-lg">
+        <div className="space-y-3">
+          <Label htmlFor="phone" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+            <Phone className="h-5 w-5" />
             Phone Number *
           </Label>
           <Input
@@ -134,16 +156,21 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
             type="tel"
             value={formData.phone}
             onChange={(e) => handleInputChange('phone', e.target.value)}
-            className={`text-lg p-4 ${errors.phone ? 'border-red-500' : ''}`}
+            className={`text-xl p-6 rounded-xl border-2 transition-all duration-200 ${
+              errors.phone 
+                ? 'border-red-500 bg-red-50' 
+                : 'border-gray-300 hover:border-blue-300 focus:border-blue-500'
+            }`}
             placeholder="(555) 123-4567"
           />
           {errors.phone && (
-            <p className="text-red-500 text-sm">{errors.phone}</p>
+            <p className="text-red-500 text-lg font-medium">{errors.phone}</p>
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-lg">
+        <div className="space-y-3">
+          <Label htmlFor="email" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+            <Mail className="h-5 w-5" />
             Email Address (Optional)
           </Label>
           <Input
@@ -151,16 +178,23 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
             type="email"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
-            className={`text-lg p-4 ${errors.email ? 'border-red-500' : ''}`}
+            className={`text-xl p-6 rounded-xl border-2 transition-all duration-200 ${
+              errors.email 
+                ? 'border-red-500 bg-red-50' 
+                : 'border-gray-300 hover:border-blue-300 focus:border-blue-500'
+            }`}
             placeholder="your.email@example.com"
           />
           {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
+            <p className="text-red-500 text-lg font-medium">{errors.email}</p>
           )}
         </div>
 
-        <div className="flex justify-end pt-4">
-          <Button type="submit" size="lg" className="px-8 py-4 text-lg">
+        <div className="flex justify-end pt-8">
+          <Button 
+            type="submit" 
+            className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-xl"
+          >
             Generate Ticket
           </Button>
         </div>

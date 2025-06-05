@@ -31,16 +31,16 @@ export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOv
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">Q</span>
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-2xl">Q</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">QueueFlow Kiosk</h1>
-              <p className="text-gray-600">Self-Service Check-in</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">QueueFlow Kiosk</h1>
+              <p className="text-lg text-blue-600 font-medium">Self-Service Check-in</p>
             </div>
           </div>
         </div>
@@ -48,26 +48,45 @@ export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOv
         <Button
           variant="outline"
           onClick={onStartOver}
-          className="flex items-center gap-2 text-lg px-6 py-3"
+          className="flex items-center gap-3 text-xl px-8 py-4 border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
         >
-          <Home className="h-5 w-5" />
+          <Home className="h-6 w-6" />
           Start Over
         </Button>
       </div>
       
-      <div className="mt-6">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold text-gray-800">
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-gray-800">
             Step {getStepNumber(currentStep)}: {getStepTitle(currentStep)}
           </h2>
+          <div className="text-lg text-gray-500 font-medium">
+            {getStepNumber(currentStep)} of 4
+          </div>
         </div>
         
-        {/* Progress bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        {/* Enhanced Progress bar */}
+        <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
           <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out shadow-sm"
             style={{ width: `${(getStepNumber(currentStep) / 4) * 100}%` }}
           />
+        </div>
+        
+        {/* Step indicators */}
+        <div className="flex justify-between mt-4">
+          {[1, 2, 3, 4].map((step) => (
+            <div
+              key={step}
+              className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold transition-all duration-300 ${
+                step <= getStepNumber(currentStep)
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-300 text-gray-600'
+              }`}
+            >
+              {step}
+            </div>
+          ))}
         </div>
       </div>
     </div>

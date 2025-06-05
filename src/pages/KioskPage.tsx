@@ -190,44 +190,52 @@ const KioskPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <KioskHeader 
           currentStep={kioskState.step}
           onStartOver={handleStartOver}
         />
         
-        <div className="mt-8">
+        <div className="mt-10">
           {kioskState.step === 'location' && (
-            <KioskLocationSelector
-              locations={locations || []}
-              onLocationSelect={handleLocationSelect}
-            />
+            <div className="animate-fade-in">
+              <KioskLocationSelector
+                locations={locations || []}
+                onLocationSelect={handleLocationSelect}
+              />
+            </div>
           )}
           
           {kioskState.step === 'service' && (
-            <KioskServiceSelector
-              services={services || []}
-              onServiceSelect={handleServiceSelect}
-              onBack={() => setKioskState(prev => ({ ...prev, step: 'location' }))}
-            />
+            <div className="animate-fade-in">
+              <KioskServiceSelector
+                services={services || []}
+                onServiceSelect={handleServiceSelect}
+                onBack={() => setKioskState(prev => ({ ...prev, step: 'location' }))}
+              />
+            </div>
           )}
           
           {kioskState.step === 'customer' && (
-            <KioskCustomerForm
-              onSubmit={handleCustomerSubmit}
-              onBack={() => setKioskState(prev => ({ ...prev, step: 'service' }))}
-            />
+            <div className="animate-fade-in">
+              <KioskCustomerForm
+                onSubmit={handleCustomerSubmit}
+                onBack={() => setKioskState(prev => ({ ...prev, step: 'service' }))}
+              />
+            </div>
           )}
           
           {kioskState.step === 'ticket' && kioskState.appointmentId && (
-            <KioskTicketGeneration
-              appointmentId={kioskState.appointmentId}
-              customerData={kioskState.customerData!}
-              locationId={kioskState.selectedLocation!}
-              serviceId={kioskState.selectedService!}
-              onStartOver={handleStartOver}
-            />
+            <div className="animate-fade-in">
+              <KioskTicketGeneration
+                appointmentId={kioskState.appointmentId}
+                customerData={kioskState.customerData!}
+                locationId={kioskState.selectedLocation!}
+                serviceId={kioskState.selectedService!}
+                onStartOver={handleStartOver}
+              />
+            </div>
           )}
         </div>
       </div>
