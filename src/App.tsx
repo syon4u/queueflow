@@ -106,6 +106,7 @@ function App() {
                 <Route path="/power-user" element={<PowerUserPage />} />
                 <Route path="/queue" element={<VirtualQueuePage />} />
                 <Route path="/status" element={<StatusPage />} />
+                <Route path="/check-in" element={<CheckInPage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/kiosk" element={<KioskPage />} />
                 <Route path="/signage" element={<DigitalSignagePage />} />
