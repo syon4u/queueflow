@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -88,12 +87,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           label: 'Users & Staff',
           icon: Users,
           description: 'User roles and staff management'
-        },
-        {
-          id: 'customers',
-          label: 'Customers',
-          icon: Contact,
-          description: 'Customer profiles'
         }
       ]
     },

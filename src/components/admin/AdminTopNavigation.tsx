@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -34,7 +33,6 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
     { id: 'users', label: 'Users', icon: Users },
     { id: 'locations', label: 'Locations', icon: MapPin },
     { id: 'services', label: 'Services', icon: Wrench },
-    { id: 'customers', label: 'Customers', icon: Users },
     { id: 'communication', label: 'Communication', icon: MessageSquare },
     { id: 'queue', label: 'Queue', icon: Activity },
     { id: 'advanced-analytics', label: 'Analytics', icon: BarChart3 },

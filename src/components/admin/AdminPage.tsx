@@ -8,7 +8,6 @@ import { DashboardTab } from './DashboardTab';
 import { StatsTab } from './StatsTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
-import CustomerManagementTab from './CustomerManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
@@ -87,10 +86,6 @@ export const AdminPage: React.FC = () => {
             
             <TabsContent value="services">
               <ServicesTab />
-            </TabsContent>
-            
-            <TabsContent value="customers">
-              <CustomerManagementTab />
             </TabsContent>
             
             <TabsContent value="communication">

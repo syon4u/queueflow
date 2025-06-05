@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useQueue } from '@/context/QueueContext';
@@ -17,6 +16,7 @@ import { StaffDashboardHeader } from '@/components/staff/StaffDashboardHeader';
 import { StaffDashboardSkeleton } from '@/components/staff/StaffDashboardSkeleton';
 import { StaffStatusSkeleton } from '@/components/staff/StaffStatusSkeleton';
 import StaffStatusSection from '@/components/staff/StaffStatusSection';
+import CustomerSearchTab from '@/components/staff/CustomerSearchTab';
 
 interface StaffMainContentProps {
   activeSection: string;
@@ -103,6 +103,9 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
 
       case 'appointments':
         return <EnhancedAppointmentTable />;
+
+      case 'customer-search':
+        return <CustomerSearchTab />;
 
       case 'analytics':
         return <StaffPerformanceReport />;
