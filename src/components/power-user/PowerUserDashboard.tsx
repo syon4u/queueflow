@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,14 +23,14 @@ import { AppointmentOverridesTab } from './tabs/AppointmentOverridesTab';
 import { PowerUserAppointmentsTab } from './tabs/PowerUserAppointmentsTab';
 
 interface PowerUserDashboardProps {
-  activeTab?: string;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
 }
 
 export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({ 
-  activeTab = 'dashboard' 
+  activeTab,
+  onTabChange
 }) => {
-  const [currentTab, setCurrentTab] = useState(activeTab);
-
   return (
     <div className="space-y-6 p-6">
       {/* Breadcrumb Navigation */}
@@ -70,7 +70,7 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-7 bg-gray-100">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />

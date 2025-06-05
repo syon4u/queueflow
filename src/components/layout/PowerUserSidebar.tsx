@@ -101,18 +101,24 @@ const quickActions = [
   }
 ];
 
-export const PowerUserSidebar: React.FC = () => {
-  const [activeItem, setActiveItem] = useState('dashboard');
+interface PowerUserSidebarProps {
+  activeItem: string;
+  onItemChange: (item: string) => void;
+}
 
+export const PowerUserSidebar: React.FC<PowerUserSidebarProps> = ({
+  activeItem,
+  onItemChange
+}) => {
   return (
     <BaseSidebar
       title="Power User Portal"
       subtitle="Comprehensive Management Tools"
-      userRole="power_user"
+      userRole="Power User"
       navigationGroups={navigationGroups}
       quickActions={quickActions}
       activeItem={activeItem}
-      onItemChange={setActiveItem}
+      onItemChange={onItemChange}
     />
   );
 };
