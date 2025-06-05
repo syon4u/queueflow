@@ -55,8 +55,8 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <PowerUserStatsCards />
+      {/* Stats Overview - Only show on dashboard tab */}
+      {activeTab === 'dashboard' && <PowerUserStatsCards />}
 
       {/* Main Content */}
       <Card>
