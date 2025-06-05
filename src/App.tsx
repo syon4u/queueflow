@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,6 +20,7 @@ import DigitalSignagePage from "./pages/DigitalSignagePage";
 import MobileQueuePage from "./pages/MobileQueuePage";
 import PowerUserPage from "./pages/PowerUserPage";
 import StatusPage from "./pages/StatusPage";
+import CheckInPage from "./pages/CheckInPage";
 import "./App.css";
 
 const queryClient = new QueryClient();

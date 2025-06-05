@@ -36,7 +36,7 @@ const HeroSection: React.FC = () => {
               <Link to="/status">Check Status</Link>
             </Button>
             <Button size="lg" variant="ghost" className="w-full sm:w-auto text-gray-600 hover:bg-gray-100 px-8" asChild>
-              <Link to="/kiosk">I'm Here, Check In</Link>
+              <Link to="/check-in">I'm Here, Check In</Link>
             </Button>
           </div>
 

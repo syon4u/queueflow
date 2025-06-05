@@ -33,7 +33,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               <Link to="/status">Status</Link>
             </Button>
             <Button variant="ghost" asChild>
-              <Link to="/kiosk">Check In</Link>
+              <Link to="/check-in">Check In</Link>
             </Button>
             <div className="ml-4 pl-4 border-l border-gray-200">
               <Button variant="outline" size="sm" onClick={onToggleStaffAccess}>
@@ -64,7 +64,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                 <Link to="/status">Check Status</Link>
               </Button>
               <Button variant="ghost" className="justify-start" asChild>
-                <Link to="/kiosk">Check In</Link>
+                <Link to="/check-in">I'm Here, Check In</Link>
               </Button>
               <Button variant="outline" className="justify-start mt-4" onClick={onToggleStaffAccess}>
                 Employee Login
