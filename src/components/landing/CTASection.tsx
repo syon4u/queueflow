@@ -19,7 +19,7 @@ const CTASection: React.FC = () => {
             </Link>
           </Button>
           <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600 px-8" asChild>
-            <Link to="/queue-status">Check Status</Link>
+            <Link to="/queue">Check Status</Link>
           </Button>
           <Button size="lg" variant="ghost" className="w-full sm:w-auto text-white hover:bg-blue-700 px-8" asChild>
             <Link to="/kiosk">I'm Here, Check In</Link>
