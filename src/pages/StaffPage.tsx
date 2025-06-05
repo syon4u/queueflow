@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
 import { useTranslation } from 'react-i18next';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { QueueProvider } from '@/context/QueueContext';
@@ -9,10 +8,11 @@ import { useStaffNotifications } from '@/hooks/useStaffNotifications';
 import { StaffSidebar } from '@/components/layout/StaffSidebar';
 import { StaffMainContent } from '@/components/staff/StaffMainContent';
 import StaffShortcuts from '@/components/staff/StaffShortcuts';
+import { useAppData } from '@/hooks/useAppData';
 
 const StaffPageContent = () => {
   const { user, role } = useAuth();
-  const { appointments, refreshAppointments } = useRealtimeAppointments();
+  const { appointments, refetch: refreshAppointments, isLoading } = useAppData();
   const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState('basic-queue');
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
@@ -44,6 +44,16 @@ const StaffPageContent = () => {
   const handleSettingsClick = () => {
     setShowShortcutsDialog(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex w-full bg-gray-50">
+        <div className="flex justify-center items-center w-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>

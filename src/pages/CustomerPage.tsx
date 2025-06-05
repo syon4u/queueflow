@@ -13,12 +13,14 @@ import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { useToast } from '@/hooks/use-toast';
 import { useCustomerAppointmentFlow } from '@/hooks/customer/useCustomerAppointmentFlow';
 import { CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentForm';
+import { useAppData } from '@/hooks/useAppData';
 
 const CustomerPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState('');
   const { toast } = useToast();
   const { createAppointment, isSubmitting } = useCustomerAppointmentFlow();
+  const { locations, services, appointments, isLoading } = useAppData();
 
   const handleAppointmentRequested = async (customerInfo: CustomerAppointmentData) => {
     console.log('CustomerPage - Processing appointment request:', customerInfo);
@@ -44,6 +46,23 @@ const CustomerPage = () => {
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <PageLayout 
+        headerTitle="Consumer Protection Division"
+        headerSubtitle="Schedule appointments and manage your visits"
+      >
+        <div className="min-h-screen bg-pattern-grid bg-gradient-overlay-teal">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout 

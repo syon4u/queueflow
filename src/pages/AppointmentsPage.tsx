@@ -10,22 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Calendar, Clock } from 'lucide-react';
-
-interface Appointment {
-  id: string;
-  status: string;
-  scheduled_time: string;
-  check_in_time: string | null;
-  start_time: string | null;
-  end_time: string | null;
-  service: {
-    name: string;
-    duration: number;
-  };
-  location: {
-    name: string;
-  };
-}
+import { useAppData } from '@/hooks/useAppData';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -43,52 +28,12 @@ const AppointmentsPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { appointments, isLoading, refetch } = useAppData();
   
-  React.useEffect(() => {
-    const fetchAppointments = async () => {
-      if (!user?.id) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('appointments')
-          .select(`
-            id,
-            status,
-            scheduled_time,
-            check_in_time,
-            start_time,
-            end_time,
-            services!appointments_service_id_fkey (name, duration),
-            locations!appointments_location_id_fkey (name)
-          `)
-          .eq('customer_id', user.id)
-          .order('scheduled_time', { ascending: false });
-          
-        if (error) throw error;
-        
-        const formattedAppointments = (data || []).map(appointment => ({
-          ...appointment,
-          service: appointment.services || { name: 'Unknown Service', duration: 0 },
-          location: appointment.locations || { name: 'Unknown Location' }
-        }));
-        
-        setAppointments(formattedAppointments);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-        toast({
-          title: t('common.error'),
-          description: t('appointments.errorFetching'),
-          variant: 'destructive'
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchAppointments();
-  }, [user?.id, toast, t]);
+  // Filter appointments for current user
+  const userAppointments = appointments.filter(
+    appointment => appointment.customer_id === user?.id
+  );
   
   const handleCancel = async (id: string) => {
     try {
@@ -99,10 +44,8 @@ const AppointmentsPage = () => {
         
       if (error) throw error;
       
-      // Update local state
-      setAppointments(prev => prev.map(appt => 
-        appt.id === id ? { ...appt, status: 'cancelled' } : appt
-      ));
+      // Refresh data
+      refetch();
       
       toast({
         title: t('appointments.cancelled'),
@@ -126,6 +69,18 @@ const AppointmentsPage = () => {
     }
   };
   
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-pattern-waves bg-gradient-overlay-teal">
+        <div className="container mx-auto p-6">
+          <div className="flex justify-center p-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-pattern-waves bg-gradient-overlay-teal">
       <div className="container mx-auto p-6">
@@ -139,11 +94,7 @@ const AppointmentsPage = () => {
           </div>
         </div>
         
-        {isLoading ? (
-          <div className="flex justify-center p-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          </div>
-        ) : appointments.length === 0 ? (
+        {userAppointments.length === 0 ? (
           <Card className="text-center p-12 bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
             <CardContent className="pt-6">
               <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
@@ -156,17 +107,17 @@ const AppointmentsPage = () => {
           </Card>
         ) : (
           <div className="space-y-4">
-            {appointments.map((appointment) => (
+            {userAppointments.map((appointment) => (
               <Card key={appointment.id} className={`${appointment.status === 'cancelled' ? 'opacity-60' : ''} bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50 transition-all hover:shadow-md`}>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div>
                       <Badge className={getStatusColor(appointment.status)}>{t(`appointments.status.${appointment.status}`)}</Badge>
-                      <CardTitle className="mt-2">{appointment.service.name}</CardTitle>
+                      <CardTitle className="mt-2">{appointment.service?.name || 'Unknown Service'}</CardTitle>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">{t('appointments.location')}</p>
-                      <p>{appointment.location.name}</p>
+                      <p>{appointment.location?.name || 'Unknown Location'}</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -178,7 +129,7 @@ const AppointmentsPage = () => {
                     </div>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2" />
-                      <span className="text-sm">{t('appointments.duration')}: {appointment.service.duration} {t('appointments.minutes')}</span>
+                      <span className="text-sm">{t('appointments.duration')}: {appointment.service?.duration || 0} {t('appointments.minutes')}</span>
                     </div>
                   </div>
                   

@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { KioskHeader } from '@/components/kiosk/KioskHeader';
 import { KioskServiceSelector } from '@/components/kiosk/KioskServiceSelector';
 import { KioskLocationSelector } from '@/components/kiosk/KioskLocationSelector';
 import { KioskTicketGeneration } from '@/components/kiosk/KioskTicketGeneration';
 import { KioskCustomerForm } from '@/components/kiosk/KioskCustomerForm';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAppData } from '@/hooks/useAppData';
 
 export type KioskStep = 'location' | 'service' | 'customer' | 'ticket';
 
@@ -26,6 +26,7 @@ interface KioskState {
 
 const KioskPage = () => {
   const { toast } = useToast();
+  const { locations, services, isLoading } = useAppData();
   const [kioskState, setKioskState] = useState<KioskState>({
     step: 'location',
     selectedLocation: null,
@@ -51,39 +52,15 @@ const KioskPage = () => {
     }
   }, [kioskState.step, kioskState.appointmentId]);
 
-  // Fetch locations for selection
-  const { data: locations } = useQuery({
-    queryKey: ['kiosk-locations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name, address')
-        .eq('queue_status', 'open')
-        .order('name');
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  // Filter services by selected location
+  const availableServices = services.filter(
+    service => service.location_id === kioskState.selectedLocation
+  );
 
-  // Fetch services for selected location
-  const { data: services } = useQuery({
-    queryKey: ['kiosk-services', kioskState.selectedLocation],
-    queryFn: async () => {
-      if (!kioskState.selectedLocation) return [];
-      
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, description, duration')
-        .eq('location_id', kioskState.selectedLocation)
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!kioskState.selectedLocation,
-  });
+  // Filter open locations
+  const openLocations = locations.filter(
+    location => location.queue_status === 'open'
+  );
 
   const handleLocationSelect = (locationId: string) => {
     setKioskState(prev => ({
@@ -189,6 +166,18 @@ const KioskPage = () => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -201,7 +190,7 @@ const KioskPage = () => {
           {kioskState.step === 'location' && (
             <div className="animate-fade-in">
               <KioskLocationSelector
-                locations={locations || []}
+                locations={openLocations}
                 onLocationSelect={handleLocationSelect}
               />
             </div>
@@ -210,7 +199,7 @@ const KioskPage = () => {
           {kioskState.step === 'service' && (
             <div className="animate-fade-in">
               <KioskServiceSelector
-                services={services || []}
+                services={availableServices}
                 onServiceSelect={handleServiceSelect}
                 onBack={() => setKioskState(prev => ({ ...prev, step: 'location' }))}
               />
