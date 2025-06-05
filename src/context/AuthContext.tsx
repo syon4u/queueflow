@@ -16,14 +16,30 @@ export const useAuth = (): AuthContextType => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Temporarily disable authentication - provide mock data
-  const [user, setUser] = useState<User | null>(null);
+  // Create a mock user for admin access since authentication is disabled
+  const mockAdminUser: User = {
+    id: 'mock-admin-user-id',
+    email: 'admin@broward.gov',
+    aud: 'authenticated',
+    role: 'authenticated',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    app_metadata: {},
+    user_metadata: {},
+    identities: [],
+    email_confirmed_at: new Date().toISOString(),
+    last_sign_in_at: new Date().toISOString(),
+    phone: null,
+    confirmed_at: new Date().toISOString()
+  };
+
+  const [user, setUser] = useState<User | null>(mockAdminUser);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); // Set to false to skip loading
-  const [role, setRole] = useState<UserRoleType | null>('admin'); // Mock admin role
+  const [loading, setLoading] = useState<boolean>(false);
+  const [role, setRole] = useState<UserRoleType | null>('admin');
 
   useEffect(() => {
-    console.log('AuthProvider: Authentication disabled - using mock data');
+    console.log('AuthProvider: Authentication disabled - using mock admin user');
     setLoading(false);
   }, []);
 
@@ -61,7 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     hasUser: !!user,
     hasSession: !!session,
     role,
-    loading
+    loading,
+    userId: user?.id
   });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

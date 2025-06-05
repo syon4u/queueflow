@@ -16,72 +16,65 @@ export const useUserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
 
-  // Fetch all users with their roles from the database using user_profiles view
+  // Mock user data since authentication is disabled
+  const mockUsers: UserData[] = [
+    {
+      id: 'mock-admin-user-id',
+      email: 'admin@broward.gov',
+      role: 'admin',
+      created_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString()
+    },
+    {
+      id: 'mock-staff-user-1',
+      email: 'staff1@broward.gov',
+      role: 'staff',
+      created_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString()
+    },
+    {
+      id: 'mock-staff-user-2',
+      email: 'staff2@broward.gov',
+      role: 'staff',
+      created_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString()
+    },
+    {
+      id: 'mock-customer-user-1',
+      email: 'customer1@example.com',
+      role: 'customer',
+      created_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString()
+    }
+  ];
+
+  // Return mock data when authentication is disabled
   const { 
-    data: users = [], 
+    data: users = mockUsers, 
     isLoading, 
     error 
   } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      try {
-        console.log('Fetching users with roles from database...');
-        
-        // First, let's try to get the current user's role to check permissions
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-        console.log('Current authenticated user:', currentUser?.id);
-        
-        if (!currentUser) {
-          console.log('No authenticated user found');
-          return [];
-        }
-
-        // Call the database function to get users with roles
-        const { data, error } = await supabase.rpc('get_users_with_roles');
-        
-        if (error) {
-          console.error('Error fetching users:', error);
-          throw error;
-        }
-        
-        console.log('Fetched users from database:', data);
-        return data as UserData[];
-      } catch (error) {
-        console.error('Error in user management query:', error);
-        throw error;
-      }
+      console.log('Using mock user data since authentication is disabled');
+      return mockUsers;
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
-    retry: (failureCount, error) => {
-      // Don't retry permission errors
-      if (error?.message?.includes('Access denied')) {
-        return false;
-      }
-      return failureCount < 3;
-    },
+    refetchInterval: 30000,
+    retry: false,
   });
 
-  // Update user role mutation
+  // Mock update role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string, role: string }) => {
-      console.log(`Updating user ${userId} role to ${role}`);
-      
-      const { data, error } = await supabase.rpc('update_user_role', {
-        target_user_id: userId,
-        new_role: role
-      });
-      
-      if (error) {
-        console.error('Error updating user role:', error);
-        throw error;
-      }
-      
+      console.log(`Mock: Updating user ${userId} role to ${role}`);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
       return { userId, role };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: 'Role updated',
+        title: 'Role updated (mock)',
         description: `User role has been updated to ${data.role}`,
       });
     },
@@ -95,51 +88,18 @@ export const useUserManagement = () => {
     }
   });
 
-  // Add test data using existing profiles table
+  // Mock add temporary data mutation
   const addTemporaryDataMutation = useMutation({
     mutationFn: async () => {
-      console.log('Adding temporary test data...');
-      
-      // Add some temporary profiles for testing using the profiles table
-      const profilesData = [
-        { id: crypto.randomUUID(), first_name: 'John', last_name: 'Doe', email: 'john.doe@example.com' },
-        { id: crypto.randomUUID(), first_name: 'Jane', last_name: 'Smith', email: 'jane.smith@example.com' },
-        { id: crypto.randomUUID(), first_name: 'Alex', last_name: 'Johnson', email: 'alex.johnson@example.com' }
-      ];
-
-      // Insert profiles data if they don't exist
-      for (const profile of profilesData) {
-        const { error: checkError, data: existingProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', profile.email);
-
-        if (!checkError && (!existingProfile || existingProfile.length === 0)) {
-          const { error } = await supabase.from('profiles').insert(profile);
-          if (error) {
-            console.error('Error inserting profile:', error);
-            throw error;
-          }
-
-          // Add corresponding user roles
-          const { error: roleError } = await supabase.from('user_roles').insert({
-            user_id: profile.id,
-            role: 'staff'
-          });
-          if (roleError) {
-            console.error('Error inserting user role:', roleError);
-            throw roleError;
-          }
-        }
-      }
-
+      console.log('Mock: Adding temporary test data...');
+      await new Promise(resolve => setTimeout(resolve, 500));
       return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: 'Test data added',
-        description: 'Temporary profile data has been created for testing',
+        title: 'Test data added (mock)',
+        description: 'Mock profile data has been created for testing',
       });
     },
     onError: (error: any) => {
@@ -168,8 +128,8 @@ export const useUserManagement = () => {
 
   return {
     users: filteredUsers,
-    isLoading,
-    error,
+    isLoading: false,
+    error: null,
     searchQuery,
     setSearchQuery,
     handleRoleChange,
