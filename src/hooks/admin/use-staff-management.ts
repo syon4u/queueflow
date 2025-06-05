@@ -4,49 +4,40 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export interface Profile {
+interface Staff {
   id: string;
   first_name: string;
   last_name: string;
   phone: string | null;
-  email: string | null;
+  role: 'admin' | 'staff';
   status: string;
-  created_at: string;
-  updated_at: string;
-  locations?: {
-    id: string;
-    name: string;
-  };
-  user_roles?: {
-    role: string;
-  };
 }
 
-interface ProfileFormData {
+interface StaffFormData {
   id?: string;
   first_name: string;
   last_name: string;
   phone: string;
-  role: 'admin' | 'staff' | 'customer';
-  email: string;
+  role: 'admin' | 'staff';
+  location_id: string;
 }
 
-export const useProfileManagement = () => {
+export const useStaffManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<ProfileFormData>({
+  const [formData, setFormData] = useState<StaffFormData>({
     first_name: '',
     last_name: '',
     phone: '',
     role: 'staff',
-    email: ''
+    location_id: ''
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch profiles with staff/admin roles using the new view
-  const { data: profiles, isLoading } = useQuery({
-    queryKey: ['profiles'],
+  // Fetch staff using user_profiles view
+  const { data: staffMembers, isLoading } = useQuery({
+    queryKey: ['staff'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -73,10 +64,10 @@ export const useProfileManagement = () => {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: async (data: ProfileFormData) => {
+    mutationFn: async (data: StaffFormData) => {
       const id = crypto.randomUUID();
       
-      // Insert profile
+      // Insert into profiles table
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([{ 
@@ -84,31 +75,30 @@ export const useProfileManagement = () => {
           first_name: data.first_name,
           last_name: data.last_name,
           phone: data.phone || null,
-          email: data.email || null,
           status: 'active'
         }]);
       
       if (profileError) throw profileError;
 
-      // Insert or update user role
+      // Insert user role
       const { error: roleError } = await supabase
         .from('user_roles')
-        .upsert({ 
+        .insert([{
           user_id: id,
           role: data.role
-        });
-      
+        }]);
+
       if (roleError) throw roleError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      toast({ title: "Success", description: "Profile created successfully" });
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+      toast({ title: "Success", description: "Staff member created successfully" });
       closeDialog();
     },
     onError: (error) => {
       toast({ 
         title: "Error", 
-        description: `Failed to create profile: ${error.message}`, 
+        description: `Failed to create staff member: ${error.message}`, 
         variant: "destructive" 
       });
     }
@@ -116,15 +106,14 @@ export const useProfileManagement = () => {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async (data: ProfileFormData) => {
-      // Update profile
+    mutationFn: async (data: StaffFormData) => {
+      // Update profiles table
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ 
           first_name: data.first_name,
           last_name: data.last_name,
-          phone: data.phone || null,
-          email: data.email || null
+          phone: data.phone || null
         })
         .eq('id', data.id);
       
@@ -133,22 +122,22 @@ export const useProfileManagement = () => {
       // Update user role
       const { error: roleError } = await supabase
         .from('user_roles')
-        .upsert({ 
+        .upsert({
           user_id: data.id!,
           role: data.role
         });
-      
+
       if (roleError) throw roleError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      toast({ title: "Success", description: "Profile updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+      toast({ title: "Success", description: "Staff member updated successfully" });
       closeDialog();
     },
     onError: (error) => {
       toast({ 
         title: "Error", 
-        description: `Failed to update profile: ${error.message}`, 
+        description: `Failed to update staff member: ${error.message}`, 
         variant: "destructive" 
       });
     }
@@ -165,46 +154,48 @@ export const useProfileManagement = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      toast({ title: "Success", description: "Profile deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+      toast({ title: "Success", description: "Staff member deleted successfully" });
     },
     onError: (error) => {
       toast({ 
         title: "Error", 
-        description: `Failed to delete profile: ${error.message}`, 
+        description: `Failed to delete staff member: ${error.message}`, 
         variant: "destructive" 
       });
     }
   });
 
   const handleAddClick = () => {
+    const defaultLocationId = locations && locations.length > 0 ? locations[0].id : '';
+    
     setFormData({
       first_name: '',
       last_name: '',
       phone: '',
       role: 'staff',
-      email: ''
+      location_id: defaultLocationId
     });
     setIsEditing(false);
     setIsDialogOpen(true);
   };
 
-  const handleEditClick = (profile: Profile) => {
+  const handleEditClick = (staff: Staff) => {
     setFormData({
-      id: profile.id,
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      phone: profile.phone || '',
-      role: (profile.user_roles?.role as 'admin' | 'staff' | 'customer') || 'staff',
-      email: profile.email || ''
+      id: staff.id,
+      first_name: staff.first_name,
+      last_name: staff.last_name,
+      phone: staff.phone || '',
+      role: staff.role,
+      location_id: ''
     });
     setIsEditing(true);
     setIsDialogOpen(true);
   };
 
-  const handleDeleteClick = (profile: Profile) => {
-    if (window.confirm(`Are you sure you want to delete ${profile.first_name} ${profile.last_name}?`)) {
-      deleteMutation.mutate(profile.id);
+  const handleDeleteClick = (staff: Staff) => {
+    if (window.confirm(`Are you sure you want to delete ${staff.first_name} ${staff.last_name}?`)) {
+      deleteMutation.mutate(staff.id);
     }
   };
 
@@ -222,7 +213,7 @@ export const useProfileManagement = () => {
   };
 
   return {
-    staffMembers: profiles, // Keep the same property name for compatibility
+    staffMembers,
     locations,
     isLoading,
     isDialogOpen,

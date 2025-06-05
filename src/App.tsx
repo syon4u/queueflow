@@ -1,108 +1,119 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { AuthProvider } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
-import { Toaster } from './components/ui/toaster';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { AdminRoute } from './components/auth/AdminRoute';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import HomePage from './pages/HomePage';
-import AdminPage from './pages/AdminPage';
-import StaffPage from './pages/StaffPage';
-import CustomerPage from './pages/CustomerPage';
-import ProfilePage from './pages/ProfilePage';
-import NotFoundPage from './pages/NotFoundPage';
-import StaffManagementPage from './pages/StaffManagementPage';
-import EmployeeManagementPage from './pages/EmployeeManagementPage';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+import { useState, useEffect } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from '@/context/AuthContext';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import Index from "./pages/Index";
+import CustomerPage from "./pages/CustomerPage";
+import AppointmentsPage from "./pages/AppointmentsPage";
+import StaffPage from "./pages/StaffPage";
+import AdminPage from "./components/admin/AdminPage";
+import { VirtualQueuePage } from "./pages/VirtualQueuePage";
+import AuthPage from "./pages/AuthPage";
+import KioskPage from "./pages/KioskPage";
+import DigitalSignagePage from "./pages/DigitalSignagePage";
+import MobileQueuePage from "./pages/MobileQueuePage";
+import "./App.css";
 
-const App = () => {
+const queryClient = new QueryClient();
+
+function App() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { toast } = useToast();
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast({
+        title: "Connection Restored",
+        description: "You're back online!",
+      });
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast({
+        title: "Connection Lost",
+        description: "You're currently offline. Some features may be limited.",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [toast]);
+
+  // Monitor Supabase connection
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const { error } = await supabase.from('locations').select('count').limit(1);
+        if (error) {
+          console.error('Supabase connection error:', error);
+        }
+      } catch (error) {
+        console.error('Database connection failed:', error);
+        if (isOnline) {
+          toast({
+            title: "Database Connection Issue",
+            description: "Having trouble connecting to the database. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    // Check connection on mount and every 30 seconds
+    checkConnection();
+    const interval = setInterval(checkConnection, 30000);
+
+    return () => clearInterval(interval);
+  }, [isOnline, toast]);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <Router>
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-gray-50">
+              {!isOnline && (
+                <div className="bg-yellow-500 text-yellow-900 text-center py-2 px-4 text-sm font-medium">
+                  You're currently offline. Some features may not be available.
+                </div>
+              )}
+              
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route
-                  path="/admin/*"
-                  element={
-                    <AdminRoute>
-                      <AdminPage />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                {/* Consolidated user management routes */}
-                <Route 
-                  path="/staff-management" 
-                  element={
-                    <ProtectedRoute>
-                      <StaffManagementPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/employee-management" 
-                  element={
-                    <ProtectedRoute>
-                      <EmployeeManagementPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Keep existing /staff route for backward compatibility */}
-                <Route 
-                  path="/staff" 
-                  element={
-                    <ProtectedRoute>
-                      <StaffPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route
-                  path="/customer"
-                  element={
-                    <ProtectedRoute>
-                      <CustomerPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/404" element={<NotFoundPage />} />
-                <Route path="*" element={<Navigate to="/404" replace />} />
+                <Route path="/" element={<Index />} />
+                <Route path="/customer" element={<CustomerPage />} />
+                <Route path="/appointments" element={<AppointmentsPage />} />
+                <Route path="/staff" element={<StaffPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/queue" element={<VirtualQueuePage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/kiosk" element={<KioskPage />} />
+                <Route path="/signage" element={<DigitalSignagePage />} />
+                <Route path="/mobile-queue" element={<MobileQueuePage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
-          </Router>
-          <Toaster />
-        </AuthProvider>
-      </ThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;

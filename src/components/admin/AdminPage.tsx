@@ -1,55 +1,174 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LayoutDashboard, UserIcon, Settings } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
 import { DashboardTab } from './DashboardTab';
+import { StatsTab } from './StatsTab';
+import { UserManagementTab } from './UserManagementTab';
+import { LocationsTab } from './LocationsTab';
+import { ServicesTab } from './ServicesTab';
 import { StaffTab } from './StaffTab';
 import { EmployeeTab } from './EmployeeTab';
-import { SettingsTab } from './SettingsTab';
+import CustomerManagementTab from './CustomerManagementTab';
+import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
+import { QueueManagementTab } from './QueueManagementTab';
+import SystemSettingsTab from './SystemSettingsTab';
+import SecurityMetricsTab from './SecurityMetricsTab';
+import { SMSCommandsTab } from './SMSCommandsTab';
 import { MergedUsersTab } from './MergedUsersTab';
+import { AdvancedAnalyticsTab } from './AdvancedAnalyticsTab';
+import { CapacityManagementTab } from './CapacityManagementTab';
+import { CapacityThrottlingTab } from './CapacityThrottlingTab';
+import { QueueFlow2Tab } from './QueueFlow2Tab';
+import { AdminDashboardHeader } from './AdminDashboardHeader';
+import { AdminTopNavigation } from './AdminTopNavigation';
+import BackendHealthCheck from './BackendHealthCheck';
 
-export const AdminPage = () => {
+export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardTab />;
+  // Get current user's role to verify admin access
+  const { data: userRole, isLoading } = useQuery({
+    queryKey: ['user-role'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
       
-      case 'users':
-        return <MergedUsersTab />;
+      const { data: role } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
       
-      default:
-        return <DashboardTab />;
+      return role?.role || 'customer';
     }
+  });
+
+  const handleRefresh = () => {
+    // Refresh data
+    window.location.reload();
   };
 
-  return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+  const handleNotificationClick = () => {
+    // Handle notification click
+    console.log('Notification clicked');
+  };
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="bg-gray-100 rounded-md p-1">
-          <TabsTrigger value="dashboard" className="data-[state=active]:bg-gray-200 rounded-md">
-            <LayoutDashboard className="h-5 w-5 mr-2" />
-            Dashboard
-          </TabsTrigger>
-          <TabsTrigger value="users" className="data-[state=active]:bg-gray-200 rounded-md">
-            <UserIcon className="h-5 w-5 mr-2" />
-            User Management
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="data-[state=active]:bg-gray-200 rounded-md">
-            <Settings className="h-5 w-5 mr-2" />
-            Settings
-          </TabsTrigger>
-        </TabsList>
-        <div className="mt-6">
-          {renderTabContent()}
+  const handleSettingsClick = () => {
+    // Handle settings click
+    console.log('Settings clicked');
+  };
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (userRole !== 'admin') {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p>You need admin privileges to access this page.</p>
         </div>
-      </Tabs>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AdminDashboardHeader 
+        systemStatus="healthy"
+        totalUsers={0}
+        activeStaff={0}
+        todayAppointments={0}
+        onRefresh={handleRefresh}
+        onNotificationClick={handleNotificationClick}
+        onSettingsClick={handleSettingsClick}
+      />
+      <AdminTopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsContent value="dashboard">
+            <DashboardTab />
+          </TabsContent>
+          
+          <TabsContent value="stats">
+            <StatsTab />
+          </TabsContent>
+          
+          <TabsContent value="users">
+            <UserManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="locations">
+            <LocationsTab />
+          </TabsContent>
+          
+          <TabsContent value="services">
+            <ServicesTab />
+          </TabsContent>
+          
+          <TabsContent value="staff">
+            <StaffTab />
+          </TabsContent>
+          
+          <TabsContent value="employees">
+            <EmployeeTab />
+          </TabsContent>
+          
+          <TabsContent value="customers">
+            <CustomerManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="communication">
+            <CommunicationTemplatesTab />
+          </TabsContent>
+          
+          <TabsContent value="queue">
+            <QueueManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="settings">
+            <SystemSettingsTab />
+          </TabsContent>
+          
+          <TabsContent value="security">
+            <SecurityMetricsTab />
+          </TabsContent>
+          
+          <TabsContent value="sms-commands">
+            <SMSCommandsTab />
+          </TabsContent>
+          
+          <TabsContent value="merged-users">
+            <MergedUsersTab />
+          </TabsContent>
+          
+          <TabsContent value="advanced-analytics">
+            <AdvancedAnalyticsTab />
+          </TabsContent>
+          
+          <TabsContent value="capacity-management">
+            <CapacityManagementTab />
+          </TabsContent>
+          
+          <TabsContent value="capacity-throttling">
+            <CapacityThrottlingTab />
+          </TabsContent>
+          
+          <TabsContent value="queue-flow-2">
+            <QueueFlow2Tab />
+          </TabsContent>
+          
+          <TabsContent value="backend-health">
+            <BackendHealthCheck />
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };
 
-// Add default export
 export default AdminPage;
