@@ -16,6 +16,7 @@ import AdminPage from "./components/admin/AdminPage";
 import { VirtualQueuePage } from "./pages/VirtualQueuePage";
 import AuthPage from "./pages/AuthPage";
 import KioskPage from "./pages/KioskPage";
+import DigitalSignagePage from "./pages/DigitalSignagePage";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,7 @@ function App() {
                 <Route path="/queue" element={<VirtualQueuePage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/kiosk" element={<KioskPage />} />
+                <Route path="/signage" element={<DigitalSignagePage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
