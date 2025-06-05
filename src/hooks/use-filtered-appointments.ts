@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
-import { useRealtimeAppointments } from './use-realtime-appointments';
+import { useAppData } from '@/hooks/useAppData';
 import { AppointmentFilterOptions } from '@/components/staff/AppointmentFilters';
 import { Appointment } from './use-appointments';
 
 export const useFilteredAppointments = () => {
-  const { appointments, isLoading, error, refreshAppointments } = useRealtimeAppointments();
+  const { appointments, isLoading, error, refetch } = useAppData();
   const [filters, setFilters] = useState<AppointmentFilterOptions>({});
 
   const filteredAppointments = useMemo(() => {
@@ -48,6 +48,10 @@ export const useFilteredAppointments = () => {
 
   const handleFiltersChange = (newFilters: AppointmentFilterOptions) => {
     setFilters(newFilters);
+  };
+
+  const refreshAppointments = () => {
+    refetch();
   };
 
   return {

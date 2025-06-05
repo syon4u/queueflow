@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw, Download, Calendar, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useFilteredAppointments } from '@/hooks/use-filtered-appointments';
+import { useAppData } from '@/hooks/useAppData';
 import { AppointmentFilters } from './AppointmentFilters';
 import { SendReminderDialog } from './SendReminderDialog';
 import { CreateAppointmentDialog } from './CreateAppointmentDialog';
@@ -17,20 +18,46 @@ import type { Appointment } from '@/hooks/use-appointments';
 
 const EnhancedAppointmentTable: React.FC = () => {
   const { t } = useTranslation();
-  const { 
-    appointments, 
-    allAppointments, 
-    isLoading: appointmentsLoading, 
-    refreshAppointments,
-    handleFiltersChange 
-  } = useFilteredAppointments();
+  const { appointments, isLoading, refetch } = useAppData();
   
   const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const { isLoading, updateAppointmentStatus } = useAppointmentActions(refreshAppointments);
+  const [filters, setFilters] = useState<any>({});
+  const { isLoading: actionsLoading, updateAppointmentStatus } = useAppointmentActions(refetch);
   
+  // Apply filters to appointments
+  const filteredAppointments = React.useMemo(() => {
+    let filtered = appointments;
+
+    // Filter by status
+    if (filters.status) {
+      filtered = filtered.filter(apt => apt.status === filters.status);
+    }
+
+    // Filter by customer name
+    if (filters.customerName) {
+      const searchTerm = filters.customerName.toLowerCase();
+      filtered = filtered.filter(apt => {
+        const customerName = apt.customer 
+          ? `${apt.customer.first_name} ${apt.customer.last_name}`.toLowerCase()
+          : '';
+        return customerName.includes(searchTerm);
+      });
+    }
+
+    // Filter by service
+    if (filters.service) {
+      const searchTerm = filters.service.toLowerCase();
+      filtered = filtered.filter(apt => 
+        apt.service?.name?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    return filtered;
+  }, [appointments, filters]);
+
   const handleOpenReminderDialog = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
     setReminderDialogOpen(true);
@@ -38,12 +65,10 @@ const EnhancedAppointmentTable: React.FC = () => {
 
   const handleAction = (action: string, appointmentId: string) => {
     if (action === 'survey_completed') {
-      // Handle survey completion - refresh data
-      refreshAppointments();
+      refetch();
       return;
     }
     
-    // Handle other actions through the existing system
     const statusMap: Record<string, string> = {
       check_in: 'checked_in',
       start: 'in_progress',
@@ -67,7 +92,7 @@ const EnhancedAppointmentTable: React.FC = () => {
       no_show: 0
     };
 
-    allAppointments.forEach(apt => {
+    appointments.forEach(apt => {
       if (counts.hasOwnProperty(apt.status)) {
         counts[apt.status as keyof typeof counts]++;
       }
@@ -77,6 +102,10 @@ const EnhancedAppointmentTable: React.FC = () => {
   };
 
   const statusCounts = getStatusCounts();
+
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+  };
 
   return (
     <TooltipProvider>
@@ -100,7 +129,7 @@ const EnhancedAppointmentTable: React.FC = () => {
                 <Filter className="mr-2 h-4 w-4" />
                 {showFilters ? 'Hide Filters' : 'Show Filters'}
               </Button>
-              <Button onClick={refreshAppointments} variant="outline" size="sm" className="bg-white">
+              <Button onClick={refetch} variant="outline" size="sm" className="bg-white">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Refresh
               </Button>
@@ -154,16 +183,16 @@ const EnhancedAppointmentTable: React.FC = () => {
                 </div>
                 <div>
                   <CardTitle className="text-xl font-semibold text-gray-900">
-                    Appointments ({appointments.length})
+                    Appointments ({filteredAppointments.length})
                   </CardTitle>
                   <p className="text-sm text-gray-500 mt-1">
-                    {allAppointments.length > appointments.length 
-                      ? `Showing ${appointments.length} of ${allAppointments.length} total appointments`
+                    {appointments.length > filteredAppointments.length 
+                      ? `Showing ${filteredAppointments.length} of ${appointments.length} total appointments`
                       : 'All appointments displayed'
                     }
                   </p>
                 </div>
-                {appointmentsLoading && (
+                {isLoading && (
                   <Badge variant="outline" className="animate-pulse bg-blue-50 text-blue-600 border-blue-200">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
@@ -175,7 +204,7 @@ const EnhancedAppointmentTable: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            {appointmentsLoading ? (
+            {isLoading ? (
               <div className="flex flex-col items-center justify-center p-12">
                 <div className="relative">
                   <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200"></div>
@@ -183,7 +212,7 @@ const EnhancedAppointmentTable: React.FC = () => {
                 </div>
                 <p className="text-gray-500 mt-4 font-medium">Loading appointments...</p>
               </div>
-            ) : appointments.length === 0 ? (
+            ) : filteredAppointments.length === 0 ? (
               <div className="text-center p-12 bg-gray-50">
                 <div className="max-w-md mx-auto">
                   <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -191,7 +220,7 @@ const EnhancedAppointmentTable: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No appointments found</h3>
                   <p className="text-gray-500 mb-6">
-                    {allAppointments.length > 0 
+                    {appointments.length > 0 
                       ? "Try adjusting your filters to see more results"
                       : "Create your first appointment to get started"
                     }
@@ -207,7 +236,7 @@ const EnhancedAppointmentTable: React.FC = () => {
                 <Table>
                   <AppointmentTableHeader />
                   <TableBody>
-                    {appointments.map((appointment, index) => (
+                    {filteredAppointments.map((appointment, index) => (
                       <AppointmentTableRow
                         key={appointment.id}
                         appointment={appointment}
