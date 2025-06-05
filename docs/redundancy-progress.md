@@ -10,7 +10,7 @@
 ### Component Consolidation
 - [x] Merge StaffTab and EmployeeTab components – Created unified UserManagementTab with role-based props
 - [x] Consolidate StaffSidebar and EmployeeSidebar – Created shared UserSidebar component with userType prop
-- [ ] Unify StaffFormDialog and EmployeeFormDialog – Same form fields and validation logic
+- [x] Unify StaffFormDialog and EmployeeFormDialog – Enhanced UserFormDialog with status field support for employees
 - [ ] Merge StaffTableColumns and EmployeeTableColumns – Similar column definitions with role differences
 
 ### Hook Consolidation  
@@ -48,4 +48,4 @@
 - [ ] Final report generated
 
 ---
-**Status:** 🚧 In Progress | **Completed:** 8/16 | **Remaining:** 8
+**Status:** 🚧 In Progress | **Completed:** 11/16 | **Remaining:** 5

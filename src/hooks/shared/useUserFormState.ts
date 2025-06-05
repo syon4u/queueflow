@@ -9,6 +9,7 @@ interface UserFormData {
   role: 'admin' | 'staff' | 'customer';
   email: string;
   location_id?: string;
+  status?: string;
 }
 
 export const useUserFormState = (userType: 'staff' | 'employee') => {
@@ -20,7 +21,8 @@ export const useUserFormState = (userType: 'staff' | 'employee') => {
     phone: '',
     role: 'staff',
     email: '',
-    location_id: ''
+    location_id: '',
+    ...(userType === 'employee' && { status: 'active' })
   });
 
   const resetForm = () => {
@@ -30,7 +32,8 @@ export const useUserFormState = (userType: 'staff' | 'employee') => {
       phone: '',
       role: 'staff',
       email: '',
-      location_id: ''
+      location_id: '',
+      ...(userType === 'employee' && { status: 'active' })
     });
   };
 
@@ -48,7 +51,8 @@ export const useUserFormState = (userType: 'staff' | 'employee') => {
       phone: user.phone || '',
       role: (user.user_roles?.role || user.role) as 'admin' | 'staff' | 'customer',
       email: user.email || '',
-      location_id: user.location_id || ''
+      location_id: user.location_id || '',
+      ...(userType === 'employee' && { status: user.status || 'active' })
     });
     setIsEditing(true);
     setIsDialogOpen(true);

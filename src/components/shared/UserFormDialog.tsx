@@ -14,6 +14,7 @@ interface UserFormData {
   role: 'admin' | 'staff' | 'customer';
   email: string;
   location_id?: string;
+  status?: string;
 }
 
 interface Location {
@@ -119,23 +120,40 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
             </Select>
           </div>
           
+          <div className="space-y-2">
+            <Label htmlFor="location_id">Location</Label>
+            <Select
+              value={formData.location_id || ''}
+              onValueChange={(value) => onFormDataChange({ ...formData, location_id: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Unassigned</SelectItem>
+                {locations?.map(location => (
+                  <SelectItem key={location.id} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {userType === 'employee' && (
             <div className="space-y-2">
-              <Label htmlFor="location_id">Location</Label>
+              <Label htmlFor="status">Status</Label>
               <Select
-                value={formData.location_id || ''}
-                onValueChange={(value) => onFormDataChange({ ...formData, location_id: value })}
+                value={formData.status || 'active'}
+                onValueChange={(value) => onFormDataChange({ ...formData, status: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select location" />
+                  <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Unassigned</SelectItem>
-                  {locations?.map(location => (
-                    <SelectItem key={location.id} value={location.id}>
-                      {location.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="on_break">On Break</SelectItem>
                 </SelectContent>
               </Select>
             </div>

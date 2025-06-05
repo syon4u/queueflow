@@ -11,6 +11,7 @@ interface UserFormData {
   role: 'admin' | 'staff' | 'customer';
   email: string;
   location_id?: string;
+  status?: string;
 }
 
 export const useUserMutations = (userType: 'staff' | 'employee') => {
@@ -30,7 +31,8 @@ export const useUserMutations = (userType: 'staff' | 'employee') => {
           last_name: data.last_name,
           phone: data.phone || null,
           email: data.email || null,
-          status: 'active'
+          status: data.status || 'active',
+          location_id: data.location_id || null
         }]);
       
       if (profileError) throw profileError;
@@ -61,14 +63,22 @@ export const useUserMutations = (userType: 'staff' | 'employee') => {
   const updateUser = useMutation({
     mutationFn: async (data: UserFormData) => {
       // Update profile
+      const updateData: any = { 
+        first_name: data.first_name,
+        last_name: data.last_name,
+        phone: data.phone || null,
+        email: data.email || null,
+        location_id: data.location_id || null
+      };
+
+      // Add status if it's an employee
+      if (userType === 'employee' && data.status) {
+        updateData.status = data.status;
+      }
+
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ 
-          first_name: data.first_name,
-          last_name: data.last_name,
-          phone: data.phone || null,
-          email: data.email || null
-        })
+        .update(updateData)
         .eq('id', data.id);
       
       if (profileError) throw profileError;
