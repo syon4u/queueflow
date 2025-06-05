@@ -679,6 +679,129 @@ export type Database = {
         }
         Relationships: []
       }
+      demand_patterns: {
+        Row: {
+          average_demand: number
+          created_at: string
+          id: string
+          last_calculated: string
+          location_id: string
+          pattern_key: string
+          pattern_type: string
+          peak_demand: number
+          sample_size: number
+          service_id: string | null
+          updated_at: string
+          variance: number
+        }
+        Insert: {
+          average_demand?: number
+          created_at?: string
+          id?: string
+          last_calculated?: string
+          location_id: string
+          pattern_key: string
+          pattern_type: string
+          peak_demand?: number
+          sample_size?: number
+          service_id?: string | null
+          updated_at?: string
+          variance?: number
+        }
+        Update: {
+          average_demand?: number
+          created_at?: string
+          id?: string
+          last_calculated?: string
+          location_id?: string
+          pattern_key?: string
+          pattern_type?: string
+          peak_demand?: number
+          sample_size?: number
+          service_id?: string | null
+          updated_at?: string
+          variance?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demand_patterns_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demand_patterns_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      demand_predictions: {
+        Row: {
+          accuracy_score: number | null
+          actual_demand: number | null
+          confidence_score: number
+          created_at: string
+          day_of_week: number
+          hour_of_day: number
+          id: string
+          location_id: string
+          model_version: string
+          predicted_demand: number
+          prediction_date: string
+          service_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          accuracy_score?: number | null
+          actual_demand?: number | null
+          confidence_score?: number
+          created_at?: string
+          day_of_week: number
+          hour_of_day: number
+          id?: string
+          location_id: string
+          model_version?: string
+          predicted_demand?: number
+          prediction_date: string
+          service_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accuracy_score?: number | null
+          actual_demand?: number | null
+          confidence_score?: number
+          created_at?: string
+          day_of_week?: number
+          hour_of_day?: number
+          id?: string
+          location_id?: string
+          model_version?: string
+          predicted_demand?: number
+          prediction_date?: string
+          service_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demand_predictions_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demand_predictions_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           address: string | null
@@ -871,6 +994,63 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_accuracy: {
+        Row: {
+          accuracy_percentage: number | null
+          created_at: string
+          id: string
+          location_id: string
+          mae: number | null
+          mape: number | null
+          model_version: string
+          prediction_date: string
+          rmse: number | null
+          service_id: string | null
+          total_predictions: number
+        }
+        Insert: {
+          accuracy_percentage?: number | null
+          created_at?: string
+          id?: string
+          location_id: string
+          mae?: number | null
+          mape?: number | null
+          model_version: string
+          prediction_date: string
+          rmse?: number | null
+          service_id?: string | null
+          total_predictions?: number
+        }
+        Update: {
+          accuracy_percentage?: number | null
+          created_at?: string
+          id?: string
+          location_id?: string
+          mae?: number | null
+          mape?: number | null
+          model_version?: string
+          prediction_date?: string
+          rmse?: number | null
+          service_id?: string | null
+          total_predictions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_accuracy_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_accuracy_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -1097,6 +1277,72 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      scheduling_recommendations: {
+        Row: {
+          applied_at: string | null
+          applied_by: string | null
+          created_at: string
+          hour_of_day: number
+          id: string
+          location_id: string
+          priority_score: number
+          reasoning: string | null
+          recommendation_date: string
+          recommended_capacity: number
+          recommended_staff: number
+          service_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applied_at?: string | null
+          applied_by?: string | null
+          created_at?: string
+          hour_of_day: number
+          id?: string
+          location_id: string
+          priority_score?: number
+          reasoning?: string | null
+          recommendation_date: string
+          recommended_capacity?: number
+          recommended_staff?: number
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applied_at?: string | null
+          applied_by?: string | null
+          created_at?: string
+          hour_of_day?: number
+          id?: string
+          location_id?: string
+          priority_score?: number
+          reasoning?: string | null
+          recommendation_date?: string
+          recommended_capacity?: number
+          recommended_staff?: number
+          service_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduling_recommendations_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduling_recommendations_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_audit_log: {
         Row: {
@@ -1490,6 +1736,10 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_demand_patterns: {
+        Args: { target_location_id?: string; target_service_id?: string }
+        Returns: Json
+      }
       can_access_customer: {
         Args: { customer_uuid: string }
         Returns: boolean
@@ -1500,6 +1750,10 @@ export type Database = {
       }
       check_location_capacity: {
         Args: { location_uuid: string; requested_time?: string }
+        Returns: Json
+      }
+      generate_demand_predictions: {
+        Args: { target_location_id: string; prediction_days?: number }
         Returns: Json
       }
       get_admin_dashboard_stats: {
