@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Settings,
   UserCheck
 } from 'lucide-react';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
@@ -41,10 +40,10 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
         return <AppointmentOverridesTab />;
       case 'settings':
         return (
-          <div className="space-y-6 mt-6">
+          <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Power User Settings</h2>
-              <p className="text-sm text-gray-500">Configure your power user preferences and settings</p>
+              <h2 className="text-lg font-semibold text-gray-900">Settings</h2>
+              <p className="text-sm text-gray-500">Configure your preferences and operational settings</p>
             </div>
             
             <Card className="bg-gray-50">
@@ -62,19 +61,13 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
   return (
     <div className="space-y-6 p-6">
       {/* Breadcrumb Navigation */}
-      <Breadcrumb 
-        items={[
-          { label: 'Power User Portal', isActive: true }
-        ]}
-        className="mb-6"
-      />
-
-      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Power User Portal</h1>
-          <p className="text-gray-600 mt-1">Comprehensive management tools and day-to-day operations</p>
-        </div>
+        <Breadcrumb 
+          items={[
+            { label: 'Dashboard', isActive: true }
+          ]}
+          className="mb-0"
+        />
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
             <UserCheck className="h-3 w-3 mr-1" />
@@ -87,20 +80,9 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
       {activeTab === 'dashboard' && <PowerUserStatsCards />}
 
       {/* Main Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            Management Dashboard
-          </CardTitle>
-          <CardDescription>
-            Access all management tools and operational features in one unified interface
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {renderTabContent()}
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        {renderTabContent()}
+      </div>
     </div>
   );
 };
