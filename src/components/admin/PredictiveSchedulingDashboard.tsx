@@ -32,6 +32,7 @@ export const PredictiveSchedulingDashboard = () => {
     predictionsLoading,
     patternsLoading,
     recommendationsLoading,
+    accuracyLoading,
     isGenerating,
     isCalculating,
     calculateDemandPatterns,

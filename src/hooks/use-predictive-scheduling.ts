@@ -66,6 +66,20 @@ interface PredictionAccuracy {
   created_at: string;
 }
 
+interface PatternCalculationResult {
+  patterns_calculated: number;
+  locations_processed: number;
+  services_processed: number;
+  calculated_at: string;
+}
+
+interface PredictionGenerationResult {
+  predictions_generated: number;
+  location_id: string;
+  prediction_period_days: number;
+  generated_at: string;
+}
+
 export function usePredictiveScheduling() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -145,14 +159,16 @@ export function usePredictiveScheduling() {
 
       if (error) throw error;
 
+      const result = data as PatternCalculationResult;
+
       queryClient.invalidateQueries({ queryKey: ['demand-patterns'] });
 
       toast({
         title: 'Success',
-        description: `Calculated ${data.patterns_calculated} demand patterns for ${data.locations_processed} locations`,
+        description: `Calculated ${result.patterns_calculated} demand patterns for ${result.locations_processed} locations`,
       });
 
-      return data;
+      return result;
     } catch (error) {
       console.error('Error calculating demand patterns:', error);
       toast({
@@ -176,14 +192,16 @@ export function usePredictiveScheduling() {
 
       if (error) throw error;
 
+      const result = data as PredictionGenerationResult;
+
       queryClient.invalidateQueries({ queryKey: ['demand-predictions'] });
 
       toast({
         title: 'Success',
-        description: `Generated ${data.predictions_generated} predictions for ${data.prediction_period_days} days`,
+        description: `Generated ${result.predictions_generated} predictions for ${result.prediction_period_days} days`,
       });
 
-      return data;
+      return result;
     } catch (error) {
       console.error('Error generating predictions:', error);
       toast({
