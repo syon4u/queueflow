@@ -159,7 +159,7 @@ export function usePredictiveScheduling() {
 
       if (error) throw error;
 
-      const result = data as PatternCalculationResult;
+      const result = data as unknown as PatternCalculationResult;
 
       queryClient.invalidateQueries({ queryKey: ['demand-patterns'] });
 
@@ -192,7 +192,7 @@ export function usePredictiveScheduling() {
 
       if (error) throw error;
 
-      const result = data as PredictionGenerationResult;
+      const result = data as unknown as PredictionGenerationResult;
 
       queryClient.invalidateQueries({ queryKey: ['demand-predictions'] });
 
