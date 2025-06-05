@@ -16,9 +16,9 @@ import {
 import { QueueDashboard } from './QueueDashboard';
 import { EnhancedQueueDashboard } from './EnhancedQueueDashboard';
 import { StaffAppointmentsTab } from './StaffAppointmentsTab';
-import { CustomerSearchTab } from './CustomerSearchTab';
+import CustomerSearchTab from './CustomerSearchTab';
 import { AdvancedStaffTools } from './AdvancedStaffTools';
-import { StaffHeader } from './StaffHeader';
+import StaffHeader from './StaffHeader';
 
 interface StaffMainContentProps {
   activeSection: string;
