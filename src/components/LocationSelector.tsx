@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useLocations } from '@/hooks/appointment-form/useLocations';
+import { useAppData } from '@/hooks/useAppData';
 import {
   Select,
   SelectContent,
@@ -16,7 +16,7 @@ interface LocationSelectorProps {
 }
 
 const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
-  const { locations, isLoading, error } = useLocations();
+  const { locations, isLoading, error } = useAppData();
 
   console.log('LocationSelector - Component state:', {
     locationsCount: locations?.length || 0,
@@ -52,7 +52,7 @@ const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
             </SelectTrigger>
           </Select>
         </FormControl>
-        <FormMessage>Unable to load locations: {error}</FormMessage>
+        <FormMessage>Unable to load locations: {error.message}</FormMessage>
       </FormItem>
     );
   }

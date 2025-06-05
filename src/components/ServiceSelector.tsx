@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useAppData } from '@/hooks/useAppData';
 import {
   Select,
   SelectContent,
@@ -20,53 +19,19 @@ interface ServiceSelectorProps {
 }
 
 const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) => {
-  const { data: services, isLoading, error } = useQuery({
-    queryKey: ['services', locationId],
-    queryFn: async () => {
-      console.log('ServiceSelector - Fetching services for location:', locationId);
-      
-      if (!locationId) {
-        console.log('ServiceSelector - No locationId provided, returning empty array');
-        return [];
-      }
-      
-      let query = supabase
-        .from('services')
-        .select('id, name, duration, description, is_active')
-        .eq('location_id', locationId)
-        .eq('is_active', true)
-        .order('name');
-      
-      const { data, error } = await query;
-      
-      console.log('ServiceSelector - Raw response:', { data, error });
-      
-      if (error) {
-        console.error('ServiceSelector - Error fetching services:', error);
-        throw error;
-      }
-      
-      // Filter out any services with empty or invalid IDs
-      const validServices = (data || []).filter(service => 
-        service.id && 
-        service.id.trim() !== '' && 
-        service.name && 
-        service.name.trim() !== ''
-      );
-      
-      console.log('ServiceSelector - Valid services:', validServices);
-      
-      return validServices;
-    },
-    enabled: !!locationId, // Only run when locationId is available
-    retry: 2,
-    retryDelay: 1000,
-  });
+  const { services, isLoading, error } = useAppData();
+
+  // Filter services by location if locationId is provided
+  const filteredServices = React.useMemo(() => {
+    if (!services) return [];
+    if (!locationId) return services;
+    return services.filter(service => service.location_id === locationId);
+  }, [services, locationId]);
 
   console.log('ServiceSelector - Component state:', {
     value,
     locationId,
-    servicesCount: services?.length || 0,
+    servicesCount: filteredServices?.length || 0,
     isLoading,
     error: error?.message
   });
@@ -103,7 +68,7 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
                   ? "Select a location first"
                   : isLoading 
                     ? "Loading services..."
-                    : services && services.length === 0
+                    : filteredServices && filteredServices.length === 0
                       ? "No services available"
                       : "Select a service"
               } 
@@ -111,8 +76,8 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           </SelectTrigger>
           <SelectContent>
-            {services && services.length > 0 ? (
-              services.map((service) => (
+            {filteredServices && filteredServices.length > 0 ? (
+              filteredServices.map((service) => (
                 <SelectItem key={service.id} value={service.id}>
                   <div className="flex flex-col">
                     <span>{service.name}</span>
@@ -140,7 +105,7 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
           <strong>ServiceSelector Debug:</strong><br />
           Location ID: {locationId || 'None'}<br />
           Current Value: {value || 'None'}<br />
-          Services Count: {services?.length || 0}<br />
+          Services Count: {filteredServices?.length || 0}<br />
           Loading: {isLoading ? 'Yes' : 'No'}<br />
           Error: {error?.message || 'None'}
         </div>

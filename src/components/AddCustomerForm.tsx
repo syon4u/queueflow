@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useQueue } from '@/context/QueueContext';
+import { useAppData } from '@/hooks/useAppData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
 
 const AddCustomerForm: React.FC = () => {
   const { addCustomer } = useQueue();
+  const { services, isLoading } = useAppData();
   const [name, setName] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [notes, setNotes] = React.useState('');
@@ -78,16 +80,22 @@ const AddCustomerForm: React.FC = () => {
           
           <div className="space-y-2">
             <Label htmlFor="service">Service <span className="text-red-500">*</span></Label>
-            <Select value={service} onValueChange={setService} required>
+            <Select value={service} onValueChange={setService} required disabled={isLoading}>
               <SelectTrigger>
-                <SelectValue placeholder="Select a service" />
+                <SelectValue placeholder={isLoading ? "Loading services..." : "Select a service"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Business License">Business License</SelectItem>
-                <SelectItem value="Code Violation">Code Violation</SelectItem>
-                <SelectItem value="General Inquiry">General Inquiry</SelectItem>
-                <SelectItem value="Permit Application">Permit Application</SelectItem>
-                <SelectItem value="Document Review">Document Review</SelectItem>
+                {services && services.length > 0 ? (
+                  services.map((serviceItem) => (
+                    <SelectItem key={serviceItem.id} value={serviceItem.name}>
+                      {serviceItem.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="" disabled>
+                    No services available
+                  </SelectItem>
+                )}
               </SelectContent>
             </Select>
           </div>
