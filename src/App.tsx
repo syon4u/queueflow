@@ -18,6 +18,7 @@ import KioskPage from "./pages/KioskPage";
 import DigitalSignagePage from "./pages/DigitalSignagePage";
 import MobileQueuePage from "./pages/MobileQueuePage";
 import PowerUserPage from "./pages/PowerUserPage";
+import StatusPage from "./pages/StatusPage";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,7 @@ function App() {
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/power-user" element={<PowerUserPage />} />
                 <Route path="/queue" element={<VirtualQueuePage />} />
+                <Route path="/status" element={<StatusPage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/kiosk" element={<KioskPage />} />
                 <Route path="/signage" element={<DigitalSignagePage />} />
