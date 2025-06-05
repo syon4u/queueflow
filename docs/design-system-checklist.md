@@ -1,10 +1,11 @@
 
+
 # Design System Consistency Checklist
 
 ## Layout & Structure
-- [ ] AdminPage.tsx - Create shared AppLayout component -> Use consistent page wrapper
-- [ ] StaffMainContent.tsx - Unify layout pattern -> Use same layout system as Admin
-- [ ] Create src/components/layout/AppLayout.tsx -> Shared page layout component
+- [x] AdminPage.tsx - Create shared AppLayout component -> Use consistent page wrapper
+- [x] StaffMainContent.tsx - Unify layout pattern -> Use same layout system as Admin
+- [x] Create src/components/layout/AppLayout.tsx -> Shared page layout component
 
 ## Sidebar Components (Oversized - Need Refactoring)
 - [ ] StaffSidebar.tsx (219 lines) - Extract reusable components -> Create BaseSidebar + SidebarSection components
@@ -70,7 +71,8 @@
 ---
 
 **Total Items**: 31
-**Completed**: 0
-**Remaining**: 31
+**Completed**: 3
+**Remaining**: 28
 
-**Next Priority**: Start with Layout & Structure items, then tackle oversized component refactoring.
+**Next Priority**: Continue with sidebar component refactoring to create shared BaseSidebar component.
+

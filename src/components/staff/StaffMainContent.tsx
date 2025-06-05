@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useQueue } from '@/context/QueueContext';
@@ -121,51 +122,44 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
   // Show skeleton loading for staff dashboard when profile data is loading
   if (activeSection === 'basic-queue' && isProfileLoading) {
     return (
-      <div className="flex flex-col min-h-screen">
-        <div className="bg-white border-b p-6">
+      <div className="space-y-6">
+        <div className="bg-white border rounded-lg p-6">
           <StaffDashboardSkeleton />
         </div>
-        <div className="bg-white border-b px-6 py-4">
+        <div className="bg-white border rounded-lg p-4">
           <StaffStatusSkeleton />
         </div>
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto">
-            {renderMainContent()}
-          </div>
-        </main>
+        <div className="space-y-6">
+          {renderMainContent()}
+        </div>
+      </div>
+    );
+  }
+
+  // Show header and status section only on basic-queue tab
+  if (activeSection === 'basic-queue') {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white border rounded-lg p-6">
+          <StaffDashboardHeader
+            queueStatus={queueStatus}
+            staffStatus={staffStatus as 'active' | 'inactive'}
+            activeAppointments={activeAppointments.length}
+            onRefresh={onRefresh}
+            onNotificationClick={onNotificationClick}
+            onSettingsClick={onSettingsClick}
+          />
+        </div>
+
+        <div className="bg-white border rounded-lg p-4">
+          <StaffStatusSection onStatusChange={onStatusChange} />
+        </div>
+
+        {renderMainContent()}
       </div>
     );
   }
   
-  return (
-    <div className="flex flex-col min-h-screen">
-      {/* Header - Only show on basic-queue tab (main staff dashboard) */}
-      {activeSection === 'basic-queue' && (
-        <>
-          <div className="bg-white border-b p-6">
-            <StaffDashboardHeader
-              queueStatus={queueStatus}
-              staffStatus={staffStatus as 'active' | 'inactive'}
-              activeAppointments={activeAppointments.length}
-              onRefresh={onRefresh}
-              onNotificationClick={onNotificationClick}
-              onSettingsClick={onSettingsClick}
-            />
-          </div>
-
-          {/* Status Section - Only show on basic-queue tab */}
-          <div className="bg-white border-b px-6 py-4">
-            <StaffStatusSection onStatusChange={onStatusChange} />
-          </div>
-        </>
-      )}
-      
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        <div className="max-w-7xl mx-auto">
-          {renderMainContent()}
-        </div>
-      </main>
-    </div>
-  );
+  // For all other sections, just render the content
+  return renderMainContent();
 };
