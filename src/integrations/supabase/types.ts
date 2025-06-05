@@ -1403,6 +1403,75 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_notifications: {
+        Row: {
+          appointment_id: string | null
+          call_duration: number | null
+          completed_at: string | null
+          created_at: string
+          customer_id: string
+          error_message: string | null
+          id: string
+          max_retries: number
+          message: string
+          phone_number: string
+          retry_count: number
+          scheduled_for: string
+          status: string
+          updated_at: string
+          voice_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          call_duration?: number | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id: string
+          error_message?: string | null
+          id?: string
+          max_retries?: number
+          message: string
+          phone_number: string
+          retry_count?: number
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+          voice_id?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          call_duration?: number | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string
+          error_message?: string | null
+          id?: string
+          max_retries?: number
+          message?: string
+          phone_number?: string
+          retry_count?: number
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+          voice_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_notifications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       user_profiles: {

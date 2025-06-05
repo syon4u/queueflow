@@ -41,7 +41,7 @@ export function useVoiceNotifications() {
     queryKey: ['voice-notifications'],
     queryFn: async (): Promise<VoiceNotification[]> => {
       const { data, error } = await supabase
-        .from('voice_notifications')
+        .from('voice_notifications' as any)
         .select(`
           *,
           customers!voice_notifications_customer_id_fkey(first_name, last_name),
@@ -51,7 +51,7 @@ export function useVoiceNotifications() {
 
       if (error) throw error;
       
-      return data || [];
+      return (data || []) as VoiceNotification[];
     },
     refetchInterval: 30000 // Refetch every 30 seconds
   });
@@ -63,7 +63,7 @@ export function useVoiceNotifications() {
       const now = new Date().toISOString();
       
       const { data, error } = await supabase
-        .from('voice_notifications')
+        .from('voice_notifications' as any)
         .select(`
           *,
           customers!voice_notifications_customer_id_fkey(first_name, last_name, phone),
@@ -75,7 +75,7 @@ export function useVoiceNotifications() {
 
       if (error) throw error;
       
-      return data || [];
+      return (data || []) as VoiceNotification[];
     },
     refetchInterval: 15000 // Check every 15 seconds
   });
@@ -86,7 +86,7 @@ export function useVoiceNotifications() {
     
     try {
       const { error } = await supabase
-        .from('voice_notifications')
+        .from('voice_notifications' as any)
         .insert({
           customer_id: request.customerId,
           appointment_id: request.appointmentId,
@@ -129,7 +129,7 @@ export function useVoiceNotifications() {
       try {
         // Update status to calling
         await supabase
-          .from('voice_notifications')
+          .from('voice_notifications' as any)
           .update({ status: 'calling' })
           .eq('id', notification.id);
 
@@ -163,7 +163,7 @@ export function useVoiceNotifications() {
   const cancelVoiceNotification = async (notificationId: string) => {
     try {
       const { error } = await supabase
-        .from('voice_notifications')
+        .from('voice_notifications' as any)
         .update({ status: 'failed', error_message: 'Cancelled by user' })
         .eq('id', notificationId);
 
