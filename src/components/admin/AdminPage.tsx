@@ -45,6 +45,21 @@ export const AdminPage: React.FC = () => {
     }
   });
 
+  const handleRefresh = () => {
+    // Refresh data
+    window.location.reload();
+  };
+
+  const handleNotificationClick = () => {
+    // Handle notification click
+    console.log('Notification clicked');
+  };
+
+  const handleSettingsClick = () => {
+    // Handle settings click
+    console.log('Settings clicked');
+  };
+
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
@@ -67,9 +82,9 @@ export const AdminPage: React.FC = () => {
         totalUsers={0}
         activeStaff={0}
         todayAppointments={0}
-        recentAlerts={[]}
-        capacityUtilization={0}
-        avgWaitTime={0}
+        onRefresh={handleRefresh}
+        onNotificationClick={handleNotificationClick}
+        onSettingsClick={handleSettingsClick}
       />
       <AdminTopNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       
