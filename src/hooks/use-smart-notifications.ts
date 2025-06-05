@@ -53,7 +53,13 @@ export function useSmartNotifications() {
         .order('priority', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      
+      // Cast to proper types
+      return (data || []).map(rule => ({
+        ...rule,
+        trigger_type: rule.trigger_type as NotificationRule['trigger_type'],
+        priority: rule.priority as NotificationRule['priority']
+      }));
     },
     refetchInterval: 30000 // Refetch every 30 seconds
   });
@@ -73,7 +79,12 @@ export function useSmartNotifications() {
         .limit(50);
 
       if (error) throw error;
-      return data || [];
+      
+      // Cast to proper types
+      return (data || []).map(log => ({
+        ...log,
+        status: log.status as NotificationLog['status']
+      }));
     }
   });
 
@@ -237,11 +248,23 @@ export function useSmartNotifications() {
   };
 
   // Create or update notification rule
-  const saveNotificationRule = async (rule: Partial<NotificationRule>) => {
+  const saveNotificationRule = async (rule: Omit<NotificationRule, 'id' | 'created_at' | 'updated_at'> & { id?: string }) => {
     try {
+      // Prepare the data for upsert
+      const ruleData = {
+        name: rule.name,
+        trigger_type: rule.trigger_type,
+        trigger_condition: rule.trigger_condition,
+        channels: rule.channels,
+        template_id: rule.template_id,
+        enabled: rule.enabled,
+        priority: rule.priority,
+        ...(rule.id && { id: rule.id })
+      };
+
       const { error } = await supabase
         .from('notification_rules')
-        .upsert(rule);
+        .upsert(ruleData);
 
       if (error) throw error;
 
