@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,6 +18,7 @@ import AuthPage from "./pages/AuthPage";
 import KioskPage from "./pages/KioskPage";
 import DigitalSignagePage from "./pages/DigitalSignagePage";
 import MobileQueuePage from "./pages/MobileQueuePage";
+import PowerUserPage from "./pages/PowerUserPage";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -102,6 +102,7 @@ function App() {
                 <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/power-user" element={<PowerUserPage />} />
                 <Route path="/queue" element={<VirtualQueuePage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/kiosk" element={<KioskPage />} />

@@ -1864,6 +1864,14 @@ export type Database = {
           last_sign_in_at: string
         }[]
       }
+      has_power_user_access: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_power_user: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       update_user_role: {
         Args: { target_user_id: string; new_role: string }
         Returns: boolean
@@ -1877,7 +1885,7 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "no_show"
-      user_role: "customer" | "staff" | "admin"
+      user_role: "customer" | "staff" | "admin" | "power_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2001,7 +2009,7 @@ export const Constants = {
         "cancelled",
         "no_show",
       ],
-      user_role: ["customer", "staff", "admin"],
+      user_role: ["customer", "staff", "admin", "power_user"],
     },
   },
 } as const

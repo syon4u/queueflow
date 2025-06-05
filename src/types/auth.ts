@@ -1,15 +1,15 @@
-
 import { User, Session } from '@supabase/supabase-js';
 
 // Define role enum for better type safety
 export enum UserRole {
   ADMIN = 'admin',
   STAFF = 'staff',
-  CUSTOMER = 'customer'
+  CUSTOMER = 'customer',
+  POWER_USER = 'power_user'
 }
 
 // Union type for roles - provides flexibility while maintaining type safety
-export type UserRoleType = 'admin' | 'staff' | 'customer';
+export type UserRoleType = 'admin' | 'staff' | 'customer' | 'power_user';
 
 export interface AuthUser extends User {
   role?: UserRoleType;
@@ -72,7 +72,7 @@ export interface RolePermissions {
 
 // Type guards for better type safety
 export const isValidUserRole = (role: string): role is UserRoleType => {
-  return ['admin', 'staff', 'customer'].includes(role);
+  return ['admin', 'staff', 'customer', 'power_user'].includes(role);
 };
 
 export const getUserRolePermissions = (role: UserRoleType | null): RolePermissions => {
@@ -82,6 +82,14 @@ export const getUserRolePermissions = (role: UserRoleType | null): RolePermissio
         canManageUsers: true,
         canManageStaff: true,
         canViewAdmin: true,
+        canManageAppointments: true,
+        canViewReports: true,
+      };
+    case 'power_user':
+      return {
+        canManageUsers: true,
+        canManageStaff: true,
+        canViewAdmin: false, // Power users don't get full admin access
         canManageAppointments: true,
         canViewReports: true,
       };

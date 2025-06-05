@@ -26,6 +26,13 @@ export const useUserManagement = () => {
       last_sign_in_at: new Date().toISOString()
     },
     {
+      id: 'mock-power-user-id',
+      email: 'poweruser@broward.gov',
+      role: 'power_user',
+      created_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString()
+    },
+    {
       id: 'mock-staff-user-1',
       email: 'staff1@broward.gov',
       role: 'staff',
