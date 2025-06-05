@@ -16,7 +16,7 @@ import { StaffDashboardHeader } from '@/components/staff/StaffDashboardHeader';
 import { StaffDashboardSkeleton } from '@/components/staff/StaffDashboardSkeleton';
 import { StaffStatusSkeleton } from '@/components/staff/StaffStatusSkeleton';
 import StaffStatusSection from '@/components/staff/StaffStatusSection';
-import CustomerSearchTab from './CustomerSearchTab';
+import { CustomerSearchTab } from './CustomerSearchTab';
 
 interface StaffMainContentProps {
   activeSection: string;
