@@ -1,157 +1,229 @@
 import React from 'react';
-import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-import { useTranslation } from 'react-i18next';
-import { Info, Clock, User } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { AppointmentActionButtons } from './AppointmentActionButtons';
-import type { Appointment } from '@/hooks/use-appointments';
+import { 
+  Clock, 
+  User, 
+  CheckCircle, 
+  XCircle, 
+  Play, 
+  Pause,
+  MessageSquare,
+  Star
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { useCustomerSurvey } from '@/hooks/use-customer-survey';
+import { CustomerSurveyModal } from '@/components/customer/CustomerSurveyModal';
+
+interface Appointment {
+  id: string;
+  customer_id: string;
+  service_id: string;
+  location_id: string;
+  staff_id: string | null;
+  scheduled_time: string;
+  check_in_time: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  status: 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
+  notes: string | null;
+  reason_for_visit: string | null;
+  created_at: string;
+  updated_at: string;
+  customers: {
+    first_name: string;
+    last_name: string;
+  } | null;
+  services: {
+    name: string;
+    duration: number;
+  } | null;
+}
 
 interface AppointmentTableRowProps {
   appointment: Appointment;
-  isLoading: boolean;
-  onUpdateStatus: (id: string, status: any) => Promise<void>;
-  onOpenReminderDialog: (appointment: Appointment) => void;
+  onAction?: (action: string, appointmentId: string) => void;
 }
 
-// Helper function to determine badge variant and styling based on status
-const getStatusConfig = (status: string) => {
-  switch (status) {
-    case 'scheduled': 
-      return { 
-        variant: 'outline' as const, 
-        className: 'bg-blue-50 text-blue-700 border-blue-200 font-medium hover:bg-blue-100 transition-colors',
-        icon: Clock
-      };
-    case 'checked_in': 
-      return { 
-        variant: 'secondary' as const, 
-        className: 'bg-amber-50 text-amber-700 border-amber-200 font-medium hover:bg-amber-100 transition-colors',
-        icon: User
-      };
-    case 'in_progress': 
-      return { 
-        variant: 'default' as const, 
-        className: 'bg-green-50 text-green-700 border-green-200 font-medium hover:bg-green-100 transition-colors',
-        icon: Clock
-      };
-    case 'completed': 
-      return { 
-        variant: 'outline' as const, 
-        className: 'bg-gray-50 text-gray-700 border-gray-200 font-medium hover:bg-gray-100 transition-colors',
-        icon: Clock
-      };
-    case 'cancelled': 
-    case 'no_show': 
-      return { 
-        variant: 'destructive' as const, 
-        className: 'bg-red-50 text-red-700 border-red-200 font-medium hover:bg-red-100 transition-colors',
-        icon: Clock
-      };
-    default: 
-      return { 
-        variant: 'outline' as const, 
-        className: 'bg-gray-50 text-gray-700 border-gray-200 font-medium hover:bg-gray-100 transition-colors',
-        icon: Clock
-      };
-  }
-};
+export const AppointmentTableRow = ({ appointment, onAction }: AppointmentTableRowProps) => {
+  const { 
+    openSurveyModal, 
+    closeSurveyModal, 
+    isModalOpen, 
+    selectedAppointment,
+    hasSurveyBeenSubmitted 
+  } = useCustomerSurvey();
 
-export const AppointmentTableRow: React.FC<AppointmentTableRowProps> = ({
-  appointment,
-  isLoading,
-  onUpdateStatus,
-  onOpenReminderDialog
-}) => {
-  const { t } = useTranslation();
+  const timeAgo = appointment.check_in_time
+    ? formatDistanceToNow(new Date(appointment.check_in_time), { addSuffix: true })
+    : 'Not checked in';
 
-  // Get display names for better UX
-  const customerName = appointment.customer 
-    ? `${appointment.customer.first_name} ${appointment.customer.last_name}`
-    : 'Unknown Customer';
-  
-  const serviceName = appointment.service?.name || 'Unknown Service';
-  const statusConfig = getStatusConfig(appointment.status);
+  const handleCheckIn = () => {
+    onAction?.('check_in', appointment.id);
+  };
+
+  const handleStart = () => {
+    onAction?.('start', appointment.id);
+  };
+
+  const handlePause = () => {
+    onAction?.('pause', appointment.id);
+  };
+
+  const handleComplete = () => {
+    onAction?.('complete', appointment.id);
+  };
+
+  const handleCancel = () => {
+    onAction?.('cancel', appointment.id);
+  };
+
+  const handleSurveyRequest = () => {
+    openSurveyModal(appointment.id, appointment.customer_id);
+  };
+
+  const showSurveyButton = appointment.status === 'completed' && 
+    !hasSurveyBeenSubmitted(appointment.id);
+
+  const showSurveyIndicator = appointment.status === 'completed' && 
+    hasSurveyBeenSubmitted(appointment.id);
 
   return (
-    <TableRow className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-300 border-b border-gray-100 group cursor-pointer relative">
-      {/* Subtle selection indicator */}
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 transform scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top"></div>
-      
-      <TableCell className="py-4 px-6 relative">
-        <div className="space-y-1">
-          <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors">
-            {format(new Date(appointment.scheduled_time), 'MMM dd, yyyy')}
-          </div>
-          <div className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">
-            {format(new Date(appointment.scheduled_time), 'h:mm a')}
-          </div>
-        </div>
-      </TableCell>
-      
-      <TableCell className="py-4 px-6">
-        <Badge className={`${statusConfig.className} cursor-pointer transform group-hover:scale-105 transition-transform duration-200`}>
-          <statusConfig.icon className="w-3 h-3 mr-1" />
-          {t(`appointments.statusOptions.${appointment.status}`)}
-        </Badge>
-      </TableCell>
-      
-      <TableCell className="py-4 px-6">
-        <div className="space-y-1">
-          <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors">{serviceName}</div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            {appointment.service?.duration && (
-              <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-md text-xs font-medium group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">
-                {appointment.service.duration}m duration
-              </span>
+    <>
+      <tr className="hover:bg-gray-50">
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm text-gray-900">{appointment.customers?.first_name} {appointment.customers?.last_name}</div>
+          <div className="text-sm text-gray-500">{appointment.services?.name}</div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm text-gray-900">{new Date(appointment.scheduled_time).toLocaleTimeString()}</div>
+          <div className="text-sm text-gray-500">Duration: {appointment.services?.duration} min</div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          {appointment.status === 'scheduled' && (
+            <Badge variant="outline">
+              <Clock className="h-3 w-3 mr-1" />
+              Scheduled
+            </Badge>
+          )}
+          {appointment.status === 'checked_in' && (
+            <Badge variant="secondary">
+              <User className="h-3 w-3 mr-1" />
+              Checked In {timeAgo}
+            </Badge>
+          )}
+          {appointment.status === 'in_progress' && (
+            <Badge variant="default">
+              <Play className="h-3 w-3 mr-1" />
+              In Progress
+            </Badge>
+          )}
+          {appointment.status === 'completed' && (
+            <Badge variant="success">
+              <CheckCircle className="h-3 w-3 mr-1" />
+              Completed
+            </Badge>
+          )}
+          {appointment.status === 'cancelled' && (
+            <Badge variant="destructive">
+              <XCircle className="h-3 w-3 mr-1" />
+              Cancelled
+            </Badge>
+          )}
+        </td>
+        
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="flex items-center space-x-2">
+            {appointment.status === 'scheduled' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCheckIn}
+                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <User className="h-4 w-4 mr-1" />
+                Check In
+              </Button>
             )}
-            {appointment.reason_for_visit && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-blue-100 hover:text-blue-600 transition-colors">
-                    <Info size={12} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="max-w-xs bg-white border border-gray-200 shadow-lg">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-xs text-gray-700">{t('appointments.reasonForVisit')}:</p>
-                    <p className="text-xs break-words text-gray-600">{appointment.reason_for_visit}</p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
+            {appointment.status === 'checked_in' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleStart}
+                className="text-green-600 border-green-200 hover:bg-green-50"
+              >
+                <Play className="h-4 w-4 mr-1" />
+                Start
+              </Button>
+            )}
+             {appointment.status === 'in_progress' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePause}
+                className="text-orange-600 border-orange-200 hover:bg-orange-50"
+              >
+                <Pause className="h-4 w-4 mr-1" />
+                Pause
+              </Button>
+            )}
+            {appointment.status === 'in_progress' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleComplete}
+                className="text-purple-600 border-purple-200 hover:bg-purple-50"
+              >
+                <CheckCircle className="h-4 w-4 mr-1" />
+                Complete
+              </Button>
+            )}
+            {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancel}
+                className="text-red-600 hover:bg-red-50"
+              >
+                <XCircle className="h-4 w-4 mr-1" />
+                Cancel
+              </Button>
+            )}
+            
+            {showSurveyButton && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSurveyRequest}
+                className="text-purple-600 border-purple-200 hover:bg-purple-50"
+              >
+                <MessageSquare className="h-4 w-4 mr-1" />
+                Survey
+              </Button>
+            )}
+            
+            {showSurveyIndicator && (
+              <Badge variant="secondary" className="text-green-600 bg-green-100">
+                <Star className="h-3 w-3 mr-1" />
+                Surveyed
+              </Badge>
             )}
           </div>
-        </div>
-      </TableCell>
-      
-      <TableCell className="hidden md:table-cell py-4 px-6">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors duration-200">
-            <span className="text-blue-600 font-semibold text-sm group-hover:text-blue-700 transition-colors">
-              {customerName.split(' ').map(n => n[0]).join('').toUpperCase()}
-            </span>
-          </div>
-          <div>
-            <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors">{customerName}</div>
-            {appointment.customer?.phone && (
-              <div className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors">{appointment.customer.phone}</div>
-            )}
-          </div>
-        </div>
-      </TableCell>
-      
-      <TableCell className="py-4 px-6">
-        <div className="flex justify-center transform group-hover:scale-105 transition-transform duration-200">
-          <AppointmentActionButtons
-            appointment={appointment}
-            isLoading={isLoading}
-            onUpdateStatus={onUpdateStatus}
-            onOpenReminderDialog={onOpenReminderDialog}
-          />
-        </div>
-      </TableCell>
-    </TableRow>
+        </td>
+      </tr>
+
+      {selectedAppointment && isModalOpen && (
+        <CustomerSurveyModal
+          isOpen={isModalOpen}
+          onClose={closeSurveyModal}
+          appointmentId={selectedAppointment.appointmentId}
+          customerId={selectedAppointment.customerId}
+          onSubmitSuccess={() => {
+            // Refresh appointment data or show success message
+            onAction?.('survey_completed', appointment.id);
+          }}
+        />
+      )}
+    </>
   );
 };

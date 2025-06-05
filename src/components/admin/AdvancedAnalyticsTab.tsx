@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import PredictiveAnalytics from './analytics/PredictiveAnalytics';
 import { PredictiveSchedulingDashboard } from './PredictiveSchedulingDashboard';
 import { QueueOptimizationDashboard } from './QueueOptimizationDashboard';
+import { CustomerSatisfactionAnalytics } from './CustomerSatisfactionAnalytics';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -12,7 +13,8 @@ import {
   PieChart,
   Brain,
   Calendar,
-  Zap
+  Zap,
+  Star
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,12 +38,12 @@ export const AdvancedAnalyticsTab = () => {
       <div>
         <h2 className="text-2xl font-bold mb-2">Advanced Analytics & AI Optimization</h2>
         <p className="text-muted-foreground">
-          Deep insights, predictive analytics, AI-powered scheduling, and real-time queue optimization
+          Deep insights, predictive analytics, AI-powered scheduling, customer satisfaction, and real-time queue optimization
         </p>
       </div>
 
       <Tabs defaultValue="predictive" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="predictive" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             <span className="hidden sm:inline">Predictive Analytics</span>
@@ -53,6 +55,10 @@ export const AdvancedAnalyticsTab = () => {
           <TabsTrigger value="optimization" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
             <span className="hidden sm:inline">Queue Optimization</span>
+          </TabsTrigger>
+          <TabsTrigger value="satisfaction" className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            <span className="hidden sm:inline">Customer Satisfaction</span>
           </TabsTrigger>
           <TabsTrigger value="insights" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -70,6 +76,10 @@ export const AdvancedAnalyticsTab = () => {
         
         <TabsContent value="optimization" className="space-y-4">
           <QueueOptimizationDashboard />
+        </TabsContent>
+        
+        <TabsContent value="satisfaction" className="space-y-4">
+          <CustomerSatisfactionAnalytics />
         </TabsContent>
         
         <TabsContent value="insights" className="space-y-4">

@@ -1562,6 +1562,81 @@ export type Database = {
           },
         ]
       }
+      survey_questions: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_required: boolean
+          options: Json | null
+          order_index: number
+          question_text: string
+          question_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          options?: Json | null
+          order_index?: number
+          question_text: string
+          question_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          options?: Json | null
+          order_index?: number
+          question_text?: string
+          question_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      survey_responses: {
+        Row: {
+          created_at: string
+          id: string
+          question_id: string
+          response_value: string
+          survey_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_id: string
+          response_value: string
+          survey_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_id?: string
+          response_value?: string
+          survey_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "survey_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "survey_responses_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "customer_surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_settings: {
         Row: {
           created_at: string | null
