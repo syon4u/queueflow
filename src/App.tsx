@@ -35,11 +35,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <SessionProvider>
-            <Toaster />
-            <Sonner />
-            <PWAInstallPrompt onDismiss={() => {}} />
-            <BrowserRouter>
+          <Toaster />
+          <Sonner />
+          <PWAInstallPrompt onDismiss={() => {}} />
+          <BrowserRouter>
+            <SessionProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
@@ -71,8 +71,8 @@ function App() {
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </SessionProvider>
+            </SessionProvider>
+          </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
