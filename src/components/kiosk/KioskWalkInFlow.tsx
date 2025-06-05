@@ -49,51 +49,61 @@ export const KioskWalkInFlow: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch locations with simplified query function
-  const fetchLocations = async (): Promise<Location[]> => {
-    const { data, error } = await supabase
-      .from('locations')
-      .select('id, name, current_capacity, max_capacity')
-      .eq('is_active', true);
-    
-    if (error) throw error;
-    
-    return (data || []).map(item => ({
-      id: item.id,
-      name: item.name,
-      current_capacity: item.current_capacity || 0,
-      max_capacity: item.max_capacity || 50
-    }));
-  };
-
-  const locationsQuery = useQuery({
+  // Fetch locations with explicit typing
+  const locationsQuery = useQuery<Location[]>({
     queryKey: ['kiosk-locations'],
-    queryFn: fetchLocations
+    queryFn: async (): Promise<Location[]> => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('id, name, current_capacity, max_capacity')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      
+      const locations: Location[] = [];
+      if (data) {
+        for (const item of data) {
+          locations.push({
+            id: item.id,
+            name: item.name,
+            current_capacity: item.current_capacity || 0,
+            max_capacity: item.max_capacity || 50
+          });
+        }
+      }
+      
+      return locations;
+    }
   });
 
-  // Fetch services with simplified query function
-  const fetchServices = async (): Promise<Service[]> => {
-    if (!selectedLocation) return [];
-    
-    const { data, error } = await supabase
-      .from('services')
-      .select('id, name, description, duration')
-      .eq('location_id', selectedLocation.id)
-      .eq('is_active', true);
-    
-    if (error) throw error;
-    
-    return (data || []).map(item => ({
-      id: item.id,
-      name: item.name,
-      description: item.description || '',
-      duration: item.duration
-    }));
-  };
-
-  const servicesQuery = useQuery({
+  // Fetch services with explicit typing
+  const servicesQuery = useQuery<Service[]>({
     queryKey: ['kiosk-services', selectedLocation?.id],
-    queryFn: fetchServices,
+    queryFn: async (): Promise<Service[]> => {
+      if (!selectedLocation) return [];
+      
+      const { data, error } = await supabase
+        .from('services')
+        .select('id, name, description, duration')
+        .eq('location_id', selectedLocation.id)
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      
+      const services: Service[] = [];
+      if (data) {
+        for (const item of data) {
+          services.push({
+            id: item.id,
+            name: item.name,
+            description: item.description || '',
+            duration: item.duration
+          });
+        }
+      }
+      
+      return services;
+    },
     enabled: !!selectedLocation
   });
 
