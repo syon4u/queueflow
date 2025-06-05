@@ -60,15 +60,21 @@ const QueueFlow2TaskTracker: React.FC = () => {
     {
       id: 'capacity-throttling',
       name: 'Capacity Throttling Engine',
-      status: 'in-progress',
+      status: 'completed',
       priority: 'P0',
-      description: 'Enhanced capacity rules, auto-throttling, waitlist integration, and dynamic adjustments',
-      dependencies: ['capacity-management']
+      description: 'Enhanced capacity rules, auto-throttling, waitlist integration, and dynamic adjustments'
+    },
+    {
+      id: 'realtime-queue-management',
+      name: 'Real-time Queue Management',
+      status: 'completed',
+      priority: 'P0',
+      description: 'Live queue tracking, real-time position updates, and staff queue controls'
     },
     {
       id: 'notification-system',
       name: 'Smart Notification System',
-      status: 'not-started',
+      status: 'in-progress',
       priority: 'P0',
       description: 'Intelligent notification timing, escalation, and multi-channel delivery',
       dependencies: ['customer-communication']
@@ -102,6 +108,20 @@ const QueueFlow2TaskTracker: React.FC = () => {
       status: 'not-started',
       priority: 'P2',
       description: 'API endpoints for third-party system integration'
+    },
+    {
+      id: 'voice-notifications',
+      name: 'Voice Call Notifications',
+      status: 'not-started',
+      priority: 'P1',
+      description: 'Automated voice call system for customer notifications and confirmations'
+    },
+    {
+      id: 'appointment-reminders',
+      name: 'Automated Appointment Reminders',
+      status: 'not-started',
+      priority: 'P0',
+      description: 'Smart reminder system with multiple touchpoints and escalation'
     }
   ];
 
@@ -119,79 +139,106 @@ const QueueFlow2TaskTracker: React.FC = () => {
   const getStatusBadge = (status: Task['status']) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Completed</Badge>;
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">✅ Completed</Badge>;
       case 'in-progress':
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">In Progress</Badge>;
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800">🚧 In Progress</Badge>;
       case 'not-started':
-        return <Badge variant="outline">Not Started</Badge>;
+        return <Badge variant="outline">⏳ Not Started</Badge>;
     }
   };
 
   const getPriorityBadge = (priority: Task['priority']) => {
     switch (priority) {
       case 'P0':
-        return <Badge variant="destructive">P0 - Critical</Badge>;
+        return <Badge variant="destructive">🔥 P0 - Critical</Badge>;
       case 'P1':
-        return <Badge variant="default">P1 - High</Badge>;
+        return <Badge variant="default">⚡ P1 - High</Badge>;
       case 'P2':
-        return <Badge variant="outline">P2 - Medium</Badge>;
+        return <Badge variant="outline">📋 P2 - Medium</Badge>;
     }
   };
 
   const completedTasks = tasks.filter(t => t.status === 'completed').length;
+  const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length;
   const totalTasks = tasks.length;
   const progressPercentage = Math.round((completedTasks / totalTasks) * 100);
+
+  const nextTasks = tasks.filter(t => t.status === 'not-started' && t.priority === 'P0');
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            Queue Flow 2.0 - Task Tracker
-            <div className="flex items-center gap-2">
+            🚀 Queue Flow 2.0 - Implementation Progress
+            <div className="flex items-center gap-3">
               <span className="text-sm font-normal">
-                {completedTasks}/{totalTasks} tasks completed
+                {completedTasks}/{totalTasks} completed • {inProgressTasks} in progress
               </span>
-              <Badge variant="secondary">{progressPercentage}%</Badge>
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                {progressPercentage}% Complete
+              </Badge>
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                className={`p-4 rounded-lg border ${
-                  task.status === 'in-progress' 
-                    ? 'border-blue-200 bg-blue-50' 
-                    : task.status === 'completed'
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-gray-200'
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
-                    {getStatusIcon(task.status)}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium">{task.name}</h4>
-                        {getPriorityBadge(task.priority)}
-                        {getStatusBadge(task.status)}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">{task.description}</p>
-                      {task.dependencies && (
-                        <div className="flex items-center gap-1">
-                          <AlertTriangle className="h-3 w-3 text-amber-500" />
-                          <span className="text-xs text-amber-700">
-                            Depends on: {task.dependencies.join(', ')}
-                          </span>
+          <div className="space-y-6">
+            {/* Next Priority Tasks */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <h3 className="font-medium text-amber-800 mb-2">
+                🎯 Next Priority Tasks (P0)
+              </h3>
+              {nextTasks.length > 0 ? (
+                <div className="space-y-2">
+                  {nextTasks.map(task => (
+                    <div key={task.id} className="text-sm text-amber-700">
+                      • {task.name}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-amber-700">All P0 tasks completed! 🎉</p>
+              )}
+            </div>
+
+            {/* All Tasks */}
+            <div className="grid gap-4">
+              <h3 className="font-medium text-gray-900">All Tasks</h3>
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`p-4 rounded-lg border ${
+                    task.status === 'in-progress' 
+                      ? 'border-blue-200 bg-blue-50' 
+                      : task.status === 'completed'
+                      ? 'border-green-200 bg-green-50'
+                      : 'border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3 flex-1">
+                      {getStatusIcon(task.status)}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h4 className="font-medium">{task.name}</h4>
+                          {getPriorityBadge(task.priority)}
+                          {getStatusBadge(task.status)}
                         </div>
-                      )}
+                        <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                        {task.dependencies && (
+                          <div className="flex items-center gap-1">
+                            <AlertTriangle className="h-3 w-3 text-amber-500" />
+                            <span className="text-xs text-amber-700">
+                              Depends on: {task.dependencies.join(', ')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
