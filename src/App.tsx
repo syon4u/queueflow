@@ -1,124 +1,115 @@
 
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
-// import { SessionProvider } from "@/context/SessionContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import { AuthProvider } from '@/context/AuthContext';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
-import AdminPage from "./pages/AdminPage";
-import StaffPage from "./pages/StaffPage";
 import CustomerPage from "./pages/CustomerPage";
-import ProfilePage from "./pages/ProfilePage";
-import AppointmentsPage from "./pages/AppointmentsPage";
-import NewAppointmentPage from "./pages/NewAppointmentPage";
-import PerformanceReportPage from "./pages/PerformanceReportPage";
-import BackendHealthPage from "./pages/BackendHealthPage";
-import Unauthorized from "./pages/Unauthorized";
-import NotFound from "./pages/NotFound";
+import AppointmentPage from "./pages/AppointmentPage";
+import StaffPage from "./pages/StaffPage";
+import AdminPage from "./components/admin/AdminPage";
+import VirtualQueuePage from "./pages/VirtualQueuePage";
 import AuthPage from "./pages/AuthPage";
-import BrowardIndex from "./pages/BrowardIndex";
-import BrowardDesignSystem from "./pages/BrowardDesignSystem";
+import KioskPage from "./pages/KioskPage";
+import "./App.css";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+function App() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { toast } = useToast();
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast({
+        title: "Connection Restored",
+        description: "You're back online!",
+      });
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast({
+        title: "Connection Lost",
+        description: "You're currently offline. Some features may be limited.",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [toast]);
+
+  // Monitor Supabase connection
+  useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        const { error } = await supabase.from('locations').select('count').limit(1);
+        if (error) {
+          console.error('Supabase connection error:', error);
+        }
+      } catch (error) {
+        console.error('Database connection failed:', error);
+        if (isOnline) {
+          toast({
+            title: "Database Connection Issue",
+            description: "Having trouble connecting to the database. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    // Check connection on mount and every 30 seconds
+    checkConnection();
+    const interval = setInterval(checkConnection, 30000);
+
+    return () => clearInterval(interval);
+  }, [isOnline, toast]);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            {/* Temporarily disabled SessionProvider to debug infinite recursion */}
-            {/* <SessionProvider> */}
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen bg-gray-50">
+              {!isOnline && (
+                <div className="bg-yellow-500 text-yellow-900 text-center py-2 px-4 text-sm font-medium">
+                  You're currently offline. Some features may not be available.
+                </div>
+              )}
+              
               <Routes>
-                {/* Public routes */}
                 <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/customer" element={<CustomerPage />} />
+                <Route path="/appointments" element={<AppointmentPage />} />
+                <Route path="/staff" element={<StaffPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/queue" element={<VirtualQueuePage />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/broward" element={<BrowardIndex />} />
-                <Route path="/broward/design-system" element={<BrowardDesignSystem />} />
-                <Route path="/unauthorized" element={<Unauthorized />} />
-                
-                {/* Protected routes */}
-                <Route 
-                  path="/admin/*" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/staff" 
-                  element={
-                    <ProtectedRoute requiredRole={['staff', 'admin']}>
-                      <StaffPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/customer" 
-                  element={
-                    <ProtectedRoute>
-                      <CustomerPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <ProfilePage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/appointments" 
-                  element={
-                    <ProtectedRoute>
-                      <AppointmentsPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/appointments/new" 
-                  element={
-                    <ProtectedRoute>
-                      <NewAppointmentPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/performance" 
-                  element={
-                    <ProtectedRoute requiredRole={['staff', 'admin']}>
-                      <PerformanceReportPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/admin/health" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <BackendHealthPage />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Fallback routes */}
-                <Route path="*" element={<NotFound />} />
+                <Route path="/kiosk" element={<KioskPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
-            {/* </SessionProvider> */}
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+            </div>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
