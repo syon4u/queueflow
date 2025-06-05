@@ -20,59 +20,76 @@ export const KioskLocationSelector: React.FC<KioskLocationSelectorProps> = ({
 }) => {
   if (!locations.length) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-12 text-center border border-orange-100">
-        <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Clock className="h-12 w-12 text-orange-500" />
+      <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl shadow-2xl p-12 text-center border-2 border-orange-200">
+        <div className="w-28 h-28 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+          <Clock className="h-14 w-14 text-white" />
         </div>
-        <h3 className="text-3xl font-bold text-gray-800 mb-4">
+        <h3 className="text-4xl font-bold text-gray-800 mb-6">
           No Locations Available
         </h3>
-        <p className="text-xl text-gray-600 max-w-md mx-auto">
+        <p className="text-2xl text-gray-600 max-w-md mx-auto">
           All service locations are currently closed. Please try again later.
         </p>
       </div>
     );
   }
 
+  const tileColors = [
+    'from-blue-500 to-blue-700',
+    'from-emerald-500 to-emerald-700',
+    'from-purple-500 to-purple-700',
+    'from-pink-500 to-pink-700',
+    'from-indigo-500 to-indigo-700',
+    'from-teal-500 to-teal-700',
+  ];
+
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-10 border border-blue-100">
-      <div className="text-center mb-10">
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <MapPin className="h-10 w-10 text-white" />
+    <div className="bg-white rounded-3xl shadow-2xl p-12 border-2 border-blue-100">
+      <div className="text-center mb-12">
+        <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+          <MapPin className="h-12 w-12 text-white" />
         </div>
-        <h3 className="text-4xl font-bold text-gray-900 mb-3">
+        <h3 className="text-5xl font-bold text-gray-900 mb-4">
           Choose Your Service Location
         </h3>
-        <p className="text-xl text-gray-600">
+        <p className="text-2xl text-gray-600">
           Select the location where you'd like to receive service
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {locations.map((location) => (
-          <Button
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        {locations.map((location, index) => (
+          <div
             key={location.id}
-            variant="outline"
+            className={`relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer bg-gradient-to-br ${tileColors[index % tileColors.length]}`}
             onClick={() => onLocationSelect(location.id)}
-            className="h-auto p-8 flex items-center justify-between text-left hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-200 rounded-xl group"
           >
-            <div className="flex items-start gap-4 flex-1">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <MapPin className="h-6 w-6 text-blue-600" />
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+            <div className="relative p-8 text-white">
+              <div className="flex items-start justify-between mb-6">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <MapPin className="h-8 w-8 text-white" />
+                </div>
+                <ChevronRight className="h-8 w-8 text-white/80" />
               </div>
-              <div className="flex-1">
-                <h4 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors">
-                  {location.name}
-                </h4>
-                {location.address && (
-                  <p className="text-lg text-gray-600 leading-relaxed">
-                    {location.address}
-                  </p>
-                )}
+              
+              <h4 className="text-2xl font-bold mb-3 leading-tight">
+                {location.name}
+              </h4>
+              
+              {location.address && (
+                <p className="text-lg text-white/90 leading-relaxed">
+                  {location.address}
+                </p>
+              )}
+              
+              <div className="mt-6">
+                <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
+                  <span className="text-sm font-medium">Select Location</span>
+                </div>
               </div>
             </div>
-            <ChevronRight className="h-8 w-8 text-gray-400 group-hover:text-blue-600 transition-colors ml-4" />
-          </Button>
+          </div>
         ))}
       </div>
     </div>

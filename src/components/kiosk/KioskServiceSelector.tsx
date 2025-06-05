@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, FileText, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Clock, FileText, ChevronRight, Zap } from 'lucide-react';
 
 interface Service {
   id: string;
@@ -33,69 +33,94 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
     return `${hours}h ${remainingMinutes}m`;
   };
 
+  const serviceColors = [
+    'from-violet-500 to-violet-700',
+    'from-cyan-500 to-cyan-700',
+    'from-rose-500 to-rose-700',
+    'from-amber-500 to-amber-700',
+    'from-lime-500 to-lime-700',
+    'from-fuchsia-500 to-fuchsia-700',
+  ];
+
+  const serviceIcons = [FileText, Zap, Clock, FileText, Zap, Clock];
+
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-10 border border-blue-100">
-      <div className="flex items-center gap-6 mb-8">
+    <div className="bg-white rounded-3xl shadow-2xl p-12 border-2 border-blue-100">
+      <div className="flex items-center gap-8 mb-12">
         <Button 
           variant="outline" 
           onClick={onBack} 
-          className="flex items-center gap-3 px-6 py-3 text-lg border-2 border-gray-300 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 rounded-xl"
+          className="flex items-center gap-3 px-8 py-4 text-xl border-3 border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 rounded-2xl shadow-lg"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-6 w-6" />
           Back
         </Button>
         <div>
-          <h3 className="text-4xl font-bold text-gray-900 mb-2">
+          <h3 className="text-5xl font-bold text-gray-900 mb-3">
             Select Service Type
           </h3>
-          <p className="text-xl text-gray-600">
+          <p className="text-2xl text-gray-600">
             Choose the service you need today
           </p>
         </div>
       </div>
       
       {!services.length ? (
-        <div className="text-center py-16">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FileText className="h-12 w-12 text-gray-400" />
+        <div className="text-center py-20">
+          <div className="w-32 h-32 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+            <FileText className="h-16 w-16 text-white" />
           </div>
-          <h4 className="text-3xl font-bold text-gray-600 mb-4">
+          <h4 className="text-4xl font-bold text-gray-600 mb-6">
             No Services Available
           </h4>
-          <p className="text-xl text-gray-500 max-w-md mx-auto">
+          <p className="text-2xl text-gray-500 max-w-md mx-auto">
             No services are currently available at this location.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {services.map((service) => (
-            <Button
-              key={service.id}
-              variant="outline"
-              onClick={() => onServiceSelect(service.id)}
-              className="h-auto p-8 flex items-center justify-between text-left hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-200 rounded-xl group"
-            >
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-2xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {services.map((service, index) => {
+            const ServiceIcon = serviceIcons[index % serviceIcons.length];
+            return (
+              <div
+                key={service.id}
+                className={`relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer bg-gradient-to-br ${serviceColors[index % serviceColors.length]}`}
+                onClick={() => onServiceSelect(service.id)}
+              >
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                <div className="relative p-8 text-white min-h-[280px] flex flex-col">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                      <ServiceIcon className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+                      <Clock className="h-5 w-5 text-white" />
+                      <span className="text-lg font-bold">
+                        {formatDuration(service.duration)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h4 className="text-2xl font-bold mb-4 leading-tight flex-shrink-0">
                     {service.name}
                   </h4>
-                  <div className="flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-full group-hover:bg-blue-200 transition-colors">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    <span className="text-lg font-bold text-blue-700">
-                      {formatDuration(service.duration)}
-                    </span>
+                  
+                  {service.description && (
+                    <p className="text-lg text-white/90 leading-relaxed mb-6 flex-grow">
+                      {service.description}
+                    </p>
+                  )}
+                  
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
+                      <span className="text-sm font-medium">Select Service</span>
+                    </div>
+                    <ChevronRight className="h-6 w-6 text-white/80" />
                   </div>
                 </div>
-                {service.description && (
-                  <p className="text-lg text-gray-600 leading-relaxed mb-4">
-                    {service.description}
-                  </p>
-                )}
               </div>
-              <ChevronRight className="h-8 w-8 text-gray-400 group-hover:text-blue-600 transition-colors ml-6" />
-            </Button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
