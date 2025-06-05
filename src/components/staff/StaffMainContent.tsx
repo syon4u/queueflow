@@ -16,9 +16,8 @@ import {
 import { QueueDashboard } from './QueueDashboard';
 import { EnhancedQueueDashboard } from './EnhancedQueueDashboard';
 import { StaffAppointmentsTab } from './StaffAppointmentsTab';
-import { CustomerSearchTab } from './CustomerSearchTab';
+import CustomerSearchTab from './CustomerSearchTab';
 import { AdvancedStaffTools } from './AdvancedStaffTools';
-import { StaffHeader } from './StaffHeader';
 
 interface StaffMainContentProps {
   activeSection: string;
@@ -67,11 +66,28 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <StaffHeader 
-        onNotificationClick={onNotificationClick}
-        onSettingsClick={onSettingsClick}
-        activeSection={activeSection}
-      />
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Staff Portal</h1>
+            <p className="text-sm text-gray-600">
+              {activeSection === 'basic-queue' && 'Basic Queue Management'}
+              {activeSection === 'enhanced-queue' && 'Enhanced Queue Management'}
+              {activeSection === 'appointments' && 'Appointments Management'}
+              {activeSection === 'customer-search' && 'Customer Search & History'}
+              {activeSection === 'advanced-tools' && 'Advanced Staff Tools'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onNotificationClick}>
+              <Bell className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={onSettingsClick}>
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
       
       <main className="flex-1 overflow-auto p-6">
         {renderContent()}
