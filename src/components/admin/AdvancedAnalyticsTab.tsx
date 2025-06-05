@@ -4,13 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import PredictiveAnalytics from './analytics/PredictiveAnalytics';
 import { PredictiveSchedulingDashboard } from './PredictiveSchedulingDashboard';
+import { QueueOptimizationDashboard } from './QueueOptimizationDashboard';
 import { 
   BarChart3, 
   TrendingUp, 
   Users, 
   PieChart,
   Brain,
-  Calendar
+  Calendar,
+  Zap
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,14 +34,14 @@ export const AdvancedAnalyticsTab = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Advanced Analytics & Predictions</h2>
+        <h2 className="text-2xl font-bold mb-2">Advanced Analytics & AI Optimization</h2>
         <p className="text-muted-foreground">
-          Deep insights, predictive analytics, and AI-powered scheduling optimization
+          Deep insights, predictive analytics, AI-powered scheduling, and real-time queue optimization
         </p>
       </div>
 
       <Tabs defaultValue="predictive" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="predictive" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             <span className="hidden sm:inline">Predictive Analytics</span>
@@ -47,6 +49,10 @@ export const AdvancedAnalyticsTab = () => {
           <TabsTrigger value="scheduling" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
             <span className="hidden sm:inline">AI Scheduling</span>
+          </TabsTrigger>
+          <TabsTrigger value="optimization" className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            <span className="hidden sm:inline">Queue Optimization</span>
           </TabsTrigger>
           <TabsTrigger value="insights" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -60,6 +66,10 @@ export const AdvancedAnalyticsTab = () => {
         
         <TabsContent value="scheduling" className="space-y-4">
           <PredictiveSchedulingDashboard />
+        </TabsContent>
+        
+        <TabsContent value="optimization" className="space-y-4">
+          <QueueOptimizationDashboard />
         </TabsContent>
         
         <TabsContent value="insights" className="space-y-4">
