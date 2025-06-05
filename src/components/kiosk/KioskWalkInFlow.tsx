@@ -49,10 +49,10 @@ export const KioskWalkInFlow: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch locations with explicit typing
-  const locationsQuery = useQuery<Location[]>({
+  // Fetch locations - let TypeScript infer the types naturally
+  const locationsQuery = useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async (): Promise<Location[]> => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')
@@ -60,26 +60,19 @@ export const KioskWalkInFlow: React.FC = () => {
       
       if (error) throw error;
       
-      const locations: Location[] = [];
-      if (data) {
-        for (const item of data) {
-          locations.push({
-            id: item.id,
-            name: item.name,
-            current_capacity: item.current_capacity || 0,
-            max_capacity: item.max_capacity || 50
-          });
-        }
-      }
-      
-      return locations;
+      return (data || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        current_capacity: item.current_capacity || 0,
+        max_capacity: item.max_capacity || 50
+      }));
     }
   });
 
-  // Fetch services with explicit typing
-  const servicesQuery = useQuery<Service[]>({
+  // Fetch services - let TypeScript infer the types naturally
+  const servicesQuery = useQuery({
     queryKey: ['kiosk-services', selectedLocation?.id],
-    queryFn: async (): Promise<Service[]> => {
+    queryFn: async () => {
       if (!selectedLocation) return [];
       
       const { data, error } = await supabase
@@ -90,19 +83,12 @@ export const KioskWalkInFlow: React.FC = () => {
       
       if (error) throw error;
       
-      const services: Service[] = [];
-      if (data) {
-        for (const item of data) {
-          services.push({
-            id: item.id,
-            name: item.name,
-            description: item.description || '',
-            duration: item.duration
-          });
-        }
-      }
-      
-      return services;
+      return (data || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        description: item.description || '',
+        duration: item.duration
+      }));
     },
     enabled: !!selectedLocation
   });
