@@ -5,11 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { DashboardTab } from './DashboardTab';
 import { StatsTab } from './StatsTab';
-import { UserManagementTab } from './UserManagementTab';
 import { LocationsTab } from './LocationsTab';
 import { ServicesTab } from './ServicesTab';
-import { StaffTab } from './StaffTab';
-import { EmployeeTab } from './EmployeeTab';
 import CustomerManagementTab from './CustomerManagementTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { QueueManagementTab } from './QueueManagementTab';
@@ -79,7 +76,7 @@ export const AdminPage: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="users">
-            <UserManagementTab />
+            <MergedUsersTab />
           </TabsContent>
           
           <TabsContent value="locations">
@@ -88,14 +85,6 @@ export const AdminPage: React.FC = () => {
           
           <TabsContent value="services">
             <ServicesTab />
-          </TabsContent>
-          
-          <TabsContent value="staff">
-            <StaffTab />
-          </TabsContent>
-          
-          <TabsContent value="employees">
-            <EmployeeTab />
           </TabsContent>
           
           <TabsContent value="customers">
@@ -120,10 +109,6 @@ export const AdminPage: React.FC = () => {
           
           <TabsContent value="sms-commands">
             <SMSCommandsTab />
-          </TabsContent>
-          
-          <TabsContent value="merged-users">
-            <MergedUsersTab />
           </TabsContent>
           
           <TabsContent value="advanced-analytics">
