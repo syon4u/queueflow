@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -71,6 +72,31 @@ export default {
 				'bc-blue-60': 'rgba(0, 90, 156, 0.6)',
 				'bc-teal-70': 'rgba(0, 133, 155, 0.7)',
 				'bc-gold-80': 'rgba(243, 213, 78, 0.8)',
+				// Semantic Status Colors
+				success: {
+					DEFAULT: '#10b981',
+					foreground: '#ffffff',
+					muted: '#d1fae5',
+					'muted-foreground': '#059669'
+				},
+				warning: {
+					DEFAULT: '#f59e0b',
+					foreground: '#ffffff',
+					muted: '#fef3c7',
+					'muted-foreground': '#d97706'
+				},
+				error: {
+					DEFAULT: '#ef4444',
+					foreground: '#ffffff',
+					muted: '#fee2e2',
+					'muted-foreground': '#dc2626'
+				},
+				info: {
+					DEFAULT: '#3b82f6',
+					foreground: '#ffffff',
+					muted: '#dbeafe',
+					'muted-foreground': '#2563eb'
+				},
 				neutral: {
 					50: '#fafafa',
 					100: '#f5f5f5',
@@ -82,18 +108,35 @@ export default {
 					700: '#404040',
 					800: '#262626',
 					900: '#171717',
-				},
-				status: {
-					success: '#10b981',
-					warning: '#f59e0b',
-					error: '#ef4444',
-					info: '#3b82f6',
 				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			// Design Token Spacing Scale
+			spacing: {
+				'xs': '0.25rem',    // 4px
+				'sm': '0.5rem',     // 8px
+				'md': '1rem',       // 16px
+				'lg': '1.5rem',     // 24px
+				'xl': '2rem',       // 32px
+				'2xl': '3rem',      // 48px
+				'3xl': '4rem',      // 64px
+			},
+			// Typography Scale
+			fontSize: {
+				'heading-xs': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '600' }],  // 14px
+				'heading-sm': ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }],       // 16px
+				'heading-md': ['1.125rem', { lineHeight: '1.75rem', fontWeight: '600' }],  // 18px
+				'heading-lg': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],   // 20px
+				'heading-xl': ['1.5rem', { lineHeight: '2rem', fontWeight: '600' }],       // 24px
+				'heading-2xl': ['1.875rem', { lineHeight: '2.25rem', fontWeight: '700' }], // 30px
+				'body-xs': ['0.75rem', { lineHeight: '1rem', fontWeight: '400' }],         // 12px
+				'body-sm': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '400' }],     // 14px
+				'body-md': ['1rem', { lineHeight: '1.5rem', fontWeight: '400' }],          // 16px
+				'body-lg': ['1.125rem', { lineHeight: '1.75rem', fontWeight: '400' }],     // 18px
 			},
 			keyframes: {
 				'accordion-down': {

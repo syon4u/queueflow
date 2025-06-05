@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -46,10 +47,10 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
   ];
 
   return (
-    <div className="border-b bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="border-b bg-background shadow-sm">
+      <div className="max-w-7xl mx-auto px-md sm:px-lg lg:px-xl">
         <ScrollArea className="w-full">
-          <div className="flex space-x-1 py-2 min-w-max">
+          <div className="flex space-x-1 py-sm min-w-max">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
               return (
@@ -58,7 +59,7 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
                   variant={activeTab === item.id ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => onTabChange(item.id)}
-                  className="flex items-center gap-2 whitespace-nowrap"
+                  className="flex items-center gap-sm whitespace-nowrap transition-all duration-200"
                 >
                   <IconComponent className="h-4 w-4" />
                   {item.label}
