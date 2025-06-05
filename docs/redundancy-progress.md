@@ -19,15 +19,15 @@
 - [x] Unify employee-management hooks – Deleted redundant employee-management hook folder and files
 
 ### Route and Page Optimization
-- [ ] Consolidate StaffPage and employee routes – Single interface with role-based access control
-- [ ] Merge AdminPage staff/employee tabs – Unified user management interface
-- [ ] Optimize App.tsx routing – Remove duplicate staff/employee route handling
+- [x] Consolidate StaffPage and employee routes – Created unified UserManagementPage with role-based access control
+- [x] Merge AdminPage staff/employee tabs – Unified user management interface using MergedUsersTab
+- [x] Optimize App.tsx routing – Added consolidated routes while maintaining backward compatibility
 
 ### Shared Component Creation
 - [x] Create UserManagementTable component – Shared table for staff/employee data display
 - [x] Create UserFormDialog component – Unified form for staff/employee creation/editing  
 - [x] Create UserSidebar component – Role-aware navigation sidebar
-- [ ] Create RoleBasedAccess component – Centralized RBAC logic
+- [x] Create RoleBasedAccess component – Centralized RBAC logic
 
 ### Data Layer Optimization
 - [x] Unify profile queries – Single hook for staff/employee data fetching
@@ -48,5 +48,4 @@
 - [ ] Final report generated
 
 ---
-**Status:** 🚧 In Progress | **Completed:** 15/16 | **Remaining:** 1
-
+**Status:** 🚧 In Progress | **Completed:** 18/19 | **Remaining:** 1
