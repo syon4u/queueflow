@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Monitor, Users, Clock, Zap } from 'lucide-react';
@@ -46,9 +45,9 @@ export const DigitalSignageDisplay: React.FC = () => {
           id,
           check_in_time,
           status,
-          customers(first_name, last_name),
-          services(name),
-          locations(name)
+          customer_id,
+          service_id,
+          location_id
         `)
         .in('status', ['checked_in', 'in_progress'])
         .order('check_in_time', { ascending: true });
@@ -57,6 +56,42 @@ export const DigitalSignageDisplay: React.FC = () => {
       return data;
     },
     refetchInterval: 5000, // Refresh every 5 seconds
+  });
+
+  // Fetch customers data separately
+  const { data: customersData } = useQuery({
+    queryKey: ['signage-customers'],
+    queryFn: async () => {
+      if (!queueData) return [];
+      const customerIds = queueData.map(item => item.customer_id);
+      const { data, error } = await supabase
+        .from('customers')
+        .select('id, first_name, last_name')
+        .in('id', customerIds);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!queueData,
+    refetchInterval: 5000,
+  });
+
+  // Fetch services data separately
+  const { data: servicesData } = useQuery({
+    queryKey: ['signage-services'],
+    queryFn: async () => {
+      if (!queueData) return [];
+      const serviceIds = queueData.map(item => item.service_id);
+      const { data, error } = await supabase
+        .from('services')
+        .select('id, name')
+        .in('id', serviceIds);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!queueData,
+    refetchInterval: 5000,
   });
 
   // Fetch location data
@@ -99,38 +134,46 @@ export const DigitalSignageDisplay: React.FC = () => {
 
   // Process queue data
   useEffect(() => {
-    if (queueData) {
+    if (queueData && customersData && servicesData) {
       const serving = queueData
         .filter(item => item.status === 'in_progress')
         .slice(0, 4)
-        .map(item => ({
-          id: item.id,
-          customer_name: `${item.customers?.first_name} ${item.customers?.last_name}`,
-          service_name: item.services?.name || 'Service',
-          ticket_number: item.id.slice(-8).toUpperCase(),
-          status: item.status,
-          check_in_time: item.check_in_time,
-          estimated_wait: 0
-        }));
+        .map(item => {
+          const customer = customersData.find(c => c.id === item.customer_id);
+          const service = servicesData.find(s => s.id === item.service_id);
+          return {
+            id: item.id,
+            customer_name: customer ? `${customer.first_name} ${customer.last_name}` : 'Unknown Customer',
+            service_name: service?.name || 'Service',
+            ticket_number: item.id.slice(-8).toUpperCase(),
+            status: item.status,
+            check_in_time: item.check_in_time,
+            estimated_wait: 0
+          };
+        });
 
       const next = queueData
         .filter(item => item.status === 'checked_in')
         .slice(0, 6)
-        .map(item => ({
-          id: item.id,
-          customer_name: `${item.customers?.first_name} ${item.customers?.last_name}`,
-          service_name: item.services?.name || 'Service',
-          ticket_number: item.id.slice(-8).toUpperCase(),
-          status: item.status,
-          check_in_time: item.check_in_time,
-          estimated_wait: Math.floor(Math.random() * 20) + 5 // Mock estimate
-        }));
+        .map(item => {
+          const customer = customersData.find(c => c.id === item.customer_id);
+          const service = servicesData.find(s => s.id === item.service_id);
+          return {
+            id: item.id,
+            customer_name: customer ? `${customer.first_name} ${customer.last_name}` : 'Unknown Customer',
+            service_name: service?.name || 'Service',
+            ticket_number: item.id.slice(-8).toUpperCase(),
+            status: item.status,
+            check_in_time: item.check_in_time,
+            estimated_wait: Math.floor(Math.random() * 20) + 5 // Mock estimate
+          };
+        });
 
       setCurrentlyServing(serving);
       setUpNext(next);
       setWaitingCount(queueData.filter(item => item.status === 'checked_in').length);
     }
-  }, [queueData]);
+  }, [queueData, customersData, servicesData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 p-8 text-white">
