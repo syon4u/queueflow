@@ -53,22 +53,22 @@ export const KioskWalkInFlow: React.FC = () => {
   // Fetch locations
   const { data: locations, isLoading: locationsLoading } = useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async (): Promise<Location[]> => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')
         .eq('is_active', true);
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as Location[];
     }
   });
 
   // Fetch services for selected location
   const { data: services, isLoading: servicesLoading } = useQuery({
     queryKey: ['kiosk-services', selectedLocation?.id],
-    queryFn: async (): Promise<Service[]> => {
-      if (!selectedLocation) return [];
+    queryFn: async () => {
+      if (!selectedLocation) return [] as Service[];
       
       const { data, error } = await supabase
         .from('services')
@@ -77,7 +77,7 @@ export const KioskWalkInFlow: React.FC = () => {
         .eq('is_active', true);
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as Service[];
     },
     enabled: !!selectedLocation
   });
