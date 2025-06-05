@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CustomerNotesManager } from './customer-notes/CustomerNotesManager';
 import { CustomerCommunicationHistory } from './CustomerCommunicationHistory';
+import { CustomerAppointmentHistory } from './CustomerAppointmentHistory';
 import { User, FileText, Calendar, MessageSquare } from 'lucide-react';
 
 interface CustomerHistoryDialogProps {
@@ -21,7 +22,7 @@ export const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-w-6xl max-h-[85vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -45,21 +46,21 @@ export const CustomerHistoryDialog: React.FC<CustomerHistoryDialogProps> = ({
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="notes" className="flex-1 overflow-auto">
+          <TabsContent value="notes" className="flex-1 overflow-auto mt-6">
             <CustomerNotesManager
               customerId={customerId}
               customerName={customerName}
             />
           </TabsContent>
           
-          <TabsContent value="appointments" className="flex-1 overflow-auto">
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Appointment history will be displayed here</p>
-            </div>
+          <TabsContent value="appointments" className="flex-1 overflow-auto mt-6">
+            <CustomerAppointmentHistory
+              customerId={customerId}
+              customerName={customerName}
+            />
           </TabsContent>
           
-          <TabsContent value="communications" className="flex-1 overflow-auto">
+          <TabsContent value="communications" className="flex-1 overflow-auto mt-6">
             <CustomerCommunicationHistory
               customerId={customerId}
               customerName={customerName}

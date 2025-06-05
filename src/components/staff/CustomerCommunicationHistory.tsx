@@ -1,13 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, BarChart3 } from 'lucide-react';
+import { RefreshCw, BarChart3, MessageSquare } from 'lucide-react';
 import { EnhancedCommunicationFilters } from './communication/EnhancedCommunicationFilters';
 import { CommunicationList } from './communication/CommunicationList';
 import { CommunicationAnalytics } from './communication/CommunicationAnalytics';
 import { RetryFailedMessages } from './communication/RetryFailedMessages';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CommunicationHistory {
   id: string;
@@ -49,13 +51,20 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
   const fetchCommunications = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching communications for customer:', customerId);
+      
       const { data, error } = await supabase
         .from('customer_communications')
         .select('*')
         .eq('customer_id', customerId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching communications:', error);
+        throw error;
+      }
+
+      console.log('Fetched communications:', data);
 
       // Fetch staff details for each communication using profiles table
       const communicationsWithStaff: CommunicationHistory[] = [];
@@ -121,6 +130,12 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
 
   const failedCommunications = communications.filter(comm => comm.status === 'failed');
 
+  // Calculate summary stats
+  const totalCommunications = communications.length;
+  const emailCount = communications.filter(comm => comm.type === 'email').length;
+  const smsCount = communications.filter(comm => comm.type === 'sms').length;
+  const failedCount = failedCommunications.length;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -138,6 +153,42 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-blue-600">
+              {totalCommunications}
+            </div>
+            <div className="text-sm text-muted-foreground">Total Messages</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-600">
+              {emailCount}
+            </div>
+            <div className="text-sm text-muted-foreground">Emails Sent</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600">
+              {smsCount}
+            </div>
+            <div className="text-sm text-muted-foreground">SMS Sent</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-red-600">
+              {failedCount}
+            </div>
+            <div className="text-sm text-muted-foreground">Failed</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Enhanced Filters */}
@@ -166,14 +217,17 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
       {/* Tabs for List and Analytics */}
       <Tabs defaultValue="list" className="w-full">
         <TabsList>
-          <TabsTrigger value="list">Communications</TabsTrigger>
-          <TabsTrigger value="analytics">
-            <BarChart3 className="h-4 w-4 mr-2" />
+          <TabsTrigger value="list" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Communications
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
             Analytics
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="list" className="space-y-4">
+        <TabsContent value="list" className="space-y-4 mt-6">
           <CommunicationList
             communications={filteredCommunications}
             isLoading={isLoading}
@@ -183,7 +237,7 @@ export const CustomerCommunicationHistory: React.FC<CustomerCommunicationHistory
           />
         </TabsContent>
         
-        <TabsContent value="analytics" className="space-y-4">
+        <TabsContent value="analytics" className="space-y-4 mt-6">
           <CommunicationAnalytics
             communications={filteredCommunications}
             dateRange={dateRange}
