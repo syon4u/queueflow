@@ -42,12 +42,18 @@ const handler = async (req: Request): Promise<Response> => {
 
       const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase();
       
-      // Find appointment that starts with this prefix - use explicit relationship hint
+      // Find appointment using a proper text search - convert UUID to text and use LIKE
       const { data: appointments, error: searchError } = await supabaseClient
         .from('appointments')
-        .select('id, status, scheduled_time, customers!appointments_customer_id_fkey(first_name, last_name)')
-        .filter('id::text', 'ilike', `${appointmentIdPrefix}%`)
-        .eq('status', 'scheduled');
+        .select(`
+          id, 
+          status, 
+          scheduled_time, 
+          customers!appointments_customer_id_fkey(first_name, last_name)
+        `)
+        .eq('status', 'scheduled')
+        .gte('scheduled_time', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Within last 24 hours
+        .lte('scheduled_time', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()); // Within next 24 hours
 
       if (searchError) {
         console.error('Error searching for appointment:', searchError);
@@ -59,7 +65,12 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
 
-      if (!appointments || appointments.length === 0) {
+      // Filter appointments client-side to find matching ID prefix
+      const matchingAppointment = appointments?.find(apt => 
+        apt.id.toLowerCase().startsWith(appointmentIdPrefix)
+      );
+
+      if (!matchingAppointment) {
         return new Response(JSON.stringify({ 
           error: 'Invalid confirmation code or appointment not found' 
         }), {
@@ -68,9 +79,6 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
 
-      // Use the first matching appointment
-      const appointment = appointments[0];
-      
       // Update appointment status to checked_in
       const { error: updateError } = await supabaseClient
         .from('appointments')
@@ -78,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
           status: 'checked_in',
           check_in_time: new Date().toISOString()
         })
-        .eq('id', appointment.id);
+        .eq('id', matchingAppointment.id);
 
       if (updateError) {
         console.error('Error updating appointment:', updateError);
@@ -90,14 +98,14 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
 
-      console.log(`Successfully checked in appointment: ${appointment.id}`);
+      console.log(`Successfully checked in appointment: ${matchingAppointment.id}`);
       
       return new Response(JSON.stringify({ 
         success: true, 
         message: 'Check-in successful',
         confirmation_code,
-        appointment_id: appointment.id,
-        customer_name: `${appointment.customers?.first_name} ${appointment.customers?.last_name}`.trim()
+        appointment_id: matchingAppointment.id,
+        customer_name: `${matchingAppointment.customers?.first_name} ${matchingAppointment.customers?.last_name}`.trim()
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
