@@ -12,7 +12,7 @@ interface Location {
 export const useKioskLocations = () => {
   return useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Location[]> => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')
