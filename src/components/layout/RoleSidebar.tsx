@@ -42,7 +42,6 @@ export const RoleSidebar: React.FC<RoleSidebarProps> = ({
 }) => {
   const { user, role } = useAuth();
   const { t } = useTranslation();
-  const location = useLocation();
 
   const navigationItems = [
     {

@@ -21,8 +21,7 @@ export const useKioskLocations = () => {
       if (error) throw error;
       if (!data) return [];
 
-      // Simple mapping without complex type inference
-      return data.map((item): Location => ({
+      return data.map((item) => ({
         id: item.id,
         name: item.name,
         current_capacity: item.current_capacity || 0,

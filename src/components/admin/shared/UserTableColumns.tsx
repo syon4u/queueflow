@@ -20,17 +20,12 @@ export const useUserTableColumns = (options: UserTableColumnsOptions = {}): Colu
     { 
       key: 'name', 
       header: 'Name',
-      cell: (row) => `${row.first_name} ${row.last_name}`
+      cell: (row) => `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'N/A'
     },
     { 
       key: 'role', 
       header: 'Role',
-      cell: (row) => {
-        if (userType === 'employee') {
-          return row.role || 'staff';
-        }
-        return row.user_roles?.role || 'staff';
-      }
+      cell: (row) => row.role || 'customer'
     }
   ];
 
