@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from '@/context/AuthContext';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { RoleDashboardWrapper } from "./components/staff/RoleDashboardWrapper";
 import Index from "./pages/Index";
 import CustomerPage from "./pages/CustomerPage";
 import AppointmentsPage from "./pages/AppointmentsPage";
