@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -104,7 +103,7 @@ export const AutomatedAppointmentReminders: React.FC = () => {
                 <SelectContent>
                   {upcomingAppointments.map(appointment => (
                     <SelectItem key={appointment.id} value={appointment.id}>
-                      {appointment.customers?.first_name} {appointment.customers?.last_name} - {format(new Date(appointment.scheduled_time), 'PPP p')}
+                      {appointment.customer?.first_name} {appointment.customer?.last_name} - {format(new Date(appointment.scheduled_time), 'PPP p')}
                     </SelectItem>
                   ))}
                 </SelectContent>
