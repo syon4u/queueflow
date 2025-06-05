@@ -5,6 +5,7 @@ import { CustomerHistoryDialog } from './CustomerHistoryDialog';
 import { CustomerSearchHeader } from './customer-search/CustomerSearchHeader';
 import { CustomerSearchFilters } from './customer-search/CustomerSearchFilters';
 import { CustomerTable } from './customer-search/CustomerTable';
+import { CustomerStatsCards } from './customer-search/CustomerStatsCards';
 
 interface Customer {
   id: string;
@@ -144,6 +145,11 @@ export const CustomerSearchTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <CustomerSearchHeader totalCustomers={customers.length} />
+      
+      <CustomerStatsCards 
+        customers={customers}
+        filteredCustomers={filteredCustomers}
+      />
       
       <CustomerSearchFilters
         searchTerm={searchTerm}
