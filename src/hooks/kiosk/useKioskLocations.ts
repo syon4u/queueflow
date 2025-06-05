@@ -12,25 +12,22 @@ interface Location {
 export const useKioskLocations = () => {
   return useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Location[]> => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')
         .eq('is_active', true);
 
       if (error) throw error;
-
       if (!data) return [];
 
-      // Explicitly map to avoid type inference issues
-      const locations: Location[] = data.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        current_capacity: item.current_capacity ?? 0,
-        max_capacity: item.max_capacity ?? 50,
-      }));
-
-      return locations;
+      // Map with explicit typing to avoid inference issues
+      return data.map((item) => ({
+        id: String(item.id),
+        name: String(item.name),
+        current_capacity: Number(item.current_capacity) || 0,
+        max_capacity: Number(item.max_capacity) || 50,
+      })) as Location[];
     },
   });
 };
