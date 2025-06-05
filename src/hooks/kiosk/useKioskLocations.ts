@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Location {
+interface KioskLocation {
   id: string;
   name: string;
   current_capacity: number;
@@ -12,7 +12,7 @@ interface Location {
 export const useKioskLocations = () => {
   return useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async (): Promise<Location[]> => {
+    queryFn: async (): Promise<KioskLocation[]> => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')

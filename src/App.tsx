@@ -17,7 +17,7 @@ import NotFound from "./pages/NotFound";
 import Unauthorized from "./pages/Unauthorized";
 import ProfilePage from "./pages/ProfilePage";
 import NewAppointmentPage from "./pages/NewAppointmentPage";
-import VirtualQueuePage from "./pages/VirtualQueuePage";
+import { VirtualQueuePage } from "./pages/VirtualQueuePage";
 import MobileQueuePage from "./pages/MobileQueuePage";
 import DigitalSignagePage from "./pages/DigitalSignagePage";
 import PerformanceReportPage from "./pages/PerformanceReportPage";
@@ -38,7 +38,7 @@ function App() {
           <SessionProvider>
             <Toaster />
             <Sonner />
-            <PWAInstallPrompt />
+            <PWAInstallPrompt onDismiss={() => {}} />
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
