@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import CustomerHistoryModal from './CustomerHistoryModal';
 import { CommunicationDialog } from './CommunicationDialog';
 import { CustomerNotesDialog } from './CustomerNotesDialog';
+import { toast } from '@/hooks/use-toast';
 import type { Appointment } from '@/hooks/use-appointments';
 
 interface AppointmentActionButtonsProps {
@@ -25,6 +26,36 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
   const { t } = useTranslation();
   const [communicationOpen, setCommunicationOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handleStatusUpdate = async (newStatus: string, actionType: string) => {
+    try {
+      setActionLoading(actionType);
+      await onUpdateStatus(appointment.id, newStatus);
+      
+      // Show success message
+      const statusMessages = {
+        'checked_in': 'Customer checked in successfully',
+        'in_progress': 'Service started successfully',
+        'completed': 'Appointment completed successfully',
+        'cancelled': 'Appointment cancelled successfully'
+      };
+      
+      toast({
+        title: 'Status Updated',
+        description: statusMessages[newStatus as keyof typeof statusMessages] || 'Status updated successfully',
+      });
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update appointment status. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const getQuickActions = () => {
     switch (appointment.status) {
@@ -32,30 +63,33 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
         return [
           {
             label: 'Check In',
-            action: () => onUpdateStatus(appointment.id, 'checked_in'),
+            action: () => handleStatusUpdate('checked_in', 'check_in'),
             icon: CheckCircle,
             variant: 'default' as const,
-            disabled: false
+            disabled: false,
+            actionType: 'check_in'
           }
         ];
       case 'checked_in':
         return [
           {
             label: 'Start Service',
-            action: () => onUpdateStatus(appointment.id, 'in_progress'),
+            action: () => handleStatusUpdate('in_progress', 'start_service'),
             icon: Play,
             variant: 'default' as const,
-            disabled: false
+            disabled: false,
+            actionType: 'start_service'
           }
         ];
       case 'in_progress':
         return [
           {
             label: 'Complete',
-            action: () => onUpdateStatus(appointment.id, 'completed'),
+            action: () => handleStatusUpdate('completed', 'complete'),
             icon: CheckCircle,
             variant: 'default' as const,
-            disabled: false
+            disabled: false,
+            actionType: 'complete'
           }
         ];
       default:
@@ -73,15 +107,15 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
           size="sm"
           variant={quickActions[0].variant}
           onClick={quickActions[0].action}
-          disabled={isLoading || quickActions[0].disabled}
+          disabled={isLoading || quickActions[0].disabled || actionLoading === quickActions[0].actionType}
           className="whitespace-nowrap"
         >
-          {isLoading ? (
+          {actionLoading === quickActions[0].actionType ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
           ) : (
             React.createElement(quickActions[0].icon, { className: "h-4 w-4 mr-2" })
           )}
-          {isLoading ? 'Loading...' : quickActions[0].label}
+          {actionLoading === quickActions[0].actionType ? 'Processing...' : quickActions[0].label}
         </Button>
       )}
 
@@ -97,35 +131,35 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
           {appointment.status === 'scheduled' && (
             <>
               <DropdownMenuItem 
-                onClick={() => onUpdateStatus(appointment.id, 'checked_in')}
-                disabled={isLoading}
+                onClick={() => handleStatusUpdate('checked_in', 'check_in_dropdown')}
+                disabled={isLoading || actionLoading === 'check_in_dropdown'}
                 className="flex items-center gap-2 hover:bg-gray-50"
               >
                 <CheckCircle className="h-4 w-4 text-green-600" />
-                Check In
+                {actionLoading === 'check_in_dropdown' ? 'Processing...' : 'Check In'}
               </DropdownMenuItem>
             </>
           )}
           
           {appointment.status === 'checked_in' && (
             <DropdownMenuItem 
-              onClick={() => onUpdateStatus(appointment.id, 'in_progress')}
-              disabled={isLoading}
+              onClick={() => handleStatusUpdate('in_progress', 'start_service_dropdown')}
+              disabled={isLoading || actionLoading === 'start_service_dropdown'}
               className="flex items-center gap-2 hover:bg-gray-50"
             >
               <Play className="h-4 w-4 text-blue-600" />
-              Start Service
+              {actionLoading === 'start_service_dropdown' ? 'Processing...' : 'Start Service'}
             </DropdownMenuItem>
           )}
           
           {appointment.status === 'in_progress' && (
             <DropdownMenuItem 
-              onClick={() => onUpdateStatus(appointment.id, 'completed')}
-              disabled={isLoading}
+              onClick={() => handleStatusUpdate('completed', 'complete_dropdown')}
+              disabled={isLoading || actionLoading === 'complete_dropdown'}
               className="flex items-center gap-2 hover:bg-gray-50"
             >
               <CheckCircle className="h-4 w-4 text-green-600" />
-              Complete
+              {actionLoading === 'complete_dropdown' ? 'Processing...' : 'Complete'}
             </DropdownMenuItem>
           )}
 
@@ -133,12 +167,12 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => onUpdateStatus(appointment.id, 'cancelled')}
-                disabled={isLoading}
+                onClick={() => handleStatusUpdate('cancelled', 'cancel')}
+                disabled={isLoading || actionLoading === 'cancel'}
                 className="flex items-center gap-2 hover:bg-red-50 text-red-600"
               >
                 <XCircle className="h-4 w-4" />
-                Cancel
+                {actionLoading === 'cancel' ? 'Processing...' : 'Cancel'}
               </DropdownMenuItem>
             </>
           )}

@@ -107,7 +107,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           description: 'Performance analytics'
         },
         {
-          id: 'templates',
+          id: 'communication',
           label: 'Templates',
           icon: MessageSquare,
           description: 'Message templates'
@@ -203,25 +203,21 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link 
-                    to="/staff" 
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
-                  >
-                    <Activity className="h-4 w-4 text-green-600 flex-shrink-0" />
-                    <span className="text-sm">Staff Portal</span>
-                  </Link>
+                <SidebarMenuButton 
+                  onClick={() => window.open('/staff', '_blank')}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900 cursor-pointer"
+                >
+                  <Activity className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">Staff Portal</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link 
-                    to="/performance"
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
-                  >
-                    <BarChart3 className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                    <span className="text-sm">Performance</span>
-                  </Link>
+                <SidebarMenuButton 
+                  onClick={() => window.open('/performance', '_blank')}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900 cursor-pointer"
+                >
+                  <BarChart3 className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <span className="text-sm">Performance</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
