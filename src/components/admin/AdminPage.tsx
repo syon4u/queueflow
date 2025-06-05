@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DashboardIcon, UserIcon, Settings } from 'lucide-react';
+import { LayoutDashboard, UserIcon, Settings } from 'lucide-react';
 import { DashboardTab } from './DashboardTab';
 import { StaffTab } from './StaffTab';
 import { EmployeeTab } from './EmployeeTab';
@@ -30,7 +31,7 @@ export const AdminPage = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-gray-100 rounded-md p-1">
           <TabsTrigger value="dashboard" className="data-[state=active]:bg-gray-200 rounded-md">
-            <DashboardIcon className="h-5 w-5 mr-2" />
+            <LayoutDashboard className="h-5 w-5 mr-2" />
             Dashboard
           </TabsTrigger>
           <TabsTrigger value="users" className="data-[state=active]:bg-gray-200 rounded-md">
@@ -49,3 +50,6 @@ export const AdminPage = () => {
     </div>
   );
 };
+
+// Add default export
+export default AdminPage;

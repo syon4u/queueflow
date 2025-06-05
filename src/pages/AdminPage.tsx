@@ -1,6 +1,6 @@
 
 import React from 'react';
-import AdminPageComponent from '@/components/admin/AdminPage';
+import { AdminPage as AdminPageComponent } from '@/components/admin/AdminPage';
 import { QueueProvider } from '@/context/QueueContext';
 
 const AdminPage = () => {
