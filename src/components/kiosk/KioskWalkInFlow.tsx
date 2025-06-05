@@ -49,29 +49,30 @@ export const KioskWalkInFlow: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch locations with explicit typing
-  const locationsQuery = useQuery<Location[]>({
+  // Fetch locations - simplified without explicit generic typing
+  const locationsQuery = useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async (): Promise<Location[]> => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')
         .eq('is_active', true);
       
       if (error) throw error;
-      return (data || []).map(item => ({
+      const locations: Location[] = (data || []).map(item => ({
         id: item.id,
         name: item.name,
         current_capacity: item.current_capacity || 0,
         max_capacity: item.max_capacity || 50
       }));
+      return locations;
     }
   });
 
-  // Fetch services with explicit typing
-  const servicesQuery = useQuery<Service[]>({
+  // Fetch services - simplified without explicit generic typing
+  const servicesQuery = useQuery({
     queryKey: ['kiosk-services', selectedLocation?.id],
-    queryFn: async (): Promise<Service[]> => {
+    queryFn: async () => {
       if (!selectedLocation) return [];
       
       const { data, error } = await supabase
@@ -81,12 +82,13 @@ export const KioskWalkInFlow: React.FC = () => {
         .eq('is_active', true);
       
       if (error) throw error;
-      return (data || []).map(item => ({
+      const services: Service[] = (data || []).map(item => ({
         id: item.id,
         name: item.name,
         description: item.description || '',
         duration: item.duration
       }));
+      return services;
     },
     enabled: !!selectedLocation
   });
