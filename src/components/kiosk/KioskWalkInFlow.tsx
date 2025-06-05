@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,26 +49,24 @@ export const KioskWalkInFlow: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch locations with explicit typing
+  // Simplified locations query
   const locationsQuery = useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async (): Promise<Location[]> => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('locations')
         .select('id, name, current_capacity, max_capacity')
         .eq('is_active', true);
       
       if (error) throw error;
-      return (data || []) as Location[];
+      return data as Location[];
     }
   });
 
-  const { data: locations = [], isLoading: locationsLoading } = locationsQuery;
-
-  // Fetch services with explicit typing
+  // Simplified services query
   const servicesQuery = useQuery({
     queryKey: ['kiosk-services', selectedLocation?.id],
-    queryFn: async (): Promise<Service[]> => {
+    queryFn: async () => {
       if (!selectedLocation) return [];
       
       const { data, error } = await supabase
@@ -79,12 +76,15 @@ export const KioskWalkInFlow: React.FC = () => {
         .eq('is_active', true);
       
       if (error) throw error;
-      return (data || []) as Service[];
+      return data as Service[];
     },
     enabled: !!selectedLocation
   });
 
-  const { data: services = [], isLoading: servicesLoading } = servicesQuery;
+  const locations = locationsQuery.data || [];
+  const services = servicesQuery.data || [];
+  const locationsLoading = locationsQuery.isLoading;
+  const servicesLoading = servicesQuery.isLoading;
 
   // Create walk-in appointment
   const createAppointmentMutation = useMutation({
