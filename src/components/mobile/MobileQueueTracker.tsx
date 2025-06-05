@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, Users, MapPin, Bell, QrCode, Refresh } from 'lucide-react';
+import { Clock, Users, MapPin, Bell, QrCode, RefreshCw } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -140,7 +139,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
             <CardContent className="p-8 text-center">
               <p className="text-red-600 mb-4">Unable to load queue information</p>
               <Button onClick={handleRefresh} variant="outline">
-                <Refresh className="h-4 w-4 mr-2" />
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Try Again
               </Button>
             </CardContent>
@@ -190,7 +189,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
                 onClick={handleRefresh}
                 disabled={isRefreshing}
               >
-                <Refresh className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
             </div>
           </div>
