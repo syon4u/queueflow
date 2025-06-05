@@ -74,10 +74,25 @@ const QueueFlow2TaskTracker: React.FC = () => {
     {
       id: 'notification-system',
       name: 'Smart Notification System',
-      status: 'in-progress',
+      status: 'completed',
       priority: 'P0',
-      description: 'Intelligent notification timing, escalation, and multi-channel delivery',
-      dependencies: ['customer-communication']
+      description: 'Intelligent notification timing, escalation rules, multi-channel delivery with templates and history tracking'
+    },
+    {
+      id: 'appointment-reminders',
+      name: 'Automated Appointment Reminders',
+      status: 'not-started',
+      priority: 'P0',
+      description: 'Smart reminder system with multiple touchpoints, escalation, and customer preferences',
+      dependencies: ['notification-system']
+    },
+    {
+      id: 'voice-notifications',
+      name: 'Voice Call Notifications',
+      status: 'not-started',
+      priority: 'P0',
+      description: 'Automated voice call system for customer notifications and confirmations',
+      dependencies: ['notification-system']
     },
     {
       id: 'predictive-scheduling',
@@ -108,20 +123,6 @@ const QueueFlow2TaskTracker: React.FC = () => {
       status: 'not-started',
       priority: 'P2',
       description: 'API endpoints for third-party system integration'
-    },
-    {
-      id: 'voice-notifications',
-      name: 'Voice Call Notifications',
-      status: 'not-started',
-      priority: 'P1',
-      description: 'Automated voice call system for customer notifications and confirmations'
-    },
-    {
-      id: 'appointment-reminders',
-      name: 'Automated Appointment Reminders',
-      status: 'not-started',
-      priority: 'P0',
-      description: 'Smart reminder system with multiple touchpoints and escalation'
     }
   ];
 

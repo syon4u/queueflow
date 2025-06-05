@@ -724,6 +724,106 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_logs: {
+        Row: {
+          appointment_id: string | null
+          channel: string
+          customer_id: string
+          error_message: string | null
+          id: string
+          message: string
+          retry_count: number
+          rule_id: string | null
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          channel: string
+          customer_id: string
+          error_message?: string | null
+          id?: string
+          message: string
+          retry_count?: number
+          rule_id?: string | null
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          channel?: string
+          customer_id?: string
+          error_message?: string | null
+          id?: string
+          message?: string
+          retry_count?: number
+          rule_id?: string | null
+          sent_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "notification_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_rules: {
+        Row: {
+          channels: string[]
+          created_at: string
+          enabled: boolean
+          id: string
+          name: string
+          priority: string
+          template_id: string | null
+          trigger_condition: string
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          channels?: string[]
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          priority?: string
+          template_id?: string | null
+          trigger_condition: string
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          channels?: string[]
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          priority?: string
+          template_id?: string | null
+          trigger_condition?: string
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       performance_metrics: {
         Row: {
           appointments_completed: number | null

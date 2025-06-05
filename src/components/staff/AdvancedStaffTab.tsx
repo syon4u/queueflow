@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PerformanceAnalyticsDashboard } from './PerformanceAnalyticsDashboard';
 import { SmartBreakManagement } from './SmartBreakManagement';
 import { WorkloadDistribution } from './WorkloadDistribution';
+import { SmartNotificationSystem } from './SmartNotificationSystem';
 import { 
   BarChart3, 
   Coffee, 
@@ -20,7 +21,7 @@ export const AdvancedStaffTab: React.FC = () => {
       <div>
         <h2 className="text-2xl font-bold mb-2">Advanced Staff Tools</h2>
         <p className="text-muted-foreground">
-          Enhanced tools for performance tracking, break management, and workload optimization
+          Enhanced tools for performance tracking, break management, workload optimization, and notifications
         </p>
       </div>
 
@@ -57,10 +58,7 @@ export const AdvancedStaffTab: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="notifications" className="space-y-4">
-          <div className="text-center py-8 text-muted-foreground">
-            <Bell className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>Advanced notification system coming soon...</p>
-          </div>
+          <SmartNotificationSystem />
         </TabsContent>
       </Tabs>
     </div>
