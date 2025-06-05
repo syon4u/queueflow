@@ -11,8 +11,7 @@ import {
   Settings,
   Home,
   Plus,
-  Bell,
-  Activity
+  Bell
 } from 'lucide-react';
 
 const navigationGroups = [
@@ -59,12 +58,6 @@ const navigationGroups = [
   {
     label: 'Analytics & Management',
     items: [
-      {
-        id: 'analytics',
-        label: 'Performance Analytics',
-        icon: Activity,
-        description: 'Staff performance and queue metrics'
-      },
       {
         id: 'reports',
         label: 'Reports & Analytics',

@@ -11,8 +11,7 @@ import {
   Calendar,
   ClipboardList,
   Settings,
-  UserCheck,
-  Activity
+  UserCheck
 } from 'lucide-react';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { PowerUserStatsCards } from './PowerUserStatsCards';
@@ -22,7 +21,6 @@ import { SMSNotificationTab } from './tabs/SMSNotificationTab';
 import { ReportsAnalyticsTab } from './tabs/ReportsAnalyticsTab';
 import { AppointmentOverridesTab } from './tabs/AppointmentOverridesTab';
 import { PowerUserAppointmentsTab } from './tabs/PowerUserAppointmentsTab';
-import { PerformanceAnalyticsDashboard } from '@/components/staff/PerformanceAnalyticsDashboard';
 
 interface PowerUserDashboardProps {
   activeTab?: string;
@@ -73,7 +71,7 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
         </CardHeader>
         <CardContent>
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-8 bg-gray-100">
+            <TabsList className="grid w-full grid-cols-7 bg-gray-100">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 Appointments
@@ -89,10 +87,6 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
               <TabsTrigger value="communications" className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 SMS
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-2">
-                <Activity className="h-4 w-4" />
-                Analytics
               </TabsTrigger>
               <TabsTrigger value="reports" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
@@ -122,10 +116,6 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
 
             <TabsContent value="communications">
               <SMSNotificationTab />
-            </TabsContent>
-
-            <TabsContent value="analytics">
-              <PerformanceAnalyticsDashboard />
             </TabsContent>
 
             <TabsContent value="reports">
