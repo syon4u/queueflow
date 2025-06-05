@@ -29,7 +29,7 @@ export const MergedUsersTab: React.FC = () => {
     handleAddClick,
     handleEditClick,
     handleDeleteClick,
-    handleSubmit
+    handleSubmit: handleSubmitWithEvent
   } = useProfileManagement();
 
   const staffColumns = useStaffTableColumns();
@@ -44,6 +44,15 @@ export const MergedUsersTab: React.FC = () => {
     handleRoleChange,
     addTemporaryData
   } = useUserManagement();
+
+  // Create a wrapper function that doesn't expect an event parameter
+  const handleSubmit = () => {
+    // Create a synthetic event to pass to the original handler
+    const syntheticEvent = {
+      preventDefault: () => {}
+    } as React.FormEvent;
+    handleSubmitWithEvent(syntheticEvent);
+  };
 
   // Show loading spinner only for the roles tab when it's active and loading
   if (usersLoading && activeTab === 'roles') {
