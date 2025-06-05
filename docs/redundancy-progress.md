@@ -14,9 +14,9 @@
 - [x] Merge StaffTableColumns and EmployeeTableColumns – Consolidated into unified UserTableColumns with role-based configurations
 
 ### Hook Consolidation  
-- [ ] Consolidate use-staff-management and use-employee-management – Duplicate profile management logic
-- [ ] Merge use-profile-management functionality – Central profile operations for both roles
-- [ ] Unify employee-management hooks – Reduce hook fragmentation in admin/employee-management folder
+- [x] Consolidate use-staff-management and use-employee-management – Removed redundant hooks, using shared user management hooks
+- [x] Merge use-profile-management functionality – Updated to use shared hooks as thin wrapper for backward compatibility
+- [x] Unify employee-management hooks – Deleted redundant employee-management hook folder and files
 
 ### Route and Page Optimization
 - [ ] Consolidate StaffPage and employee routes – Single interface with role-based access control
@@ -48,4 +48,5 @@
 - [ ] Final report generated
 
 ---
-**Status:** 🚧 In Progress | **Completed:** 12/16 | **Remaining:** 4
+**Status:** 🚧 In Progress | **Completed:** 15/16 | **Remaining:** 1
+
