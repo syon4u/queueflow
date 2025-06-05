@@ -5,165 +5,354 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { MessageSquare, Plus, Send, Users, Clock, CheckCircle, AlertCircle, Search } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  MessageSquare, 
-  Plus, 
-  Send, 
-  Edit, 
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Clock
-} from 'lucide-react';
 
 export const SMSNotificationTab: React.FC = () => {
-  const [activeSubTab, setActiveSubTab] = useState('compose');
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [messageContent, setMessageContent] = useState('');
+  const [recipientType, setRecipientType] = useState('all');
 
-  // Mock data
+  // Mock data for demonstration
   const templates = [
-    { id: '1', name: 'Appointment Reminder', content: 'Your appointment is scheduled for {date} at {time}', active: true },
-    { id: '2', name: 'Queue Update', content: 'You are now #{position} in the queue', active: true },
-    { id: '3', name: 'Service Complete', content: 'Thank you for visiting us today!', active: false },
+    { id: '1', name: 'Appointment Reminder', content: 'Hi {customer_name}, your appointment is scheduled for {appointment_time}.' },
+    { id: '2', name: 'Check-in Notification', content: 'Hello {customer_name}, please check in for your appointment.' },
+    { id: '3', name: 'Service Complete', content: 'Thank you {customer_name}, your service is complete.' },
+    { id: '4', name: 'Queue Update', content: 'Hi {customer_name}, you are now #{queue_position} in line.' },
   ];
 
-  const messageLog = [
-    { id: '1', recipient: '+1234567890', message: 'Appointment reminder sent', status: 'delivered', time: '2 hours ago' },
-    { id: '2', recipient: '+1987654321', message: 'Queue position update', status: 'failed', time: '3 hours ago' },
-    { id: '3', recipient: '+1122334455', message: 'Service completion notice', status: 'delivered', time: '4 hours ago' },
+  const recentMessages = [
+    { id: '1', recipient: 'John Doe', message: 'Appointment reminder sent', status: 'delivered', time: '2 mins ago' },
+    { id: '2', recipient: 'Jane Smith', message: 'Check-in notification', status: 'pending', time: '5 mins ago' },
+    { id: '3', recipient: 'Bob Johnson', message: 'Service complete notification', status: 'delivered', time: '10 mins ago' },
+    { id: '4', recipient: 'All customers', message: 'System maintenance notification', status: 'delivered', time: '1 hour ago' },
   ];
+
+  const stats = {
+    sent: 1247,
+    delivered: 1198,
+    pending: 12,
+    failed: 37,
+  };
+
+  const handleSendMessage = () => {
+    if (!messageContent.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a message to send",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Message Sent",
+      description: `Message sent to ${recipientType === 'all' ? 'all customers' : 'selected recipients'}`,
+    });
+
+    setMessageContent('');
+  };
+
+  const handleSendTemplate = () => {
+    if (!selectedTemplate) {
+      toast({
+        title: "Error",
+        description: "Please select a template",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Template Sent",
+      description: "Template message sent successfully",
+    });
+  };
+
+  const handleCreateTemplate = () => {
+    toast({
+      title: "Create Template",
+      description: "Template creation form would open here",
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'delivered': return 'bg-green-50 text-green-700 border-green-200';
+      case 'pending': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 'failed': return 'bg-red-50 text-red-700 border-red-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'delivered': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'failed': return <XCircle className="h-4 w-4 text-red-500" />;
-      case 'pending': return <Clock className="h-4 w-4 text-yellow-500" />;
-      default: return <Clock className="h-4 w-4 text-gray-500" />;
+      case 'delivered': return <CheckCircle className="h-4 w-4" />;
+      case 'pending': return <Clock className="h-4 w-4" />;
+      case 'failed': return <AlertCircle className="h-4 w-4" />;
+      default: return <MessageSquare className="h-4 w-4" />;
     }
   };
 
   return (
-    <div className="space-y-6 mt-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-start">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">SMS & Notification Center</h2>
-          <p className="text-sm text-gray-500">Manage SMS templates, send messages, and view delivery logs</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">SMS & Notifications</h2>
+          <p className="text-gray-600">Manage communication templates and send notifications to customers</p>
         </div>
+        <Button onClick={handleCreateTemplate} className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="h-4 w-4 mr-2" />
+          Create Template
+        </Button>
       </div>
 
-      <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="compose" className="flex items-center gap-2">
-            <Send className="h-4 w-4" />
-            Compose
-          </TabsTrigger>
-          <TabsTrigger value="templates" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Templates
-          </TabsTrigger>
-          <TabsTrigger value="logs" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Delivery Logs
-          </TabsTrigger>
-        </TabsList>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-700 mb-1">Messages Sent</p>
+                <p className="text-3xl font-bold text-blue-900">{stats.sent}</p>
+              </div>
+              <Send className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="compose">
-          <Card>
-            <CardHeader>
-              <CardTitle>Send Message</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-green-50 to-green-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">Recipients</label>
-                <Input placeholder="Enter phone numbers (comma separated)" />
+                <p className="text-sm font-medium text-green-700 mb-1">Delivered</p>
+                <p className="text-3xl font-bold text-green-900">{stats.delivered}</p>
               </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-yellow-50 to-yellow-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium">Message</label>
-                <Textarea 
-                  placeholder="Type your message here..."
-                  rows={4}
-                />
-                <p className="text-xs text-gray-500 mt-1">160 characters remaining</p>
+                <p className="text-sm font-medium text-yellow-700 mb-1">Pending</p>
+                <p className="text-3xl font-bold text-yellow-900">{stats.pending}</p>
               </div>
-              <div className="flex gap-3">
-                <Button>
+              <Clock className="h-8 w-8 text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-red-50 to-red-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-red-700 mb-1">Failed</p>
+                <p className="text-3xl font-bold text-red-900">{stats.failed}</p>
+              </div>
+              <AlertCircle className="h-8 w-8 text-red-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Send Messages */}
+        <Card className="border-0 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Send className="h-5 w-5 text-blue-600" />
+              Send Messages
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="compose" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="compose">Compose</TabsTrigger>
+                <TabsTrigger value="templates">Templates</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="compose" className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Recipients</label>
+                  <Select value={recipientType} onValueChange={setRecipientType}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Customers</SelectItem>
+                      <SelectItem value="today">Today's Appointments</SelectItem>
+                      <SelectItem value="waiting">Waiting Queue</SelectItem>
+                      <SelectItem value="custom">Custom Selection</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Message</label>
+                  <Textarea
+                    placeholder="Type your message here..."
+                    value={messageContent}
+                    onChange={(e) => setMessageContent(e.target.value)}
+                    rows={4}
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {messageContent.length}/160 characters
+                  </p>
+                </div>
+                
+                <Button onClick={handleSendMessage} className="w-full">
                   <Send className="h-4 w-4 mr-2" />
-                  Send Now
+                  Send Message
                 </Button>
-                <Button variant="outline">Schedule</Button>
-                <Button variant="outline">Save as Template</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </TabsContent>
+              
+              <TabsContent value="templates" className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Select Template</label>
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templates.map(template => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {selectedTemplate && (
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Preview:</p>
+                    <p className="text-sm mt-1">
+                      {templates.find(t => t.id === selectedTemplate)?.content}
+                    </p>
+                  </div>
+                )}
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Recipients</label>
+                  <Select value={recipientType} onValueChange={setRecipientType}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Customers</SelectItem>
+                      <SelectItem value="today">Today's Appointments</SelectItem>
+                      <SelectItem value="waiting">Waiting Queue</SelectItem>
+                      <SelectItem value="custom">Custom Selection</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Button onClick={handleSendTemplate} className="w-full">
+                  <Send className="h-4 w-4 mr-2" />
+                  Send Template
+                </Button>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="templates">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium">Message Templates</h3>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                New Template
-              </Button>
+        {/* Recent Messages */}
+        <Card className="border-0 shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <MessageSquare className="h-5 w-5 text-green-600" />
+                Recent Messages
+              </CardTitle>
+              <Badge variant="outline">{recentMessages.length} messages</Badge>
             </div>
-
-            <div className="grid gap-4">
-              {templates.map((template) => (
-                <Card key={template.id}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="font-semibold">{template.name}</h4>
-                          <Badge variant={template.active ? 'default' : 'secondary'}>
-                            {template.active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600">{template.content}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-600">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            
+            <div className="relative mt-4">
+              <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+              <Input
+                placeholder="Search messages..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="logs">
-          <Card>
-            <CardHeader>
-              <CardTitle>Message Delivery Logs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {messageLog.map((log) => (
-                  <div key={log.id} className="flex items-center justify-between p-4 border rounded">
+          </CardHeader>
+          
+          <CardContent className="p-0">
+            <div className="max-h-96 overflow-y-auto">
+              {recentMessages.map((message, index) => (
+                <div 
+                  key={message.id} 
+                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                    index === recentMessages.length - 1 ? 'border-b-0' : ''
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        {getStatusIcon(log.status)}
-                        <span className="font-medium">{log.recipient}</span>
-                        <Badge variant={log.status === 'delivered' ? 'default' : 'destructive'}>
-                          {log.status}
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium text-gray-900 text-sm">{message.recipient}</p>
+                        <Badge 
+                          variant="outline" 
+                          className={`${getStatusColor(message.status)} text-xs border-0`}
+                        >
+                          <span className="flex items-center gap-1">
+                            {getStatusIcon(message.status)}
+                            {message.status}
+                          </span>
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{log.message}</p>
+                      <p className="text-sm text-gray-600 mb-1">{message.message}</p>
+                      <p className="text-xs text-gray-500">{message.time}</p>
                     </div>
-                    <span className="text-sm text-gray-500">{log.time}</span>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Message Templates */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Message Templates</CardTitle>
+            <Button variant="outline" onClick={handleCreateTemplate}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Template
+            </Button>
+          </div>
+        </CardHeader>
+        
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {templates.map(template => (
+              <Card key={template.id} className="border border-gray-200">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">{template.name}</h4>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline">Edit</Button>
+                      <Button size="sm" variant="outline">Use</Button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600">{template.content}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
