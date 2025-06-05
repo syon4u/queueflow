@@ -62,8 +62,8 @@ export const MergedUsersTab: React.FC = () => {
   const staffStats = {
     total: staffMembers?.length || 0,
     active: staffMembers?.filter(s => s.status === 'active').length || 0,
-    admin: staffMembers?.filter(s => s.user_roles?.role === 'admin').length || 0,
-    staff: staffMembers?.filter(s => s.user_roles?.role === 'staff').length || 0,
+    admin: staffMembers?.filter(s => s.role === 'admin').length || 0,
+    staff: staffMembers?.filter(s => s.role === 'staff').length || 0,
     locations: locations?.length || 0
   };
 
