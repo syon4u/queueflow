@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, User, Calendar, Phone, Mail, History, FileText, MapPin, Settings, Filter, Users } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Search, User, Calendar, Phone, Mail, History, MapPin, Settings, Filter, Users } from 'lucide-react';
 import { useAppData } from '@/hooks/useAppData';
 import { CustomerHistoryDialog } from './CustomerHistoryDialog';
 import { format } from 'date-fns';
@@ -145,9 +146,9 @@ export const CustomerSearchTab: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
-        <Card className="shadow-sm border-0 bg-white rounded-xl">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 p-6">
+      <div className="space-y-6 p-6">
+        <Card>
+          <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
               Customer Management
@@ -167,10 +168,10 @@ export const CustomerSearchTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 p-6 bg-gray-50 min-h-screen">
+    <div className="space-y-6 p-6">
       {/* Page Header */}
-      <Card className="shadow-sm border-0 bg-white rounded-xl">
-        <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 p-6">
+      <Card>
+        <CardHeader>
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -185,18 +186,16 @@ export const CustomerSearchTab: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-                {customers.length} Total Customers
-              </Badge>
-            </div>
+            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
+              {customers.length} Total Customers
+            </Badge>
           </div>
         </CardHeader>
       </Card>
 
       {/* Search and Filters */}
-      <Card className="shadow-sm border-0 bg-white rounded-xl">
-        <CardHeader className="p-6 border-b border-gray-100">
+      <Card>
+        <CardHeader>
           <div className="flex items-center gap-2 mb-4">
             <Search className="h-5 w-5 text-gray-500" />
             <span className="font-medium text-gray-900">Search & Filter</span>
@@ -210,106 +209,93 @@ export const CustomerSearchTab: React.FC = () => {
                 placeholder="Search by name, email, or phone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-10"
+                className="pl-10"
               />
             </div>
 
-            {/* Filter Tabs */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Dropdown Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Location Filter */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Filter by Location</span>
-                </div>
-                <Tabs value={selectedLocation} onValueChange={setSelectedLocation} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 h-9">
-                    <TabsTrigger value="all" className="text-xs">
-                      All
-                    </TabsTrigger>
-                    {locations.slice(0, 3).map((location) => (
-                      <TabsTrigger
-                        key={location.id}
-                        value={location.name}
-                        className="text-xs"
-                      >
+                  Location
+                </label>
+                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="All Locations" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border shadow-md z-50">
+                    <SelectItem value="all">All Locations</SelectItem>
+                    {locations.map((location) => (
+                      <SelectItem key={location.id} value={location.name}>
                         {location.name}
-                      </TabsTrigger>
+                      </SelectItem>
                     ))}
-                  </TabsList>
-                </Tabs>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Service Filter */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
                   <Settings className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Filter by Service</span>
-                </div>
-                <Tabs value={selectedService} onValueChange={setSelectedService} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 h-9">
-                    <TabsTrigger value="all" className="text-xs">
-                      All
-                    </TabsTrigger>
-                    {services.slice(0, 3).map((service) => (
-                      <TabsTrigger
-                        key={service.id}
-                        value={service.name}
-                        className="text-xs"
-                      >
+                  Service
+                </label>
+                <Select value={selectedService} onValueChange={setSelectedService}>
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="All Services" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border shadow-md z-50">
+                    <SelectItem value="all">All Services</SelectItem>
+                    {services.map((service) => (
+                      <SelectItem key={service.id} value={service.name}>
                         {service.name}
-                      </TabsTrigger>
+                      </SelectItem>
                     ))}
-                  </TabsList>
-                </Tabs>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Clear Filters */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-transparent">Clear</label>
+                {(selectedLocation !== 'all' || selectedService !== 'all') && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedLocation('all');
+                      setSelectedService('all');
+                    }}
+                    className="w-full"
+                  >
+                    <Filter className="h-4 w-4 mr-2" />
+                    Clear Filters
+                  </Button>
+                )}
               </div>
             </div>
             
             {/* Results Summary */}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-              <span className="text-sm text-muted-foreground">
-                Showing {filteredCustomers.length} of {customers.length} customers
-              </span>
-              {(selectedLocation !== 'all' || selectedService !== 'all') && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedLocation('all');
-                    setSelectedService('all');
-                  }}
-                  className="h-8"
-                >
-                  <Filter className="h-3 w-3 mr-1" />
-                  Clear Filters
-                </Button>
-              )}
+            <div className="text-sm text-muted-foreground pt-2 border-t">
+              Showing {filteredCustomers.length} of {customers.length} customers
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      {/* Customer Results */}
-      <Card className="shadow-sm border-0 bg-white rounded-xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <User className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                Customer Records ({filteredCustomers.length})
-              </CardTitle>
-              <p className="text-sm text-gray-500 mt-1">
-                Customer information extracted from appointment history
-              </p>
-            </div>
-          </div>
+      {/* Customer Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Customer Records ({filteredCustomers.length})
+          </CardTitle>
         </CardHeader>
         
         <CardContent className="p-0">
           {filteredCustomers.length === 0 ? (
-            <div className="text-center p-12 bg-gray-50">
+            <div className="text-center p-12">
               <div className="max-w-md mx-auto">
                 <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <User className="h-8 w-8 text-gray-400" />
@@ -329,91 +315,105 @@ export const CustomerSearchTab: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {filteredCustomers.map((customer, index) => (
-                <div key={customer.id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-start space-x-4 flex-1">
-                      <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                        <User className="h-6 w-6 text-primary" />
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Appointments</TableHead>
+                  <TableHead>Last Visit</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Locations</TableHead>
+                  <TableHead>Services</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.map((customer) => (
+                  <TableRow key={customer.id} className="hover:bg-gray-50">
+                    <TableCell>
+                      <div className="font-medium">
+                        {customer.first_name} {customer.last_name}
                       </div>
-                      
-                      <div className="space-y-3 flex-1 min-w-0">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {customer.first_name} {customer.last_name}
-                          </h3>
-                          <div className="flex items-center gap-6 text-sm text-muted-foreground mt-1">
-                            {customer.email && (
-                              <div className="flex items-center gap-1">
-                                <Mail className="h-4 w-4" />
-                                <span className="truncate">{customer.email}</span>
-                              </div>
-                            )}
-                            {customer.phone && (
-                              <div className="flex items-center gap-1">
-                                <Phone className="h-4 w-4" />
-                                {customer.phone}
-                              </div>
-                            )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1 text-sm">
+                        {customer.email && (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Mail className="h-3 w-3" />
+                            <span className="truncate max-w-[150px]">{customer.email}</span>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-6 text-sm">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4 text-blue-600" />
-                            <span className="font-medium">{customer.appointmentCount}</span>
-                            <span className="text-muted-foreground">
-                              appointment{customer.appointmentCount !== 1 ? 's' : ''}
-                            </span>
+                        )}
+                        {customer.phone && (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Phone className="h-3 w-3" />
+                            <span>{customer.phone}</span>
                           </div>
-                          
-                          {customer.lastAppointment && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-muted-foreground">Last visit:</span>
-                              <span className="font-medium">
-                                {format(new Date(customer.lastAppointment), 'MMM d, yyyy')}
-                              </span>
-                              <Badge className={getStatusColor(customer.mostRecentStatus)}>
-                                {customer.mostRecentStatus.replace('_', ' ').toUpperCase()}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Location and Service Tags */}
-                        <div className="flex flex-wrap gap-2">
-                          {customer.locations.map((location, idx) => (
-                            <Badge key={idx} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {location}
-                            </Badge>
-                          ))}
-                          {customer.services.map((service, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200">
-                              <Settings className="h-3 w-3 mr-1" />
-                              {service}
-                            </Badge>
-                          ))}
-                        </div>
+                        )}
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium">{customer.appointmentCount}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {customer.lastAppointment ? (
+                        <span className="text-sm">
+                          {format(new Date(customer.lastAppointment), 'MMM d, yyyy')}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(customer.mostRecentStatus)}>
+                        {customer.mostRecentStatus.replace('_', ' ').toUpperCase()}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1 max-w-[120px]">
+                        {customer.locations.slice(0, 2).map((location, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                            {location}
+                          </Badge>
+                        ))}
+                        {customer.locations.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{customer.locations.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1 max-w-[120px]">
+                        {customer.services.slice(0, 2).map((service, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            {service}
+                          </Badge>
+                        ))}
+                        {customer.services.length > 2 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{customer.services.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleViewHistory(customer.id)}
-                        className="h-9"
                       >
-                        <History className="h-4 w-4 mr-2" />
-                        View History
+                        <History className="h-4 w-4 mr-1" />
+                        History
                       </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
