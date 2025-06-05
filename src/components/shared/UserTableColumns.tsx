@@ -2,7 +2,7 @@
 import { Column } from '@/components/admin/DataTable';
 
 export const useUserTableColumns = (userType: 'staff' | 'employee'): Column[] => {
-  const baseColumns = [
+  const baseColumns: Column[] = [
     { 
       key: 'name', 
       header: 'Name',
@@ -18,7 +18,11 @@ export const useUserTableColumns = (userType: 'staff' | 'employee'): Column[] =>
       header: 'Location',
       cell: (row: any) => row.locations?.name || 'Unassigned'
     },
-    { key: 'phone', header: 'Phone' }
+    { 
+      key: 'phone', 
+      header: 'Phone',
+      cell: (row: any) => row.phone || '-'
+    }
   ];
 
   if (userType === 'employee') {
@@ -29,7 +33,11 @@ export const useUserTableColumns = (userType: 'staff' | 'employee'): Column[] =>
         header: 'Status',
         cell: (row: any) => row.status || 'inactive'
       },
-      { key: 'email', header: 'Email' }
+      { 
+        key: 'email', 
+        header: 'Email',
+        cell: (row: any) => row.email || '-'
+      }
     ];
   }
 
