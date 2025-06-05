@@ -10,14 +10,22 @@ interface UserSidebarProps {
   notificationCount?: number;
 }
 
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  badge?: number;
+}
+
 export const UserSidebar: React.FC<UserSidebarProps> = ({
   userType,
   activeSection,
   onSectionChange,
   notificationCount = 0
 }) => {
-  const getMenuItems = () => {
-    const baseItems = [
+  const getMenuItems = (): MenuItem[] => {
+    const baseItems: MenuItem[] = [
       {
         id: 'basic-queue',
         label: 'Queue Management',
