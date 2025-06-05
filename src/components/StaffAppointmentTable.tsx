@@ -40,6 +40,27 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
     }
   };
 
+  const handleAction = (action: string, appointmentId: string) => {
+    if (action === 'survey_completed') {
+      // Handle survey completion - refresh data
+      onStatusChange?.();
+      return;
+    }
+    
+    // Handle other actions through the existing system
+    const statusMap: Record<string, string> = {
+      check_in: 'checked_in',
+      start: 'in_progress',
+      pause: 'checked_in',
+      complete: 'completed',
+      cancel: 'cancelled'
+    };
+    
+    if (statusMap[action]) {
+      updateAppointmentStatus(appointmentId, statusMap[action] as any);
+    }
+  };
+
   return (
     <TooltipProvider>
       <div className="space-y-4">
@@ -71,9 +92,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
                 <AppointmentTableRow
                   key={appointment.id}
                   appointment={appointment}
-                  isLoading={isLoading[appointment.id]}
-                  onUpdateStatus={updateAppointmentStatus}
-                  onOpenReminderDialog={handleOpenReminderDialog}
+                  onAction={handleAction}
                 />
               ))}
             </TableBody>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -35,6 +34,27 @@ const EnhancedAppointmentTable: React.FC = () => {
   const handleOpenReminderDialog = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
     setReminderDialogOpen(true);
+  };
+
+  const handleAction = (action: string, appointmentId: string) => {
+    if (action === 'survey_completed') {
+      // Handle survey completion - refresh data
+      refreshAppointments();
+      return;
+    }
+    
+    // Handle other actions through the existing system
+    const statusMap: Record<string, string> = {
+      check_in: 'checked_in',
+      start: 'in_progress',
+      pause: 'checked_in',
+      complete: 'completed',
+      cancel: 'cancelled'
+    };
+    
+    if (statusMap[action]) {
+      updateAppointmentStatus(appointmentId, statusMap[action] as any);
+    }
   };
 
   const getStatusCounts = () => {
@@ -191,9 +211,7 @@ const EnhancedAppointmentTable: React.FC = () => {
                       <AppointmentTableRow
                         key={appointment.id}
                         appointment={appointment}
-                        isLoading={isLoading[appointment.id]}
-                        onUpdateStatus={updateAppointmentStatus}
-                        onOpenReminderDialog={handleOpenReminderDialog}
+                        onAction={handleAction}
                       />
                     ))}
                   </TableBody>

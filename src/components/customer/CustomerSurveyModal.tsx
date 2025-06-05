@@ -54,7 +54,18 @@ export const CustomerSurveyModal: React.FC<CustomerSurveyModalProps> = ({
         .order('order_index');
 
       if (error) throw error;
-      setQuestions(data || []);
+      
+      // Transform the data to match our interface with proper typing
+      const typedQuestions: SurveyQuestion[] = (data || []).map(question => ({
+        id: question.id,
+        question_text: question.question_text,
+        question_type: question.question_type as 'rating' | 'text' | 'multiple_choice',
+        options: question.options,
+        is_required: question.is_required,
+        order_index: question.order_index
+      }));
+      
+      setQuestions(typedQuestions);
     } catch (error) {
       console.error('Error loading survey questions:', error);
       toast({

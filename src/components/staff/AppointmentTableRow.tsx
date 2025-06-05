@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,11 +31,11 @@ interface Appointment {
   reason_for_visit: string | null;
   created_at: string;
   updated_at: string;
-  customers: {
+  customers?: {
     first_name: string;
     last_name: string;
   } | null;
-  services: {
+  services?: {
     name: string;
     duration: number;
   } | null;
@@ -92,7 +93,9 @@ export const AppointmentTableRow = ({ appointment, onAction }: AppointmentTableR
     <>
       <tr className="hover:bg-gray-50">
         <td className="px-6 py-4 whitespace-nowrap">
-          <div className="text-sm text-gray-900">{appointment.customers?.first_name} {appointment.customers?.last_name}</div>
+          <div className="text-sm text-gray-900">
+            {appointment.customers?.first_name} {appointment.customers?.last_name}
+          </div>
           <div className="text-sm text-gray-500">{appointment.services?.name}</div>
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
