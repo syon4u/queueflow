@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { QueueProvider } from '@/context/QueueContext';
 import { useStaffNotifications } from '@/hooks/useStaffNotifications';
-import { StaffSidebar } from '@/components/layout/StaffSidebar';
+import { RoleSidebar } from '@/components/layout/RoleSidebar';
 import { StaffMainContent } from '@/components/staff/StaffMainContent';
 import StaffShortcuts from '@/components/staff/StaffShortcuts';
 
@@ -48,10 +48,11 @@ const StaffPageContent = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gray-50">
-        <StaffSidebar
+        <RoleSidebar
           activeSection={activeSection}
           onSectionChange={setActiveSection}
           notificationCount={0}
+          userRole="staff"
         />
         
         <SidebarInset className="flex-1">

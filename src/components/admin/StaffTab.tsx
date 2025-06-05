@@ -3,7 +3,7 @@ import React from 'react';
 import { DataTable } from './DataTable';
 import { StaffFormDialog } from './staff/StaffFormDialog';
 import { useProfileManagement } from '@/hooks/admin/use-profile-management';
-import { useStaffTableColumns } from './staff/StaffTableColumns';
+import { useUserTableColumns } from './shared/UserTableColumns';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 export const StaffTab: React.FC = () => {
@@ -22,7 +22,12 @@ export const StaffTab: React.FC = () => {
     handleSubmit
   } = useProfileManagement();
 
-  const columns = useStaffTableColumns();
+  const columns = useUserTableColumns({ 
+    userType: 'staff',
+    showLocation: true,
+    showStatus: false,
+    showEmail: false
+  });
 
   return (
     <div>
