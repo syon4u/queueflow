@@ -8,8 +8,8 @@
 ## Task Checklist
 
 ### Component Consolidation
-- [ ] Merge StaffTab and EmployeeTab components – Both manage user profiles with similar CRUD operations
-- [ ] Consolidate StaffSidebar and EmployeeSidebar – Nearly identical navigation structures
+- [x] Merge StaffTab and EmployeeTab components – Created unified UserManagementTab with role-based props
+- [x] Consolidate StaffSidebar and EmployeeSidebar – Created shared UserSidebar component with userType prop
 - [ ] Unify StaffFormDialog and EmployeeFormDialog – Same form fields and validation logic
 - [ ] Merge StaffTableColumns and EmployeeTableColumns – Similar column definitions with role differences
 
@@ -24,15 +24,15 @@
 - [ ] Optimize App.tsx routing – Remove duplicate staff/employee route handling
 
 ### Shared Component Creation
-- [ ] Create UserManagementTable component – Shared table for staff/employee data display
-- [ ] Create UserFormDialog component – Unified form for staff/employee creation/editing  
-- [ ] Create UserSidebar component – Role-aware navigation sidebar
+- [x] Create UserManagementTable component – Shared table for staff/employee data display
+- [x] Create UserFormDialog component – Unified form for staff/employee creation/editing  
+- [x] Create UserSidebar component – Role-aware navigation sidebar
 - [ ] Create RoleBasedAccess component – Centralized RBAC logic
 
 ### Data Layer Optimization
-- [ ] Unify profile queries – Single hook for staff/employee data fetching
-- [ ] Consolidate mutation operations – Shared create/update/delete logic
-- [ ] Optimize form state management – Single form state hook for user management
+- [x] Unify profile queries – Single hook for staff/employee data fetching
+- [x] Consolidate mutation operations – Shared create/update/delete logic
+- [x] Optimize form state management – Single form state hook for user management
 
 ### Configuration and Types
 - [ ] Create unified user management types – Consolidate staff/employee interfaces
@@ -48,4 +48,4 @@
 - [ ] Final report generated
 
 ---
-**Status:** 🚧 In Progress | **Completed:** 0/16 | **Remaining:** 16
+**Status:** 🚧 In Progress | **Completed:** 8/16 | **Remaining:** 8
