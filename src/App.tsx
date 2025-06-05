@@ -10,10 +10,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Index from "./pages/Index";
 import CustomerPage from "./pages/CustomerPage";
-import AppointmentPage from "./pages/AppointmentPage";
+import AppointmentsPage from "./pages/AppointmentsPage";
 import StaffPage from "./pages/StaffPage";
 import AdminPage from "./components/admin/AdminPage";
-import VirtualQueuePage from "./pages/VirtualQueuePage";
+import { VirtualQueuePage } from "./pages/VirtualQueuePage";
 import AuthPage from "./pages/AuthPage";
 import KioskPage from "./pages/KioskPage";
 import "./App.css";
@@ -96,7 +96,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/customer" element={<CustomerPage />} />
-                <Route path="/appointments" element={<AppointmentPage />} />
+                <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/queue" element={<VirtualQueuePage />} />

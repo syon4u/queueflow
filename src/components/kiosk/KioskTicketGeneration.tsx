@@ -67,7 +67,7 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch appointment details
+  // Fetch appointment details with explicit column hints
   const { data: appointmentDetails } = useQuery({
     queryKey: ['kiosk-appointment', appointmentId],
     queryFn: async () => {
@@ -75,8 +75,8 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
         .from('appointments')
         .select(`
           *,
-          locations(name, address),
-          services(name, duration)
+          locations!appointments_location_id_fkey(name, address),
+          services!appointments_service_id_fkey(name, duration)
         `)
         .eq('id', appointmentId)
         .single();
