@@ -49,35 +49,39 @@ export const KioskWalkInFlow: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Simplified locations query
+  // Fetch locations - simplified query function
+  const fetchLocations = async () => {
+    const { data, error } = await supabase
+      .from('locations')
+      .select('id, name, current_capacity, max_capacity')
+      .eq('is_active', true);
+    
+    if (error) throw error;
+    return data || [];
+  };
+
   const locationsQuery = useQuery({
     queryKey: ['kiosk-locations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name, current_capacity, max_capacity')
-        .eq('is_active', true);
-      
-      if (error) throw error;
-      return data as Location[];
-    }
+    queryFn: fetchLocations
   });
 
-  // Simplified services query
+  // Fetch services - simplified query function
+  const fetchServices = async () => {
+    if (!selectedLocation) return [];
+    
+    const { data, error } = await supabase
+      .from('services')
+      .select('id, name, description, duration')
+      .eq('location_id', selectedLocation.id)
+      .eq('is_active', true);
+    
+    if (error) throw error;
+    return data || [];
+  };
+
   const servicesQuery = useQuery({
     queryKey: ['kiosk-services', selectedLocation?.id],
-    queryFn: async () => {
-      if (!selectedLocation) return [];
-      
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, description, duration')
-        .eq('location_id', selectedLocation.id)
-        .eq('is_active', true);
-      
-      if (error) throw error;
-      return data as Service[];
-    },
+    queryFn: fetchServices,
     enabled: !!selectedLocation
   });
 
