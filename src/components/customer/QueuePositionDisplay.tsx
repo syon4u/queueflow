@@ -41,8 +41,8 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
             check_in_time,
             location_id,
             service_id,
-            locations(name),
-            services(name, estimated_duration)
+            locations!appointments_location_id_fkey(name),
+            services!appointments_service_id_fkey(name, duration)
           `)
           .filter('id::text', 'ilike', `${appointmentIdPrefix}%`)
           .single();
@@ -67,7 +67,7 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
 
         const position = queueData.findIndex(apt => apt.id === appointments.id) + 1;
         const totalAhead = position - 1;
-        const estimatedWaitTime = totalAhead * (appointments.services?.estimated_duration || 30);
+        const estimatedWaitTime = totalAhead * (appointments.services?.duration || 30);
 
         setQueueInfo({
           position,
@@ -109,15 +109,15 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
             fetchQueuePosition();
             
             // Show notification for status changes
-            if (payload.new.status === 'called') {
+            if (payload.new.status === 'in_progress') {
               toast({
                 title: 'You\'re Being Called!',
                 description: 'Please proceed to the service counter.',
               });
-            } else if (payload.new.status === 'in_progress') {
+            } else if (payload.new.status === 'completed') {
               toast({
-                title: 'Service Started',
-                description: 'Your service is now in progress.',
+                title: 'Service Completed',
+                description: 'Thank you for visiting us today.',
               });
             }
           }
@@ -161,9 +161,8 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in': return 'bg-blue-100 text-blue-800';
-      case 'called': return 'bg-yellow-100 text-yellow-800';
-      case 'in_progress': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-gray-100 text-gray-800';
+      case 'in_progress': return 'bg-yellow-100 text-yellow-800';
+      case 'completed': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -171,8 +170,7 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
   const getStatusMessage = (status: string) => {
     switch (status) {
       case 'checked_in': return 'You are in the queue';
-      case 'called': return 'You are being called!';
-      case 'in_progress': return 'Service in progress';
+      case 'in_progress': return 'You are being called!';
       case 'completed': return 'Service completed';
       default: return 'Status unknown';
     }
@@ -224,7 +222,7 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
           </div>
         </div>
 
-        {queueInfo.status === 'called' && (
+        {queueInfo.status === 'in_progress' && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-yellow-800 font-medium text-center">
               🔔 You're being called! Please proceed to the service counter.

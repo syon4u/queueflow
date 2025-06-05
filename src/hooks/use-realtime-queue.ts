@@ -57,7 +57,7 @@ export function useRealtimeQueue(locationId?: string) {
           check_in_time,
           scheduled_time,
           customers!appointments_customer_id_fkey(first_name, last_name, phone),
-          services(name, estimated_duration)
+          services!appointments_service_id_fkey(name, duration)
         `)
         .eq('location_id', locationId)
         .eq('status', 'checked_in')
@@ -67,7 +67,7 @@ export function useRealtimeQueue(locationId?: string) {
 
       // Calculate positions and estimated wait times
       return (data || []).map((appointment, index) => {
-        const estimatedWaitTime = index * (appointment.services?.estimated_duration || 30);
+        const estimatedWaitTime = index * (appointment.services?.duration || 30);
         
         return {
           id: appointment.id,
@@ -76,10 +76,13 @@ export function useRealtimeQueue(locationId?: string) {
           service_id: appointment.service_id,
           position: index + 1,
           estimated_wait_time: estimatedWaitTime,
-          status: appointment.status as any,
+          status: 'waiting' as const,
           check_in_time: appointment.check_in_time || appointment.scheduled_time,
           customer: appointment.customers,
-          service: appointment.services
+          service: appointment.services ? {
+            name: appointment.services.name,
+            estimated_duration: appointment.services.duration
+          } : undefined
         };
       });
     },
@@ -114,7 +117,7 @@ export function useRealtimeQueue(locationId?: string) {
         .select('id', { count: 'exact' })
         .eq('location_id', locationId)
         .eq('status', 'completed')
-        .gte('completion_time', `${today}T00:00:00`);
+        .gte('end_time', `${today}T00:00:00`);
 
       // Get currently in service count
       const { data: inServiceData } = await supabase
@@ -159,7 +162,6 @@ export function useRealtimeQueue(locationId?: string) {
           // Show notification for status changes
           if (payload.eventType === 'UPDATE' && payload.new.status !== payload.old?.status) {
             const statusMessages = {
-              'called': 'Customer has been called',
               'in_progress': 'Service has started',
               'completed': 'Service completed',
               'no_show': 'Customer marked as no-show'
@@ -201,8 +203,8 @@ export function useRealtimeQueue(locationId?: string) {
     const { error } = await supabase
       .from('appointments')
       .update({ 
-        status: 'called',
-        called_time: new Date().toISOString()
+        status: 'in_progress',
+        start_time: new Date().toISOString()
       })
       .eq('id', nextCustomer.id);
 
@@ -227,7 +229,7 @@ export function useRealtimeQueue(locationId?: string) {
       .from('appointments')
       .update({ 
         status: 'in_progress',
-        service_start_time: new Date().toISOString()
+        start_time: new Date().toISOString()
       })
       .eq('id', customerId);
 
@@ -252,7 +254,7 @@ export function useRealtimeQueue(locationId?: string) {
       .from('appointments')
       .update({ 
         status: 'completed',
-        completion_time: new Date().toISOString()
+        end_time: new Date().toISOString()
       })
       .eq('id', customerId);
 
@@ -277,7 +279,7 @@ export function useRealtimeQueue(locationId?: string) {
       .from('appointments')
       .update({ 
         status: 'no_show',
-        completion_time: new Date().toISOString()
+        end_time: new Date().toISOString()
       })
       .eq('id', customerId);
 
