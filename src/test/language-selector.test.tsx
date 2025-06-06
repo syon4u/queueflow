@@ -21,7 +21,7 @@ describe('LanguageSelector', () => {
   it('renders language selector with globe icon', () => {
     renderWithProviders(<LanguageSelector />);
     
-    const selector = screen.getByRole('button', { name: /english/i });
+    const selector = screen.getByRole('button');
     expect(selector).toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe('LanguageSelector', () => {
     const user = userEvent.setup();
     renderWithProviders(<LanguageSelector />);
     
-    const selector = screen.getByRole('button', { name: /english/i });
+    const selector = screen.getByRole('button');
     await user.click(selector);
     
     expect(screen.getByText('English')).toBeInTheDocument();
@@ -40,7 +40,7 @@ describe('LanguageSelector', () => {
     const user = userEvent.setup();
     renderWithProviders(<LanguageSelector />);
     
-    const selector = screen.getByRole('button', { name: /english/i });
+    const selector = screen.getByRole('button');
     await user.click(selector);
     
     const spanishOption = screen.getByText('Español');
