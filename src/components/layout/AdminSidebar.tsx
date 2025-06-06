@@ -2,12 +2,9 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
-  FileText,
   MessageSquare,
-  BarChart3,
   Settings,
-  Shield,
-  Activity
+  Shield
 } from 'lucide-react';
 import { BaseSidebar } from './BaseSidebar';
 
@@ -33,25 +30,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       ]
     },
     {
-      label: 'Queue Management',
+      label: 'Communication',
       items: [
-        {
-          id: 'queue',
-          label: 'Queue Control',
-          icon: Activity,
-          description: 'Manage active queues'
-        }
-      ]
-    },
-    {
-      label: 'Analytics & Communication',
-      items: [
-        {
-          id: 'stats',
-          label: 'Reports',
-          icon: BarChart3,
-          description: 'Performance analytics'
-        },
         {
           id: 'communication',
           label: 'Templates',
@@ -82,15 +62,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const quickActions = [
     {
       label: 'Power User Portal',
-      icon: Activity,
+      icon: LayoutDashboard,
       onClick: () => window.open('/power-user', '_blank'),
       iconColor: 'text-green-600'
-    },
-    {
-      label: 'Performance',
-      icon: BarChart3,
-      onClick: () => window.open('/performance', '_blank'),
-      iconColor: 'text-blue-600'
     }
   ];
 

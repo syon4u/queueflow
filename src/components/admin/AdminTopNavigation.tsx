@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { BarChart3, MapPin, Wrench, MessageSquare, Settings, Shield, Phone, GitMerge, TrendingUp, Gauge, Zap, Activity, Stethoscope } from 'lucide-react';
+import { MessageSquare, Settings, Shield, Phone, GitMerge, TrendingUp, Gauge, Zap, Stethoscope } from 'lucide-react';
 
 interface AdminTopNavigationProps {
   activeTab: string;
@@ -17,27 +17,12 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: BarChart3
-    },
-    {
-      id: 'stats',
-      label: 'Statistics',
       icon: TrendingUp
     },
     {
       id: 'communication',
       label: 'Communication',
       icon: MessageSquare
-    },
-    {
-      id: 'queue',
-      label: 'Queue',
-      icon: Activity
-    },
-    {
-      id: 'advanced-analytics',
-      label: 'Analytics',
-      icon: BarChart3
     },
     {
       id: 'capacity-management',

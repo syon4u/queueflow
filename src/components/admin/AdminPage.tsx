@@ -7,9 +7,7 @@ import { QueueProvider } from '@/context/QueueContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { DashboardTab } from './DashboardTab';
-import { StatsTab } from './StatsTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
-import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import SecurityMetricsTab from './SecurityMetricsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
@@ -78,16 +76,8 @@ export const AdminPage: React.FC = () => {
             <DashboardTab />
           </TabsContent>
           
-          <TabsContent value="stats">
-            <StatsTab />
-          </TabsContent>
-          
           <TabsContent value="communication">
             <CommunicationTemplatesTab />
-          </TabsContent>
-          
-          <TabsContent value="queue">
-            <QueueManagementTab />
           </TabsContent>
           
           <TabsContent value="settings">
