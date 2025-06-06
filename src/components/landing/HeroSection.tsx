@@ -35,7 +35,12 @@ const HeroSection: React.FC = () => {
             <Button size="lg" variant="outline" className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50 px-8" asChild>
               <Link to="/status">Check Status</Link>
             </Button>
-            <Button size="lg" variant="ghost" className="w-full sm:w-auto text-gray-600 hover:bg-gray-100 px-8" asChild>
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 px-8" 
+              asChild
+            >
               <Link to="/check-in">I'm Here, Check In</Link>
             </Button>
           </div>
