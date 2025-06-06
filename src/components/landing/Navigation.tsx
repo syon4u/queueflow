@@ -32,9 +32,12 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
             <Button variant="ghost" asChild>
               <Link to="/status">Status</Link>
             </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/check-in">Check In</Link>
-            </Button>
+            <Link 
+              to="/check-in" 
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2"
+            >
+              Check In
+            </Link>
             <div className="ml-4 pl-4 border-l border-gray-200">
               <Button variant="outline" size="sm" onClick={onToggleStaffAccess}>
                 Employee Login
@@ -63,9 +66,12 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               <Button variant="ghost" className="justify-start" asChild>
                 <Link to="/status">Check Status</Link>
               </Button>
-              <Button variant="ghost" className="justify-start" asChild>
-                <Link to="/check-in">Check In Now</Link>
-              </Button>
+              <Link 
+                to="/check-in" 
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2 justify-start"
+              >
+                Check In Now
+              </Link>
               <Button variant="outline" className="justify-start mt-4" onClick={onToggleStaffAccess}>
                 Employee Login
               </Button>
