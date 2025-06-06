@@ -30,51 +30,114 @@ const handler = async (req: Request): Promise<Response> => {
 
       console.log(`Check-in attempt with code: ${confirmation_code}`);
       
-      // Extract appointment ID from confirmation code (format: APT-XXXXXXXX)
-      if (!confirmation_code.startsWith('APT-')) {
+      let appointmentId: string | null = null;
+
+      // Handle customer confirmation codes (CUST-XXXXXXXX)
+      if (confirmation_code.startsWith('CUST-')) {
+        const { data: customerData, error: customerError } = await supabaseClient
+          .from('customers')
+          .select(`
+            id,
+            appointments!appointments_customer_id_fkey(
+              id,
+              status,
+              scheduled_time
+            )
+          `)
+          .eq('confirmation_number', confirmation_code)
+          .maybeSingle();
+
+        if (customerError) {
+          console.error('Customer lookup error:', customerError);
+          return new Response(JSON.stringify({ 
+            error: 'Database error occurred' 
+          }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (customerData && customerData.appointments && customerData.appointments.length > 0) {
+          // Find the most recent scheduled appointment for today
+          const today = new Date();
+          const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+
+          const todayAppointment = customerData.appointments.find(apt => {
+            const aptDate = new Date(apt.scheduled_time);
+            return apt.status === 'scheduled' && 
+                   aptDate >= todayStart && 
+                   aptDate < todayEnd;
+          });
+
+          if (todayAppointment) {
+            appointmentId = todayAppointment.id;
+          }
+        }
+      } 
+      // Handle appointment codes (APT-XXXXXXXX)
+      else if (confirmation_code.startsWith('APT-')) {
+        const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase();
+        
+        const { data: appointments, error: searchError } = await supabaseClient
+          .from('appointments')
+          .select('id, status, scheduled_time')
+          .eq('status', 'scheduled')
+          .gte('scheduled_time', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .lte('scheduled_time', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
+
+        if (searchError) {
+          console.error('Error searching for appointment:', searchError);
+          return new Response(JSON.stringify({ 
+            error: 'Database error occurred' 
+          }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const matchingAppointment = appointments?.find(apt => 
+          apt.id.toLowerCase().startsWith(appointmentIdPrefix)
+        );
+
+        if (matchingAppointment) {
+          appointmentId = matchingAppointment.id;
+        }
+      } else {
         return new Response(JSON.stringify({ 
-          error: 'Invalid confirmation code format' 
+          error: 'Invalid confirmation code format. Use CUST-XXXXXXXX or APT-XXXXXXXX format.' 
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase();
-      
-      // Find appointment using a proper text search - convert UUID to text and use LIKE
-      const { data: appointments, error: searchError } = await supabaseClient
-        .from('appointments')
-        .select(`
-          id, 
-          status, 
-          scheduled_time, 
-          customers!appointments_customer_id_fkey(first_name, last_name)
-        `)
-        .eq('status', 'scheduled')
-        .gte('scheduled_time', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Within last 24 hours
-        .lte('scheduled_time', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()); // Within next 24 hours
-
-      if (searchError) {
-        console.error('Error searching for appointment:', searchError);
+      if (!appointmentId) {
         return new Response(JSON.stringify({ 
-          error: 'Database error occurred' 
+          error: 'No scheduled appointment found for today with the provided confirmation code' 
         }), {
-          status: 500,
+          status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      // Filter appointments client-side to find matching ID prefix
-      const matchingAppointment = appointments?.find(apt => 
-        apt.id.toLowerCase().startsWith(appointmentIdPrefix)
-      );
+      // Get appointment details for confirmation
+      const { data: appointment, error: appointmentError } = await supabaseClient
+        .from('appointments')
+        .select(`
+          id,
+          status,
+          customers!appointments_customer_id_fkey(first_name, last_name)
+        `)
+        .eq('id', appointmentId)
+        .single();
 
-      if (!matchingAppointment) {
+      if (appointmentError || !appointment) {
+        console.error('Appointment details error:', appointmentError);
         return new Response(JSON.stringify({ 
-          error: 'Invalid confirmation code or appointment not found' 
+          error: 'Failed to retrieve appointment details' 
         }), {
-          status: 404,
+          status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -86,7 +149,7 @@ const handler = async (req: Request): Promise<Response> => {
           status: 'checked_in',
           check_in_time: new Date().toISOString()
         })
-        .eq('id', matchingAppointment.id);
+        .eq('id', appointmentId);
 
       if (updateError) {
         console.error('Error updating appointment:', updateError);
@@ -98,14 +161,14 @@ const handler = async (req: Request): Promise<Response> => {
         });
       }
 
-      console.log(`Successfully checked in appointment: ${matchingAppointment.id}`);
+      console.log(`Successfully checked in appointment: ${appointmentId}`);
       
       return new Response(JSON.stringify({ 
         success: true, 
         message: 'Check-in successful',
         confirmation_code,
-        appointment_id: matchingAppointment.id,
-        customer_name: `${matchingAppointment.customers?.first_name} ${matchingAppointment.customers?.last_name}`.trim()
+        appointment_id: appointmentId,
+        customer_name: `${appointment.customers?.first_name} ${appointment.customers?.last_name}`.trim()
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

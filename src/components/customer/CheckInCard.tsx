@@ -86,13 +86,16 @@ const CheckInCard = () => {
           <Label htmlFor="confirmation-code">Confirmation Code</Label>
           <Input
             id="confirmation-code"
-            placeholder="APT-XXXXXXXX"
+            placeholder="CUST-XXXXXXXX or APT-XXXXXXXX"
             className="text-center font-mono"
             value={confirmationCode}
             onChange={(e) => setConfirmationCode(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isChecking}
           />
+          <p className="text-xs text-gray-500">
+            Use your customer confirmation number (CUST-XXXXXXXX) or appointment code (APT-XXXXXXXX)
+          </p>
         </div>
         
         <Button 
