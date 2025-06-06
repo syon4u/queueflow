@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BaseSidebar } from './BaseSidebar';
 import { 
   Users, 
@@ -9,6 +9,7 @@ import {
   Calendar,
   ClipboardList,
   Settings,
+  Home,
   Plus,
   Bell
 } from 'lucide-react';
@@ -18,10 +19,16 @@ const navigationGroups = [
     label: 'Operations',
     items: [
       {
+        id: 'dashboard',
+        label: 'Dashboard',
+        icon: Home,
+        description: 'Overview and today\'s activities'
+      },
+      {
         id: 'appointments',
         label: 'Appointments',
         icon: Calendar,
-        description: 'Manage appointments and schedule'
+        description: 'Manage today\'s schedule'
       }
     ]
   },

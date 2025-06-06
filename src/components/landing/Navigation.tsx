@@ -34,21 +34,6 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link to="/customer">
-                <Button variant="ghost" size="sm">
-                  {t('landing.book', 'Book')}
-                </Button>
-              </Link>
-              <Link to="/status">
-                <Button variant="ghost" size="sm">
-                  {t('landing.status', 'Status')}
-                </Button>
-              </Link>
-              <Link to="/check-in">
-                <Button variant="ghost" size="sm">
-                  {t('landing.checkIn', 'Check-In')}
-                </Button>
-              </Link>
               <LanguageSelector />
               <div className="ml-4 pl-4 border-l border-gray-200">
                 <Button 
@@ -76,21 +61,6 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-gray-200 py-4">
               <div className="flex flex-col space-y-2">
-                <Link to="/customer">
-                  <Button variant="ghost" className="justify-start w-full" onClick={() => setMobileMenuOpen(false)}>
-                    {t('landing.book', 'Book')}
-                  </Button>
-                </Link>
-                <Link to="/status">
-                  <Button variant="ghost" className="justify-start w-full" onClick={() => setMobileMenuOpen(false)}>
-                    {t('landing.status', 'Status')}
-                  </Button>
-                </Link>
-                <Link to="/check-in">
-                  <Button variant="ghost" className="justify-start w-full" onClick={() => setMobileMenuOpen(false)}>
-                    {t('landing.checkIn', 'Check-In')}
-                  </Button>
-                </Link>
                 <div className="flex justify-center mb-4">
                   <LanguageSelector />
                 </div>

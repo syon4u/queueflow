@@ -7,7 +7,7 @@ import { useAppData } from '@/hooks/useAppData';
 
 const PowerUserPage = () => {
   const { isLoading } = useAppData();
-  const [activeSection, setActiveSection] = useState('appointments');
+  const [activeSection, setActiveSection] = useState('dashboard');
 
   // Sync sidebar navigation with dashboard tabs
   const handleSectionChange = (section: string) => {
