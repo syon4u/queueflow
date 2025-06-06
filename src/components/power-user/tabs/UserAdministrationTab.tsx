@@ -120,14 +120,6 @@ export const UserAdministrationTab: React.FC = () => {
     }
   });
 
-  // Filter users based on search and role
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = searchTerm === '' || 
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
-
   const handleUpdateRole = (userId: string, newRole: string) => {
     updateRoleMutation.mutate({ userId, newRole });
   };
