@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import Navigation from '@/components/landing/Navigation';
 import HeroSection from '@/components/landing/HeroSection';
-import HowItWorksSection from '@/components/landing/HowItWorksSection';
+import FeaturesSection from '@/components/landing/FeaturesSection';
+import ProcessSection from '@/components/landing/ProcessSection';
 import BenefitsSection from '@/components/landing/BenefitsSection';
 import SocialProofSection from '@/components/landing/SocialProofSection';
-import CTASection from '@/components/landing/CTASection';
+import FinalCTASection from '@/components/landing/FinalCTASection';
 import EmployeeAccessSection from '@/components/landing/EmployeeAccessSection';
 import Footer from '@/components/landing/Footer';
 
@@ -20,10 +21,11 @@ const Index: React.FC = () => {
       />
       
       <HeroSection />
-      <HowItWorksSection />
+      <FeaturesSection />
+      <ProcessSection />
       <BenefitsSection />
       <SocialProofSection />
-      <CTASection />
+      <FinalCTASection />
       
       <EmployeeAccessSection 
         showStaffAccess={showStaffAccess}
