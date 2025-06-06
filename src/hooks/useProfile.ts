@@ -23,19 +23,40 @@ export const useProfile = () => {
     queryFn: async (): Promise<UserProfile | null> => {
       if (!user?.id) return null;
 
-      // Use the new unified staff view
-      const { data, error } = await supabase
-        .from('staff_view')
+      // Get profile data
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (error) {
-        console.error('Error fetching user profile:', error);
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
         return null;
       }
 
-      return data as UserProfile;
+      // Get user role
+      const { data: userRole, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (roleError) {
+        console.error('Error fetching user role:', roleError);
+      }
+
+      return {
+        id: user.id,
+        email: user.email || profile?.email || '',
+        first_name: profile?.first_name || '',
+        last_name: profile?.last_name || '',
+        phone: profile?.phone || null,
+        status: profile?.status || 'active',
+        location_id: profile?.location_id || null,
+        role: userRole?.role || 'customer',
+        last_sign_in_at: user.last_sign_in_at || null,
+      } as UserProfile;
     },
     enabled: !!user?.id,
     refetchOnWindowFocus: false,

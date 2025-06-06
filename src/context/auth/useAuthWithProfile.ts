@@ -12,18 +12,43 @@ export const useAuthWithProfile = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('staff_view')
+      // Get profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
         return null;
       }
 
-      return data as UserProfile;
+      // Get user role
+      const { data: userRole, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (roleError) {
+        console.error('Error fetching user role:', roleError);
+      }
+
+      // Get user auth data
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+
+      return {
+        id: userId,
+        email: authUser?.email || profileData?.email || '',
+        first_name: profileData?.first_name || '',
+        last_name: profileData?.last_name || '',
+        phone: profileData?.phone || null,
+        status: profileData?.status || 'active',
+        location_id: profileData?.location_id || null,
+        role: userRole?.role || 'customer',
+        last_sign_in_at: authUser?.last_sign_in_at || null,
+      } as UserProfile;
     } catch (error) {
       console.error('Profile fetch error:', error);
       return null;

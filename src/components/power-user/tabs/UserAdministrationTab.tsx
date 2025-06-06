@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,27 +26,51 @@ export const UserAdministrationTab: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
-  // Use the new staff_view for unified data
+  // Fetch users by combining auth users with profiles and roles
   const { data: users = [], isLoading, refetch } = useQuery({
     queryKey: ['staff-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('staff_view')
+      // Get all users with roles (staff, admin, power_user only)
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('role', ['admin', 'staff', 'power_user']);
+      
+      if (rolesError) throw rolesError;
+      
+      if (!userRoles || userRoles.length === 0) {
+        return [];
+      }
+
+      // Get profiles for these users
+      const userIds = userRoles.map(ur => ur.user_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
         .select('*')
-        .order('auth_created_at', { ascending: false });
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Get auth data using the RPC function
+      const { data: authUsers, error: authError } = await supabase.rpc('get_users_with_roles');
       
-      if (error) throw error;
-      
-      // Transform the data to match the expected User interface
-      return (data || []).map(user => ({
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        created_at: user.auth_created_at,
-        last_sign_in_at: user.last_sign_in_at,
-        first_name: user.first_name,
-        last_name: user.last_name,
-      })) as User[];
+      if (authError) throw authError;
+
+      // Combine the data
+      return userRoles.map(userRole => {
+        const profile = profiles?.find(p => p.id === userRole.user_id);
+        const authUser = authUsers?.find(au => au.id === userRole.user_id);
+        
+        return {
+          id: userRole.user_id,
+          email: authUser?.email || profile?.email || '',
+          role: userRole.role,
+          created_at: authUser?.created_at || '',
+          last_sign_in_at: authUser?.last_sign_in_at || '',
+          first_name: profile?.first_name || '',
+          last_name: profile?.last_name || '',
+        } as User;
+      }).filter(user => user.email); // Filter out users without email
     }
   });
 
