@@ -1,6 +1,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
+import { screen } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
