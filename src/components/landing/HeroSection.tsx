@@ -21,8 +21,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
       {/* Tech Watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-20">
         <img 
-          src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop&crop=center" 
-          alt="Tech background" 
+          src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&h=600&fit=crop&crop=center" 
+          alt="Digital display screens" 
           className="w-full h-full object-cover"
         />
       </div>
@@ -63,8 +63,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
 
           {/* Trust Badge */}
           <div className="flex items-center justify-center text-sm text-gray-500 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <Star className="h-4 w-4 text-yellow-400 mr-1" />
-            <span className="mr-4">2.4M appointments processed</span>
             <Shield className="h-4 w-4 text-green-500 mr-1" />
             <span>HIPAA Compliant</span>
           </div>

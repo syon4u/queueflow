@@ -1,15 +1,9 @@
 
 import React from 'react';
-import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
+import { TrendingUp, Clock, CheckCircle } from 'lucide-react';
 
 const StatsSection: React.FC = () => {
   const stats = [
-    {
-      icon: Users,
-      number: '2.4M+',
-      label: 'Appointments Processed',
-      description: 'Successfully managed appointments across all locations'
-    },
     {
       icon: Clock,
       number: '85%',
@@ -43,7 +37,7 @@ const StatsSection: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center group">
               <div className="bg-blue-500 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-400 transition-colors">
