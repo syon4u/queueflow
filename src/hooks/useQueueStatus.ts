@@ -46,59 +46,59 @@ export const useQueueStatus = (
       let appointmentId: string | null = null;
 
       if (confirmationNumber) {
-        // First try to find by customer confirmation number
-        const { data: customerData, error: customerError } = await supabase
-          .from('customers')
-          .select(`
-            id,
-            appointments!appointments_customer_id_fkey(
+        // First try to find by customer confirmation number (CUST-XXXXXXXX)
+        if (confirmationNumber.startsWith('CUST-')) {
+          const { data: customerData, error: customerError } = await supabase
+            .from('customers')
+            .select(`
               id,
-              status,
-              scheduled_time,
-              check_in_time,
-              services!appointments_service_id_fkey(name),
-              locations!appointments_location_id_fkey(name)
-            )
-          `)
-          .eq('confirmation_number', confirmationNumber.toUpperCase())
-          .maybeSingle();
-
-        if (customerError) throw customerError;
-
-        if (customerData && customerData.appointments && customerData.appointments.length > 0) {
-          // Get the most recent appointment
-          const mostRecentAppointment = customerData.appointments
-            .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
-          appointmentId = mostRecentAppointment.id;
-        } else {
-          // If not found by customer confirmation, try appointment confirmation format (APT-XXXXXXXX)
-          if (confirmationNumber.startsWith('APT-')) {
-            const appointmentIdPrefix = confirmationNumber.substring(4).toLowerCase();
-            
-            const { data: appointments, error: lookupError } = await supabase
-              .from('appointments')
-              .select(`
+              appointments!appointments_customer_id_fkey(
                 id,
                 status,
                 scheduled_time,
                 check_in_time,
-                customers!appointments_customer_id_fkey(first_name, last_name),
                 services!appointments_service_id_fkey(name),
                 locations!appointments_location_id_fkey(name)
-              `)
-              .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Within last 7 days
-              .order('scheduled_time', { ascending: false });
+              )
+            `)
+            .eq('confirmation_number', confirmationNumber.toUpperCase())
+            .maybeSingle();
 
-            if (lookupError) throw lookupError;
+          if (customerError) throw customerError;
 
-            // Filter appointments client-side to find matching ID prefix
-            const matchingAppointment = appointments?.find(apt => 
-              apt.id.toLowerCase().startsWith(appointmentIdPrefix)
-            );
+          if (customerData && customerData.appointments && customerData.appointments.length > 0) {
+            // Get the most recent appointment
+            const mostRecentAppointment = customerData.appointments
+              .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
+            appointmentId = mostRecentAppointment.id;
+          }
+        } else if (confirmationNumber.startsWith('APT-')) {
+          // Handle appointment confirmation format (APT-XXXXXXXX)
+          const appointmentIdPrefix = confirmationNumber.substring(4).toLowerCase();
+          
+          const { data: appointments, error: lookupError } = await supabase
+            .from('appointments')
+            .select(`
+              id,
+              status,
+              scheduled_time,
+              check_in_time,
+              customers!appointments_customer_id_fkey(first_name, last_name),
+              services!appointments_service_id_fkey(name),
+              locations!appointments_location_id_fkey(name)
+            `)
+            .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Within last 7 days
+            .order('scheduled_time', { ascending: false });
 
-            if (matchingAppointment) {
-              appointmentId = matchingAppointment.id;
-            }
+          if (lookupError) throw lookupError;
+
+          // Filter appointments client-side to find matching ID prefix
+          const matchingAppointment = appointments?.find(apt => 
+            apt.id.toLowerCase().startsWith(appointmentIdPrefix)
+          );
+
+          if (matchingAppointment) {
+            appointmentId = matchingAppointment.id;
           }
         }
       } else if (lastName && phone) {
@@ -143,7 +143,9 @@ export const useQueueStatus = (
         return;
       }
 
-      // Get queue position using the edge function
+      console.log('Found appointment ID:', appointmentId);
+
+      // Get queue position using the edge function with appointment ID in the body
       const { data: queueData, error: queueError } = await supabase.functions.invoke(
         'queue-position',
         {
@@ -151,9 +153,13 @@ export const useQueueStatus = (
         }
       );
 
-      if (queueError) throw queueError;
+      if (queueError) {
+        console.error('Edge function error:', queueError);
+        throw queueError;
+      }
 
       if (queueData) {
+        console.log('Queue data received:', queueData);
         setData(queueData);
       } else {
         setError('Unable to retrieve queue status');

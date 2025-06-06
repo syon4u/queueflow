@@ -18,17 +18,17 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     );
 
-    const url = new URL(req.url);
-    const appointmentId = url.pathname.split('/').pop();
+    // Get appointment ID from request body
+    const { appointment_id } = await req.json();
 
-    if (!appointmentId) {
+    if (!appointment_id) {
       return new Response(JSON.stringify({ error: 'Appointment ID is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log(`Getting queue position for appointment: ${appointmentId}`);
+    console.log(`Getting queue position for appointment: ${appointment_id}`);
 
     // Get the specific appointment
     const { data: appointment, error: appointmentError } = await supabaseClient
@@ -43,10 +43,11 @@ const handler = async (req: Request): Promise<Response> => {
         customers!appointments_customer_id_fkey(first_name, last_name),
         services!appointments_service_id_fkey(name, duration)
       `)
-      .eq('id', appointmentId)
+      .eq('id', appointment_id)
       .single();
 
     if (appointmentError || !appointment) {
+      console.error('Appointment lookup error:', appointmentError);
       return new Response(JSON.stringify({ 
         error: 'Appointment not found' 
       }), {
@@ -55,17 +56,26 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    console.log('Found appointment:', appointment);
+
     // If not checked in, return basic info
     if (appointment.status !== 'checked_in') {
-      return new Response(JSON.stringify({
-        appointment_id: appointmentId,
+      const response = {
+        appointment_id: appointment_id,
         status: appointment.status,
         customer_name: `${appointment.customers?.first_name} ${appointment.customers?.last_name}`.trim(),
         service_name: appointment.services?.name,
+        estimated_wait_time_minutes: 0,
+        current_wait_time_minutes: 0,
+        ticket_number: appointment_id.slice(-8).toUpperCase(),
+        location_id: appointment.location_id,
         message: appointment.status === 'in_progress' ? 'Currently being served' : 
                 appointment.status === 'completed' ? 'Service completed' : 
                 'Not in queue'
-      }), {
+      };
+
+      console.log('Non-checked-in response:', response);
+      return new Response(JSON.stringify(response), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -89,7 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Find position in queue
-    const position = queueData.findIndex(item => item.id === appointmentId) + 1;
+    const position = queueData.findIndex(item => item.id === appointment_id) + 1;
     
     if (position === 0) {
       return new Response(JSON.stringify({ 
@@ -108,7 +118,7 @@ const handler = async (req: Request): Promise<Response> => {
     const currentWaitTime = Math.floor((Date.now() - checkInTime.getTime()) / 60000); // in minutes
 
     const response = {
-      appointment_id: appointmentId,
+      appointment_id: appointment_id,
       status: appointment.status,
       position: position,
       total_in_queue: queueData.length,
@@ -117,7 +127,7 @@ const handler = async (req: Request): Promise<Response> => {
       customer_name: `${appointment.customers?.first_name} ${appointment.customers?.last_name}`.trim(),
       service_name: appointment.services?.name,
       check_in_time: appointment.check_in_time,
-      ticket_number: appointmentId.slice(-8).toUpperCase(),
+      ticket_number: appointment_id.slice(-8).toUpperCase(),
       location_id: appointment.location_id
     };
 
