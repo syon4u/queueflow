@@ -40,16 +40,11 @@ const ScheduleAppointmentCard: React.FC<ScheduleAppointmentCardProps> = ({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>{t('appointments.newAppointment')}</CardTitle>
-            <CardDescription>
-              {t('appointments.scheduleDescription')}
-            </CardDescription>
-          </div>
-          <div className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-            No Auth Required
-          </div>
+        <div>
+          <CardTitle>{t('appointments.newAppointment')}</CardTitle>
+          <CardDescription>
+            {t('appointments.scheduleDescription')}
+          </CardDescription>
         </div>
       </CardHeader>
 
