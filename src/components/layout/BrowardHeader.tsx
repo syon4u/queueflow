@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, User, Settings, BarChart3 } from 'lucide-react';
+import { Menu, User, Settings, BarChart3, Zap } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface BrowardHeaderProps {
@@ -76,17 +76,11 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="relative">
-                <ShieldCheckmarkAnimation size={40} className="text-white drop-shadow-lg group-hover:scale-105 transition-transform duration-200" />
-                <div className="absolute inset-0 bg-white/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-              </div>
-              <div>
-                <h1 className="text-xl font-serif font-bold text-white drop-shadow-lg">
+              <div className="relative flex items-center gap-3">
+                <Zap size={32} className="text-yellow-300 drop-shadow-lg group-hover:scale-105 transition-transform duration-200" />
+                <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">
                   Queue Flow
                 </h1>
-                <p className="text-sm text-white/95 drop-shadow font-medium">
-                  {title}
-                </p>
               </div>
             </Link>
           </div>
