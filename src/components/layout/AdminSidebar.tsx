@@ -2,9 +2,7 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
-  Users, 
   FileText,
-  UsersRound,
   MessageSquare,
   BarChart3,
   Settings,
@@ -40,19 +38,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {
           id: 'queue',
           label: 'Queue Control',
-          icon: UsersRound,
+          icon: Activity,
           description: 'Manage active queues'
-        }
-      ]
-    },
-    {
-      label: 'User Management',
-      items: [
-        {
-          id: 'users',
-          label: 'Users & Staff',
-          icon: Users,
-          description: 'User roles and staff management'
         }
       ]
     },
@@ -94,9 +81,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const quickActions = [
     {
-      label: 'Staff Portal',
+      label: 'Power User Portal',
       icon: Activity,
-      onClick: () => window.open('/staff', '_blank'),
+      onClick: () => window.open('/power-user', '_blank'),
       iconColor: 'text-green-600'
     },
     {

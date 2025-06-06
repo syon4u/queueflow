@@ -13,7 +13,6 @@ import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import SecurityMetricsTab from './SecurityMetricsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
-import { MergedUsersTab } from './MergedUsersTab';
 import { AdvancedAnalyticsTab } from './AdvancedAnalyticsTab';
 import { CapacityManagementTab } from './CapacityManagementTab';
 import { CapacityThrottlingTab } from './CapacityThrottlingTab';
@@ -81,10 +80,6 @@ export const AdminPage: React.FC = () => {
           
           <TabsContent value="stats">
             <StatsTab />
-          </TabsContent>
-          
-          <TabsContent value="users">
-            <MergedUsersTab />
           </TabsContent>
           
           <TabsContent value="communication">
