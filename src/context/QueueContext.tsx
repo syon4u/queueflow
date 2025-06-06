@@ -96,7 +96,7 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.log('QueueContext - Raw appointments data:', data);
 
       // Transform database data to Customer interface
-      return data.map(appointment => ({
+      const transformedCustomers = data.map(appointment => ({
         id: appointment.id,
         name: `${appointment.customers?.first_name || ''} ${appointment.customers?.last_name || ''}`.trim(),
         phone: appointment.customers?.phone,
@@ -108,17 +108,23 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         calledAt: appointment.start_time ? new Date(appointment.start_time) : undefined,
         notes: appointment.notes
       }));
+
+      console.log('QueueContext - Transformed customers:', transformedCustomers);
+      console.log('QueueContext - Customers with serving status:', transformedCustomers.filter(c => c.status === 'serving'));
+      
+      return transformedCustomers;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Helper function to map appointment status to customer status
   const mapAppointmentStatusToCustomerStatus = (appointmentStatus: string): Customer['status'] => {
+    console.log('QueueContext - Mapping appointment status:', appointmentStatus);
     switch (appointmentStatus) {
       case 'checked_in':
         return 'waiting';
       case 'in_progress':
-        return 'serving'; // This is the key fix - map in_progress to serving
+        return 'serving';
       case 'completed':
         return 'served';
       case 'no_show':
@@ -167,9 +173,14 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, [customers]);
 
-  // Find current customer being served
+  // Find current customer being served - with better debugging
   useEffect(() => {
+    console.log('QueueContext - Looking for serving customer among:', customers.length, 'customers');
+    console.log('QueueContext - All customer statuses:', customers.map(c => ({ id: c.id, name: c.name, status: c.status })));
+    
     const servingCustomer = customers.find(c => c.status === 'serving');
+    console.log('QueueContext - Found serving customer:', servingCustomer);
+    
     setCurrentCustomer(servingCustomer || null);
   }, [customers]);
 
