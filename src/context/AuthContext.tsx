@@ -16,7 +16,7 @@ export const useAuth = (): AuthContextType => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Create a mock user for admin access since authentication is disabled
+  // Create a mock user for admin access since role checks are disabled
   const mockAdminUser: User = {
     id: 'mock-admin-user-id',
     email: 'admin@broward.gov',
@@ -39,26 +39,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [role, setRole] = useState<UserRoleType | null>('admin');
 
   useEffect(() => {
-    console.log('AuthProvider: Authentication disabled - using mock admin user');
+    console.log('AuthProvider: Role checks disabled - using mock admin user with full access');
     setLoading(false);
   }, []);
 
   const signIn = async (email: string, password: string): Promise<{ error?: AuthError }> => {
-    console.log('AuthProvider: Sign in disabled - mock success');
+    console.log('AuthProvider: Sign in disabled - mock success (role checks disabled)');
     return {};
   };
 
   const signUp = async (email: string, password: string, userData?: any): Promise<{ error?: AuthError }> => {
-    console.log('AuthProvider: Sign up disabled - mock success');
+    console.log('AuthProvider: Sign up disabled - mock success (role checks disabled)');
     return {};
   };
 
   const signOut = async (): Promise<void> => {
-    console.log('AuthProvider: Sign out disabled');
+    console.log('AuthProvider: Sign out disabled (role checks disabled)');
   };
 
   const signInWithGoogle = async (): Promise<{ error?: AuthError }> => {
-    console.log('AuthProvider: Google sign in disabled - mock success');
+    console.log('AuthProvider: Google sign in disabled - mock success (role checks disabled)');
     return {};
   };
 
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
   };
 
-  console.log('AuthProvider: Current state (auth disabled):', {
+  console.log('AuthProvider: Current state (role checks disabled):', {
     hasUser: !!user,
     hasSession: !!session,
     role,

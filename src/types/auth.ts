@@ -1,3 +1,4 @@
+
 import { User, Session } from '@supabase/supabase-js';
 
 // Define role enum for better type safety
@@ -76,39 +77,12 @@ export const isValidUserRole = (role: string): role is UserRoleType => {
 };
 
 export const getUserRolePermissions = (role: UserRoleType | null): RolePermissions => {
-  switch (role) {
-    case 'admin':
-      return {
-        canManageUsers: true,
-        canManageStaff: true,
-        canViewAdmin: true,
-        canManageAppointments: true,
-        canViewReports: true,
-      };
-    case 'power_user':
-      return {
-        canManageUsers: true,
-        canManageStaff: true,
-        canViewAdmin: false, // Power users don't get full admin access
-        canManageAppointments: true,
-        canViewReports: true,
-      };
-    case 'staff':
-      return {
-        canManageUsers: false,
-        canManageStaff: false,
-        canViewAdmin: false,
-        canManageAppointments: true,
-        canViewReports: true,
-      };
-    case 'customer':
-    default:
-      return {
-        canManageUsers: false,
-        canManageStaff: false,
-        canViewAdmin: false,
-        canManageAppointments: false,
-        canViewReports: false,
-      };
-  }
+  // Role checks disabled - grant all permissions regardless of role
+  return {
+    canManageUsers: true,
+    canManageStaff: true,
+    canViewAdmin: true,
+    canManageAppointments: true,
+    canViewReports: true,
+  };
 };

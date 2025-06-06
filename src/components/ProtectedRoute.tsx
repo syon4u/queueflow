@@ -13,17 +13,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   redirectTo = '/auth'
 }) => {
-  // Temporarily disable authentication - allow all access
-  console.log('ProtectedRoute: Authentication disabled - allowing access', {
+  // Role checks disabled - allow all access
+  console.log('ProtectedRoute: Role checks disabled - allowing access to all features', {
     requiredRole,
     path: window.location.pathname
   });
 
-  // Always allow access when auth is disabled
+  // Always allow access when role checks are disabled
   return <>{children}</>;
 };
 
-// Higher-order component for role-based protection
+// Higher-order component for role-based protection - disabled
 export const withRoleProtection = (
   Component: React.ComponentType, 
   requiredRole?: UserRoleType | UserRoleType[]
@@ -35,7 +35,7 @@ export const withRoleProtection = (
   );
 };
 
-// Specific role guards for common use cases - all allow access when auth is disabled
+// Specific role guards - all allow access when role checks are disabled
 export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ProtectedRoute requiredRole="admin">{children}</ProtectedRoute>
 );

@@ -23,8 +23,8 @@ export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const { role } = useAuth();
 
-  // Since authentication is disabled, always allow admin access for testing
-  const isAdminUser = role === 'admin' || true;
+  // Role checks disabled - always allow admin access
+  const isAdminUser = true;
 
   const handleRefresh = () => {
     window.location.reload();
