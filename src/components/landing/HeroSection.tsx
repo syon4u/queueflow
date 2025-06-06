@@ -18,13 +18,30 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl animate-float" style={{ animationDelay: '4s' }}></div>
       </div>
 
-      {/* Tech Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-20">
-        <img 
-          src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&h=600&fit=crop&crop=center" 
-          alt="Digital display screens" 
-          className="w-full h-full object-cover"
-        />
+      {/* Tech Watermark with Movement Animation */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-30">
+        <div className="relative w-full h-full overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&h=600&fit=crop&crop=center" 
+            alt="Digital display screens" 
+            className="w-full h-full object-cover animate-slow-pan"
+          />
+          
+          {/* Flowing Queue Animation Overlay */}
+          <div className="absolute inset-0">
+            {/* Moving dots representing people in queue */}
+            <div className="absolute top-1/4 left-0 w-2 h-2 bg-blue-400 rounded-full animate-queue-flow"></div>
+            <div className="absolute top-1/3 left-0 w-2 h-2 bg-green-400 rounded-full animate-queue-flow" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-2/5 left-0 w-2 h-2 bg-purple-400 rounded-full animate-queue-flow" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-1/2 left-0 w-2 h-2 bg-yellow-400 rounded-full animate-queue-flow" style={{ animationDelay: '3s' }}></div>
+            <div className="absolute top-3/5 left-0 w-2 h-2 bg-pink-400 rounded-full animate-queue-flow" style={{ animationDelay: '4s' }}></div>
+            
+            {/* Flowing lines representing queue movement */}
+            <div className="absolute top-1/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-300 to-transparent animate-flow-line"></div>
+            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-green-300 to-transparent animate-flow-line" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-3/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-purple-300 to-transparent animate-flow-line" style={{ animationDelay: '4s' }}></div>
+          </div>
+        </div>
       </div>
 
       <div className="container mx-auto px-4 text-center relative z-10">
@@ -68,6 +85,69 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slow-pan {
+          0% { transform: scale(1) translateX(0); }
+          50% { transform: scale(1.05) translateX(-10px); }
+          100% { transform: scale(1) translateX(0); }
+        }
+        
+        @keyframes queue-flow {
+          0% { 
+            transform: translateX(-20px); 
+            opacity: 0; 
+          }
+          10% { 
+            opacity: 1; 
+          }
+          90% { 
+            opacity: 1; 
+          }
+          100% { 
+            transform: translateX(calc(100vw + 20px)); 
+            opacity: 0; 
+          }
+        }
+        
+        @keyframes flow-line {
+          0% { 
+            transform: translateX(-100%); 
+            opacity: 0; 
+          }
+          10% { 
+            opacity: 0.6; 
+          }
+          90% { 
+            opacity: 0.6; 
+          }
+          100% { 
+            transform: translateX(100%); 
+            opacity: 0; 
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        .animate-slow-pan {
+          animation: slow-pan 20s ease-in-out infinite;
+        }
+        
+        .animate-queue-flow {
+          animation: queue-flow 8s linear infinite;
+        }
+        
+        .animate-flow-line {
+          animation: flow-line 6s ease-in-out infinite;
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 };
