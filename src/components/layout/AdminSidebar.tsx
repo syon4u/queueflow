@@ -3,7 +3,6 @@ import React from 'react';
 import { 
   LayoutDashboard, 
   Users, 
-  Building2,
   FileText,
   UsersRound,
   MessageSquare,
@@ -43,18 +42,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           label: 'Queue Control',
           icon: UsersRound,
           description: 'Manage active queues'
-        },
-        {
-          id: 'locations',
-          label: 'Locations',
-          icon: Building2,
-          description: 'Service centers'
-        },
-        {
-          id: 'services',
-          label: 'Services',
-          icon: FileText,
-          description: 'Available services'
         }
       ]
     },

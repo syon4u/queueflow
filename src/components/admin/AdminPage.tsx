@@ -8,8 +8,6 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { DashboardTab } from './DashboardTab';
 import { StatsTab } from './StatsTab';
-import { LocationsTab } from './LocationsTab';
-import { ServicesTab } from './ServicesTab';
 import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import { QueueManagementTab } from './QueueManagementTab';
 import SystemSettingsTab from './SystemSettingsTab';
@@ -87,14 +85,6 @@ export const AdminPage: React.FC = () => {
           
           <TabsContent value="users">
             <MergedUsersTab />
-          </TabsContent>
-          
-          <TabsContent value="locations">
-            <LocationsTab />
-          </TabsContent>
-          
-          <TabsContent value="services">
-            <ServicesTab />
           </TabsContent>
           
           <TabsContent value="communication">

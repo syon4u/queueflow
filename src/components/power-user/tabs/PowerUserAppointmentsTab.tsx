@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -317,9 +318,9 @@ export const PowerUserAppointmentsTab: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        {appointment.staff ? (
+                        {appointment.staff_id ? (
                           <span className="font-medium text-gray-900">
-                            {appointment.staff.first_name} {appointment.staff.last_name}
+                            Staff Member
                           </span>
                         ) : (
                           <span className="text-gray-500 italic">Unassigned</span>
