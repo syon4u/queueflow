@@ -19,7 +19,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
       </div>
 
       {/* Tech Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-5">
+      <div className="absolute inset-0 flex items-center justify-center opacity-20">
         <img 
           src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop&crop=center" 
           alt="Tech background" 
