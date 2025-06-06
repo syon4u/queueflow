@@ -47,22 +47,31 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
   ];
 
   return (
-    <div className="border-b bg-background shadow-sm">
-      <div className="max-w-7xl mx-auto px-md sm:px-lg lg:px-xl">
+    <div className="border-b bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-40">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollArea className="w-full">
-          <div className="flex space-x-1 py-sm min-w-max">
+          <div className="flex space-x-1 py-3 min-w-max">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
+              const isActive = activeTab === item.id;
+              
               return (
                 <Button
                   key={item.id}
-                  variant={activeTab === item.id ? 'default' : 'ghost'}
+                  variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => onTabChange(item.id)}
-                  className="flex items-center gap-sm whitespace-nowrap transition-all duration-200"
+                  className={`
+                    flex items-center gap-2 whitespace-nowrap transition-all duration-200 font-medium
+                    ${isActive 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/80'
+                    }
+                    px-4 py-2 rounded-lg border-0
+                  `}
                 >
                   <IconComponent className="h-4 w-4" />
-                  {item.label}
+                  <span className="text-sm">{item.label}</span>
                 </Button>
               );
             })}
