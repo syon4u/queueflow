@@ -6,6 +6,8 @@ import { CustomerSearchHeader } from './customer-search/CustomerSearchHeader';
 import { CustomerSearchFilters } from './customer-search/CustomerSearchFilters';
 import { CustomerTable } from './customer-search/CustomerTable';
 import { CustomerStatsCards } from './customer-search/CustomerStatsCards';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface Customer {
   id: string;
@@ -13,6 +15,7 @@ interface Customer {
   last_name: string;
   email: string | null;
   phone: string | null;
+  confirmation_number?: string;
   appointmentCount: number;
   lastAppointment: string | null;
   mostRecentStatus: string;
@@ -21,17 +24,53 @@ interface Customer {
 }
 
 export const CustomerSearchTab: React.FC = () => {
-  const { appointments, locations, services, isLoading } = useAppData();
+  const { appointments, locations, services, isLoading: appointmentsLoading } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string>('all');
   const [selectedService, setSelectedService] = useState<string>('all');
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
 
+  // Fetch customers with confirmation numbers
+  const { data: customersData = [], isLoading: customersLoading } = useQuery({
+    queryKey: ['customers-with-confirmation'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('id, first_name, last_name, email, phone, confirmation_number')
+        .order('last_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching customers:', error);
+        throw error;
+      }
+
+      return data || [];
+    }
+  });
+
   // Extract unique customers from appointments data with location and service info
   const customers = useMemo(() => {
     const customerMap = new Map<string, Customer>();
 
+    // Initialize customers from the customers table
+    customersData.forEach(customer => {
+      customerMap.set(customer.id, {
+        id: customer.id,
+        first_name: customer.first_name,
+        last_name: customer.last_name,
+        email: customer.email,
+        phone: customer.phone,
+        confirmation_number: customer.confirmation_number,
+        appointmentCount: 0,
+        lastAppointment: null,
+        mostRecentStatus: 'none',
+        locations: [],
+        services: []
+      });
+    });
+
+    // Add appointment data to existing customers
     appointments.forEach(appointment => {
       if (appointment.customer) {
         const customerId = appointment.customer_id;
@@ -41,7 +80,7 @@ export const CustomerSearchTab: React.FC = () => {
         const serviceName = appointment.service?.name || 'Unknown Service';
 
         if (existing) {
-          // Update existing customer with latest info
+          // Update existing customer with appointment info
           existing.appointmentCount += 1;
           const appointmentDate = new Date(appointment.scheduled_time);
           const existingDate = existing.lastAppointment ? new Date(existing.lastAppointment) : null;
@@ -59,13 +98,14 @@ export const CustomerSearchTab: React.FC = () => {
             existing.services.push(serviceName);
           }
         } else {
-          // Create new customer entry
+          // Create new customer entry if not found in customers table
           customerMap.set(customerId, {
             id: customerId,
             first_name: appointment.customer.first_name,
             last_name: appointment.customer.last_name,
             email: appointment.customer.email,
             phone: appointment.customer.phone,
+            confirmation_number: undefined, // Will be null for customers not in the main table
             appointmentCount: 1,
             lastAppointment: appointment.scheduled_time,
             mostRecentStatus: appointment.status,
@@ -81,20 +121,21 @@ export const CustomerSearchTab: React.FC = () => {
       const bDate = b.lastAppointment ? new Date(b.lastAppointment) : new Date(0);
       return bDate.getTime() - aDate.getTime();
     });
-  }, [appointments]);
+  }, [appointments, customersData]);
 
   // Filter customers based on search term, location, and service
   const filteredCustomers = useMemo(() => {
     let filtered = customers;
 
-    // Filter by search term
+    // Filter by search term (including confirmation number)
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase();
       filtered = filtered.filter(customer =>
         customer.first_name.toLowerCase().includes(search) ||
         customer.last_name.toLowerCase().includes(search) ||
         customer.email?.toLowerCase().includes(search) ||
-        customer.phone?.includes(search)
+        customer.phone?.includes(search) ||
+        customer.confirmation_number?.toLowerCase().includes(search)
       );
     }
 
@@ -127,6 +168,8 @@ export const CustomerSearchTab: React.FC = () => {
 
   const selectedCustomerData = selectedCustomer ? 
     customers.find(c => c.id === selectedCustomer) : null;
+
+  const isLoading = appointmentsLoading || customersLoading;
 
   if (isLoading) {
     return (

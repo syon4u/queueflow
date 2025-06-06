@@ -16,6 +16,7 @@ export type Customer = {
   last_name: string;
   phone?: string;
   email?: string;
+  confirmation_number?: string;
 }
 
 type CustomerSearchBoxProps = {
@@ -45,11 +46,11 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
     
     setIsSearching(true);
     try {
-      // Search for customers by phone or email
+      // Search for customers by phone, email, name, or confirmation number
       const { data, error } = await supabase
         .from('customers')
-        .select('id, first_name, last_name, phone, email')
-        .or(`phone.ilike.%${searchTerm}%, email.ilike.%${searchTerm}%, first_name.ilike.%${searchTerm}%, last_name.ilike.%${searchTerm}%`)
+        .select('id, first_name, last_name, phone, email, confirmation_number')
+        .or(`phone.ilike.%${searchTerm}%, email.ilike.%${searchTerm}%, first_name.ilike.%${searchTerm}%, last_name.ilike.%${searchTerm}%, confirmation_number.ilike.%${searchTerm}%`)
         .order('last_name', { ascending: true });
       
       if (error) throw error;
@@ -86,7 +87,7 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
     <div className="space-y-4">
       <div className="flex gap-2">
         <Input 
-          placeholder={t('customer.searchPlaceholder')}
+          placeholder="Search by name, phone, email, or confirmation number..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -118,9 +119,14 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
                   onClick={() => onSelectCustomer(customer)}
                 >
                   <div className="font-medium">{customer.first_name} {customer.last_name}</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground space-y-1">
                     {customer.phone && <div>{customer.phone}</div>}
                     {customer.email && <div>{customer.email}</div>}
+                    {customer.confirmation_number && (
+                      <div className="font-mono text-blue-600 font-medium">
+                        {customer.confirmation_number}
+                      </div>
+                    )}
                   </div>
                 </button>
                 
@@ -155,7 +161,7 @@ const CustomerSearchBox: React.FC<CustomerSearchBoxProps> = ({
       
       <div className="flex justify-between items-center">
         <div className="text-sm text-muted-foreground">
-          {t('customer.searchInstructions')}
+          Search by name, phone, email, or confirmation number
         </div>
         <Button variant="outline" onClick={onCreateNew}>
           <UserPlus className="mr-2 h-4 w-4" />

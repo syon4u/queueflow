@@ -651,6 +651,7 @@ export type Database = {
       }
       customers: {
         Row: {
+          confirmation_number: string | null
           created_at: string
           email: string | null
           first_name: string
@@ -660,6 +661,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          confirmation_number?: string | null
           created_at?: string
           email?: string | null
           first_name: string
@@ -669,6 +671,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          confirmation_number?: string | null
           created_at?: string
           email?: string | null
           first_name?: string
@@ -1837,6 +1840,10 @@ export type Database = {
       check_location_capacity: {
         Args: { location_uuid: string; requested_time?: string }
         Returns: Json
+      }
+      generate_confirmation_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       generate_demand_predictions: {
         Args: { target_location_id: string; prediction_days?: number }

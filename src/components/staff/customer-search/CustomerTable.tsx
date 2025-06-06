@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { User, Mail, Phone, Calendar, History } from 'lucide-react';
+import { User, Mail, Phone, Calendar, History, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Customer {
@@ -13,6 +13,7 @@ interface Customer {
   last_name: string;
   email: string | null;
   phone: string | null;
+  confirmation_number?: string;
   appointmentCount: number;
   lastAppointment: string | null;
   mostRecentStatus: string;
@@ -89,6 +90,7 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
             <TableRow>
               <TableHead>Customer</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead>Confirmation #</TableHead>
               <TableHead>Appointments</TableHead>
               <TableHead>Last Visit</TableHead>
               <TableHead>Status</TableHead>
@@ -118,6 +120,18 @@ export const CustomerTable: React.FC<CustomerTableProps> = ({
                       </div>
                     )}
                   </div>
+                </TableCell>
+                <TableCell>
+                  {customer.confirmation_number ? (
+                    <div className="flex items-center gap-1">
+                      <CreditCard className="h-3 w-3 text-blue-600" />
+                      <span className="font-mono text-sm text-blue-600 font-medium">
+                        {customer.confirmation_number}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">-</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
