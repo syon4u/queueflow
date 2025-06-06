@@ -17,6 +17,7 @@ import { StaffDashboardSkeleton } from '@/components/staff/StaffDashboardSkeleto
 import { StaffStatusSkeleton } from '@/components/staff/StaffStatusSkeleton';
 import StaffStatusSection from '@/components/staff/StaffStatusSection';
 import { CustomerSearchTab } from './CustomerSearchTab';
+import { DemoDataControls } from '@/components/demo/DemoDataControls';
 
 interface StaffMainContentProps {
   activeSection: string;
@@ -84,6 +85,11 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
       case 'basic-queue':
         return (
           <div className="space-y-6">
+            {/* Demo Data Controls - Only show in development */}
+            {process.env.NODE_ENV === 'development' && (
+              <DemoDataControls />
+            )}
+            
             <QueueStats />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
