@@ -8,45 +8,62 @@ import { Users, Search, Plus, Edit, Trash2, Shield, UserCheck } from 'lucide-rea
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
 interface User {
   id: string;
   email: string;
   role: string;
   created_at: string;
   last_sign_in_at: string;
+  first_name?: string;
+  last_name?: string;
 }
+
 export const UserAdministrationTab: React.FC = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const {
-    data: users = [],
-    isLoading,
-    refetch
-  } = useQuery({
+
+  const { data: users = [], isLoading, refetch } = useQuery({
     queryKey: ['users-with-roles'],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.rpc('get_users_with_roles');
+      const { data, error } = await supabase.rpc('get_users_with_roles');
       if (error) throw error;
-      return data as User[];
+      
+      // Get profiles for additional user info
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email');
+      
+      if (profilesError) console.error('Error fetching profiles:', profilesError);
+      
+      // Merge user data with profile data
+      const usersWithProfiles = (data as User[]).map(user => {
+        const profile = profiles?.find(p => p.id === user.id);
+        return {
+          ...user,
+          first_name: profile?.first_name || '',
+          last_name: profile?.last_name || '',
+        };
+      });
+      
+      return usersWithProfiles;
     }
   });
+
   const filteredUsers = users.filter(user => {
-    const matchesSearch = searchTerm === '' || user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === '' || 
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     return matchesSearch && matchesRole;
   });
+
   const handleUpdateRole = async (userId: string, newRole: string) => {
     try {
-      const {
-        error
-      } = await supabase.rpc('update_user_role', {
+      const { error } = await supabase.rpc('update_user_role', {
         target_user_id: userId,
         new_role: newRole
       });
@@ -64,12 +81,14 @@ export const UserAdministrationTab: React.FC = () => {
       });
     }
   };
+
   const handleCreateUser = () => {
     toast({
       title: "Create User",
       description: "User creation form would open here"
     });
   };
+
   const handleEditUser = (userId: string) => {
     setSelectedUser(userId);
     toast({
@@ -77,6 +96,7 @@ export const UserAdministrationTab: React.FC = () => {
       description: "User edit form would open here"
     });
   };
+
   const handleDeleteUser = (userId: string) => {
     toast({
       title: "Delete User",
@@ -84,6 +104,7 @@ export const UserAdministrationTab: React.FC = () => {
       variant: "destructive"
     });
   };
+
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin':
@@ -98,27 +119,36 @@ export const UserAdministrationTab: React.FC = () => {
         return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
+
   const formatRole = (role: string) => {
     return role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
+
   const roleStats = {
     admin: users.filter(u => u.role === 'admin').length,
     staff: users.filter(u => u.role === 'staff').length,
     power_user: users.filter(u => u.role === 'power_user').length,
     customer: users.filter(u => u.role === 'customer').length
   };
+
   if (isLoading) {
-    return <div className="space-y-6">
+    return (
+      <div className="space-y-6">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>)}
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
+            ))}
           </div>
           <div className="h-96 bg-gray-200 rounded-lg"></div>
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <div className="space-y-8">
+
+  return (
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -186,7 +216,6 @@ export const UserAdministrationTab: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
-            
             <Badge variant="outline">{filteredUsers.length} users</Badge>
           </div>
           
@@ -194,7 +223,12 @@ export const UserAdministrationTab: React.FC = () => {
           <div className="flex gap-4 mt-4">
             <div className="relative flex-1">
               <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
-              <Input placeholder="Search by email..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+              <Input
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-48">
@@ -212,15 +246,19 @@ export const UserAdministrationTab: React.FC = () => {
         </CardHeader>
         
         <CardContent className="p-0">
-          {filteredUsers.length === 0 ? <div className="text-center py-12 px-6">
+          {filteredUsers.length === 0 ? (
+            <div className="text-center py-12 px-6">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
               <p className="text-gray-500">Try adjusting your search or filter criteria</p>
-            </div> : <div className="overflow-x-auto">
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-left py-3 px-6 font-medium text-gray-900">User</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">Name</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">Email</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-900">Role</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-900">Created</th>
                     <th className="text-left py-3 px-6 font-medium text-gray-900">Last Sign In</th>
@@ -228,17 +266,38 @@ export const UserAdministrationTab: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user, index) => <tr key={user.id} className={`border-b hover:bg-gray-50 transition-colors ${selectedUser === user.id ? 'bg-blue-50' : ''}`} onClick={() => setSelectedUser(user.id)}>
-                      <td className="py-4 px-6">
+                  {filteredUsers.map((user, index) => (
+                    <tr
+                      key={user.id}
+                      className={`border-b hover:bg-gray-50 transition-colors ${
+                        selectedUser === user.id ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() => setSelectedUser(user.id)}
+                    >
+                      <td className="py-4 px-6 text-left">
                         <div>
-                          <p className="font-medium text-gray-900">{user.email}</p>
+                          <p className="font-medium text-gray-900">
+                            {user.first_name || user.last_name 
+                              ? `${user.first_name} ${user.last_name}`.trim()
+                              : 'N/A'
+                            }
+                          </p>
                           <p className="text-sm text-gray-500">ID: {user.id.slice(0, 8)}...</p>
                         </div>
                       </td>
-                      <td className="py-4 px-6">
-                        <Select value={user.role} onValueChange={newRole => handleUpdateRole(user.id, newRole)}>
+                      <td className="py-4 px-6 text-left">
+                        <p className="font-medium text-gray-900">{user.email}</p>
+                      </td>
+                      <td className="py-4 px-6 text-left">
+                        <Select
+                          value={user.role}
+                          onValueChange={(newRole) => handleUpdateRole(user.id, newRole)}
+                        >
                           <SelectTrigger className="w-32">
-                            <Badge variant="outline" className={`${getRoleBadgeColor(user.role)} border-0`}>
+                            <Badge
+                              variant="outline"
+                              className={`${getRoleBadgeColor(user.role)} border-0`}
+                            >
                               {formatRole(user.role)}
                             </Badge>
                           </SelectTrigger>
@@ -250,33 +309,45 @@ export const UserAdministrationTab: React.FC = () => {
                           </SelectContent>
                         </Select>
                       </td>
-                      <td className="py-4 px-6 text-sm text-gray-500">
+                      <td className="py-4 px-6 text-sm text-gray-500 text-left">
                         {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                       </td>
-                      <td className="py-4 px-6 text-sm text-gray-500">
+                      <td className="py-4 px-6 text-sm text-gray-500 text-left">
                         {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never'}
                       </td>
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-left">
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={e => {
-                      e.stopPropagation();
-                      handleEditUser(user.id);
-                    }}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditUser(user.id);
+                            }}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="outline" onClick={e => {
-                      e.stopPropagation();
-                      handleDeleteUser(user.id);
-                    }} className="text-red-600 hover:text-red-700">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteUser(user.id);
+                            }}
+                            className="text-red-600 hover:text-red-700"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </td>
-                    </tr>)}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
-            </div>}
+            </div>
+          )}
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };
