@@ -3,11 +3,8 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import SimpleScheduleCard from '@/components/customer/SimpleScheduleCard';
-import CheckInCard from '@/components/customer/CheckInCard';
-import AppointmentStatusCard from '@/components/customer/AppointmentStatusCard';
 import WaitTimesCard from '@/components/customer/WaitTimesCard';
 import AppointmentConfirmationDialog from '@/components/customer/AppointmentConfirmationDialog';
-import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
 import PageLayout from '@/components/layout/PageLayout';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { useToast } from '@/hooks/use-toast';
@@ -102,15 +99,6 @@ const CustomerPage = () => {
             
             {/* Side cards */}
             <div className="space-y-6">
-              <div className="transition-all hover:translate-y-[-2px] duration-300">
-                <QueuePositionTracker />
-              </div>
-              <div className="transition-all hover:translate-y-[-2px] duration-300">
-                <CheckInCard />
-              </div>
-              <div className="transition-all hover:translate-y-[-2px] duration-300">
-                <AppointmentStatusCard />
-              </div>
               <div className="transition-all hover:translate-y-[-2px] duration-300">
                 <WaitTimesCard />
               </div>
