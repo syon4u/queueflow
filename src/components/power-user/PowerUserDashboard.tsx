@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   UserCheck
 } from 'lucide-react';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
-import { PowerUserStatsCards } from './PowerUserStatsCards';
 import { UserAdministrationTab } from './tabs/UserAdministrationTab';
 import { LocationsServicesTab } from './tabs/LocationsServicesTab';
 import { SMSNotificationTab } from './tabs/SMSNotificationTab';
@@ -25,7 +24,6 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
 }) => {
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'dashboard':
       case 'appointments':
         return <PowerUserAppointmentsTab />;
       case 'users':
@@ -64,7 +62,7 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
       <div className="flex items-center justify-between">
         <Breadcrumb 
           items={[
-            { label: 'Dashboard', isActive: true }
+            { label: 'Power User Portal', isActive: true }
           ]}
           className="mb-0"
         />
@@ -75,9 +73,6 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
           </Badge>
         </div>
       </div>
-
-      {/* Stats Overview - Only show on dashboard tab */}
-      {activeTab === 'dashboard' && <PowerUserStatsCards />}
 
       {/* Main Content */}
       <div className="space-y-6">
