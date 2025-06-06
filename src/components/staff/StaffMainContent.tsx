@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useQueue } from '@/context/QueueContext';
@@ -10,7 +11,6 @@ import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
 import { QueueManagementTab } from '@/components/staff/QueueManagementTab';
 import EnhancedAppointmentTable from '@/components/staff/EnhancedAppointmentTable';
-import StaffPerformanceReport from '@/components/staff/StaffPerformanceReport';
 import { AdvancedStaffTab } from '@/components/staff/AdvancedStaffTab';
 import { StaffDashboardHeader } from '@/components/staff/StaffDashboardHeader';
 import { StaffDashboardSkeleton } from '@/components/staff/StaffDashboardSkeleton';
@@ -106,9 +106,6 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
 
       case 'customer-search':
         return <CustomerSearchTab />;
-
-      case 'analytics':
-        return <StaffPerformanceReport />;
 
       case 'advanced-tools':
         return <AdvancedStaffTab />;
