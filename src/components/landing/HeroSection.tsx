@@ -18,9 +18,18 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl animate-float" style={{ animationDelay: '4s' }}></div>
       </div>
 
+      {/* Tech Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-5">
+        <img 
+          src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop&crop=center" 
+          alt="Tech background" 
+          className="w-full h-full object-cover"
+        />
+      </div>
+
       <div className="container mx-auto px-4 text-center relative z-10">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in-up">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in-up relative">
             Skip the Line,
             <span className="block text-blue-600">Not Your Day.</span>
           </h1>

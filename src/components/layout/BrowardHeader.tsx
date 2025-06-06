@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Menu, User, Settings, BarChart3, Zap } from 'lucide-react';
+import { Menu, User, Settings, BarChart3, Cpu } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface BrowardHeaderProps {
@@ -77,7 +77,7 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative flex items-center gap-3">
-                <Zap size={32} className="text-yellow-300 drop-shadow-lg group-hover:scale-105 transition-transform duration-200" />
+                <Cpu size={32} className="text-cyan-300 drop-shadow-lg group-hover:scale-105 transition-transform duration-200" />
                 <h1 className="text-2xl font-serif font-bold text-white drop-shadow-lg">
                   Queue Flow
                 </h1>
