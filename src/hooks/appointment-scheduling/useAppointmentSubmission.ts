@@ -47,26 +47,24 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      // Generate a UUID for the new customer
-      const newCustomerId = crypto.randomUUID();
-
-      // Create customer first with explicit ID
+      // Create customer first - the trigger will automatically generate confirmation_number
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
         .insert({
-          id: newCustomerId,
           first_name: firstName,
           last_name: lastName,
           phone: data.phone,
           email: data.email || null,
         })
-        .select('id')
+        .select('id, confirmation_number')
         .single();
 
       if (customerError) {
         console.error('useAppointmentSubmission - Customer creation error:', customerError);
         throw new Error(`Failed to create customer: ${customerError.message}`);
       }
+
+      console.log('Customer created with confirmation number:', customerData.confirmation_number);
 
       // Create appointment
       const { data: appointmentData, error: appointmentError } = await supabase
@@ -87,7 +85,8 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
         throw new Error(`Failed to create appointment: ${appointmentError.message}`);
       }
 
-      const confirmationCode = `APT-${appointmentData.id.slice(0, 8).toUpperCase()}`;
+      // Return the customer confirmation number (not appointment code)
+      const confirmationCode = customerData.confirmation_number;
       
       toast({
         title: 'Success!',
@@ -161,7 +160,8 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
         throw new Error(`Failed to create appointment: ${appointmentError.message}`);
       }
 
-      const confirmationCode = `APT-${appointmentData.id.slice(0, 8).toUpperCase()}`;
+      // Use the existing customer's confirmation number
+      const confirmationCode = selectedCustomer.confirmation_number || `APT-${appointmentData.id.slice(0, 8).toUpperCase()}`;
       
       toast({
         title: 'Success!',

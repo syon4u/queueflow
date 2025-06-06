@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -112,12 +111,15 @@ const StatusPage: React.FC = () => {
                   <Input
                     id="confirmation"
                     type="text"
-                    placeholder="Enter your confirmation number"
+                    placeholder="Enter CUST-XXXXXXXX or APT-XXXXXXXX"
                     value={confirmationNumber}
                     onChange={(e) => setConfirmationNumber(e.target.value)}
                     autoFocus
                     className="uppercase"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Use your customer confirmation number (CUST-XXXXXXXX) or appointment code (APT-XXXXXXXX)
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -167,7 +169,7 @@ const StatusPage: React.FC = () => {
               <div className="text-center">
                 <p className="text-red-800 font-medium mb-2">Appointment Not Found</p>
                 <p className="text-red-600 text-sm mb-4">
-                  We couldn't find an appointment with the information provided. Please check your details and try again.
+                  We couldn't find an appointment with the information provided. Please check your confirmation number and try again.
                 </p>
                 <Link to="/customer">
                   <Button variant="outline" size="sm">

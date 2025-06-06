@@ -46,43 +46,94 @@ export const useQueueStatus = (
       let appointmentId: string | null = null;
 
       if (confirmationNumber) {
-        // Look up by confirmation number (using appointment ID)
-        const { data: appointments, error: lookupError } = await supabase
-          .from('appointments')
-          .select('id')
-          .ilike('id', `%${confirmationNumber.slice(-8)}%`)
-          .limit(1);
+        // First try to find by customer confirmation number
+        const { data: customerData, error: customerError } = await supabase
+          .from('customers')
+          .select(`
+            id,
+            appointments!appointments_customer_id_fkey(
+              id,
+              status,
+              scheduled_time,
+              check_in_time,
+              services!appointments_service_id_fkey(name),
+              locations!appointments_location_id_fkey(name)
+            )
+          `)
+          .eq('confirmation_number', confirmationNumber.toUpperCase())
+          .maybeSingle();
 
-        if (lookupError) throw lookupError;
-        
-        if (appointments && appointments.length > 0) {
-          appointmentId = appointments[0].id;
+        if (customerError) throw customerError;
+
+        if (customerData && customerData.appointments && customerData.appointments.length > 0) {
+          // Get the most recent appointment
+          const mostRecentAppointment = customerData.appointments
+            .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
+          appointmentId = mostRecentAppointment.id;
+        } else {
+          // If not found by customer confirmation, try appointment confirmation format (APT-XXXXXXXX)
+          if (confirmationNumber.startsWith('APT-')) {
+            const appointmentIdPrefix = confirmationNumber.substring(4).toLowerCase();
+            
+            const { data: appointments, error: lookupError } = await supabase
+              .from('appointments')
+              .select(`
+                id,
+                status,
+                scheduled_time,
+                check_in_time,
+                customers!appointments_customer_id_fkey(first_name, last_name),
+                services!appointments_service_id_fkey(name),
+                locations!appointments_location_id_fkey(name)
+              `)
+              .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Within last 7 days
+              .order('scheduled_time', { ascending: false });
+
+            if (lookupError) throw lookupError;
+
+            // Filter appointments client-side to find matching ID prefix
+            const matchingAppointment = appointments?.find(apt => 
+              apt.id.toLowerCase().startsWith(appointmentIdPrefix)
+            );
+
+            if (matchingAppointment) {
+              appointmentId = matchingAppointment.id;
+            }
+          }
         }
       } else if (lastName && phone) {
         // Look up by customer details
         const cleanPhone = phone.replace(/\D/g, '');
         
-        const { data: appointments, error: lookupError } = await supabase
-          .from('appointments')
+        const { data: customers, error: lookupError } = await supabase
+          .from('customers')
           .select(`
             id,
-            customers!appointments_customer_id_fkey(first_name, last_name, phone)
+            phone,
+            appointments!appointments_customer_id_fkey(
+              id,
+              scheduled_time,
+              status
+            )
           `)
-          .eq('customers.last_name', lastName)
-          .order('scheduled_time', { ascending: false })
+          .ilike('last_name', lastName)
+          .order('created_at', { ascending: false })
           .limit(10);
 
         if (lookupError) throw lookupError;
 
-        if (appointments && appointments.length > 0) {
+        if (customers && customers.length > 0) {
           // Find matching phone number
-          const matchingAppointment = appointments.find(apt => {
-            const customerPhone = apt.customers?.phone?.replace(/\D/g, '') || '';
+          const matchingCustomer = customers.find(customer => {
+            const customerPhone = customer.phone?.replace(/\D/g, '') || '';
             return customerPhone.includes(cleanPhone) || cleanPhone.includes(customerPhone);
           });
 
-          if (matchingAppointment) {
-            appointmentId = matchingAppointment.id;
+          if (matchingCustomer && matchingCustomer.appointments && matchingCustomer.appointments.length > 0) {
+            // Get the most recent appointment
+            const mostRecentAppointment = matchingCustomer.appointments
+              .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
+            appointmentId = mostRecentAppointment.id;
           }
         }
       }

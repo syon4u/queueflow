@@ -30,25 +30,63 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
   useEffect(() => {
     const fetchQueuePosition = async () => {
       try {
-        const appointmentIdPrefix = confirmationCode.substring(4).toLowerCase();
-        
-        // Find the appointment
-        const { data: appointments, error } = await supabase
-          .from('appointments')
-          .select(`
-            id,
-            status,
-            check_in_time,
-            location_id,
-            service_id,
-            locations!appointments_location_id_fkey(name),
-            services!appointments_service_id_fkey(name, duration)
-          `)
-          .filter('id::text', 'ilike', `${appointmentIdPrefix}%`)
-          .single();
+        let appointment = null;
 
-        if (error || !appointments) {
-          console.error('Error fetching appointment:', error);
+        // Check if it's a customer confirmation number (CUST-XXXXXXXX)
+        if (confirmationCode.startsWith('CUST-')) {
+          const { data: customerData, error: customerError } = await supabase
+            .from('customers')
+            .select(`
+              id,
+              appointments!appointments_customer_id_fkey(
+                id,
+                status,
+                check_in_time,
+                location_id,
+                service_id,
+                scheduled_time,
+                locations!appointments_location_id_fkey(name),
+                services!appointments_service_id_fkey(name, duration)
+              )
+            `)
+            .eq('confirmation_number', confirmationCode)
+            .maybeSingle();
+
+          if (customerError) throw customerError;
+
+          if (customerData && customerData.appointments && customerData.appointments.length > 0) {
+            // Get the most recent appointment
+            appointment = customerData.appointments
+              .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
+          }
+        } else if (confirmationCode.startsWith('APT-')) {
+          // Handle appointment confirmation format (APT-XXXXXXXX)
+          const appointmentIdPrefix = confirmationCode.substring(4).toLowerCase();
+          
+          const { data: appointments, error } = await supabase
+            .from('appointments')
+            .select(`
+              id,
+              status,
+              check_in_time,
+              location_id,
+              service_id,
+              scheduled_time,
+              locations!appointments_location_id_fkey(name),
+              services!appointments_service_id_fkey(name, duration)
+            `)
+            .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+            .order('scheduled_time', { ascending: false });
+
+          if (error) throw error;
+
+          appointment = appointments?.find(apt => 
+            apt.id.toLowerCase().startsWith(appointmentIdPrefix)
+          );
+        }
+
+        if (!appointment) {
+          console.error('No appointment found for confirmation code:', confirmationCode);
           return;
         }
 
@@ -56,7 +94,7 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
         const { data: queueData, error: queueError } = await supabase
           .from('appointments')
           .select('id, check_in_time')
-          .eq('location_id', appointments.location_id)
+          .eq('location_id', appointment.location_id)
           .eq('status', 'checked_in')
           .order('check_in_time', { ascending: true });
 
@@ -65,16 +103,16 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
           return;
         }
 
-        const position = queueData.findIndex(apt => apt.id === appointments.id) + 1;
+        const position = queueData.findIndex(apt => apt.id === appointment.id) + 1;
         const totalAhead = position - 1;
-        const estimatedWaitTime = totalAhead * (appointments.services?.duration || 30);
+        const estimatedWaitTime = totalAhead * (appointment.services?.duration || 30);
 
         setQueueInfo({
           position,
           estimatedWaitTime,
-          status: appointments.status,
-          serviceName: appointments.services?.name || 'Service',
-          locationName: appointments.locations?.name || 'Location',
+          status: appointment.status,
+          serviceName: appointment.services?.name || 'Service',
+          locationName: appointment.locations?.name || 'Location',
           totalAhead
         });
 
@@ -103,23 +141,20 @@ export const QueuePositionDisplay: React.FC<QueuePositionDisplayProps> = ({
           table: 'appointments'
         },
         (payload) => {
-          const appointmentIdPrefix = confirmationCode.substring(4).toLowerCase();
-          if (payload.new.id.toString().toLowerCase().startsWith(appointmentIdPrefix)) {
-            // Refetch queue position when our appointment is updated
-            fetchQueuePosition();
-            
-            // Show notification for status changes
-            if (payload.new.status === 'in_progress') {
-              toast({
-                title: 'You\'re Being Called!',
-                description: 'Please proceed to the service counter.',
-              });
-            } else if (payload.new.status === 'completed') {
-              toast({
-                title: 'Service Completed',
-                description: 'Thank you for visiting us today.',
-              });
-            }
+          // Refetch queue position when any appointment is updated
+          fetchQueuePosition();
+          
+          // Show notification for status changes if it's our appointment
+          if (payload.new.status === 'in_progress') {
+            toast({
+              title: 'You\'re Being Called!',
+              description: 'Please proceed to the service counter.',
+            });
+          } else if (payload.new.status === 'completed') {
+            toast({
+              title: 'Service Completed',
+              description: 'Thank you for visiting us today.',
+            });
           }
         }
       )
