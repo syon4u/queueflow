@@ -17,42 +17,44 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
 }) => {
   return (
     <Card className="border-0 shadow-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg">Quick Actions</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-medium">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <Button 
-          variant="outline" 
-          className="w-full justify-start h-12"
-          onClick={onViewFullQueue}
-        >
-          <Calendar className="h-4 w-4 mr-3" />
-          Check In Customer
-        </Button>
-        <Button 
-          variant="outline" 
-          className="w-full justify-start h-12"
-          onClick={onViewFullQueue}
-        >
-          <Users className="h-4 w-4 mr-3" />
-          View Full Queue
-        </Button>
-        <Button 
-          variant="outline" 
-          className="w-full justify-start h-12"
-          onClick={onAddWalkIn}
-        >
-          <Clock className="h-4 w-4 mr-3" />
-          Add Walk-in
-        </Button>
-        <Button 
-          variant="outline" 
-          className="w-full justify-start h-12"
-          onClick={onScheduleFollowUp}
-        >
-          <Plus className="h-4 w-4 mr-3" />
-          Schedule Follow-up
-        </Button>
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <Button 
+            variant="outline" 
+            className="h-10 text-sm"
+            onClick={onViewFullQueue}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Check In Customer
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-10 text-sm"
+            onClick={onViewFullQueue}
+          >
+            <Users className="h-4 w-4 mr-2" />
+            View Full Queue
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-10 text-sm"
+            onClick={onAddWalkIn}
+          >
+            <Clock className="h-4 w-4 mr-2" />
+            Add Walk-in
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-10 text-sm"
+            onClick={onScheduleFollowUp}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Schedule Follow-up
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

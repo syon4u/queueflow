@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -179,7 +178,7 @@ export const PowerUserAppointmentsTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header Section */}
       <div className="flex justify-between items-start">
         <div>
@@ -202,34 +201,27 @@ export const PowerUserAppointmentsTab: React.FC = () => {
         avgServiceTime={avgServiceTime}
       />
 
-      {/* Main Content Grid - Simplified Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Today's Schedule */}
-        <div className="lg:col-span-3">
-          <AppointmentsList
-            appointments={filteredAppointments}
-            searchTerm={searchTerm}
-            statusFilter={statusFilter}
-            selectedAppointment={selectedAppointment}
-            onSearchChange={setSearchTerm}
-            onStatusFilterChange={setStatusFilter}
-            onAppointmentSelect={setSelectedAppointment}
-            onCheckIn={handleCheckIn}
-            onStartService={handleStartService}
-            onCompleteService={handleCompleteService}
-            onScheduleAppointment={handleScheduleAppointment}
-          />
-        </div>
+      {/* Quick Actions - Horizontal Layout */}
+      <QuickActions
+        onViewFullQueue={handleViewFullQueue}
+        onAddWalkIn={handleAddWalkIn}
+        onScheduleFollowUp={handleScheduleFollowUp}
+      />
 
-        {/* Quick Actions */}
-        <div className="lg:col-span-1">
-          <QuickActions
-            onViewFullQueue={handleViewFullQueue}
-            onAddWalkIn={handleAddWalkIn}
-            onScheduleFollowUp={handleScheduleFollowUp}
-          />
-        </div>
-      </div>
+      {/* Today's Schedule - Full Width */}
+      <AppointmentsList
+        appointments={filteredAppointments}
+        searchTerm={searchTerm}
+        statusFilter={statusFilter}
+        selectedAppointment={selectedAppointment}
+        onSearchChange={setSearchTerm}
+        onStatusFilterChange={setStatusFilter}
+        onAppointmentSelect={setSelectedAppointment}
+        onCheckIn={handleCheckIn}
+        onStartService={handleStartService}
+        onCompleteService={handleCompleteService}
+        onScheduleAppointment={handleScheduleAppointment}
+      />
     </div>
   );
 };
