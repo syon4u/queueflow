@@ -32,7 +32,12 @@ const HeroSection: React.FC = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50 px-8" asChild>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md px-8" 
+              asChild
+            >
               <Link to="/status">Check Status</Link>
             </Button>
             <Button 
