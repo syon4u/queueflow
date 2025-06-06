@@ -64,8 +64,8 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
                   className={`
                     flex items-center gap-2 whitespace-nowrap transition-all duration-200
                     ${isActive 
-                      ? 'bg-slate-900 text-white shadow-md hover:bg-slate-800' 
-                      : 'text-slate-800 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
+                      ? 'bg-black text-white shadow-md hover:bg-gray-800' 
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
                     }
                     px-4 py-2.5 rounded-lg font-medium
                   `}
