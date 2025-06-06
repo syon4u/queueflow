@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Star, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  onShowGuide?: () => void;
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
   return (
     <section className="relative bg-gradient-to-br from-blue-50 via-white to-blue-50 py-20 overflow-hidden">
       {/* Background Animation */}

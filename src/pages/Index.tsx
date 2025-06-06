@@ -1,37 +1,54 @@
 
 import React, { useState } from 'react';
-import Navigation from '@/components/landing/Navigation';
+import PageLayout from '@/components/layout/PageLayout';
 import HeroSection from '@/components/landing/HeroSection';
-import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import BenefitsSection from '@/components/landing/BenefitsSection';
-import SocialProofSection from '@/components/landing/SocialProofSection';
+import CustomerServiceCards from '@/components/landing/CustomerServiceCards';
+import FeaturesSection from '@/components/landing/FeaturesSection';
+import StatsSection from '@/components/landing/StatsSection';
+import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import CTASection from '@/components/landing/CTASection';
-import EmployeeAccessSection from '@/components/landing/EmployeeAccessSection';
-import Footer from '@/components/landing/Footer';
+import WelcomeGuideModal from '@/components/landing/WelcomeGuideModal';
+import { useTranslation } from 'react-i18next';
 
-const Index: React.FC = () => {
-  const [showStaffAccess, setShowStaffAccess] = useState(false);
+const Index = () => {
+  const [showGuide, setShowGuide] = useState(false);
+  const { t } = useTranslation();
+  
+  const handleShowGuide = () => {
+    setShowGuide(true);
+  };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation 
-        showStaffAccess={showStaffAccess}
-        onToggleStaffAccess={() => setShowStaffAccess(!showStaffAccess)}
+    <PageLayout 
+      headerTitle={t('landing.headerTitle')}
+      headerSubtitle={t('landing.headerSubtitle')}
+    >
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero Section */}
+        <HeroSection onShowGuide={handleShowGuide} />
+        
+        {/* Customer-Focused Cards */}
+        <CustomerServiceCards />
+        
+        {/* Features Section */}
+        <FeaturesSection />
+        
+        {/* Stats Section */}
+        <StatsSection />
+        
+        {/* Testimonials Section */}
+        <TestimonialsSection />
+        
+        {/* Call to Action Section */}
+        <CTASection />
+      </div>
+      
+      {/* Welcome guide modal */}
+      <WelcomeGuideModal 
+        isOpen={showGuide} 
+        onClose={() => setShowGuide(false)} 
       />
-      
-      <HeroSection />
-      <HowItWorksSection />
-      <BenefitsSection />
-      <SocialProofSection />
-      <CTASection />
-      
-      <EmployeeAccessSection 
-        showStaffAccess={showStaffAccess}
-        onToggleStaffAccess={() => setShowStaffAccess(false)}
-      />
-      
-      <Footer onShowStaffAccess={() => setShowStaffAccess(true)} />
-    </div>
+    </PageLayout>
   );
 };
 
