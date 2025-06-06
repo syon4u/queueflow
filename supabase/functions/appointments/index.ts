@@ -58,20 +58,20 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         if (customerData && customerData.appointments && customerData.appointments.length > 0) {
-          // Find the most recent scheduled appointment for today
-          const today = new Date();
-          const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-          const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+          // Find the most recent scheduled appointment (within the last 7 days to next 7 days)
+          const now = new Date();
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-          const todayAppointment = customerData.appointments.find(apt => {
+          const validAppointment = customerData.appointments.find(apt => {
             const aptDate = new Date(apt.scheduled_time);
             return apt.status === 'scheduled' && 
-                   aptDate >= todayStart && 
-                   aptDate < todayEnd;
+                   aptDate >= weekAgo && 
+                   aptDate <= weekFromNow;
           });
 
-          if (todayAppointment) {
-            appointmentId = todayAppointment.id;
+          if (validAppointment) {
+            appointmentId = validAppointment.id;
           }
         }
       } 
@@ -79,12 +79,13 @@ const handler = async (req: Request): Promise<Response> => {
       else if (confirmation_code.startsWith('APT-')) {
         const appointmentIdPrefix = confirmation_code.substring(4).toLowerCase();
         
+        // Look for appointments within a broader time range (last 7 days to next 7 days)
         const { data: appointments, error: searchError } = await supabaseClient
           .from('appointments')
           .select('id, status, scheduled_time')
           .eq('status', 'scheduled')
-          .gte('scheduled_time', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-          .lte('scheduled_time', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
+          .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .lte('scheduled_time', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString());
 
         if (searchError) {
           console.error('Error searching for appointment:', searchError);
@@ -114,7 +115,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       if (!appointmentId) {
         return new Response(JSON.stringify({ 
-          error: 'No scheduled appointment found for today with the provided confirmation code' 
+          error: 'No scheduled appointment found with the provided confirmation code' 
         }), {
           status: 404,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
