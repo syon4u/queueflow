@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Star, Shield } from 'lucide-react';
@@ -22,8 +21,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
       <div className="absolute inset-0 flex items-center justify-center opacity-30">
         <div className="relative w-full h-full overflow-hidden">
           <img 
-            src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&h=600&fit=crop&crop=center" 
-            alt="Digital display screens" 
+            src="https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&h=600&fit=crop&crop=center" 
+            alt="People waiting in a modern office reception area" 
             className="w-full h-full object-cover animate-slow-pan"
           />
           
