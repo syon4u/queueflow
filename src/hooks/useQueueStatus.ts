@@ -62,7 +62,8 @@ export const useQueueStatus = (
                 status,
                 scheduled_time,
                 check_in_time,
-                services!appointments_service_id_fkey(name),
+                location_id,
+                services!appointments_service_id_fkey(name, duration),
                 locations!appointments_location_id_fkey(name),
                 customers!appointments_customer_id_fkey(first_name, last_name)
               )
@@ -88,11 +89,11 @@ export const useQueueStatus = (
               status,
               scheduled_time,
               check_in_time,
+              location_id,
               customers!appointments_customer_id_fkey(first_name, last_name),
-              services!appointments_service_id_fkey(name),
+              services!appointments_service_id_fkey(name, duration),
               locations!appointments_location_id_fkey(name)
             `)
-            .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
             .order('scheduled_time', { ascending: false });
 
           if (lookupError) throw lookupError;
@@ -115,7 +116,8 @@ export const useQueueStatus = (
               scheduled_time,
               status,
               check_in_time,
-              services!appointments_service_id_fkey(name),
+              location_id,
+              services!appointments_service_id_fkey(name, duration),
               locations!appointments_location_id_fkey(name),
               customers!appointments_customer_id_fkey(first_name, last_name)
             )
@@ -146,25 +148,36 @@ export const useQueueStatus = (
 
       console.log('Found appointment:', appointment);
 
-      // Get queue position if checked in
+      // Get queue position and calculate wait time if checked in
       let position = null;
       let estimatedWaitTime = 0;
       let currentWaitTime = 0;
 
       if (appointment.status === 'checked_in' && appointment.check_in_time) {
-        // Get queue position
+        // Get all unserved appointments in the queue for this location
         const { data: queueData, error: queueError } = await supabase
           .from('appointments')
-          .select('id, check_in_time')
-          .eq('location_id', appointment.locations?.id || '')
-          .eq('status', 'checked_in')
+          .select(`
+            id, 
+            check_in_time,
+            services!appointments_service_id_fkey(duration)
+          `)
+          .eq('location_id', appointment.location_id)
+          .in('status', ['checked_in', 'in_progress'])
           .order('check_in_time', { ascending: true });
 
         if (!queueError && queueData) {
           const queuePosition = queueData.findIndex(item => item.id === appointment.id) + 1;
           if (queuePosition > 0) {
             position = queuePosition;
-            estimatedWaitTime = Math.max(0, (position - 1) * 15); // 15 min average
+            
+            // Calculate estimated wait time based on actual service durations
+            // Sum up the service durations of all appointments ahead in line
+            const appointmentsAhead = queueData.slice(0, queuePosition - 1);
+            estimatedWaitTime = appointmentsAhead.reduce((total, apt) => {
+              const serviceDuration = apt.services?.duration || 15; // fallback to 15 min
+              return total + serviceDuration;
+            }, 0);
           }
         }
 
@@ -185,7 +198,7 @@ export const useQueueStatus = (
         scheduled_at: appointment.scheduled_time,
         check_in_time: appointment.check_in_time || undefined,
         ticket_number: appointment.id.slice(-8).toUpperCase(),
-        location_id: appointment.locations?.id || '',
+        location_id: appointment.location_id || '',
         is_checked_in: appointment.status === 'checked_in' || appointment.status === 'in_progress'
       };
 

@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Getting queue position for appointment: ${appointment_id}`);
 
-    // Get the specific appointment
+    // Get the specific appointment with service duration
     const { data: appointment, error: appointmentError } = await supabaseClient
       .from('appointments')
       .select(`
@@ -80,12 +80,16 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Get all checked-in appointments for the same location, ordered by check-in time
+    // Get all unserved appointments for the same location, ordered by check-in time
     const { data: queueData, error: queueError } = await supabaseClient
       .from('appointments')
-      .select('id, check_in_time')
+      .select(`
+        id, 
+        check_in_time,
+        services!appointments_service_id_fkey(duration)
+      `)
       .eq('location_id', appointment.location_id)
-      .eq('status', 'checked_in')
+      .in('status', ['checked_in', 'in_progress'])
       .order('check_in_time', { ascending: true });
 
     if (queueError) {
@@ -110,8 +114,12 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Calculate estimated wait time (position * average service duration)
-    const estimatedWaitTime = Math.max(0, (position - 1) * (appointment.services?.duration || 15));
+    // Calculate estimated wait time using actual service durations
+    const appointmentsAhead = queueData.slice(0, position - 1);
+    const estimatedWaitTime = appointmentsAhead.reduce((total, apt) => {
+      const serviceDuration = apt.services?.duration || 15; // fallback to 15 min
+      return total + serviceDuration;
+    }, 0);
     
     // Calculate actual wait time so far
     const checkInTime = new Date(appointment.check_in_time);

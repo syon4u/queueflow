@@ -74,7 +74,7 @@ const StepCheckInCard = () => {
                 scheduled_time,
                 location_id,
                 customers!appointments_customer_id_fkey(first_name, last_name),
-                services!appointments_service_id_fkey(name),
+                services!appointments_service_id_fkey(name, duration),
                 locations!appointments_location_id_fkey(name)
               )
             `)
@@ -101,7 +101,7 @@ const StepCheckInCard = () => {
               scheduled_time,
               location_id,
               customers!appointments_customer_id_fkey(first_name, last_name),
-              services!appointments_service_id_fkey(name),
+              services!appointments_service_id_fkey(name, duration),
               locations!appointments_location_id_fkey(name)
             `)
             .eq('status', 'scheduled');
@@ -126,7 +126,7 @@ const StepCheckInCard = () => {
               scheduled_time,
               status,
               location_id,
-              services!appointments_service_id_fkey(name),
+              services!appointments_service_id_fkey(name, duration),
               locations!appointments_location_id_fkey(name),
               customers!appointments_customer_id_fkey(first_name, last_name)
             )
@@ -199,23 +199,33 @@ const StepCheckInCard = () => {
 
       if (updateError) throw updateError;
 
-      // Get queue position
+      // Get queue position and calculate wait time based on actual service durations
       const { data: queueData, error: queueError } = await supabase
         .from('appointments')
-        .select('id, check_in_time')
+        .select(`
+          id, 
+          check_in_time,
+          services!appointments_service_id_fkey(duration)
+        `)
         .eq('location_id', appointmentInfo.location_id)
-        .eq('status', 'checked_in')
+        .in('status', ['checked_in', 'in_progress'])
         .order('check_in_time', { ascending: true });
 
       if (queueError) throw queueError;
 
       const position = queueData.findIndex(apt => apt.id === appointmentInfo.id) + 1;
-      const estimatedWaitTime = Math.max(0, (position - 1) * 15); // 15 min average per person
+      
+      // Calculate estimated wait time using actual service durations
+      const appointmentsAhead = queueData.slice(0, position - 1);
+      const estimatedWaitTime = appointmentsAhead.reduce((total, apt) => {
+        const serviceDuration = apt.services?.duration || 15; // fallback to 15 min
+        return total + serviceDuration;
+      }, 0);
 
       setQueueInfo({ position, estimatedWaitTime });
       setStep('success');
 
-      console.log('Check-in successful, position:', position);
+      console.log('Check-in successful, position:', position, 'estimated wait:', estimatedWaitTime);
       
     } catch (error: any) {
       console.error('Check-in error:', error);
