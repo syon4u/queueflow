@@ -4,16 +4,19 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface QueueStatusData {
   appointment_id: string;
-  status: string;
+  status: 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
   position?: number;
   total_in_queue?: number;
   estimated_wait_time_minutes: number;
   current_wait_time_minutes: number;
   customer_name: string;
   service_name: string;
+  location_name: string;
+  scheduled_at: string;
   check_in_time?: string;
   ticket_number: string;
   location_id: string;
+  is_checked_in: boolean;
 }
 
 interface UseQueueStatusReturn {
@@ -160,7 +163,16 @@ export const useQueueStatus = (
 
       if (queueData) {
         console.log('Queue data received:', queueData);
-        setData(queueData);
+        
+        // Transform the data to include check-in status and location name
+        const transformedData: QueueStatusData = {
+          ...queueData,
+          is_checked_in: queueData.status === 'checked_in' || queueData.status === 'in_progress',
+          location_name: 'Main Office', // Default location name since it's not in the response
+          scheduled_at: queueData.scheduled_time || new Date().toISOString()
+        };
+        
+        setData(transformedData);
       } else {
         setError('Unable to retrieve queue status');
       }
