@@ -118,7 +118,7 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       case 'checked_in':
         return 'waiting';
       case 'in_progress':
-        return 'serving';
+        return 'serving'; // This is the key fix - map in_progress to serving
       case 'completed':
         return 'served';
       case 'no_show':
