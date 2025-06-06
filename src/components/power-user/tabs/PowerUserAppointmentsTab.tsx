@@ -1,21 +1,23 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Plus, Search, Filter, Calendar, Users, Clock, PhoneCall, UserX } from 'lucide-react';
+import { format } from 'date-fns';
 import { useAppData } from '@/hooks/useAppData';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AppointmentMetricsCards } from '../appointments/AppointmentMetricsCards';
-import { AppointmentsList } from '../appointments/AppointmentsList';
-import { PerformanceSummary } from '../appointments/PerformanceSummary';
-import { QuickActions } from '../appointments/QuickActions';
 
 export const PowerUserAppointmentsTab: React.FC = () => {
   const { appointments, customers, isLoading, refetch } = useAppData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null);
 
   // Filter for today's appointments
   const today = new Date().toDateString();
@@ -135,32 +137,25 @@ export const PowerUserAppointmentsTab: React.FC = () => {
     }
   };
 
-  const handleAddWalkIn = () => {
-    toast({
-      title: "Walk-in Feature",
-      description: "Walk-in appointment form would open here",
-    });
-  };
-
-  const handleScheduleFollowUp = () => {
-    toast({
-      title: "Follow-up Feature",
-      description: "Follow-up scheduling form would open here",
-    });
-  };
-
-  const handleViewFullQueue = () => {
-    toast({
-      title: "Queue View",
-      description: "Full queue management view would open here",
-    });
-  };
-
   const handleScheduleAppointment = () => {
     toast({
       title: "Schedule Appointment",
       description: "New appointment scheduling form would open here",
     });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'bg-green-50 text-green-700 border-green-200';
+      case 'in_progress': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'checked_in': return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'scheduled': return 'bg-gray-50 text-gray-700 border-gray-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  };
+
+  const formatStatusText = (status: string) => {
+    return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
   if (isLoading) {
@@ -180,17 +175,49 @@ export const PowerUserAppointmentsTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
-      <div className="flex justify-between items-start">
+    <div className="space-y-6">
+      {/* Header Section with Quick Actions */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Appointments Management</h2>
-          <p className="text-gray-600">Monitor today's schedule, queue status, and operational performance</p>
+          <p className="text-gray-600">Monitor today's schedule and queue status</p>
         </div>
-        <Button onClick={handleScheduleAppointment} className="bg-blue-600 hover:bg-blue-700 shadow-sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Schedule Appointment
-        </Button>
+        
+        {/* Quick Actions - Now in header */}
+        <div className="flex flex-wrap gap-3">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => toast({ title: "Check In", description: "Check in feature would open here" })}
+          >
+            <UserX className="h-4 w-4 mr-2" />
+            Check In Customer
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => toast({ title: "Queue View", description: "Full queue view would open here" })}
+          >
+            <Users className="h-4 w-4 mr-2" />
+            View Queue
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => toast({ title: "Walk-in", description: "Add walk-in form would open here" })}
+          >
+            <Clock className="h-4 w-4 mr-2" />
+            Add Walk-in
+          </Button>
+          <Button 
+            onClick={handleScheduleAppointment} 
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Schedule Appointment
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics Cards */}
@@ -201,43 +228,139 @@ export const PowerUserAppointmentsTab: React.FC = () => {
         avgServiceTime={avgServiceTime}
       />
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Today's Schedule */}
-        <div className="lg:col-span-2">
-          <AppointmentsList
-            appointments={filteredAppointments}
-            searchTerm={searchTerm}
-            statusFilter={statusFilter}
-            selectedAppointment={selectedAppointment}
-            onSearchChange={setSearchTerm}
-            onStatusFilterChange={setStatusFilter}
-            onAppointmentSelect={setSelectedAppointment}
-            onCheckIn={handleCheckIn}
-            onStartService={handleStartService}
-            onCompleteService={handleCompleteService}
-            onScheduleAppointment={handleScheduleAppointment}
-          />
-        </div>
-
-        {/* Performance Summary and Actions */}
-        <div className="space-y-6">
-          <PerformanceSummary
-            completionRate={todaysAppointments.length > 0 
-              ? Math.round((completedToday.length / todaysAppointments.length) * 100)
-              : 0}
-            activeCustomers={queueStats.inProgress}
-            queueLength={queueStats.waiting}
-            totalCustomers={customers.length}
-          />
-
-          <QuickActions
-            onViewFullQueue={handleViewFullQueue}
-            onAddWalkIn={handleAddWalkIn}
-            onScheduleFollowUp={handleScheduleFollowUp}
-          />
-        </div>
-      </div>
+      {/* Simplified Today's Schedule */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Calendar className="h-5 w-5 text-blue-600" />
+              Today's Schedule
+            </CardTitle>
+            <Badge variant="outline">
+              {filteredAppointments.length} appointments
+            </Badge>
+          </div>
+          
+          <div className="flex gap-4 mt-4">
+            <div className="relative flex-1">
+              <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+              <Input
+                placeholder="Search customers or services..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="checked_in">Checked In</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-0">
+          {filteredAppointments.length === 0 ? (
+            <div className="text-center py-12 px-6">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {searchTerm || statusFilter !== 'all' ? 'No matching appointments' : 'No appointments today'}
+              </h3>
+              <p className="text-gray-500 mb-4">
+                {searchTerm || statusFilter !== 'all' 
+                  ? 'Try adjusting your search or filter criteria'
+                  : 'Schedule your first appointment to get started'
+                }
+              </p>
+              {!searchTerm && statusFilter === 'all' && (
+                <Button onClick={handleScheduleAppointment} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Schedule Appointment
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAppointments.map((appointment) => (
+                  <TableRow key={appointment.id}>
+                    <TableCell className="font-medium">
+                      {format(new Date(appointment.scheduled_time), 'h:mm a')}
+                    </TableCell>
+                    <TableCell>
+                      {appointment.customer?.first_name} {appointment.customer?.last_name}
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{appointment.service?.name}</div>
+                        <div className="text-sm text-gray-500">{appointment.service?.duration} min</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant="outline" 
+                        className={`${getStatusColor(appointment.status)} text-xs font-medium`}
+                      >
+                        {formatStatusText(appointment.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        {appointment.status === 'scheduled' && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleCheckIn(appointment.id)}
+                            className="h-8 text-xs"
+                          >
+                            Check In
+                          </Button>
+                        )}
+                        {appointment.status === 'checked_in' && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleStartService(appointment.id)}
+                            className="h-8 text-xs bg-blue-600 hover:bg-blue-700"
+                          >
+                            Start Service
+                          </Button>
+                        )}
+                        {appointment.status === 'in_progress' && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleCompleteService(appointment.id)}
+                            className="h-8 text-xs bg-green-600 hover:bg-green-700"
+                          >
+                            Complete
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
