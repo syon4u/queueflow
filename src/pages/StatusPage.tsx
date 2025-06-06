@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Clock, MapPin, Calendar, User, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Calendar, User, CheckCircle, XCircle, Users, Timer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useQueueStatus } from '@/hooks/useQueueStatus';
 
@@ -222,19 +222,53 @@ const StatusPage: React.FC = () => {
                   })()}
                 </div>
 
-                {/* Queue Position (only if checked in) */}
+                {/* ENHANCED Queue Position - More Prominent Display */}
                 {statusData.is_checked_in && statusData.position && (
-                  <div className="text-center bg-blue-50 rounded-lg p-4">
-                    <div className="text-4xl font-bold text-blue-600 mb-1">
-                      #{statusData.position}
-                    </div>
-                    <p className="text-gray-600">Your position in line</p>
-                    {statusData.estimated_wait_time_minutes > 0 && (
-                      <div className="flex items-center justify-center mt-2 text-blue-600">
-                        <Clock className="h-4 w-4 mr-1" />
-                        <span>≈ {statusData.estimated_wait_time_minutes} min wait</span>
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-6 border border-blue-200">
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Users className="h-6 w-6 text-blue-600" />
+                        <h3 className="text-xl font-semibold text-blue-900">Your Queue Position</h3>
                       </div>
-                    )}
+                      
+                      {/* Large Position Number */}
+                      <div className="bg-white rounded-lg p-4 shadow-sm border border-blue-300">
+                        <div className="text-5xl font-bold text-blue-600 mb-1">
+                          #{statusData.position}
+                        </div>
+                        <p className="text-blue-700 font-medium">
+                          {statusData.position === 1 ? "You're next!" : `${statusData.position - 1} people ahead of you`}
+                        </p>
+                      </div>
+
+                      {/* Estimated Wait Time */}
+                      {statusData.estimated_wait_time_minutes > 0 && (
+                        <div className="bg-white rounded-lg p-4 shadow-sm border border-blue-300">
+                          <div className="flex items-center justify-center gap-2 mb-2">
+                            <Timer className="h-5 w-5 text-orange-500" />
+                            <span className="text-lg font-semibold text-gray-900">Estimated Wait</span>
+                          </div>
+                          <div className="text-3xl font-bold text-orange-600">
+                            ≈ {statusData.estimated_wait_time_minutes} min
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Based on current queue and service times
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Current Wait Time */}
+                      {statusData.current_wait_time_minutes > 0 && (
+                        <div className="text-center">
+                          <div className="flex items-center justify-center gap-1 text-gray-600">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-sm">
+                              You've been waiting for {statusData.current_wait_time_minutes} min
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -303,6 +337,14 @@ const StatusPage: React.FC = () => {
                         Check In Now
                       </Button>
                     </Link>
+                  </div>
+                )}
+
+                {/* Auto-refresh notice */}
+                {statusData.is_checked_in && (
+                  <div className="text-center text-xs text-gray-500 bg-gray-100 rounded-lg p-3">
+                    <Clock className="h-4 w-4 inline mr-1" />
+                    Queue information updates every 30 seconds
                   </div>
                 )}
 
