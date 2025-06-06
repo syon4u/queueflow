@@ -6,6 +6,7 @@ import { LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
+
 interface NavigationGroup {
   label: string;
   items: NavigationItem[];
@@ -76,7 +77,7 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
                 {group.items.map(item => <SidebarMenuItem key={item.id}>
                     <SidebarMenuButton onClick={() => onItemChange(item.id)} isActive={activeItem === item.id} className={`
                         w-full justify-start p-3 rounded-lg transition-all duration-200 group
-                        ${activeItem === item.id ? 'bg-bc-blue text-white shadow-sm' : 'hover:bg-muted text-muted-foreground hover:text-foreground'}
+                        ${activeItem === item.id ? 'bg-black text-white shadow-sm' : 'hover:bg-muted text-muted-foreground hover:text-foreground'}
                       `}>
                       <item.icon className={`h-4 w-4 mr-3 flex-shrink-0 ${activeItem === item.id ? 'text-white' : 'text-muted-foreground group-hover:text-foreground'}`} />
                       <div className="flex-1 text-left min-w-0">
