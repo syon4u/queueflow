@@ -16,10 +16,10 @@ export const useAuth = (): AuthContextType => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Create a mock user for access since JWT verification is disabled
-  const mockUser: User = {
-    id: 'mock-user-id',
-    email: 'test@example.com',
+  // Create a mock user for admin access since authentication is disabled
+  const mockAdminUser: User = {
+    id: 'mock-admin-user-id',
+    email: 'admin@broward.gov',
     aud: 'authenticated',
     role: 'authenticated',
     created_at: new Date().toISOString(),
@@ -33,13 +33,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     confirmed_at: new Date().toISOString()
   };
 
-  const [user, setUser] = useState<User | null>(mockUser);
+  const [user, setUser] = useState<User | null>(mockAdminUser);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [role, setRole] = useState<UserRoleType | null>('staff');
+  const [role, setRole] = useState<UserRoleType | null>('admin');
 
   useEffect(() => {
-    console.log('AuthProvider: JWT verification disabled - using mock user');
+    console.log('AuthProvider: Authentication disabled - using mock admin user');
     setLoading(false);
   }, []);
 
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
   };
 
-  console.log('AuthProvider: Current state (JWT disabled):', {
+  console.log('AuthProvider: Current state (auth disabled):', {
     hasUser: !!user,
     hasSession: !!session,
     role,

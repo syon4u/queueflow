@@ -1,91 +1,52 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus } from 'lucide-react';
+import { Users, Search, Plus, Edit, Trash2, Shield, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { UserStatsCards } from '../users/UserStatsCards';
-import { UserSearchFilters } from '../users/UserSearchFilters';
-import { UserTable } from '../users/UserTable';
-
 interface User {
   id: string;
   email: string;
   role: string;
   created_at: string;
   last_sign_in_at: string;
-  first_name?: string;
-  last_name?: string;
 }
-
 export const UserAdministrationTab: React.FC = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-
-  // Fetch users by combining auth users with profiles and roles
-  const { data: users = [], isLoading, refetch } = useQuery({
-    queryKey: ['staff-users'],
+  const {
+    data: users = [],
+    isLoading,
+    refetch
+  } = useQuery({
+    queryKey: ['users-with-roles'],
     queryFn: async () => {
-      // Get all users with roles (staff, admin, power_user only)
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role')
-        .in('role', ['admin', 'staff', 'power_user']);
-      
-      if (rolesError) throw rolesError;
-      
-      if (!userRoles || userRoles.length === 0) {
-        return [];
-      }
-
-      // Get profiles for these users
-      const userIds = userRoles.map(ur => ur.user_id);
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // Get auth data using the RPC function
-      const { data: authUsers, error: authError } = await supabase.rpc('get_users_with_roles');
-      
-      if (authError) throw authError;
-
-      // Combine the data
-      return userRoles.map(userRole => {
-        const profile = profiles?.find(p => p.id === userRole.user_id);
-        const authUser = authUsers?.find(au => au.id === userRole.user_id);
-        
-        return {
-          id: userRole.user_id,
-          email: authUser?.email || profile?.email || '',
-          role: userRole.role,
-          created_at: authUser?.created_at || '',
-          last_sign_in_at: authUser?.last_sign_in_at || '',
-          first_name: profile?.first_name || '',
-          last_name: profile?.last_name || '',
-        } as User;
-      }).filter(user => user.email); // Filter out users without email
+      const {
+        data,
+        error
+      } = await supabase.rpc('get_users_with_roles');
+      if (error) throw error;
+      return data as User[];
     }
   });
-
   const filteredUsers = users.filter(user => {
-    const matchesSearch = searchTerm === '' || 
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === '' || user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     return matchesSearch && matchesRole;
   });
-
   const handleUpdateRole = async (userId: string, newRole: string) => {
     try {
-      const { error } = await supabase.rpc('update_user_role', {
+      const {
+        error
+      } = await supabase.rpc('update_user_role', {
         target_user_id: userId,
         new_role: newRole
       });
@@ -103,14 +64,12 @@ export const UserAdministrationTab: React.FC = () => {
       });
     }
   };
-
   const handleCreateUser = () => {
     toast({
       title: "Create User",
       description: "User creation form would open here"
     });
   };
-
   const handleEditUser = (userId: string) => {
     setSelectedUser(userId);
     toast({
@@ -118,7 +77,6 @@ export const UserAdministrationTab: React.FC = () => {
       description: "User edit form would open here"
     });
   };
-
   const handleDeleteUser = (userId: string) => {
     toast({
       title: "Delete User",
@@ -126,7 +84,6 @@ export const UserAdministrationTab: React.FC = () => {
       variant: "destructive"
     });
   };
-
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin':
@@ -141,36 +98,27 @@ export const UserAdministrationTab: React.FC = () => {
         return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
-
   const formatRole = (role: string) => {
     return role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
-
   const roleStats = {
     admin: users.filter(u => u.role === 'admin').length,
     staff: users.filter(u => u.role === 'staff').length,
     power_user: users.filter(u => u.role === 'power_user').length,
     customer: users.filter(u => u.role === 'customer').length
   };
-
   if (isLoading) {
-    return (
-      <div className="space-y-6">
+    return <div className="space-y-6">
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
-            ))}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>)}
           </div>
           <div className="h-96 bg-gray-200 rounded-lg"></div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="space-y-8">
+  return <div className="space-y-8">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -184,37 +132,151 @@ export const UserAdministrationTab: React.FC = () => {
       </div>
 
       {/* Role Statistics */}
-      <UserStatsCards roleStats={roleStats} />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-red-50 to-red-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-red-700 mb-1">Administrators</p>
+                <p className="text-3xl font-bold text-red-900">{roleStats.admin}</p>
+              </div>
+              <Shield className="h-8 w-8 text-red-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-700 mb-1">Power Users</p>
+                <p className="text-3xl font-bold text-purple-900">{roleStats.power_user}</p>
+              </div>
+              <UserCheck className="h-8 w-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-blue-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-700 mb-1">Staff Members</p>
+                <p className="text-3xl font-bold text-blue-900">{roleStats.staff}</p>
+              </div>
+              <Users className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-gray-50 to-gray-100">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Customers</p>
+                <p className="text-3xl font-bold text-gray-900">{roleStats.customer}</p>
+              </div>
+              <Users className="h-8 w-8 text-gray-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* User Management */}
       <Card className="border-0 shadow-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
+            
             <Badge variant="outline">{filteredUsers.length} users</Badge>
           </div>
           
           {/* Search and Filter Controls */}
-          <UserSearchFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            roleFilter={roleFilter}
-            setRoleFilter={setRoleFilter}
-          />
+          <div className="flex gap-4 mt-4">
+            <div className="relative flex-1">
+              <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+              <Input placeholder="Search by email..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+            </div>
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="admin">Administrator</SelectItem>
+                <SelectItem value="power_user">Power User</SelectItem>
+                <SelectItem value="staff">Staff</SelectItem>
+                <SelectItem value="customer">Customer</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         
         <CardContent className="p-0">
-          <UserTable
-            filteredUsers={filteredUsers}
-            selectedUser={selectedUser}
-            setSelectedUser={setSelectedUser}
-            handleUpdateRole={handleUpdateRole}
-            handleEditUser={handleEditUser}
-            handleDeleteUser={handleDeleteUser}
-            getRoleBadgeColor={getRoleBadgeColor}
-            formatRole={formatRole}
-          />
+          {filteredUsers.length === 0 ? <div className="text-center py-12 px-6">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+              <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+            </div> : <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">User</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">Role</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">Created</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">Last Sign In</th>
+                    <th className="text-left py-3 px-6 font-medium text-gray-900">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user, index) => <tr key={user.id} className={`border-b hover:bg-gray-50 transition-colors ${selectedUser === user.id ? 'bg-blue-50' : ''}`} onClick={() => setSelectedUser(user.id)}>
+                      <td className="py-4 px-6">
+                        <div>
+                          <p className="font-medium text-gray-900">{user.email}</p>
+                          <p className="text-sm text-gray-500">ID: {user.id.slice(0, 8)}...</p>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <Select value={user.role} onValueChange={newRole => handleUpdateRole(user.id, newRole)}>
+                          <SelectTrigger className="w-32">
+                            <Badge variant="outline" className={`${getRoleBadgeColor(user.role)} border-0`}>
+                              {formatRole(user.role)}
+                            </Badge>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Administrator</SelectItem>
+                            <SelectItem value="power_user">Power User</SelectItem>
+                            <SelectItem value="staff">Staff</SelectItem>
+                            <SelectItem value="customer">Customer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-500">
+                        {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-500">
+                        {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never'}
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={e => {
+                      e.stopPropagation();
+                      handleEditUser(user.id);
+                    }}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={e => {
+                      e.stopPropagation();
+                      handleDeleteUser(user.id);
+                    }} className="text-red-600 hover:text-red-700">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>)}
+                </tbody>
+              </table>
+            </div>}
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
