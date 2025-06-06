@@ -18,9 +18,12 @@ const CTASection: React.FC = () => {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-blue-600 px-8" asChild>
-            <Link to="/status">Check Status</Link>
-          </Button>
+          <Link 
+            to="/status"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white text-white hover:bg-white hover:text-blue-600 hover:translate-y-[-1px] h-11 px-8 w-full sm:w-auto"
+          >
+            Check Status
+          </Link>
           <Link 
             to="/check-in" 
             className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-blue-700 hover:translate-y-[-1px] h-11 px-8 w-full sm:w-auto text-white"

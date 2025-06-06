@@ -29,9 +29,12 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
             <Button variant="ghost" asChild>
               <Link to="/customer">Book</Link>
             </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/status">Status</Link>
-            </Button>
+            <Link 
+              to="/status"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2"
+            >
+              Status
+            </Link>
             <Link 
               to="/check-in" 
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2"
@@ -63,9 +66,12 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               <Button variant="ghost" className="justify-start" asChild>
                 <Link to="/customer">Book Appointment</Link>
               </Button>
-              <Button variant="ghost" className="justify-start" asChild>
-                <Link to="/status">Check Status</Link>
-              </Button>
+              <Link 
+                to="/status"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2 justify-start"
+              >
+                Check Status
+              </Link>
               <Link 
                 to="/check-in" 
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2 justify-start"
