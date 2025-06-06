@@ -89,7 +89,7 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
               ))
             ) : (
               !isLoading && locationId && (
-                <SelectItem value="" disabled>
+                <SelectItem value="no-services" disabled>
                   No services available for this location
                 </SelectItem>
               )

@@ -33,7 +33,7 @@ export const BreakRequestForm: React.FC<BreakRequestFormProps> = ({
 }) => {
   const [breakType, setBreakType] = useState<'short' | 'lunch' | 'meeting' | 'training' | 'emergency'>('short');
   const [duration, setDuration] = useState(15);
-  const [handoverStaffId, setHandoverStaffId] = useState<string>('');
+  const [handoverStaffId, setHandoverStaffId] = useState<string>('no-handover');
   const [reason, setReason] = useState('');
 
   const breakTypeOptions = [
@@ -54,10 +54,11 @@ export const BreakRequestForm: React.FC<BreakRequestFormProps> = ({
   };
 
   const handleRequestBreak = async () => {
-    const success = await onRequestBreak(breakType, duration, handoverStaffId || undefined, reason || undefined);
+    const staffId = handoverStaffId === 'no-handover' ? undefined : handoverStaffId;
+    const success = await onRequestBreak(breakType, duration, staffId, reason || undefined);
     if (success) {
       setReason('');
-      setHandoverStaffId('');
+      setHandoverStaffId('no-handover');
     }
   };
 
@@ -122,7 +123,7 @@ export const BreakRequestForm: React.FC<BreakRequestFormProps> = ({
               <SelectValue placeholder="Select staff member for coverage" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No handover needed</SelectItem>
+              <SelectItem value="no-handover">No handover needed</SelectItem>
               {availableStaff
                 .filter(staff => staff.canCover)
                 .map((staff) => (
