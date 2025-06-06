@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { BaseSidebar } from './BaseSidebar';
 import { 
@@ -8,7 +7,6 @@ import {
   BarChart3, 
   Calendar,
   ClipboardList,
-  Settings,
   Home,
   Plus,
   Bell
@@ -69,12 +67,6 @@ const navigationGroups = [
         label: 'Appointment Overrides',
         icon: ClipboardList,
         description: 'Special appointment management'
-      },
-      {
-        id: 'settings',
-        label: 'Settings',
-        icon: Settings,
-        description: 'Power user preferences'
       }
     ]
   }

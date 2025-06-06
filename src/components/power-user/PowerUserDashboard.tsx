@@ -38,21 +38,6 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
         return <ReportsAnalyticsTab />;
       case 'overrides':
         return <AppointmentOverridesTab />;
-      case 'settings':
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Settings</h2>
-              <p className="text-sm text-gray-500">Configure your preferences and operational settings</p>
-            </div>
-            
-            <Card className="bg-gray-50">
-              <CardContent className="p-6">
-                <p className="text-gray-600">Settings panel coming soon. This will include notification preferences, default views, and operational settings.</p>
-              </CardContent>
-            </Card>
-          </div>
-        );
       default:
         return <PowerUserAppointmentsTab />;
     }
