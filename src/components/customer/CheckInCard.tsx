@@ -52,14 +52,9 @@ const CheckInCard = () => {
         }
 
         if (customerData && customerData.appointments && customerData.appointments.length > 0) {
-          // Find valid appointment (within reasonable time range - 7 days)
-          const now = new Date();
-          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-          
+          // Find valid appointment (any scheduled appointment)
           const validAppointment = customerData.appointments.find(apt => {
-            const aptDate = new Date(apt.scheduled_time);
-            return apt.status === 'scheduled' && aptDate >= weekAgo && aptDate <= weekFromNow;
+            return apt.status === 'scheduled';
           });
 
           if (validAppointment) {
@@ -78,9 +73,7 @@ const CheckInCard = () => {
             scheduled_time,
             customers!appointments_customer_id_fkey(first_name, last_name)
           `)
-          .eq('status', 'scheduled')
-          .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Last 7 days
-          .lte('scheduled_time', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()); // Next 7 days
+          .eq('status', 'scheduled');
 
         if (searchError) {
           console.error('CheckInCard - Appointment search error:', searchError);
