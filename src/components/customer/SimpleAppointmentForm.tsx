@@ -66,12 +66,12 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+      <CardHeader className="text-left">
+        <CardTitle className="flex items-center gap-2 text-left">
           <User className="h-5 w-5" />
           Request an Appointment
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-left">
           Fill out this form and we'll contact you to schedule your appointment
         </CardDescription>
       </CardHeader>
