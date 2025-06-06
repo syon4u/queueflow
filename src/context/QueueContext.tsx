@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
 
 export interface Customer {
   id: string;
@@ -62,12 +62,14 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [locationId] = useState('default-location');
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch today's appointments from the database
   const { data: appointmentsData = [] } = useQuery({
     queryKey: ['queue-appointments'],
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
+      
       const { data, error } = await supabase
         .from('appointments')
         .select(`
@@ -90,6 +92,8 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         console.error('Error fetching appointments:', error);
         throw error;
       }
+
+      console.log('QueueContext - Raw appointments data:', data);
 
       // Transform database data to Customer interface
       return data.map(appointment => ({
@@ -209,41 +213,58 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const nextCustomer = waitingCustomers[0];
 
     try {
+      console.log('Calling next customer:', nextCustomer.id);
+      
       // Update appointment status to in_progress
       const { error } = await supabase
         .from('appointments')
         .update({ 
           status: 'in_progress',
-          start_time: new Date().toISOString()
+          start_time: new Date().toISOString(),
+          staff_id: user?.id
         })
         .eq('id', nextCustomer.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error calling next customer:', error);
+        throw error;
+      }
 
       // Refresh the data
       queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
-      setIsLoading(false);
+      console.log('Successfully called next customer');
       toast({
         title: 'Customer Called',
         description: `${nextCustomer.name} is now being served`,
       });
     } catch (error) {
       console.error('Error calling next customer:', error);
-      setIsLoading(false);
       toast({
         title: 'Error',
-        description: 'Failed to call next customer',
+        description: 'Failed to call next customer. Please try again.',
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const markAsServed = async () => {
-    if (!currentCustomer) return;
+    if (!currentCustomer) {
+      toast({
+        title: 'No Customer Being Served',
+        description: 'No customer is currently being served.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsLoading(true);
+    
     try {
+      console.log('Marking customer as served:', currentCustomer.id);
+      
       // Update appointment status to completed
       const { error } = await supabase
         .from('appointments')
@@ -251,58 +272,81 @@ export const QueueProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           status: 'completed',
           end_time: new Date().toISOString()
         })
-        .eq('id', currentCustomer.id);
+        .eq('id', currentCustomer.id)
+        .eq('status', 'in_progress'); // Only update if currently in progress
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error marking customer as served:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
 
-      // Refresh the data
-      queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
+      // Refresh the data to get updated state
+      await queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
-      setIsLoading(false);
+      console.log('Successfully marked customer as served');
       toast({
         title: 'Customer Served',
         description: `${currentCustomer.name} has been marked as served`,
       });
     } catch (error) {
       console.error('Error marking customer as served:', error);
-      setIsLoading(false);
       toast({
         title: 'Error',
-        description: 'Failed to mark customer as served',
+        description: `Failed to mark customer as served: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const markAsNoShow = async () => {
-    if (!currentCustomer) return;
+    if (!currentCustomer) {
+      toast({
+        title: 'No Customer Being Served',
+        description: 'No customer is currently being served.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsLoading(true);
+    
     try {
+      console.log('Marking customer as no-show:', currentCustomer.id);
+      
       // Update appointment status to no_show
       const { error } = await supabase
         .from('appointments')
-        .update({ status: 'no_show' })
-        .eq('id', currentCustomer.id);
+        .update({ 
+          status: 'no_show',
+          end_time: new Date().toISOString()
+        })
+        .eq('id', currentCustomer.id)
+        .in('status', ['checked_in', 'in_progress']); // Can mark as no-show from either status
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error marking customer as no-show:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
 
       // Refresh the data
-      queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
+      await queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
-      setIsLoading(false);
+      console.log('Successfully marked customer as no-show');
       toast({
         title: 'Marked as No-Show',
         description: `${currentCustomer.name} has been marked as no-show`,
       });
     } catch (error) {
       console.error('Error marking customer as no-show:', error);
-      setIsLoading(false);
       toast({
         title: 'Error',
-        description: 'Failed to mark customer as no-show',
+        description: `Failed to mark customer as no-show: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
