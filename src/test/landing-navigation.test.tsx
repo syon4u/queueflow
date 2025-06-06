@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import CTASection from '@/components/landing/CTASection';
 import Navigation from '@/components/landing/Navigation';
+import StatusPage from '@/pages/StatusPage';
 
 // Mock the react-router-dom to track navigation
 const mockNavigate = vi.fn();
@@ -15,6 +16,28 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+// Mock the useQueueStatus hook
+vi.mock('@/hooks/useQueueStatus', () => ({
+  useQueueStatus: () => ({
+    data: {
+      id: 'test-id',
+      status: 'scheduled',
+      is_checked_in: false,
+      customer_name: 'Test User',
+      location_name: 'Test Location',
+      service_name: 'Test Service',
+      scheduled_at: '2025-06-06T10:00:00Z',
+      position: null,
+      estimated_wait_time_minutes: 0,
+      check_in_time: null,
+      ticket_number: 'TEST-123'
+    },
+    isLoading: false,
+    error: null,
+    refetch: vi.fn()
+  })
+}));
 
 const renderWithRouter = (component: React.ReactElement) => {
   return render(
@@ -88,6 +111,22 @@ describe('Landing Page Navigation', () => {
       
       expect(mobileStatusLink).toHaveAttribute('href', '/status');
       expect(mobileCheckInLink).toHaveAttribute('href', '/check-in');
+    });
+  });
+
+  describe('StatusPage Check In Navigation', () => {
+    it('renders Check In Now button with correct link when appointment is scheduled', () => {
+      const { getByRole } = renderWithRouter(<StatusPage />);
+      
+      // First submit the form to show status data
+      const confirmationInput = getByRole('textbox', { name: /confirmation number/i });
+      const submitButton = getByRole('button', { name: /find my status/i });
+      
+      // Mock form submission would trigger the status display
+      // The Check In Now button should appear for scheduled appointments
+      const checkInButton = getByRole('link', { name: /check in now/i });
+      expect(checkInButton).toBeInTheDocument();
+      expect(checkInButton).toHaveAttribute('href', '/check-in');
     });
   });
 });
