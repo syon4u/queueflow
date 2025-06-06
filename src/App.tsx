@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +24,13 @@ import CheckInPage from "./pages/CheckInPage";
 import "./App.css";
 
 const queryClient = new QueryClient();
+
+// Loading component for i18n
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -90,36 +97,38 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen bg-gray-50">
-              {!isOnline && (
-                <div className="bg-yellow-500 text-yellow-900 text-center py-2 px-4 text-sm font-medium">
-                  You're currently offline. Some features may not be available.
-                </div>
-              )}
-              
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/customer" element={<CustomerPage />} />
-                <Route path="/staff" element={<StaffPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/power-user" element={<PowerUserPage />} />
-                <Route path="/queue" element={<VirtualQueuePage />} />
-                <Route path="/status" element={<StatusPage />} />
-                <Route path="/check-in" element={<CheckInPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/kiosk" element={<KioskPage />} />
-                <Route path="/signage" element={<DigitalSignagePage />} />
-                <Route path="/mobile-queue" element={<MobileQueuePage />} />
-                <Route path="/staff-roles" element={
-                  <div>
-                    <RoleDashboardWrapper />
+          <Suspense fallback={<LoadingFallback />}>
+            <BrowserRouter>
+              <div className="min-h-screen bg-gray-50">
+                {!isOnline && (
+                  <div className="bg-yellow-500 text-yellow-900 text-center py-2 px-4 text-sm font-medium">
+                    You're currently offline. Some features may not be available.
                   </div>
-                } />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
+                )}
+                
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/customer" element={<CustomerPage />} />
+                  <Route path="/staff" element={<StaffPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/power-user" element={<PowerUserPage />} />
+                  <Route path="/queue" element={<VirtualQueuePage />} />
+                  <Route path="/status" element={<StatusPage />} />
+                  <Route path="/check-in" element={<CheckInPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/kiosk" element={<KioskPage />} />
+                  <Route path="/signage" element={<DigitalSignagePage />} />
+                  <Route path="/mobile-queue" element={<MobileQueuePage />} />
+                  <Route path="/staff-roles" element={
+                    <div>
+                      <RoleDashboardWrapper />
+                    </div>
+                  } />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </div>
+            </BrowserRouter>
+          </Suspense>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
