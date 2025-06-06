@@ -27,30 +27,27 @@ export const UserAdministrationTab: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
+  // Use the new staff_view for unified data
   const { data: users = [], isLoading, refetch } = useQuery({
-    queryKey: ['users-with-roles'],
+    queryKey: ['staff-users'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_users_with_roles');
+      const { data, error } = await supabase
+        .from('staff_view')
+        .select('*')
+        .order('auth_created_at', { ascending: false });
+      
       if (error) throw error;
       
-      // Get profiles for additional user info
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, email');
-      
-      if (profilesError) console.error('Error fetching profiles:', profilesError);
-      
-      // Merge user data with profile data
-      const usersWithProfiles = (data as User[]).map(user => {
-        const profile = profiles?.find(p => p.id === user.id);
-        return {
-          ...user,
-          first_name: profile?.first_name || '',
-          last_name: profile?.last_name || '',
-        };
-      });
-      
-      return usersWithProfiles;
+      // Transform the data to match the expected User interface
+      return (data || []).map(user => ({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        created_at: user.auth_created_at,
+        last_sign_in_at: user.last_sign_in_at,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      })) as User[];
     }
   });
 
