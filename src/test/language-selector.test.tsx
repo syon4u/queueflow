@@ -1,6 +1,6 @@
 
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { screen } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
@@ -22,7 +22,7 @@ describe('LanguageSelector', () => {
   it('renders language selector with globe icon', () => {
     renderWithProviders(<LanguageSelector />);
     
-    const selector = screen.getByRole('button');
+    const selector = screen.getByRole('button', { name: /english/i });
     expect(selector).toBeInTheDocument();
   });
 
@@ -30,7 +30,7 @@ describe('LanguageSelector', () => {
     const user = userEvent.setup();
     renderWithProviders(<LanguageSelector />);
     
-    const selector = screen.getByRole('button');
+    const selector = screen.getByRole('button', { name: /english/i });
     await user.click(selector);
     
     expect(screen.getByText('English')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('LanguageSelector', () => {
     const user = userEvent.setup();
     renderWithProviders(<LanguageSelector />);
     
-    const selector = screen.getByRole('button');
+    const selector = screen.getByRole('button', { name: /english/i });
     await user.click(selector);
     
     const spanishOption = screen.getByText('Español');
