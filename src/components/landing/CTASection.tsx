@@ -5,6 +5,10 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CTASection: React.FC = () => {
+  const handleCheckInClick = () => {
+    console.log('CTASection: Check In Now button clicked - navigating to /check-in');
+  };
+
   return (
     <section className="py-16 bg-blue-600">
       <div className="container mx-auto px-4 text-center">
@@ -22,7 +26,7 @@ const CTASection: React.FC = () => {
             <Link to="/status">Check Status</Link>
           </Button>
           <Button size="lg" variant="ghost" className="w-full sm:w-auto text-white hover:bg-blue-700 px-8" asChild>
-            <Link to="/check-in">Check In Now</Link>
+            <Link to="/check-in" onClick={handleCheckInClick}>Check In Now</Link>
           </Button>
         </div>
       </div>
