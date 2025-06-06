@@ -12,10 +12,6 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffAccess }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleCheckInClick = () => {
-    console.log('Navigation: Check In button clicked - navigating to /check-in');
-  };
-
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -37,7 +33,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               <Link to="/status">Status</Link>
             </Button>
             <Button variant="ghost" asChild>
-              <Link to="/check-in" onClick={handleCheckInClick}>Check In</Link>
+              <Link to="/check-in">Check In</Link>
             </Button>
             <div className="ml-4 pl-4 border-l border-gray-200">
               <Button variant="outline" size="sm" onClick={onToggleStaffAccess}>
@@ -68,7 +64,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                 <Link to="/status">Check Status</Link>
               </Button>
               <Button variant="ghost" className="justify-start" asChild>
-                <Link to="/check-in" onClick={handleCheckInClick}>Check In Now</Link>
+                <Link to="/check-in">Check In Now</Link>
               </Button>
               <Button variant="outline" className="justify-start mt-4" onClick={onToggleStaffAccess}>
                 Employee Login
