@@ -3,9 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Clock, Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import LanguageSelector from './LanguageSelector';
-import LoginDrawer from './LoginDrawer';
 
 interface NavigationProps {
   showStaffAccess: boolean;
@@ -13,78 +10,82 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffAccess }) => {
-  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   return (
-    <>
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">
-                {t('landing.appName', 'Queue Flow')}
-              </span>
+    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Clock className="h-5 w-5 text-white" />
             </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
-              <LanguageSelector />
-              <div className="ml-4 pl-4 border-l border-gray-200">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setLoginDrawerOpen(true)}
-                >
-                  {t('auth.access', 'Access')}
-                </Button>
-              </div>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+            <span className="text-xl font-bold text-gray-900">Queue Flow</span>
           </div>
 
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 py-4">
-              <div className="flex flex-col space-y-2">
-                <div className="flex justify-center mb-4">
-                  <LanguageSelector />
-                </div>
-                <Button 
-                  variant="outline" 
-                  className="justify-start" 
-                  onClick={() => {
-                    setLoginDrawerOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  {t('auth.access', 'Access')}
-                </Button>
-              </div>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Button variant="ghost" asChild>
+              <Link to="/customer">Book</Link>
+            </Button>
+            <Link 
+              to="/status"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2"
+            >
+              Status
+            </Link>
+            <Link 
+              to="/check-in" 
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2"
+            >
+              Check In
+            </Link>
+            <div className="ml-4 pl-4 border-l border-gray-200">
+              <Button variant="outline" size="sm" onClick={onToggleStaffAccess}>
+                Employee Login
+              </Button>
             </div>
-          )}
-        </div>
-      </nav>
+          </div>
 
-      <LoginDrawer 
-        isOpen={loginDrawerOpen} 
-        onClose={() => setLoginDrawerOpen(false)} 
-      />
-    </>
+          {/* Mobile Menu Button */}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="flex flex-col space-y-2">
+              <Button variant="ghost" className="justify-start" asChild>
+                <Link to="/customer">Book Appointment</Link>
+              </Button>
+              <Link 
+                to="/status"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2 justify-start"
+              >
+                Check Status
+              </Link>
+              <Link 
+                to="/check-in" 
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground hover:translate-y-[-1px] h-10 px-4 py-2 justify-start"
+              >
+                Check In Now
+              </Link>
+              <Button variant="outline" className="justify-start mt-4" onClick={onToggleStaffAccess}>
+                Employee Login
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
   );
 };
 
