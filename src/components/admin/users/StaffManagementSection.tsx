@@ -40,10 +40,9 @@ export const StaffManagementSection: React.FC<StaffManagementSectionProps> = ({
     <div className="space-y-6 mt-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Staff Members & Role Assignments</h2>
-          <p className="text-sm text-gray-500">Manage staff profiles, role assignments, and location access permissions</p>
+          <h2 className="text-lg font-semibold text-slate-900">Staff Members & Role Assignments</h2>
         </div>
-        <Button onClick={handleAddClick} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={handleAddClick} className="bg-slate-900 hover:bg-slate-800 text-white">
           <Plus className="h-4 w-4 mr-2" />
           Add Staff Member
         </Button>

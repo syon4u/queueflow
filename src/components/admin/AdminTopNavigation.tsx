@@ -47,7 +47,7 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
   ];
 
   return (
-    <div className="border-b bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-40">
+    <div className="border-b bg-white/95 backdrop-blur-sm shadow-sm sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollArea className="w-full">
           <div className="flex space-x-1 py-3 min-w-max">
@@ -64,14 +64,14 @@ export const AdminTopNavigation: React.FC<AdminTopNavigationProps> = ({
                   className={`
                     flex items-center gap-2 whitespace-nowrap transition-all duration-200 font-medium
                     ${isActive 
-                      ? 'bg-primary text-primary-foreground shadow-sm' 
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100/80'
+                      ? 'bg-slate-900 text-white shadow-sm hover:bg-slate-800' 
+                      : 'text-slate-900 hover:text-slate-950 hover:bg-slate-100'
                     }
                     px-4 py-2 rounded-lg border-0
                   `}
                 >
                   <IconComponent className="h-4 w-4" />
-                  <span className="text-sm">{item.label}</span>
+                  <span className="text-sm font-semibold">{item.label}</span>
                 </Button>
               );
             })}
