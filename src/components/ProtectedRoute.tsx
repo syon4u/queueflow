@@ -13,13 +13,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   redirectTo = '/auth'
 }) => {
-  // Temporarily disable authentication - allow all access
-  console.log('ProtectedRoute: Authentication disabled - allowing access', {
+  // JWT verification disabled - allow all access
+  console.log('ProtectedRoute: JWT verification disabled - allowing access', {
     requiredRole,
     path: window.location.pathname
   });
 
-  // Always allow access when auth is disabled
+  // Always allow access when JWT verification is disabled
   return <>{children}</>;
 };
 
@@ -35,7 +35,7 @@ export const withRoleProtection = (
   );
 };
 
-// Specific role guards for common use cases - all allow access when auth is disabled
+// Specific role guards for common use cases - all allow access when JWT is disabled
 export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ProtectedRoute requiredRole="admin">{children}</ProtectedRoute>
 );

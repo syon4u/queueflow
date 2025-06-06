@@ -23,39 +23,19 @@ export const useProfile = () => {
     queryFn: async (): Promise<UserProfile | null> => {
       if (!user?.id) return null;
 
-      // Get profile data
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        return null;
-      }
-
-      // Get user role
-      const { data: userRole, error: roleError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (roleError) {
-        console.error('Error fetching user role:', roleError);
-      }
-
+      // JWT verification disabled - return mock profile data
+      console.log('useProfile: JWT verification disabled - returning mock profile');
+      
       return {
         id: user.id,
-        email: user.email || profile?.email || '',
-        first_name: profile?.first_name || '',
-        last_name: profile?.last_name || '',
-        phone: profile?.phone || null,
-        status: profile?.status || 'active',
-        location_id: profile?.location_id || null,
-        role: userRole?.role || 'customer',
-        last_sign_in_at: user.last_sign_in_at || null,
+        email: user.email || 'test@example.com',
+        first_name: 'Test',
+        last_name: 'User',
+        phone: null,
+        status: 'active',
+        location_id: null,
+        role: 'staff',
+        last_sign_in_at: new Date().toISOString(),
       } as UserProfile;
     },
     enabled: !!user?.id,
