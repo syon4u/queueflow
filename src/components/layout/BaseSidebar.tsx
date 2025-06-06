@@ -83,9 +83,7 @@ export const BaseSidebar: React.FC<BaseSidebarProps> = ({
                         <div className={`font-medium text-sm truncate ${activeItem === item.id ? 'text-white' : 'text-foreground'}`}>
                           {item.label}
                         </div>
-                        <div className={`text-xs mt-0.5 truncate ${activeItem === item.id ? 'text-blue-100' : 'text-muted-foreground'}`}>
-                          {item.description}
-                        </div>
+                        
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>)}
