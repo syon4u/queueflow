@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -31,6 +30,10 @@ export interface Appointment {
   customer?: Customer;
   service?: Service;
   location?: Location;
+  staff?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface Service {
@@ -105,7 +108,11 @@ export const useAppData = (): AppData => {
           *,
           customers!appointments_customer_id_fkey (*),
           services!appointments_service_id_fkey (*),
-          locations!appointments_location_id_fkey (*)
+          locations!appointments_location_id_fkey (*),
+          profiles!appointments_staff_id_fkey (
+            first_name,
+            last_name
+          )
         `)
         .order('scheduled_time', { ascending: true });
 
@@ -115,7 +122,8 @@ export const useAppData = (): AppData => {
         ...appointment,
         customer: appointment.customers,
         service: appointment.services,
-        location: appointment.locations
+        location: appointment.locations,
+        staff: appointment.profiles
       })) as Appointment[];
     },
     refetchInterval: 15000, // More frequent updates for appointments
