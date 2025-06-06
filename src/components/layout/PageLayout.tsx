@@ -21,7 +21,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   className = ""
 }) => {
   return (
-    <div className={`min-h-screen flex flex-col ${className}`}>
+    <div className={`min-h-screen w-full flex flex-col ${className}`}>
       {showHeader && (
         <BrowardHeader 
           title={headerTitle}
@@ -29,7 +29,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         />
       )}
       
-      <main className="flex-1">
+      <main className="flex-1 w-full">
         {children}
       </main>
       

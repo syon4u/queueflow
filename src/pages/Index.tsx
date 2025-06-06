@@ -22,8 +22,9 @@ const Index = () => {
     <PageLayout 
       headerTitle={t('landing.headerTitle')}
       headerSubtitle={t('landing.headerSubtitle')}
+      className="w-full"
     >
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen w-full bg-gray-50">
         {/* Hero Section */}
         <HeroSection onShowGuide={handleShowGuide} />
         

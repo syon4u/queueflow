@@ -17,16 +17,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 }) => {
   return (
     <SidebarProvider>
-      <div className={`min-h-screen flex w-full bg-gray-50 ${className}`}>
+      <div className={`min-h-screen flex w-full ${className}`}>
         {sidebar}
-        <SidebarInset className="flex-1">
+        <SidebarInset className="flex-1 w-full">
           {header && (
-            <div className="bg-white border-b">
+            <div className="bg-white border-b w-full">
               {header}
             </div>
           )}
-          <main className="flex-1 p-6">
-            <div className="max-w-7xl mx-auto">
+          <main className="flex-1 p-6 w-full">
+            <div className="w-full mx-auto">
               {children}
             </div>
           </main>

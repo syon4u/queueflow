@@ -91,7 +91,7 @@ function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen w-full">
               {!isOnline && (
                 <div className="bg-yellow-500 text-yellow-900 text-center py-2 px-4 text-sm font-medium">
                   You're currently offline. Some features may not be available.

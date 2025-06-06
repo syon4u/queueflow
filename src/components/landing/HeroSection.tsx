@@ -10,7 +10,7 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
   return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-white to-gray-100 py-20 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-slate-50 via-white to-gray-100 py-20 overflow-hidden w-full">
       {/* Background Animation */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-72 h-72 bg-slate-300 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
@@ -44,7 +44,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 text-center relative z-10">
+      <div className="w-full px-4 text-center relative z-10">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-semibold text-gray-900 mb-6 animate-fade-in-up relative font-sans tracking-tight">
             Skip the Line,
