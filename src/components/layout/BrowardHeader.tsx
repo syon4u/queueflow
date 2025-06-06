@@ -82,7 +82,7 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
               </div>
               <div>
                 <h1 className="text-xl font-serif font-bold text-white drop-shadow-lg">
-                  Broward County
+                  Queue Flow
                 </h1>
                 <p className="text-sm text-white/95 drop-shadow font-medium">
                   {title}

@@ -70,12 +70,12 @@ const BrowardFooter: React.FC = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-serif mb-4 text-white font-bold drop-shadow-lg">Broward County</h3>
+            <h3 className="text-xl font-serif mb-4 text-white font-bold drop-shadow-lg">Queue Flow</h3>
             <p className="text-white/95 mb-4 font-medium drop-shadow">
-              Consumer Protection Division
+              Smart Queue Management System
             </p>
             <p className="text-white/90 text-sm mb-4 drop-shadow">
-              Safeguarding consumers through education, mediation, and enforcement
+              Streamlining customer service through intelligent queue management
             </p>
             <div className="flex gap-4">
               <ShieldIcon className="text-white hover:text-white/80 transition-colors drop-shadow" />
@@ -113,17 +113,16 @@ const BrowardFooter: React.FC = () => {
           <div>
             <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">Contact Information</h4>
             <address className="not-italic text-white/95">
-              <p className="font-medium drop-shadow">1 N. University Drive, Suite 100</p>
-              <p className="font-medium drop-shadow">Plantation, FL 33324</p>
-              <p className="mt-2 font-medium drop-shadow">Phone: <span className="text-white font-bold">(954) 765-4400</span></p>
-              <p className="font-medium drop-shadow">Email: <span className="text-white font-bold">consumer@broward.org</span></p>
+              <p className="font-medium drop-shadow">Phone: <span className="text-white font-bold">(555) 123-4567</span></p>
+              <p className="font-medium drop-shadow">Email: <span className="text-white font-bold">support@queueflow.com</span></p>
+              <p className="mt-2 font-medium drop-shadow">Available 24/7 for customer support</p>
             </address>
           </div>
         </div>
         
         <div className="border-t border-white/30 mt-8 pt-6 text-center text-sm text-white/95">
-          <p className="font-medium drop-shadow">&copy; {currentYear} Broward County Consumer Protection Division. All rights reserved.</p>
-          <p className="mt-1 text-white/90 drop-shadow">Protecting and empowering Broward County residents</p>
+          <p className="font-medium drop-shadow">&copy; {currentYear} Queue Flow. All rights reserved.</p>
+          <p className="mt-1 text-white/90 drop-shadow">Revolutionizing customer service management</p>
         </div>
       </div>
     </footer>

@@ -1,8 +1,8 @@
 
 {
-  "name": "QueueFlow 2.0 - Broward County",
+  "name": "QueueFlow 2.0 - Smart Queue Management",
   "short_name": "QueueFlow",
-  "description": "Smart queue management for Broward County services",
+  "description": "Smart queue management system for efficient customer service",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -23,7 +23,7 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["government", "productivity", "utilities"],
+  "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {
       "name": "Join Queue",
