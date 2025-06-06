@@ -86,7 +86,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes slow-pan {
           0% { transform: scale(1) translateX(0); }
           50% { transform: scale(1.05) translateX(-10px); }
