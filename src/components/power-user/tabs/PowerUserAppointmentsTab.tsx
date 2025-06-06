@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AppointmentMetricsCards } from '../appointments/AppointmentMetricsCards';
 import { AppointmentsList } from '../appointments/AppointmentsList';
-import { PerformanceSummary } from '../appointments/PerformanceSummary';
 import { QuickActions } from '../appointments/QuickActions';
 
 export const PowerUserAppointmentsTab: React.FC = () => {
@@ -185,12 +184,14 @@ export const PowerUserAppointmentsTab: React.FC = () => {
       <div className="flex justify-between items-start">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Appointments Management</h2>
-          <p className="text-gray-600">Monitor today's schedule, queue status, and operational performance</p>
+          <p className="text-gray-600">Monitor today's schedule and queue status</p>
         </div>
-        <Button onClick={handleScheduleAppointment} className="bg-blue-600 hover:bg-blue-700 shadow-sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Schedule Appointment
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={handleScheduleAppointment} className="bg-blue-600 hover:bg-blue-700 shadow-sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Schedule Appointment
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics Cards */}
@@ -201,10 +202,10 @@ export const PowerUserAppointmentsTab: React.FC = () => {
         avgServiceTime={avgServiceTime}
       />
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main Content Grid - Simplified Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Today's Schedule */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <AppointmentsList
             appointments={filteredAppointments}
             searchTerm={searchTerm}
@@ -220,17 +221,8 @@ export const PowerUserAppointmentsTab: React.FC = () => {
           />
         </div>
 
-        {/* Performance Summary and Actions */}
-        <div className="space-y-6">
-          <PerformanceSummary
-            completionRate={todaysAppointments.length > 0 
-              ? Math.round((completedToday.length / todaysAppointments.length) * 100)
-              : 0}
-            activeCustomers={queueStats.inProgress}
-            queueLength={queueStats.waiting}
-            totalCustomers={customers.length}
-          />
-
+        {/* Quick Actions */}
+        <div className="lg:col-span-1">
           <QuickActions
             onViewFullQueue={handleViewFullQueue}
             onAddWalkIn={handleAddWalkIn}
