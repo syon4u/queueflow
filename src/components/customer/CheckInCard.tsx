@@ -26,37 +26,111 @@ const CheckInCard = () => {
     console.log('CheckInCard - Attempting check-in with code:', confirmationCode);
 
     try {
-      const { data, error } = await supabase.functions.invoke('appointments/check-in', {
-        body: {
-          confirmation_code: confirmationCode.trim().toUpperCase()
-        }
-      });
+      // Use direct database query instead of edge function for better reliability
+      let appointment = null;
+      const code = confirmationCode.trim().toUpperCase();
 
-      if (error) {
-        console.error('CheckInCard - Check-in error:', error);
-        toast({
-          title: 'Check-in Failed',
-          description: error.message || 'Unable to check in. Please verify your confirmation code.',
-          variant: 'destructive',
-        });
-        return;
+      if (code.startsWith('CUST-')) {
+        // Look up by customer confirmation number
+        const { data: customerData, error: customerError } = await supabase
+          .from('customers')
+          .select(`
+            id,
+            appointments!appointments_customer_id_fkey(
+              id,
+              status,
+              scheduled_time,
+              customers!appointments_customer_id_fkey(first_name, last_name)
+            )
+          `)
+          .eq('confirmation_number', code)
+          .maybeSingle();
+
+        if (customerError) {
+          console.error('CheckInCard - Customer lookup error:', customerError);
+          throw new Error('Unable to find customer record');
+        }
+
+        if (customerData && customerData.appointments && customerData.appointments.length > 0) {
+          // Find valid appointment (within reasonable time range)
+          const now = new Date();
+          const validAppointment = customerData.appointments.find(apt => {
+            const aptDate = new Date(apt.scheduled_time);
+            const daysDiff = Math.abs(now.getTime() - aptDate.getTime()) / (1000 * 60 * 60 * 24);
+            return apt.status === 'scheduled' && daysDiff <= 1; // Within 1 day
+          });
+
+          if (validAppointment) {
+            appointment = validAppointment;
+          }
+        }
+      } else if (code.startsWith('APT-')) {
+        // Look up by appointment ID prefix
+        const appointmentIdPrefix = code.substring(4).toLowerCase();
+        
+        const { data: appointments, error: searchError } = await supabase
+          .from('appointments')
+          .select(`
+            id,
+            status,
+            scheduled_time,
+            customers!appointments_customer_id_fkey(first_name, last_name)
+          `)
+          .eq('status', 'scheduled')
+          .gte('scheduled_time', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // Last 24 hours
+          .lte('scheduled_time', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()); // Next 24 hours
+
+        if (searchError) {
+          console.error('CheckInCard - Appointment search error:', searchError);
+          throw new Error('Unable to search for appointment');
+        }
+
+        const matchingAppointment = appointments?.find(apt => 
+          apt.id.toLowerCase().startsWith(appointmentIdPrefix)
+        );
+
+        if (matchingAppointment) {
+          appointment = matchingAppointment;
+        }
+      } else {
+        throw new Error('Invalid confirmation code format. Use CUST-XXXXXXXX or APT-XXXXXXXX format.');
       }
 
-      console.log('CheckInCard - Check-in successful:', data);
+      if (!appointment) {
+        throw new Error('No scheduled appointment found with the provided confirmation code');
+      }
+
+      console.log('CheckInCard - Found appointment:', appointment.id);
+
+      // Update appointment status and check-in time
+      const { error: updateError } = await supabase
+        .from('appointments')
+        .update({ 
+          status: 'checked_in',
+          check_in_time: new Date().toISOString()
+        })
+        .eq('id', appointment.id);
+
+      if (updateError) {
+        console.error('CheckInCard - Update error:', updateError);
+        throw new Error('Failed to check in. Please try again.');
+      }
+
+      console.log('CheckInCard - Check-in successful for appointment:', appointment.id);
       
       toast({
         title: 'Check-in Successful!',
-        description: 'You have been successfully checked in for your appointment.',
+        description: `Welcome ${appointment.customers?.first_name} ${appointment.customers?.last_name}! You have been checked in.`,
       });
 
       // Clear the form
       setConfirmationCode('');
       
     } catch (error: any) {
-      console.error('CheckInCard - Unexpected error:', error);
+      console.error('CheckInCard - Error:', error);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
+        title: 'Check-in Failed',
+        description: error.message || 'Unable to check in. Please verify your confirmation code and try again.',
         variant: 'destructive',
       });
     } finally {

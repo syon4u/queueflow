@@ -46,11 +46,13 @@ export const useQueueStatus = (
     setData(null);
 
     try {
-      let appointmentId: string | null = null;
+      let appointment = null;
 
       if (confirmationNumber) {
-        // First try to find by customer confirmation number (CUST-XXXXXXXX)
-        if (confirmationNumber.startsWith('CUST-')) {
+        const code = confirmationNumber.toUpperCase();
+        
+        if (code.startsWith('CUST-')) {
+          // Look up by customer confirmation number
           const { data: customerData, error: customerError } = await supabase
             .from('customers')
             .select(`
@@ -61,23 +63,23 @@ export const useQueueStatus = (
                 scheduled_time,
                 check_in_time,
                 services!appointments_service_id_fkey(name),
-                locations!appointments_location_id_fkey(name)
+                locations!appointments_location_id_fkey(name),
+                customers!appointments_customer_id_fkey(first_name, last_name)
               )
             `)
-            .eq('confirmation_number', confirmationNumber.toUpperCase())
+            .eq('confirmation_number', code)
             .maybeSingle();
 
           if (customerError) throw customerError;
 
           if (customerData && customerData.appointments && customerData.appointments.length > 0) {
             // Get the most recent appointment
-            const mostRecentAppointment = customerData.appointments
+            appointment = customerData.appointments
               .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
-            appointmentId = mostRecentAppointment.id;
           }
-        } else if (confirmationNumber.startsWith('APT-')) {
-          // Handle appointment confirmation format (APT-XXXXXXXX)
-          const appointmentIdPrefix = confirmationNumber.substring(4).toLowerCase();
+        } else if (code.startsWith('APT-')) {
+          // Look up by appointment ID prefix
+          const appointmentIdPrefix = code.substring(4).toLowerCase();
           
           const { data: appointments, error: lookupError } = await supabase
             .from('appointments')
@@ -90,19 +92,14 @@ export const useQueueStatus = (
               services!appointments_service_id_fkey(name),
               locations!appointments_location_id_fkey(name)
             `)
-            .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Within last 7 days
+            .gte('scheduled_time', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
             .order('scheduled_time', { ascending: false });
 
           if (lookupError) throw lookupError;
 
-          // Filter appointments client-side to find matching ID prefix
-          const matchingAppointment = appointments?.find(apt => 
+          appointment = appointments?.find(apt => 
             apt.id.toLowerCase().startsWith(appointmentIdPrefix)
           );
-
-          if (matchingAppointment) {
-            appointmentId = matchingAppointment.id;
-          }
         }
       } else if (lastName && phone) {
         // Look up by customer details
@@ -116,7 +113,11 @@ export const useQueueStatus = (
             appointments!appointments_customer_id_fkey(
               id,
               scheduled_time,
-              status
+              status,
+              check_in_time,
+              services!appointments_service_id_fkey(name),
+              locations!appointments_location_id_fkey(name),
+              customers!appointments_customer_id_fkey(first_name, last_name)
             )
           `)
           .ilike('last_name', lastName)
@@ -126,56 +127,69 @@ export const useQueueStatus = (
         if (lookupError) throw lookupError;
 
         if (customers && customers.length > 0) {
-          // Find matching phone number
           const matchingCustomer = customers.find(customer => {
             const customerPhone = customer.phone?.replace(/\D/g, '') || '';
             return customerPhone.includes(cleanPhone) || cleanPhone.includes(customerPhone);
           });
 
           if (matchingCustomer && matchingCustomer.appointments && matchingCustomer.appointments.length > 0) {
-            // Get the most recent appointment
-            const mostRecentAppointment = matchingCustomer.appointments
+            appointment = matchingCustomer.appointments
               .sort((a, b) => new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime())[0];
-            appointmentId = mostRecentAppointment.id;
           }
         }
       }
 
-      if (!appointmentId) {
+      if (!appointment) {
         setError('No appointment found with the provided information');
         return;
       }
 
-      console.log('Found appointment ID:', appointmentId);
+      console.log('Found appointment:', appointment);
 
-      // Get queue position using the edge function with appointment ID in the body
-      const { data: queueData, error: queueError } = await supabase.functions.invoke(
-        'queue-position',
-        {
-          body: { appointment_id: appointmentId }
+      // Get queue position if checked in
+      let position = null;
+      let estimatedWaitTime = 0;
+      let currentWaitTime = 0;
+
+      if (appointment.status === 'checked_in' && appointment.check_in_time) {
+        // Get queue position
+        const { data: queueData, error: queueError } = await supabase
+          .from('appointments')
+          .select('id, check_in_time')
+          .eq('location_id', appointment.locations?.id || '')
+          .eq('status', 'checked_in')
+          .order('check_in_time', { ascending: true });
+
+        if (!queueError && queueData) {
+          const queuePosition = queueData.findIndex(item => item.id === appointment.id) + 1;
+          if (queuePosition > 0) {
+            position = queuePosition;
+            estimatedWaitTime = Math.max(0, (position - 1) * 15); // 15 min average
+          }
         }
-      );
 
-      if (queueError) {
-        console.error('Edge function error:', queueError);
-        throw queueError;
+        // Calculate current wait time
+        const checkInTime = new Date(appointment.check_in_time);
+        currentWaitTime = Math.floor((Date.now() - checkInTime.getTime()) / 60000);
       }
 
-      if (queueData) {
-        console.log('Queue data received:', queueData);
-        
-        // Transform the data to include check-in status and location name
-        const transformedData: QueueStatusData = {
-          ...queueData,
-          is_checked_in: queueData.status === 'checked_in' || queueData.status === 'in_progress',
-          location_name: 'Main Office', // Default location name since it's not in the response
-          scheduled_at: queueData.scheduled_time || new Date().toISOString()
-        };
-        
-        setData(transformedData);
-      } else {
-        setError('Unable to retrieve queue status');
-      }
+      const transformedData: QueueStatusData = {
+        appointment_id: appointment.id,
+        status: appointment.status,
+        position,
+        estimated_wait_time_minutes: estimatedWaitTime,
+        current_wait_time_minutes: Math.max(0, currentWaitTime),
+        customer_name: `${appointment.customers?.first_name || ''} ${appointment.customers?.last_name || ''}`.trim(),
+        service_name: appointment.services?.name || 'Unknown Service',
+        location_name: appointment.locations?.name || 'Main Office',
+        scheduled_at: appointment.scheduled_time,
+        check_in_time: appointment.check_in_time || undefined,
+        ticket_number: appointment.id.slice(-8).toUpperCase(),
+        location_id: appointment.locations?.id || '',
+        is_checked_in: appointment.status === 'checked_in' || appointment.status === 'in_progress'
+      };
+
+      setData(transformedData);
 
     } catch (err) {
       console.error('Error fetching queue status:', err);
