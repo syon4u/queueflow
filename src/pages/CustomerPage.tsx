@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import SimpleScheduleCard from '@/components/customer/SimpleScheduleCard';
-import WaitTimesCard from '@/components/customer/WaitTimesCard';
 import AppointmentConfirmationDialog from '@/components/customer/AppointmentConfirmationDialog';
 import PageLayout from '@/components/layout/PageLayout';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
@@ -91,17 +90,10 @@ const CustomerPage = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Main appointment form takes up 2 columns */}
-            <div className="lg:col-span-2 transition-all hover:translate-y-[-2px] duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-8">
+            {/* Main appointment form takes up full width */}
+            <div className="transition-all hover:translate-y-[-2px] duration-300">
               <SimpleScheduleCard onAppointmentRequested={handleAppointmentRequested} />
-            </div>
-            
-            {/* Side cards */}
-            <div className="space-y-6">
-              <div className="transition-all hover:translate-y-[-2px] duration-300">
-                <WaitTimesCard />
-              </div>
             </div>
           </div>
           
