@@ -22,7 +22,7 @@ const CTASection: React.FC = () => {
             <Link to="/status">Check Status</Link>
           </Button>
           <Button size="lg" variant="ghost" className="w-full sm:w-auto text-white hover:bg-blue-700 px-8" asChild>
-            <Link to="/check-in">I'm Here, Check In</Link>
+            <Link to="/check-in">Check In Now</Link>
           </Button>
         </div>
       </div>
