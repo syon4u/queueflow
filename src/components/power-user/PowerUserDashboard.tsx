@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PowerUserStatsCards } from './PowerUserStatsCards';
@@ -9,31 +8,19 @@ import { SMSNotificationTab } from './tabs/SMSNotificationTab';
 import { ReportsAnalyticsTab } from './tabs/ReportsAnalyticsTab';
 import { AppointmentOverridesTab } from './tabs/AppointmentOverridesTab';
 import { AdvancedStaffTab } from '@/components/staff/AdvancedStaffTab';
-import { 
-  Home, 
-  Calendar, 
-  Users, 
-  MapPin, 
-  MessageSquare, 
-  BarChart3, 
-  ClipboardList,
-  Wrench
-} from 'lucide-react';
-
+import { Home, Calendar, Users, MapPin, MessageSquare, BarChart3, ClipboardList, Wrench } from 'lucide-react';
 interface PowerUserDashboardProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
 }
-
-export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({ 
+export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
   activeTab = 'dashboard',
-  onTabChange 
+  onTabChange
 }) => {
-  return (
-    <div className="flex-1 space-y-6 p-6">
+  return <div className="flex-1 space-y-6 p-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Power User Portal</h2>
-        <p className="text-muted-foreground">
+        <h2 className="text-3xl font-bold tracking-tight text-left">Power User Portal</h2>
+        <p className="text-muted-foreground text-left text-sm">
           Comprehensive management tools and administrative controls
         </p>
       </div>
@@ -103,6 +90,5 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
           <AdvancedStaffTab />
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
