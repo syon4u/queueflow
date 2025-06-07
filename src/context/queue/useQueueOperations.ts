@@ -4,13 +4,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useStaffActions } from '@/hooks/use-staff-actions';
 import { Customer } from './types';
 
 export const useQueueOperations = (customers: Customer[], currentCustomer: Customer | null) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingCallRequest, setPendingCallRequest] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { logAction } = useStaffActions();
 
   const addCustomer = (customerData: Omit<Customer, 'id' | 'joinedAt' | 'status'>) => {
     toast({
@@ -21,23 +24,39 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
   };
 
   const callNextCustomer = async () => {
+    if (!user) return;
+
+    // Check if staff member already has a customer
     if (currentCustomer) {
+      // Queue the request instead of blocking
+      setPendingCallRequest(true);
       toast({
-        title: 'Customer Already Being Served',
-        description: 'Please complete the current customer before calling the next one.',
-        variant: 'destructive',
+        title: 'Request Queued',
+        description: 'Your request to call the next customer has been queued. Complete your current customer first.',
+        variant: 'default'
+      });
+      return;
+    }
+
+    // Check staff availability
+    const { data: staffProfile } = await supabase
+      .from('profiles')
+      .select('availability_status')
+      .eq('id', user.id)
+      .single();
+
+    if (staffProfile?.availability_status !== 'available') {
+      toast({
+        title: 'Not Available',
+        description: 'You must be marked as available to serve customers.',
+        variant: 'destructive'
       });
       return;
     }
 
     const waitingCustomers = customers
       .filter(c => c.status === 'waiting')
-      .sort((a, b) => {
-        if (a.priority !== b.priority) {
-          return a.priority === 'priority' ? -1 : 1;
-        }
-        return a.joinedAt.getTime() - b.joinedAt.getTime();
-      });
+      .sort((a, b) => a.joinedAt.getTime() - b.joinedAt.getTime()); // Sort by check-in time
 
     if (waitingCustomers.length === 0) {
       toast({
@@ -49,24 +68,75 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
 
     setIsLoading(true);
     const nextCustomer = waitingCustomers[0];
+    let retryCount = 0;
+    const maxRetries = 2;
 
-    try {
-      console.log('Calling next customer:', nextCustomer.id);
-      
-      const { error } = await supabase
-        .from('appointments')
-        .update({ 
-          status: 'in_progress',
-          start_time: new Date().toISOString(),
-          staff_id: user?.id
-        })
-        .eq('id', nextCustomer.id);
+    const attemptCall = async (): Promise<void> => {
+      try {
+        console.log('Calling next customer:', nextCustomer.id);
+        
+        // Get current appointment data for logging
+        const { data: currentData } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('id', nextCustomer.id)
+          .single();
 
-      if (error) {
-        console.error('Error calling next customer:', error);
+        const { error } = await supabase
+          .from('appointments')
+          .update({ 
+            status: 'in_progress',
+            start_time: new Date().toISOString(),
+            assigned_staff_id: user.id
+          })
+          .eq('id', nextCustomer.id)
+          .eq('status', 'checked_in'); // Ensure customer is still checked in
+
+        if (error) {
+          console.error('Error calling next customer:', error);
+          throw error;
+        }
+
+        // Log the action for undo functionality
+        await logAction(
+          'call_customer',
+          'appointment',
+          nextCustomer.id,
+          currentData,
+          { 
+            status: 'in_progress',
+            start_time: new Date().toISOString(),
+            assigned_staff_id: user.id
+          }
+        );
+
+        // Create notification for other staff
+        await supabase
+          .from('staff_notification_queue')
+          .insert({
+            staff_id: user.id,
+            type: 'customer_called',
+            title: 'Customer Called',
+            message: `${nextCustomer.name} is now being served`,
+            data: { customer_id: nextCustomer.id, customer_name: nextCustomer.name }
+          });
+
+      } catch (error) {
+        console.error(`Call attempt ${retryCount + 1} failed:`, error);
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return attemptCall();
+        }
+        
         throw error;
       }
+    };
 
+    try {
+      await attemptCall();
+      
       queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
       console.log('Successfully called next customer');
@@ -78,7 +148,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
       console.error('Error calling next customer:', error);
       toast({
         title: 'Error',
-        description: 'Failed to call next customer. Please try again.',
+        description: `Failed to call next customer after ${maxRetries} attempts. Please try again.`,
         variant: 'destructive',
       });
     } finally {
@@ -87,7 +157,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
   };
 
   const markAsServed = async () => {
-    if (!currentCustomer) {
+    if (!currentCustomer || !user) {
       toast({
         title: 'No Customer Being Served',
         description: 'No customer is currently being served.',
@@ -97,24 +167,63 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
     }
 
     setIsLoading(true);
-    
-    try {
-      console.log('Marking customer as served:', currentCustomer.id);
-      
-      const { error } = await supabase
-        .from('appointments')
-        .update({ 
-          status: 'completed',
-          end_time: new Date().toISOString()
-        })
-        .eq('id', currentCustomer.id)
-        .eq('status', 'in_progress');
+    let retryCount = 0;
+    const maxRetries = 2;
 
-      if (error) {
-        console.error('Database error marking customer as served:', error);
-        throw new Error(`Database error: ${error.message}`);
+    const attemptMarkServed = async (): Promise<void> => {
+      try {
+        console.log('Marking customer as served:', currentCustomer.id);
+        
+        // Get current appointment data for logging
+        const { data: currentData } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('id', currentCustomer.id)
+          .single();
+
+        const { error } = await supabase
+          .from('appointments')
+          .update({ 
+            status: 'completed',
+            end_time: new Date().toISOString()
+          })
+          .eq('id', currentCustomer.id)
+          .eq('assigned_staff_id', user.id)
+          .eq('status', 'in_progress');
+
+        if (error) {
+          console.error('Database error marking customer as served:', error);
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        // Log the action for undo functionality
+        await logAction(
+          'mark_served',
+          'appointment',
+          currentCustomer.id,
+          currentData,
+          { 
+            status: 'completed',
+            end_time: new Date().toISOString()
+          }
+        );
+
+      } catch (error) {
+        console.error(`Mark served attempt ${retryCount + 1} failed:`, error);
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return attemptMarkServed();
+        }
+        
+        throw error;
       }
+    };
 
+    try {
+      await attemptMarkServed();
+      
       await queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
       console.log('Successfully marked customer as served');
@@ -122,11 +231,18 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
         title: 'Customer Served',
         description: `${currentCustomer.name} has been marked as served`,
       });
+
+      // If there was a pending call request, process it now
+      if (pendingCallRequest) {
+        setPendingCallRequest(false);
+        setTimeout(() => callNextCustomer(), 1000); // Small delay to allow UI to update
+      }
+      
     } catch (error) {
       console.error('Error marking customer as served:', error);
       toast({
         title: 'Error',
-        description: `Failed to mark customer as served: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        description: `Failed to mark customer as served after ${maxRetries} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive',
       });
     } finally {
@@ -135,7 +251,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
   };
 
   const markAsNoShow = async () => {
-    if (!currentCustomer) {
+    if (!currentCustomer || !user) {
       toast({
         title: 'No Customer Being Served',
         description: 'No customer is currently being served.',
@@ -145,24 +261,63 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
     }
 
     setIsLoading(true);
-    
-    try {
-      console.log('Marking customer as no-show:', currentCustomer.id);
-      
-      const { error } = await supabase
-        .from('appointments')
-        .update({ 
-          status: 'no_show',
-          end_time: new Date().toISOString()
-        })
-        .eq('id', currentCustomer.id)
-        .in('status', ['checked_in', 'in_progress']);
+    let retryCount = 0;
+    const maxRetries = 2;
 
-      if (error) {
-        console.error('Database error marking customer as no-show:', error);
-        throw new Error(`Database error: ${error.message}`);
+    const attemptMarkNoShow = async (): Promise<void> => {
+      try {
+        console.log('Marking customer as no-show:', currentCustomer.id);
+        
+        // Get current appointment data for logging
+        const { data: currentData } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('id', currentCustomer.id)
+          .single();
+
+        const { error } = await supabase
+          .from('appointments')
+          .update({ 
+            status: 'no_show',
+            end_time: new Date().toISOString()
+          })
+          .eq('id', currentCustomer.id)
+          .eq('assigned_staff_id', user.id)
+          .in('status', ['checked_in', 'in_progress']);
+
+        if (error) {
+          console.error('Database error marking customer as no-show:', error);
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        // Log the action for undo functionality
+        await logAction(
+          'mark_no_show',
+          'appointment',
+          currentCustomer.id,
+          currentData,
+          { 
+            status: 'no_show',
+            end_time: new Date().toISOString()
+          }
+        );
+
+      } catch (error) {
+        console.error(`Mark no-show attempt ${retryCount + 1} failed:`, error);
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return attemptMarkNoShow();
+        }
+        
+        throw error;
       }
+    };
 
+    try {
+      await attemptMarkNoShow();
+      
       await queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
       
       console.log('Successfully marked customer as no-show');
@@ -170,11 +325,18 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
         title: 'Marked as No-Show',
         description: `${currentCustomer.name} has been marked as no-show`,
       });
+
+      // If there was a pending call request, process it now
+      if (pendingCallRequest) {
+        setPendingCallRequest(false);
+        setTimeout(() => callNextCustomer(), 1000);
+      }
+      
     } catch (error) {
       console.error('Error marking customer as no-show:', error);
       toast({
         title: 'Error',
-        description: `Failed to mark customer as no-show: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        description: `Failed to mark customer as no-show after ${maxRetries} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive',
       });
     } finally {
@@ -208,6 +370,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
 
   return {
     isLoading,
+    pendingCallRequest,
     addCustomer,
     callNextCustomer,
     markAsServed,

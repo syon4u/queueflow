@@ -1,16 +1,19 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 import { Customer } from './types';
 
 // Helper function to map appointment status to customer status
-const mapAppointmentStatusToCustomerStatus = (appointmentStatus: string): Customer['status'] => {
-  console.log('QueueContext - Mapping appointment status:', appointmentStatus);
+const mapAppointmentStatusToCustomerStatus = (appointmentStatus: string, assignedStaffId: string | null, currentUserId: string | null): Customer['status'] => {
+  console.log('QueueContext - Mapping appointment status:', appointmentStatus, 'assigned to:', assignedStaffId, 'current user:', currentUserId);
+  
   switch (appointmentStatus) {
     case 'checked_in':
       return 'waiting';
     case 'in_progress':
-      return 'serving';
+      // Only show as "serving" for the assigned staff member
+      return assignedStaffId === currentUserId ? 'serving' : 'waiting';
     case 'completed':
       return 'served';
     case 'no_show':
@@ -21,8 +24,10 @@ const mapAppointmentStatusToCustomerStatus = (appointmentStatus: string): Custom
 };
 
 export const useQueueData = () => {
+  const { user } = useAuth();
+  
   const { data: appointmentsData = [] } = useQuery({
-    queryKey: ['queue-appointments'],
+    queryKey: ['queue-appointments', user?.id],
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
       
@@ -36,6 +41,7 @@ export const useQueueData = () => {
           start_time,
           end_time,
           notes,
+          assigned_staff_id,
           customers!appointments_customer_id_fkey(first_name, last_name, phone, email),
           services!appointments_service_id_fkey(name)
         `)
@@ -59,10 +65,11 @@ export const useQueueData = () => {
         email: appointment.customers?.email,
         service: appointment.services?.name || 'Unknown Service',
         priority: 'normal' as const,
-        status: mapAppointmentStatusToCustomerStatus(appointment.status),
+        status: mapAppointmentStatusToCustomerStatus(appointment.status, appointment.assigned_staff_id, user?.id || null),
         joinedAt: appointment.check_in_time ? new Date(appointment.check_in_time) : new Date(appointment.scheduled_time),
         calledAt: appointment.start_time ? new Date(appointment.start_time) : undefined,
-        notes: appointment.notes
+        notes: appointment.notes,
+        assignedStaffId: appointment.assigned_staff_id
       }));
 
       console.log('QueueContext - Transformed customers:', transformedCustomers);
@@ -71,6 +78,7 @@ export const useQueueData = () => {
       return transformedCustomers;
     },
     refetchInterval: 30000,
+    enabled: !!user
   });
 
   return { customers: appointmentsData || [] };

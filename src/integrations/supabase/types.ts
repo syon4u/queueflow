@@ -93,6 +93,7 @@ export type Database = {
       }
       appointments: {
         Row: {
+          assigned_staff_id: string | null
           check_in_time: string | null
           created_at: string
           customer_id: string
@@ -109,6 +110,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_staff_id?: string | null
           check_in_time?: string | null
           created_at?: string
           customer_id: string
@@ -125,6 +127,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_staff_id?: string | null
           check_in_time?: string | null
           created_at?: string
           customer_id?: string
@@ -1060,6 +1063,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          availability_status: string | null
           created_at: string | null
           email: string | null
           first_name: string | null
@@ -1068,9 +1072,12 @@ export type Database = {
           location_id: string | null
           phone: string | null
           status: string | null
+          unavailable_reason: string | null
+          unavailable_since: string | null
           updated_at: string | null
         }
         Insert: {
+          availability_status?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string | null
@@ -1079,9 +1086,12 @@ export type Database = {
           location_id?: string | null
           phone?: string | null
           status?: string | null
+          unavailable_reason?: string | null
+          unavailable_since?: string | null
           updated_at?: string | null
         }
         Update: {
+          availability_status?: string | null
           created_at?: string | null
           email?: string | null
           first_name?: string | null
@@ -1090,6 +1100,8 @@ export type Database = {
           location_id?: string | null
           phone?: string | null
           status?: string | null
+          unavailable_reason?: string | null
+          unavailable_since?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1480,6 +1492,45 @@ export type Database = {
           },
         ]
       }
+      staff_actions: {
+        Row: {
+          action_type: string
+          can_undo: boolean | null
+          created_at: string | null
+          id: string
+          new_data: Json | null
+          old_data: Json | null
+          resource_id: string
+          resource_type: string
+          staff_id: string
+          undone_at: string | null
+        }
+        Insert: {
+          action_type: string
+          can_undo?: boolean | null
+          created_at?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          resource_id: string
+          resource_type: string
+          staff_id: string
+          undone_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          can_undo?: boolean | null
+          created_at?: string | null
+          id?: string
+          new_data?: Json | null
+          old_data?: Json | null
+          resource_id?: string
+          resource_type?: string
+          staff_id?: string
+          undone_at?: string | null
+        }
+        Relationships: []
+      }
       staff_audit_log: {
         Row: {
           action: string
@@ -1530,6 +1581,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff_notification_queue: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          expires_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          staff_id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          expires_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          staff_id: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          expires_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          staff_id?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
       }
       staff_notifications: {
         Row: {
