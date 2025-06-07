@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { BaseSidebar } from './BaseSidebar';
 import { 
@@ -9,7 +10,8 @@ import {
   ClipboardList,
   Home,
   Plus,
-  Bell
+  Bell,
+  Wrench
 } from 'lucide-react';
 
 const navigationGroups = [
@@ -67,6 +69,12 @@ const navigationGroups = [
         label: 'Appointment Overrides',
         icon: ClipboardList,
         description: 'Special appointment management'
+      },
+      {
+        id: 'advanced-tools',
+        label: 'Advanced Tools',
+        icon: Wrench,
+        description: 'Performance analytics, break management, and advanced features'
       }
     ]
   }

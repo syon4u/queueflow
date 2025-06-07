@@ -11,7 +11,6 @@ import QueueControls from '@/components/QueueControls';
 import AddCustomerForm from '@/components/AddCustomerForm';
 import { QueueManagementTab } from '@/components/staff/QueueManagementTab';
 import EnhancedAppointmentTable from '@/components/staff/EnhancedAppointmentTable';
-import { AdvancedStaffTab } from '@/components/staff/AdvancedStaffTab';
 import { StaffDashboardHeader } from '@/components/staff/StaffDashboardHeader';
 import { StaffDashboardSkeleton } from '@/components/staff/StaffDashboardSkeleton';
 import { StaffStatusSkeleton } from '@/components/staff/StaffStatusSkeleton';
@@ -112,9 +111,6 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
 
       case 'customer-search':
         return <CustomerSearchTab />;
-
-      case 'advanced-tools':
-        return <AdvancedStaffTab />;
 
       default:
         return null;

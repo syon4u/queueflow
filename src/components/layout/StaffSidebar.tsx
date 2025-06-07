@@ -5,7 +5,6 @@ import {
   Calendar,
   Settings,
   Activity,
-  Wrench,
   Search
 } from 'lucide-react';
 import { BaseSidebar } from './BaseSidebar';
@@ -53,17 +52,6 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
           label: 'Customer Search',
           icon: Search,
           description: 'Search and view customer history'
-        }
-      ]
-    },
-    {
-      label: 'Tools',
-      items: [
-        {
-          id: 'advanced-tools',
-          label: 'Advanced Tools',
-          icon: Wrench,
-          description: 'Additional staff tools'
         }
       ]
     }
