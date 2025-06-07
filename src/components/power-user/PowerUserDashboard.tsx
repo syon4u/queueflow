@@ -26,36 +26,7 @@ export const PowerUserDashboard: React.FC<PowerUserDashboardProps> = ({
       </div>
 
       <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="dashboard" className="flex items-center gap-2">
-            <Home className="h-4 w-4" />
-            <span className="hidden sm:inline">Dashboard</span>
-          </TabsTrigger>
-          <TabsTrigger value="appointments" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Appointments</span>
-          </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Users</span>
-          </TabsTrigger>
-          <TabsTrigger value="locations" className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            <span className="hidden sm:inline">Locations</span>
-          </TabsTrigger>
-          <TabsTrigger value="communications" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">SMS</span>
-          </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Reports</span>
-          </TabsTrigger>
-          <TabsTrigger value="advanced-tools" className="flex items-center gap-2">
-            <Wrench className="h-4 w-4" />
-            <span className="hidden sm:inline">Tools</span>
-          </TabsTrigger>
-        </TabsList>
+        
 
         <TabsContent value="dashboard" className="space-y-6">
           <PowerUserStatsCards />
