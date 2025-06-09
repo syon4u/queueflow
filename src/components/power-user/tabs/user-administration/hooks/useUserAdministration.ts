@@ -101,7 +101,7 @@ export const useUserAdministration = () => {
     power_user: 0, 
     staff: 0,
     customer: 0
-  } as Record<string, number>);
+  });
 
   const handleUpdateRole = (userId: string, newRole: string) => {
     updateRoleMutation.mutate({ userId, newRole });
