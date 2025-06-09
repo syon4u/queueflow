@@ -14,9 +14,9 @@ export const useReportsAnalytics = () => {
         .from('appointments')
         .select(`
           *,
-          service:services(name),
-          location:locations(name),
-          customer:customers(first_name, last_name)
+          services!service_id(name),
+          locations!location_id(name),
+          customers!customer_id(first_name, last_name)
         `)
         .gte('scheduled_time', thirtyDaysAgo.toISOString());
 
@@ -24,7 +24,7 @@ export const useReportsAnalytics = () => {
 
       // Get service distribution
       const serviceDistribution = appointments?.reduce((acc, apt) => {
-        const serviceName = apt.service?.name || 'Unknown';
+        const serviceName = apt.services?.name || 'Unknown';
         acc[serviceName] = (acc[serviceName] || 0) + 1;
         return acc;
       }, {} as Record<string, number>) || {};
@@ -44,7 +44,7 @@ export const useReportsAnalytics = () => {
 
       // Get location performance
       const locationPerformance = appointments?.reduce((acc, apt) => {
-        const locationName = apt.location?.name || 'Unknown';
+        const locationName = apt.locations?.name || 'Unknown';
         if (!acc[locationName]) {
           acc[locationName] = { total: 0, completed: 0 };
         }

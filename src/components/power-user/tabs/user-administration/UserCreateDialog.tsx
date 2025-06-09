@@ -34,10 +34,14 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
     setIsLoading(true);
 
     try {
-      // Create user profile first
+      // Generate a UUID for the new profile
+      const userId = crypto.randomUUID();
+
+      // Create user profile with generated UUID
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .insert({
+          id: userId,
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
@@ -53,7 +57,7 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
-          user_id: profile.id,
+          user_id: userId,
           role: formData.role
         });
 

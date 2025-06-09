@@ -27,7 +27,8 @@ export const useUserAdministration = () => {
 
       return profiles.map(profile => ({
         ...profile,
-        role: profile.user_roles?.[0]?.role || 'customer'
+        role: profile.user_roles?.[0]?.role || 'customer',
+        last_sign_in_at: null // Add this required field
       }));
     }
   });
@@ -90,11 +91,17 @@ export const useUserAdministration = () => {
     }
   });
 
-  // Calculate role statistics
+  // Calculate role statistics with proper typing
   const roleStats = users.reduce((acc, user) => {
-    acc[user.role] = (acc[user.role] || 0) + 1;
+    const role = user.role || 'customer';
+    acc[role] = (acc[role] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {
+    admin: 0,
+    power_user: 0, 
+    staff: 0,
+    customer: 0
+  } as Record<string, number>);
 
   const handleUpdateRole = (userId: string, newRole: string) => {
     updateRoleMutation.mutate({ userId, newRole });
