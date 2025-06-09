@@ -27,7 +27,9 @@ export const useUserAdministration = () => {
 
       return profiles.map(profile => ({
         ...profile,
-        role: profile.user_roles?.[0]?.role || 'customer',
+        role: Array.isArray(profile.user_roles) && profile.user_roles.length > 0 
+          ? profile.user_roles[0].role 
+          : 'customer',
         last_sign_in_at: null // Add this required field
       }));
     }
