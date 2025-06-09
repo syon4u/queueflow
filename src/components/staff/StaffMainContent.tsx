@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,7 +45,7 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
         );
 
       case 'enhanced-queue':
-        return <EnhancedQueueManagement />;
+        return <EnhancedQueueManagement locationId="" />;
 
       case 'appointments':
         return <EnhancedAppointmentTable />;

@@ -96,7 +96,7 @@ export const useStaffActions = () => {
         if (action.resource_type === 'appointment') {
           const { error: undoError } = await supabase
             .from('appointments')
-            .update(action.old_data)
+            .update(action.old_data as any)
             .eq('id', action.resource_id);
 
           if (undoError) throw undoError;
