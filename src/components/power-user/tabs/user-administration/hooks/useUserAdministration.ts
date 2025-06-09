@@ -1,152 +1,124 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-  created_at: string;
-  last_sign_in_at: string;
-}
+import { useToast } from '@/hooks/use-toast';
 
 export const useUserAdministration = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
-  // Fetch users with roles from Supabase - role checks disabled
+  // Fetch users with profiles and roles
   const { data: users = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['users-with-roles'],
+    queryKey: ['power-user-administration'],
     queryFn: async () => {
-      console.log('Fetching users with roles from Supabase (role checks disabled)...');
-      
-      // Try to fetch using the RPC function first
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_users_with_roles');
-      
-      if (!rpcError && rpcData) {
-        console.log('Fetched users via RPC:', rpcData);
-        return rpcData as User[];
-      }
-      
-      console.log('RPC failed, fetching directly from user_roles (role checks disabled)');
-      
-      // Fallback to direct query with role checks disabled
-      const { data: directData, error: directError } = await supabase
-        .from('user_roles')
+      const { data: profiles, error } = await supabase
+        .from('profiles')
         .select(`
-          user_id,
-          role,
-          created_at
-        `);
-      
-      if (directError) {
-        console.error('Direct query error:', directError);
-        throw directError;
-      }
-      
-      // Transform the data to match expected format
-      const transformedData = directData?.map(userRole => ({
-        id: userRole.user_id,
-        email: `user-${userRole.user_id.slice(0, 8)}@example.com`, // Mock email since we can't access auth.users
-        role: userRole.role,
-        created_at: userRole.created_at,
-        last_sign_in_at: null
-      })) || [];
-      
-      console.log('Fetched users directly:', transformedData);
-      return transformedData as User[];
-    },
-    refetchInterval: 30000,
-    retry: 3,
-    retryDelay: 1000,
+          *,
+          user_roles(role)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return profiles.map(profile => ({
+        ...profile,
+        role: profile.user_roles?.[0]?.role || 'customer'
+      }));
+    }
   });
 
-  // Update user role mutation - role checks disabled
+  // Update user role mutation
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: string }) => {
-      console.log(`Updating user ${userId} role to ${newRole} (role checks disabled)`);
-      
-      // Try RPC function first
-      const { data: rpcData, error: rpcError } = await supabase.rpc('update_user_role', {
-        target_user_id: userId,
-        new_role: newRole
-      });
-
-      if (!rpcError) {
-        return rpcData;
-      }
-
-      console.log('RPC failed, updating directly (role checks disabled)');
-      
-      // Fallback to direct update
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_roles')
-        .update({ role: newRole })
-        .eq('user_id', userId);
+        .upsert({
+          user_id: userId,
+          role: newRole
+        });
 
-      if (error) {
-        console.error('Error updating role:', error);
-        throw error;
-      }
-
-      return data;
+      if (error) throw error;
     },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['users-with-roles'] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['power-user-administration'] });
       toast({
-        title: "Success",
-        description: `User role updated to ${variables.newRole} (role checks disabled)`
+        title: 'Success',
+        description: 'User role updated successfully'
       });
-      console.log('Role updated successfully');
     },
-    onError: (error: any) => {
-      console.error('Failed to update user role:', error);
+    onError: (error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update user role",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to update user role',
+        variant: 'destructive'
       });
     }
   });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      // Delete user roles first
+      await supabase.from('user_roles').delete().eq('user_id', userId);
+      
+      // Delete profile
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['power-user-administration'] });
+      toast({
+        title: 'Success',
+        description: 'User deleted successfully'
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete user',
+        variant: 'destructive'
+      });
+    }
+  });
+
+  // Calculate role statistics
+  const roleStats = users.reduce((acc, user) => {
+    acc[user.role] = (acc[user.role] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   const handleUpdateRole = (userId: string, newRole: string) => {
     updateRoleMutation.mutate({ userId, newRole });
   };
 
   const handleCreateUser = () => {
-    toast({
-      title: "Create User",
-      description: "User creation available (role checks disabled)"
-    });
+    // This will be handled by the UserCreateDialog component
+    return true;
   };
 
-  const handleEditUser = (userId: string) => {
-    setSelectedUser(userId);
-    toast({
-      title: "Edit User",
-      description: "User edit form would open here (role checks disabled)"
-    });
+  const handleEditUser = (user: any) => {
+    setSelectedUser(user);
+    // This will trigger the edit dialog
   };
 
   const handleDeleteUser = (userId: string) => {
-    toast({
-      title: "Delete User",
-      description: "User deletion available (role checks disabled)",
-      variant: "destructive"
-    });
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      deleteUserMutation.mutate(userId);
+    }
   };
 
-  // Calculate role statistics
-  const roleStats = {
-    admin: users.filter(u => u.role === 'admin').length,
-    power_user: users.filter(u => u.role === 'power_user').length,
-    staff: users.filter(u => u.role === 'staff').length,
-    customer: users.filter(u => u.role === 'customer').length
+  const addTemporaryData = () => {
+    // Refresh the data instead of adding temporary data
+    refetch();
   };
 
   return {
@@ -165,6 +137,7 @@ export const useUserAdministration = () => {
     handleUpdateRole,
     handleCreateUser,
     handleEditUser,
-    handleDeleteUser
+    handleDeleteUser,
+    addTemporaryData
   };
 };
