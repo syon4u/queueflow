@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_sessions: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          revoked_at: string | null
+          session_token: string
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          revoked_at?: string | null
+          session_token: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          revoked_at?: string | null
+          session_token?: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       appointment_history: {
         Row: {
           appointment_id: string | null
@@ -201,6 +237,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       break_requests: {
         Row: {
@@ -1962,9 +2037,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      has_role: {
+        Args: { required_role: string }
+        Returns: boolean
+      }
       is_power_user: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          action_type: string
+          resource_type: string
+          resource_id?: string
+          old_values?: Json
+          new_values?: Json
+        }
+        Returns: string
       }
       update_user_role: {
         Args: { target_user_id: string; new_role: string }
@@ -1979,7 +2068,6 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "no_show"
-      user_role: "customer" | "staff" | "admin" | "power_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2103,7 +2191,6 @@ export const Constants = {
         "cancelled",
         "no_show",
       ],
-      user_role: ["customer", "staff", "admin", "power_user"],
     },
   },
 } as const

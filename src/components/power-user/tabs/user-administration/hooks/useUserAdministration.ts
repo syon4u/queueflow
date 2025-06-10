@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuditLog } from '@/hooks/power-user/useAuditLog';
 
 export const useUserAdministration = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,34 +11,45 @@ export const useUserAdministration = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { logAction } = useAuditLog();
 
-  // Fetch users with profiles and roles
+  // Fetch users with profiles and roles using the new user_profiles view
   const { data: users = [], isLoading, error, refetch } = useQuery({
     queryKey: ['power-user-administration'],
     queryFn: async () => {
+      console.log('Fetching users from user_profiles view...');
+      
       const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select(`
-          *,
-          user_roles(role)
-        `)
+        .from('user_profiles')
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user profiles:', error);
+        throw error;
+      }
+
+      console.log('Fetched user profiles:', profiles);
 
       return profiles.map(profile => ({
         ...profile,
-        role: Array.isArray(profile.user_roles) && profile.user_roles.length > 0 
-          ? profile.user_roles[0].role 
-          : 'customer',
-        last_sign_in_at: null // Add this required field
+        last_sign_in_at: null // Add this required field for compatibility
       }));
     }
   });
 
-  // Update user role mutation
+  // Update user role mutation with audit logging
   const updateRoleMutation = useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: string }) => {
+      console.log('Updating user role:', { userId, newRole });
+      
+      // Get current role for audit logging
+      const { data: currentUser } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
       const { error } = await supabase
         .from('user_roles')
         .upsert({
@@ -46,6 +58,18 @@ export const useUserAdministration = () => {
         });
 
       if (error) throw error;
+
+      // Log the role change
+      await logAction({
+        action: 'UPDATE_USER_ROLE',
+        resource_type: 'user_role',
+        resource_id: userId,
+        details: {
+          old_role: currentUser?.role || 'none',
+          new_role: newRole,
+          user_id: userId
+        }
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['power-user-administration'] });
@@ -55,6 +79,7 @@ export const useUserAdministration = () => {
       });
     },
     onError: (error) => {
+      console.error('Error updating user role:', error);
       toast({
         title: 'Error',
         description: 'Failed to update user role',
@@ -63,9 +88,18 @@ export const useUserAdministration = () => {
     }
   });
 
-  // Delete user mutation
+  // Delete user mutation with audit logging
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
+      console.log('Deleting user:', userId);
+      
+      // Get user data for audit logging before deletion
+      const { data: userData } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
       // Delete user roles first
       await supabase.from('user_roles').delete().eq('user_id', userId);
       
@@ -76,6 +110,17 @@ export const useUserAdministration = () => {
         .eq('id', userId);
 
       if (error) throw error;
+
+      // Log the user deletion
+      await logAction({
+        action: 'DELETE_USER',
+        resource_type: 'user_profile',
+        resource_id: userId,
+        details: {
+          deleted_user: userData,
+          user_id: userId
+        }
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['power-user-administration'] });
@@ -85,6 +130,7 @@ export const useUserAdministration = () => {
       });
     },
     onError: (error) => {
+      console.error('Error deleting user:', error);
       toast({
         title: 'Error',
         description: 'Failed to delete user',
@@ -106,6 +152,7 @@ export const useUserAdministration = () => {
   });
 
   const handleUpdateRole = (userId: string, newRole: string) => {
+    console.log('Handle update role called:', { userId, newRole });
     updateRoleMutation.mutate({ userId, newRole });
   };
 
@@ -115,6 +162,7 @@ export const useUserAdministration = () => {
   };
 
   const handleEditUser = (user: any) => {
+    console.log('Edit user selected:', user);
     setSelectedUser(user);
     // This will trigger the edit dialog
   };
@@ -127,6 +175,7 @@ export const useUserAdministration = () => {
 
   const addTemporaryData = () => {
     // Refresh the data instead of adding temporary data
+    console.log('Refreshing user data...');
     refetch();
   };
 

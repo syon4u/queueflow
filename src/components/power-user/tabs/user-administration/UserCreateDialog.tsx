@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuditLog } from '@/hooks/power-user/useAuditLog';
 
 interface UserCreateDialogProps {
   open: boolean;
@@ -28,12 +29,15 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { logAction } = useAuditLog();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      console.log('Creating new user with data:', formData);
+      
       // Generate a UUID for the new profile
       const userId = crypto.randomUUID();
 
@@ -51,7 +55,12 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
         .select()
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        throw profileError;
+      }
+
+      console.log('Profile created:', profile);
 
       // Set user role
       const { error: roleError } = await supabase
@@ -61,7 +70,28 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
           role: formData.role
         });
 
-      if (roleError) throw roleError;
+      if (roleError) {
+        console.error('Role assignment error:', roleError);
+        throw roleError;
+      }
+
+      console.log('Role assigned successfully');
+
+      // Log the user creation
+      await logAction({
+        action: 'CREATE_USER',
+        resource_type: 'user_profile',
+        resource_id: userId,
+        details: {
+          created_user: {
+            id: userId,
+            email: formData.email,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            role: formData.role
+          }
+        }
+      });
 
       toast({
         title: 'Success',
@@ -148,6 +178,7 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
                 <SelectContent>
                   <SelectItem value="customer">Customer</SelectItem>
                   <SelectItem value="staff">Staff</SelectItem>
+                  <SelectItem value="power_user">Power User</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>

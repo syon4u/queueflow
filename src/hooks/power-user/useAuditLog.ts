@@ -15,19 +15,33 @@ export const useAuditLog = () => {
 
   const logAction = useMutation({
     mutationFn: async (entry: AuditLogEntry) => {
-      if (!user) throw new Error('User not authenticated');
+      console.log('Logging audit action:', entry);
+      
+      if (!user) {
+        console.warn('User not authenticated, skipping audit log');
+        return;
+      }
 
+      // Use the new audit_log table created by the migration
       const { error } = await supabase
-        .from('staff_audit_log')
+        .from('audit_log')
         .insert({
-          staff_id: user.id,
+          user_id: user.id,
           action: entry.action,
           resource_type: entry.resource_type,
           resource_id: entry.resource_id || null,
-          details: entry.details || {}
+          old_values: entry.details?.old_values || null,
+          new_values: entry.details?.new_values || entry.details || {},
+          ip_address: null, // Will be populated by the database function
+          user_agent: navigator.userAgent
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error logging audit action:', error);
+        throw error;
+      }
+
+      console.log('Audit action logged successfully');
     }
   });
 
