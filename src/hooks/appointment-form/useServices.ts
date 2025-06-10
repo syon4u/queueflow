@@ -1,62 +1,57 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Service } from './types';
+import type { ServiceRow } from '@/types/supabase';
 
-export const useServices = (selectedLocationId: string) => {
-  const { 
-    data: services = [], 
-    isLoading: servicesLoading, 
-    error: servicesError 
-  } = useQuery({
-    queryKey: ['services', selectedLocationId],
-    queryFn: async (): Promise<Service[]> => {
-      console.log('useServices - Fetching services for anonymous user, location:', selectedLocationId);
-      
-      if (!selectedLocationId) {
-        console.log('useServices - No location selected, returning empty array');
-        return [];
-      }
+export const useServices = () => {
+  const { data: services = [], isLoading, error } = useQuery({
+    queryKey: ['services'],
+    queryFn: async (): Promise<ServiceRow[]> => {
+      console.log('useServices - Starting service fetch...');
       
       try {
         const { data, error } = await supabase
           .from('services')
-          .select('id, name, duration, description')
-          .eq('location_id', selectedLocationId)
+          .select('id, name, description, duration')
           .eq('is_active', true)
           .order('name');
         
-        console.log('useServices - Query result:', { data, error });
+        console.log('useServices - Raw query result:', { data, error });
         
         if (error) {
           console.error('useServices - Database error:', error);
           throw new Error(`Failed to load services: ${error.message}`);
         }
         
-        const result = data || [];
-        console.log('useServices - Returning services:', result.length);
-        return result;
+        if (!data) {
+          console.warn('useServices - No data returned from query');
+          return [];
+        }
+        
+        console.log('useServices - Successfully fetched services:', data.length);
+        return data;
         
       } catch (err) {
         console.error('useServices - Fetch error:', err);
         throw err;
       }
     },
-    enabled: !!selectedLocationId,
-    retry: 2,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
-  console.log('useServices - Hook state:', {
-    selectedLocationId,
+  console.log('useServices - Hook final state:', {
     servicesCount: services?.length || 0,
-    servicesLoading,
-    servicesError: servicesError?.message || null
+    services: services,
+    isLoading,
+    error: error?.message || null
   });
 
-  return {
+  return { 
     services,
-    servicesLoading,
-    servicesError: servicesError?.message || null
+    isLoading,
+    error: error?.message || null
   };
 };

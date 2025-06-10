@@ -1,6 +1,8 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from 'react';
+import { useLocations } from '@/hooks/appointment-form/useLocations';
+import { useServices } from '@/hooks/appointment-form/useServices';
+import type { LocationRow, ServiceRow } from '@/types/supabase';
 
 export interface CustomerAppointmentData {
   firstName: string;
@@ -13,19 +15,6 @@ export interface CustomerAppointmentData {
   preferredTime: string;
   reasonForVisit: string;
   additionalNotes: string;
-}
-
-interface Location {
-  id: string;
-  name: string;
-  address: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  duration: number;
 }
 
 export const useSimpleAppointmentForm = () => {
@@ -42,90 +31,18 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [locationsLoading, setLocationsLoading] = useState(true);
-  const [servicesLoading, setServicesLoading] = useState(true);
-  const [locationsError, setLocationsError] = useState<string | null>(null);
-  const [servicesError, setServicesError] = useState<string | null>(null);
+  // Use existing hooks with proper typing
+  const { 
+    locations, 
+    isLoading: locationsLoading, 
+    error: locationsError 
+  } = useLocations();
 
-  // Load locations with simplified typing
-  useEffect(() => {
-    let isMounted = true;
-    
-    const fetchLocations = async (): Promise<void> => {
-      try {
-        const response = await supabase
-          .from('locations')
-          .select('id, name, address')
-          .eq('is_active', true);
-
-        if (!isMounted) return;
-
-        if (response.error) {
-          console.error('Error loading locations:', response.error);
-          setLocationsError('Failed to load locations');
-        } else {
-          const locationData: Location[] = response.data || [];
-          setLocations(locationData);
-          setLocationsError(null);
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        console.error('Error loading locations:', err);
-        setLocationsError('Failed to load locations');
-      } finally {
-        if (isMounted) {
-          setLocationsLoading(false);
-        }
-      }
-    };
-
-    fetchLocations();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Load services with simplified typing
-  useEffect(() => {
-    let isMounted = true;
-    
-    const fetchServices = async (): Promise<void> => {
-      try {
-        const response = await supabase
-          .from('services')
-          .select('id, name, description, duration')
-          .eq('is_active', true);
-
-        if (!isMounted) return;
-
-        if (response.error) {
-          console.error('Error loading services:', response.error);
-          setServicesError('Failed to load services');
-        } else {
-          const serviceData: Service[] = response.data || [];
-          setServices(serviceData);
-          setServicesError(null);
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        console.error('Error loading services:', err);
-        setServicesError('Failed to load services');
-      } finally {
-        if (isMounted) {
-          setServicesLoading(false);
-        }
-      }
-    };
-
-    fetchServices();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { 
+    services, 
+    isLoading: servicesLoading, 
+    error: servicesError 
+  } = useServices();
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData(prev => ({
