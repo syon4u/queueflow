@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import PageLayout from '@/components/layout/PageLayout';
+import Navigation from '@/components/landing/Navigation';
 import HeroSection from '@/components/landing/HeroSection';
 import CustomerServiceCards from '@/components/landing/CustomerServiceCards';
 import FeaturesSection from '@/components/landing/FeaturesSection';
@@ -12,19 +13,27 @@ import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [showGuide, setShowGuide] = useState(false);
+  const [showStaffAccess, setShowStaffAccess] = useState(false);
   const { t } = useTranslation();
   
   const handleShowGuide = () => {
     setShowGuide(true);
   };
 
+  const handleToggleStaffAccess = () => {
+    setShowStaffAccess(!showStaffAccess);
+  };
+
   return (
-    <PageLayout 
-      headerTitle={t('landing.headerTitle')}
-      headerSubtitle={t('landing.headerSubtitle')}
-      className="w-full"
-    >
-      <div className="min-h-screen w-full bg-gray-50">
+    <div className="min-h-screen w-full bg-gray-50">
+      {/* Navigation */}
+      <Navigation 
+        showStaffAccess={showStaffAccess}
+        onToggleStaffAccess={handleToggleStaffAccess}
+      />
+      
+      {/* Main Content */}
+      <div className="w-full">
         {/* Hero Section */}
         <HeroSection onShowGuide={handleShowGuide} />
         
@@ -49,7 +58,7 @@ const Index = () => {
         isOpen={showGuide} 
         onClose={() => setShowGuide(false)} 
       />
-    </PageLayout>
+    </div>
   );
 };
 
