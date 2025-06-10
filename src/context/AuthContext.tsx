@@ -16,50 +16,130 @@ export const useAuth = (): AuthContextType => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Create a mock user for admin access since role checks are disabled
-  const mockAdminUser: User = {
-    id: 'mock-admin-user-id',
-    email: 'admin@broward.gov',
-    aud: 'authenticated',
-    role: 'authenticated',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    app_metadata: {},
-    user_metadata: {},
-    identities: [],
-    email_confirmed_at: new Date().toISOString(),
-    last_sign_in_at: new Date().toISOString(),
-    phone: null,
-    confirmed_at: new Date().toISOString()
-  };
-
-  const [user, setUser] = useState<User | null>(mockAdminUser);
+  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [role, setRole] = useState<UserRoleType | null>('admin');
+  const [loading, setLoading] = useState<boolean>(true);
+  const { role, fetchUserRole, clearRole } = useUserRole();
 
   useEffect(() => {
-    console.log('AuthProvider: Role checks disabled - using mock admin user with full access');
-    setLoading(false);
-  }, []);
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Fetch user role when user signs in
+          await fetchUserRole(session.user.id);
+        } else {
+          // Clear role when user signs out
+          clearRole();
+        }
+        
+        setLoading(false);
+      }
+    );
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      }
+      
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [fetchUserRole, clearRole]);
 
   const signIn = async (email: string, password: string): Promise<{ error?: AuthError }> => {
-    console.log('AuthProvider: Sign in disabled - mock success (role checks disabled)');
-    return {};
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        console.error('Sign in error:', error);
+        return { error: { message: error.message } };
+      }
+      
+      return {};
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      return { error: { message: error.message || 'An unexpected error occurred' } };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signUp = async (email: string, password: string, userData?: any): Promise<{ error?: AuthError }> => {
-    console.log('AuthProvider: Sign up disabled - mock success (role checks disabled)');
-    return {};
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData || {},
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+      
+      if (error) {
+        console.error('Sign up error:', error);
+        return { error: { message: error.message } };
+      }
+      
+      return {};
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      return { error: { message: error.message || 'An unexpected error occurred' } };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signOut = async (): Promise<void> => {
-    console.log('AuthProvider: Sign out disabled (role checks disabled)');
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signInWithGoogle = async (): Promise<{ error?: AuthError }> => {
-    console.log('AuthProvider: Google sign in disabled - mock success (role checks disabled)');
-    return {};
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      
+      if (error) {
+        console.error('Google sign in error:', error);
+        return { error: { message: error.message } };
+      }
+      
+      return {};
+    } catch (error: any) {
+      console.error('Google sign in error:', error);
+      return { error: { message: error.message || 'An unexpected error occurred' } };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value: AuthContextType = {
@@ -73,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
   };
 
-  console.log('AuthProvider: Current state (role checks disabled):', {
+  console.log('AuthProvider: Current state:', {
     hasUser: !!user,
     hasSession: !!session,
     role,

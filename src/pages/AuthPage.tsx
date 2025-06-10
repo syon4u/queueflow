@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -19,7 +18,7 @@ interface LocationState {
 }
 
 const AuthPage: React.FC = () => {
-  const { user, role, loading, signIn, signUp, signInWithGoogle } = useAuth();
+  const { user, role, loading, signIn, signUp } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +52,7 @@ const AuthPage: React.FC = () => {
         setError(errorDescription || 'Authentication failed');
         toast({
           title: 'Authentication Failed',
-          description: errorDescription || 'Failed to sign in with Google',
+          description: errorDescription || 'Failed to sign in',
           variant: 'destructive'
         });
       }
@@ -67,15 +66,15 @@ const AuthPage: React.FC = () => {
     if (!loading && user && role) {
       console.log('AuthPage: User authenticated with role, redirecting...', { user: user.email, role });
       
-      // Determine redirect path based on role and previous location
-      let redirectTo = '/customer'; // default
+      // Determine redirect path based on role
+      let redirectTo = '/staff'; // default for staff role
       
       if (role === 'admin') {
         redirectTo = '/admin';
+      } else if (role === 'power_user') {
+        redirectTo = '/power-user';
       } else if (role === 'staff') {
         redirectTo = '/staff';
-      } else {
-        redirectTo = '/customer';
       }
       
       // Use previous location if it was trying to access a protected route
@@ -84,7 +83,6 @@ const AuthPage: React.FC = () => {
       }
       
       console.log('AuthPage: Redirecting to:', redirectTo);
-      window.location.href = redirectTo; // Force navigation
     }
   }, [user, role, loading, state]);
 
@@ -153,37 +151,14 @@ const AuthPage: React.FC = () => {
       } else {
         toast({
           title: 'Account Created!',
-          description: 'Please check your email to verify your account',
+          description: 'Welcome to the staff portal',
         });
+        // User will be automatically signed in and redirected
       }
     } catch (error) {
       console.error('Sign up error:', error);
       setError('An unexpected error occurred');
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error } = await signInWithGoogle();
-      
-      if (error) {
-        setError(error.message || 'Failed to sign in with Google');
-        toast({
-          title: 'Google Sign In Failed',
-          description: error.message || 'Please try again',
-          variant: 'destructive'
-        });
-        setIsLoading(false);
-      }
-      // Don't set loading to false here as the redirect will handle it
-    } catch (error) {
-      console.error('Google sign in error:', error);
-      setError('An unexpected error occurred');
       setIsLoading(false);
     }
   };
@@ -200,16 +175,10 @@ const AuthPage: React.FC = () => {
     );
   }
 
-  // If user is authenticated but role is still loading, show loading
-  if (user && !role) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Setting up your account...</p>
-        </div>
-      </div>
-    );
+  // If user is authenticated, redirect to appropriate page
+  if (user && role) {
+    const redirectTo = role === 'admin' ? '/admin' : role === 'power_user' ? '/power-user' : '/staff';
+    return <Navigate to={state?.from?.pathname || redirectTo} replace />;
   }
 
   return (
@@ -217,10 +186,10 @@ const AuthPage: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            QueueFlow
+            QueueFlow Staff Portal
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to manage your appointments
+            Sign in to manage appointments and queues
           </p>
         </div>
 
@@ -228,7 +197,7 @@ const AuthPage: React.FC = () => {
           <CardHeader>
             <CardTitle>Authentication</CardTitle>
             <CardDescription>
-              Sign in to your account or create a new one
+              Sign in to your staff account or create a new one
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -349,24 +318,11 @@ const AuthPage: React.FC = () => {
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Create Account
+                    Create Staff Account
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
-
-            <div className="mt-6">
-              <Separator className="mb-4" />
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-              >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Continue with Google
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>
