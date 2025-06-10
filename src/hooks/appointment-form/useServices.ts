@@ -1,18 +1,25 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { ServiceRow } from '@/types/supabase';
+
+interface Service {
+  id: string;
+  name: string;
+  description?: string;
+  duration: number;
+  location_id?: string;
+}
 
 export const useServices = (locationId?: string) => {
   const { data: services = [], isLoading, error } = useQuery({
     queryKey: ['services', locationId],
-    queryFn: async (): Promise<ServiceRow[]> => {
+    queryFn: async (): Promise<Service[]> => {
       console.log('useServices - Starting service fetch for location:', locationId);
       
       try {
         let query = supabase
           .from('services')
-          .select('id, name, description, duration')
+          .select('id, name, description, duration, location_id')
           .eq('is_active', true)
           .order('name');
         
@@ -30,13 +37,7 @@ export const useServices = (locationId?: string) => {
           throw new Error(`Failed to load services: ${error.message}`);
         }
         
-        if (!data) {
-          console.warn('useServices - No data returned from query');
-          return [];
-        }
-        
-        console.log('useServices - Successfully fetched services:', data.length);
-        return data;
+        return data ?? [];
         
       } catch (err) {
         console.error('useServices - Fetch error:', err);
@@ -59,8 +60,8 @@ export const useServices = (locationId?: string) => {
   });
 
   return { 
-    services,
-    servicesLoading: isLoading,
-    servicesError: error?.message || null
+    data: services,
+    isLoading,
+    error: error?.message || null
   };
 };

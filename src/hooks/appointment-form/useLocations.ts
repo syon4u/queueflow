@@ -1,7 +1,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Location } from './types';
+
+interface Location {
+  id: string;
+  name: string;
+  address?: string;
+}
 
 export const useLocations = () => {
   const { data: locations = [], isLoading, error } = useQuery({
@@ -23,25 +28,7 @@ export const useLocations = () => {
           throw new Error(`Failed to load locations: ${error.message}`);
         }
         
-        if (!data) {
-          console.warn('useLocations - No data returned from query');
-          return [];
-        }
-        
-        console.log('useLocations - Successfully fetched locations:', data.length);
-        console.log('useLocations - Location details:', data);
-        
-        // Validate that each location has required fields
-        const validLocations = data.filter(location => {
-          const isValid = location && location.id && location.name;
-          if (!isValid) {
-            console.warn('useLocations - Invalid location found:', location);
-          }
-          return isValid;
-        });
-        
-        console.log('useLocations - Valid locations after filtering:', validLocations.length);
-        return validLocations;
+        return data ?? [];
         
       } catch (err) {
         console.error('useLocations - Fetch error:', err);
@@ -62,7 +49,7 @@ export const useLocations = () => {
   });
 
   return { 
-    locations,
+    data: locations,
     isLoading,
     error: error?.message || null
   };

@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useLocations } from '@/hooks/appointment-form/useLocations';
 import { useServices } from '@/hooks/appointment-form/useServices';
-import type { LocationRow, ServiceRow } from '@/types/supabase';
 
 export interface CustomerAppointmentData {
   firstName: string;
@@ -33,15 +32,15 @@ export const useSimpleAppointmentForm = () => {
 
   // Use existing hooks with proper typing
   const { 
-    locations, 
+    data: locations, 
     isLoading: locationsLoading, 
     error: locationsError 
   } = useLocations();
 
   const { 
-    services, 
-    servicesLoading, 
-    servicesError 
+    data: services, 
+    isLoading: servicesLoading, 
+    error: servicesError 
   } = useServices();
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {

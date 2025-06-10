@@ -41,10 +41,10 @@ const NewCustomerForm = ({
 }: NewCustomerFormProps) => {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<NewCustomerFormValues>();
 
-  const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
+  const { data: locations, isLoading: locationsLoading, error: locationsError } = useLocations();
   const selectedLocationId = watch('location_id');
   const selectedServiceId = watch('service_id');
-  const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
+  const { data: services, isLoading: servicesLoading, error: servicesError } = useServices(selectedLocationId);
 
   console.log('NewCustomerForm - Component state:', {
     locationsCount: locations?.length || 0,

@@ -37,8 +37,8 @@ export const useAppointmentForm = () => {
     prevStep
   } = useFormState();
 
-  const { locations } = useLocations();
-  const { services, servicesLoading, servicesError } = useServices(selectedLocationId);
+  const { data: locations } = useLocations();
+  const { data: services, isLoading: servicesLoading, error: servicesError } = useServices(selectedLocationId);
   const { createAppointment, isCreatingAppointment } = useAppointmentCreation();
 
   const handleSubmit = async () => {
