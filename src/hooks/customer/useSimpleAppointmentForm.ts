@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -43,8 +44,8 @@ export const useSimpleAppointmentForm = () => {
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [locationsLoading, setLocationsLoading] = useState<boolean>(true);
-  const [servicesLoading, setServicesLoading] = useState<boolean>(true);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [servicesLoading, setServicesLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
@@ -52,30 +53,31 @@ export const useSimpleAppointmentForm = () => {
   useEffect(() => {
     let isMounted = true;
     
-    const loadLocations = () => {
-      supabase
-        .from('locations')
-        .select('id, name, address')
-        .eq('is_active', true)
-        .then((response) => {
-          if (!isMounted) return;
+    const loadLocations = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('locations')
+          .select('id, name, address')
+          .eq('is_active', true);
 
-          if (response.error) {
-            console.error('Error loading locations:', response.error);
-            setLocationsError('Failed to load locations');
-          } else {
-            const locationData: Location[] = response.data || [];
-            setLocations(locationData);
-            setLocationsError(null);
-          }
-          setLocationsLoading(false);
-        })
-        .catch((err) => {
-          if (!isMounted) return;
-          console.error('Error loading locations:', err);
+        if (!isMounted) return;
+
+        if (error) {
+          console.error('Error loading locations:', error);
           setLocationsError('Failed to load locations');
+        } else {
+          setLocations(data as Location[]);
+          setLocationsError(null);
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        console.error('Error loading locations:', err);
+        setLocationsError('Failed to load locations');
+      } finally {
+        if (isMounted) {
           setLocationsLoading(false);
-        });
+        }
+      }
     };
 
     loadLocations();
@@ -89,30 +91,31 @@ export const useSimpleAppointmentForm = () => {
   useEffect(() => {
     let isMounted = true;
     
-    const loadServices = () => {
-      supabase
-        .from('services')
-        .select('id, name, description, duration')
-        .eq('is_active', true)
-        .then((response) => {
-          if (!isMounted) return;
+    const loadServices = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('services')
+          .select('id, name, description, duration')
+          .eq('is_active', true);
 
-          if (response.error) {
-            console.error('Error loading services:', response.error);
-            setServicesError('Failed to load services');
-          } else {
-            const serviceData: Service[] = response.data || [];
-            setServices(serviceData);
-            setServicesError(null);
-          }
-          setServicesLoading(false);
-        })
-        .catch((err) => {
-          if (!isMounted) return;
-          console.error('Error loading services:', err);
+        if (!isMounted) return;
+
+        if (error) {
+          console.error('Error loading services:', error);
           setServicesError('Failed to load services');
+        } else {
+          setServices(data as Service[]);
+          setServicesError(null);
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        console.error('Error loading services:', err);
+        setServicesError('Failed to load services');
+      } finally {
+        if (isMounted) {
           setServicesLoading(false);
-        });
+        }
+      }
     };
 
     loadServices();
