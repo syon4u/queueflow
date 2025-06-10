@@ -15,15 +15,15 @@ function App() {
     <Router>
       <div className="min-h-screen bg-background">
         <AuthProvider>
-          <QueueProvider>
-            <QueryClientProvider client={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <QueueProvider>
               <Routes>
                 <Route path="/" element={<CustomerPage />} />
                 <Route path="/customer" element={<CustomerPage />} />
                 <Route path="/appointment-lookup" element={<AppointmentLookupPage />} />
               </Routes>
-            </QueryClientProvider>
-          </QueueProvider>
+            </QueueProvider>
+          </QueryClientProvider>
         </AuthProvider>
       </div>
     </Router>
