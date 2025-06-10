@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface Location {
   id: string;
   name: string;
-  address?: string;
+  address: string; // Make required to match LocationRow
 }
 
 export const useLocations = () => {
@@ -15,20 +15,25 @@ export const useLocations = () => {
       console.log('useLocations - Starting location fetch...');
       
       try {
-        // First, let's check if the locations table exists and what data it contains
-        const { data, error, count } = await supabase
+        const { data, error } = await supabase
           .from('locations')
-          .select('id, name, address', { count: 'exact' })
+          .select('id, name, address')
           .order('name');
         
-        console.log('useLocations - Raw query result:', { data, error, count });
+        console.log('useLocations - Raw query result:', { data, error });
         
         if (error) {
           console.error('useLocations - Database error:', error);
           throw new Error(`Failed to load locations: ${error.message}`);
         }
         
-        return data ?? [];
+        // Ensure address is not null to match the interface
+        const locationsWithAddress = (data ?? []).map(location => ({
+          ...location,
+          address: location.address || '' // Default to empty string if null
+        }));
+        
+        return locationsWithAddress;
         
       } catch (err) {
         console.error('useLocations - Fetch error:', err);

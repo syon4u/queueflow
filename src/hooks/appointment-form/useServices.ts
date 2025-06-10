@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface Service {
   id: string;
   name: string;
-  description?: string;
+  description: string; // Make required to match ServiceRow
   duration: number;
   location_id?: string;
 }
@@ -23,7 +23,6 @@ export const useServices = (locationId?: string) => {
           .eq('is_active', true)
           .order('name');
         
-        // Only filter by location if locationId is provided
         if (locationId) {
           query = query.eq('location_id', locationId);
         }
@@ -37,7 +36,13 @@ export const useServices = (locationId?: string) => {
           throw new Error(`Failed to load services: ${error.message}`);
         }
         
-        return data ?? [];
+        // Ensure description is not null to match the interface
+        const servicesWithDescription = (data ?? []).map(service => ({
+          ...service,
+          description: service.description || '' // Default to empty string if null
+        }));
+        
+        return servicesWithDescription;
         
       } catch (err) {
         console.error('useServices - Fetch error:', err);
@@ -48,7 +53,7 @@ export const useServices = (locationId?: string) => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: true, // Always enabled, but will filter by location if provided
+    enabled: true,
   });
 
   console.log('useServices - Hook final state:', {

@@ -17,7 +17,7 @@ interface Service {
 interface LocationServiceSelectorProps {
   services: Service[] | undefined;
   servicesLoading: boolean;
-  servicesError: Error | null;
+  servicesError: string | null;
   selectedLocationId: string;
   selectedServiceId: string;
   setValue: UseFormSetValue<NewCustomerFormValues>;
@@ -31,7 +31,7 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
   selectedServiceId,
   setValue
 }) => {
-  const { locations, isLoading: locationsLoading, error: locationsError } = useLocations();
+  const { data: locations, isLoading: locationsLoading, error: locationsError } = useLocations();
 
   console.log('LocationServiceSelector - Component state:', {
     locationsCount: locations?.length || 0,
@@ -39,7 +39,7 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
     locationsError,
     servicesCount: services?.length || 0,
     servicesLoading,
-    servicesError: servicesError?.message,
+    servicesError,
     selectedLocationId,
     selectedServiceId
   });
@@ -93,7 +93,7 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Error loading services: {servicesError.message}
+              Error loading services: {servicesError}
             </AlertDescription>
           </Alert>
         )}
