@@ -27,7 +27,8 @@ export const UserAdministrationTab: React.FC = () => {
     handleUpdateRole,
     handleCreateUser,
     handleEditUser,
-    handleDeleteUser
+    handleDeleteUser,
+    refetch
   } = useUserAdministration();
 
   if (isLoading) {
@@ -35,7 +36,7 @@ export const UserAdministrationTab: React.FC = () => {
   }
 
   if (error) {
-    return <UserAdministrationErrorState error={error} />;
+    return <UserAdministrationErrorState error={error} onRetry={refetch} />;
   }
 
   const handleCreateUserSuccess = () => {
@@ -46,7 +47,10 @@ export const UserAdministrationTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <UserAdministrationHeader 
+        userCount={users.length}
+        onRefresh={refetch}
         onCreateUser={() => setCreateDialogOpen(true)}
+        isLoading={isLoading}
       />
       
       <UserSearchFilters
@@ -56,7 +60,7 @@ export const UserAdministrationTab: React.FC = () => {
         onRoleFilterChange={setRoleFilter}
       />
       
-      <UserRoleStatsCards stats={roleStats} />
+      <UserRoleStatsCards roleStats={roleStats} />
       
       <UserManagementTable
         users={users}

@@ -12,18 +12,26 @@ const VirtualQueuePage = () => {
   const [hasJoinedQueue, setHasJoinedQueue] = useState(false);
   const [queuePosition, setQueuePosition] = useState(0);
   const [estimatedWait, setEstimatedWait] = useState(0);
+  const [ticketData, setTicketData] = useState<any>(null);
 
-  const handleJoinQueue = (customerInfo: any) => {
-    console.log('Joining queue with:', customerInfo);
+  const handleJoinQueue = (ticketInfo: any) => {
+    console.log('Joining queue with:', ticketInfo);
     setHasJoinedQueue(true);
     setQueuePosition(5);
     setEstimatedWait(25);
+    setTicketData(ticketInfo);
   };
 
   const handleLeaveQueue = () => {
     setHasJoinedQueue(false);
     setQueuePosition(0);
     setEstimatedWait(0);
+    setTicketData(null);
+  };
+
+  const handleCheckIn = () => {
+    console.log('Checking in...');
+    // Handle check-in logic here
   };
 
   return (
@@ -36,10 +44,15 @@ const VirtualQueuePage = () => {
         </div>
 
         {!hasJoinedQueue ? (
-          <VirtualQueueJoin />
+          <VirtualQueueJoin onJoinSuccess={handleJoinQueue} />
         ) : (
           <div className="space-y-6">
-            <VirtualQueueTicket />
+            {ticketData && (
+              <VirtualQueueTicket 
+                ticketData={ticketData}
+                onCheckIn={handleCheckIn}
+              />
+            )}
             <QueuePositionTracker 
               currentPosition={queuePosition}
               estimatedWaitTime={estimatedWait}

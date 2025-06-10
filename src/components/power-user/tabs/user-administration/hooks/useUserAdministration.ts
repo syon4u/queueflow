@@ -20,7 +20,7 @@ export const useUserAdministration = () => {
                          user.first_name.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
                          user.last_name.toLowerCase().includes(state.searchTerm.toLowerCase());
     
-    const matchesRole = !state.roleFilter || user.role === state.roleFilter;
+    const matchesRole = !state.roleFilter || state.roleFilter === 'all' || user.role === state.roleFilter;
     
     return matchesSearch && matchesRole;
   });
