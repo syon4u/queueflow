@@ -145,6 +145,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithGoogle = async (): Promise<{ error: AuthError | null }> => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        console.error('Google SignIn error:', error);
+        setLoading(false);
+        return { error };
+      }
+
+      // Don't set loading to false here as redirect will handle it
+      return { error: null };
+    } catch (error: any) {
+      console.error('Google SignIn exception:', error);
+      setLoading(false);
+      return { error };
+    }
+  };
+
   const resetPassword = async (email: string): Promise<{ error: AuthError | null }> => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -210,6 +235,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signUp,
       signIn,
       signOut,
+      signInWithGoogle,
       resetPassword,
       updatePassword,
       resendConfirmation,

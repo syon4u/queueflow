@@ -36,8 +36,11 @@ export interface AuthState {
 export interface AuthActions {
   signIn: (email: string, password: string) => Promise<{ error?: AuthError }>;
   signUp: (email: string, password: string, userData?: any) => Promise<{ error?: AuthError }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<{ error?: AuthError }>;
   signInWithGoogle: () => Promise<{ error?: AuthError }>;
+  resetPassword: (email: string) => Promise<{ error?: AuthError }>;
+  updatePassword: (password: string) => Promise<{ error?: AuthError }>;
+  resendConfirmation: (email: string) => Promise<{ error?: AuthError }>;
 }
 
 export interface AuthContextType extends AuthState, AuthActions {}
