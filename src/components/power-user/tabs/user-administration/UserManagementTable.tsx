@@ -6,44 +6,26 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Edit, Trash2, Shield } from 'lucide-react';
 import { UserSearchFilters } from './UserSearchFilters';
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-  first_name?: string;
-  last_name?: string;
-  status?: string;
-  created_at: string;
-  last_sign_in_at: string;
-}
+import { UserAdministrationUser } from './types';
 
 interface UserManagementTableProps {
-  users: User[];
-  searchTerm: string;
-  roleFilter: string;
-  selectedUser: string | null;
-  updateRolePending: boolean;
-  onSearchChange: (value: string) => void;
-  onRoleFilterChange: (value: string) => void;
-  onUserSelect: (userId: string) => void;
-  onUpdateRole: (userId: string, newRole: string) => void;
+  users: UserAdministrationUser[];
+  selectedUserId: string | null;
+  onSelectUser: (userId: string) => void;
   onEditUser: (userId: string) => void;
+  onUpdateRole: (userId: string, newRole: string) => void;
   onDeleteUser: (userId: string) => void;
+  isUpdatingRole: boolean;
 }
 
 export const UserManagementTable: React.FC<UserManagementTableProps> = ({
   users,
-  searchTerm,
-  roleFilter,
-  selectedUser,
-  updateRolePending,
-  onSearchChange,
-  onRoleFilterChange,
-  onUserSelect,
-  onUpdateRole,
+  selectedUserId,
+  onSelectUser,
   onEditUser,
-  onDeleteUser
+  onUpdateRole,
+  onDeleteUser,
+  isUpdatingRole
 }) => {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -75,15 +57,6 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
     }
   };
 
-  // Filter users based on search and role
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = searchTerm === '' || 
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
-
   return (
     <Card className="border-0 shadow-sm">
       <CardHeader>
@@ -92,27 +65,17 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
             <Shield className="h-5 w-5 text-blue-600" />
             Enhanced User Management
           </CardTitle>
-          <Badge variant="outline">{filteredUsers.length} users</Badge>
+          <Badge variant="outline">{users.length} users</Badge>
         </div>
-        
-        <UserSearchFilters
-          searchTerm={searchTerm}
-          roleFilter={roleFilter}
-          onSearchChange={onSearchChange}
-          onRoleFilterChange={onRoleFilterChange}
-        />
       </CardHeader>
       
       <CardContent className="p-0">
-        {filteredUsers.length === 0 ? (
+        {users.length === 0 ? (
           <div className="text-center py-12 px-6">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
             <p className="text-gray-500">
-              {searchTerm || roleFilter !== 'all' 
-                ? 'Try adjusting your search or filter criteria'
-                : 'No users available in the database'
-              }
+              No users available in the database
             </p>
           </div>
         ) : (
@@ -128,13 +91,13 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {users.map((user) => (
                   <tr 
                     key={user.id} 
                     className={`border-b hover:bg-gray-50 transition-colors ${
-                      selectedUser === user.id ? 'bg-blue-50' : ''
+                      selectedUserId === user.id ? 'bg-blue-50' : ''
                     }`}
-                    onClick={() => onUserSelect(user.id)}
+                    onClick={() => onSelectUser(user.id)}
                   >
                     <td className="py-4 px-6">
                       <div>
@@ -152,7 +115,7 @@ export const UserManagementTable: React.FC<UserManagementTableProps> = ({
                       <Select 
                         value={user.role} 
                         onValueChange={(newRole) => onUpdateRole(user.id, newRole)}
-                        disabled={updateRolePending}
+                        disabled={isUpdatingRole}
                       >
                         <SelectTrigger className="w-40">
                           <Badge 
