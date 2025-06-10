@@ -1,17 +1,14 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
-import { QueryClient } from '@tanstack/react-query';
-import HomePage from '@/pages/HomePage';
-import LoginPage from '@/pages/LoginPage';
-import RegisterPage from '@/pages/RegisterPage';
-import DashboardPage from '@/pages/DashboardPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CustomerPage from '@/pages/CustomerPage';
-import StatusPage from '@/pages/StatusPage';
-import CheckInPage from '@/pages/CheckInPage';
-import NewAppointmentPage from '@/pages/NewAppointmentPage';
 import AppointmentLookupPage from './pages/AppointmentLookupPage';
+
+// Create a query client instance
+const queryClient = new QueryClient();
 
 function App() {
   return (
@@ -19,19 +16,13 @@ function App() {
       <div className="min-h-screen bg-background">
         <AuthProvider>
           <QueueProvider>
-            <QueryClient>
+            <QueryClientProvider client={queryClient}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/" element={<CustomerPage />} />
                 <Route path="/customer" element={<CustomerPage />} />
-                <Route path="/status" element={<StatusPage />} />
-                <Route path="/check-in" element={<CheckInPage />} />
-                <Route path="/new-appointment" element={<NewAppointmentPage />} />
                 <Route path="/appointment-lookup" element={<AppointmentLookupPage />} />
               </Routes>
-            </QueryClient>
+            </QueryClientProvider>
           </QueueProvider>
         </AuthProvider>
       </div>

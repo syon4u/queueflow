@@ -1,20 +1,7 @@
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Location {
-  id: string;
-  name: string;
-  address?: string;
-}
-
-interface Service {
-  id: string;
-  name: string;
-  duration: number;
-  description?: string;
-}
 
 export interface CustomerAppointmentData {
   firstName: string;
@@ -29,7 +16,20 @@ export interface CustomerAppointmentData {
   additionalNotes: string;
 }
 
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+}
+
+interface Service {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export const useSimpleAppointmentForm = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<CustomerAppointmentData>({
     firstName: '',
     lastName: '',
@@ -43,159 +43,147 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
-  console.log('useSimpleAppointmentForm - Hook initialized');
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [servicesError, setServicesError] = useState<string | null>(null);
 
-  // Fetch locations - public access (no authentication required)
-  const {
-    data: locations = [],
-    isLoading: locationsLoading,
-    error: locationsError,
-  } = useQuery<Location[]>({
-    queryKey: ['public-locations'],
-    queryFn: async (): Promise<Location[]> => {
-      console.log('useSimpleAppointmentForm - Starting locations fetch...');
-      
+  // Load locations
+  useEffect(() => {
+    const loadLocations = async () => {
       try {
-        console.log('useSimpleAppointmentForm - Making Supabase query for locations...');
-        
         const { data, error } = await supabase
           .from('locations')
           .select('id, name, address')
-          .order('name');
+          .eq('is_active', true);
 
-        console.log('useSimpleAppointmentForm - Locations query completed:', { 
-          data: data || [], 
-          error: error || null,
-          dataLength: data?.length || 0
+        if (error) throw error;
+        setLocations(data || []);
+      } catch (error) {
+        console.error('Error loading locations:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load locations',
+          variant: 'destructive',
         });
-
-        if (error) {
-          console.error('useSimpleAppointmentForm - Locations query error:', error);
-          throw new Error(`Failed to load locations: ${error.message}`);
-        }
-
-        console.log('useSimpleAppointmentForm - Successfully returning locations:', data?.length || 0);
-        return data || [];
-      } catch (err) {
-        console.error('useSimpleAppointmentForm - Exception in locations fetch:', err);
-        throw err;
+      } finally {
+        setLocationsLoading(false);
       }
-    },
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+    };
 
-  // Fetch services - public access (no authentication required)
-  const {
-    data: services = [],
-    isLoading: servicesLoading,
-    error: servicesError,
-  } = useQuery<Service[]>({
-    queryKey: ['public-services', formData.locationId],
-    queryFn: async (): Promise<Service[]> => {
-      if (!formData.locationId) {
-        console.log('useSimpleAppointmentForm - No location selected, skipping services fetch');
-        return [];
-      }
+    loadLocations();
+  }, [toast]);
 
-      console.log('useSimpleAppointmentForm - Starting services fetch for location:', formData.locationId);
-
+  // Load services
+  useEffect(() => {
+    const loadServices = async () => {
       try {
-        console.log('useSimpleAppointmentForm - Making Supabase query for services...');
-        
         const { data, error } = await supabase
           .from('services')
-          .select('id, name, duration, description')
-          .eq('location_id', formData.locationId)
-          .eq('is_active', true)
-          .order('name');
+          .select('id, name, description')
+          .eq('is_active', true);
 
-        console.log('useSimpleAppointmentForm - Services query completed:', { 
-          data: data || [], 
-          error: error || null,
-          dataLength: data?.length || 0,
-          locationId: formData.locationId
+        if (error) throw error;
+        setServices(data || []);
+      } catch (error) {
+        console.error('Error loading services:', error);
+        setServicesError('Failed to load services');
+        toast({
+          title: 'Error',
+          description: 'Failed to load services',
+          variant: 'destructive',
         });
-
-        if (error) {
-          console.error('useSimpleAppointmentForm - Services query error:', error);
-          throw new Error(`Failed to load services: ${error.message}`);
-        }
-
-        console.log('useSimpleAppointmentForm - Successfully returning services:', data?.length || 0);
-        return data || [];
-      } catch (err) {
-        console.error('useSimpleAppointmentForm - Exception in services fetch:', err);
-        throw err;
+      } finally {
+        setServicesLoading(false);
       }
-    },
-    enabled: Boolean(formData.locationId),
-    retry: 1,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+    };
 
-  console.log('useSimpleAppointmentForm - Current state:', {
-    locationsCount: locations?.length || 0,
-    locationsLoading,
-    locationsError: locationsError?.message || null,
-    servicesCount: services?.length || 0,
-    servicesLoading,
-    servicesError: servicesError?.message || null,
-    selectedLocationId: formData.locationId
-  });
+    loadServices();
+  }, [toast]);
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
-    console.log('useSimpleAppointmentForm - Updating field:', field, 'to:', value);
-    setFormData((prev) => {
-      const updated = { ...prev, [field]: value };
-      if (field === 'locationId' && value !== prev.locationId) {
-        console.log('useSimpleAppointmentForm - Location changed, clearing service selection');
-        updated.serviceId = '';
-      }
-      return updated;
-    });
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const resetForm = () => {
-    console.log('useSimpleAppointmentForm - Resetting form');
-    setFormData({
-      firstName: '',
-      lastName: '',
-      phone: '',
-      email: '',
-      locationId: '',
-      serviceId: '',
-      preferredDate: '',
-      preferredTime: '',
-      reasonForVisit: '',
-      additionalNotes: '',
-    });
-  };
+  const validateForm = () => {
+    if (!formData.firstName.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'First name is required',
+        variant: 'destructive',
+      });
+      return 'First name is required';
+    }
 
-  const validateForm = (): string | null => {
-    console.log('useSimpleAppointmentForm - Validating form:', formData);
-    if (!formData.firstName.trim()) return 'First name is required';
-    if (!formData.lastName.trim()) return 'Last name is required';
-    if (!formData.phone.trim()) return 'Phone number is required';
-    if (!formData.locationId) return 'Please select a location';
-    if (!formData.serviceId) return 'Please select a service';
+    if (!formData.lastName.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Last name is required',
+        variant: 'destructive',
+      });
+      return 'Last name is required';
+    }
+
+    if (!formData.phone.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Phone number is required',
+        variant: 'destructive',
+      });
+      return 'Phone number is required';
+    }
+
+    if (!formData.locationId) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select a location',
+        variant: 'destructive',
+      });
+      return 'Location is required';
+    }
+
+    if (!formData.serviceId) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select a service',
+        variant: 'destructive',
+      });
+      return 'Service is required';
+    }
+
+    if (!formData.preferredDate) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select a preferred date',
+        variant: 'destructive',
+      });
+      return 'Preferred date is required';
+    }
+
+    if (!formData.preferredTime) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select a preferred time',
+        variant: 'destructive',
+      });
+      return 'Preferred time is required';
+    }
+
     return null;
   };
 
   return {
     formData,
     updateField,
-    resetForm,
     validateForm,
-
     locations,
-    locationsLoading,
-    locationsError: locationsError?.message ?? null,
-
     services,
+    locationsLoading,
     servicesLoading,
-    servicesError: servicesError?.message ?? null,
+    servicesError,
   };
 };
