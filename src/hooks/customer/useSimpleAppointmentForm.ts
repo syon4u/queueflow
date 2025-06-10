@@ -49,24 +49,25 @@ export const useSimpleAppointmentForm = () => {
   const [locationsError, setLocationsError] = useState<string | null>(null);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
-  // Load locations
+  // Load locations with simplified typing
   useEffect(() => {
     let isMounted = true;
     
-    const loadLocations = async () => {
+    const fetchLocations = async (): Promise<void> => {
       try {
-        const { data, error } = await supabase
+        const response = await supabase
           .from('locations')
           .select('id, name, address')
           .eq('is_active', true);
 
         if (!isMounted) return;
 
-        if (error) {
-          console.error('Error loading locations:', error);
+        if (response.error) {
+          console.error('Error loading locations:', response.error);
           setLocationsError('Failed to load locations');
         } else {
-          setLocations(data as Location[]);
+          const locationData: Location[] = response.data || [];
+          setLocations(locationData);
           setLocationsError(null);
         }
       } catch (err) {
@@ -80,31 +81,32 @@ export const useSimpleAppointmentForm = () => {
       }
     };
 
-    loadLocations();
+    fetchLocations();
     
     return () => {
       isMounted = false;
     };
   }, []);
 
-  // Load services
+  // Load services with simplified typing
   useEffect(() => {
     let isMounted = true;
     
-    const loadServices = async () => {
+    const fetchServices = async (): Promise<void> => {
       try {
-        const { data, error } = await supabase
+        const response = await supabase
           .from('services')
           .select('id, name, description, duration')
           .eq('is_active', true);
 
         if (!isMounted) return;
 
-        if (error) {
-          console.error('Error loading services:', error);
+        if (response.error) {
+          console.error('Error loading services:', response.error);
           setServicesError('Failed to load services');
         } else {
-          setServices(data as Service[]);
+          const serviceData: Service[] = response.data || [];
+          setServices(serviceData);
           setServicesError(null);
         }
       } catch (err) {
@@ -118,7 +120,7 @@ export const useSimpleAppointmentForm = () => {
       }
     };
 
-    loadServices();
+    fetchServices();
     
     return () => {
       isMounted = false;
