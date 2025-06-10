@@ -150,7 +150,7 @@ const NewCustomerForm = ({
         <LocationServiceSelector
           services={services}
           servicesLoading={servicesLoading}
-          servicesError={servicesError ? new Error(servicesError) : null}
+          servicesError={servicesError}
           selectedLocationId={selectedLocationId || ''}
           selectedServiceId={selectedServiceId || ''}
           setValue={setValue}

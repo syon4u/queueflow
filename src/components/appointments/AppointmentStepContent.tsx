@@ -91,8 +91,8 @@ const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
       {/* Step 1: Select Location */}
       {currentStep === 1 && (
         <LocationStep 
-          locationId={selectedLocationId}
-          onLocationChange={setSelectedLocationId}
+          selectedLocationId={selectedLocationId}
+          setSelectedLocationId={setSelectedLocationId}
         />
       )}
       
