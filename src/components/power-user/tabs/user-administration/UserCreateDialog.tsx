@@ -2,102 +2,34 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuditLog } from '@/hooks/power-user/useAuditLog';
-
-interface UserCreateDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onUserCreated: () => void;
-}
+import { UserCreateForm } from './create-user/UserCreateForm';
+import { useCreateUser } from './create-user/useCreateUser';
+import { UserCreateDialogProps, CreateUserFormData } from './create-user/types';
 
 export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
   open,
   onOpenChange,
   onUserCreated
 }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateUserFormData>({
     email: '',
     firstName: '',
     lastName: '',
     phone: '',
     role: 'customer'
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  const { logAction } = useAuditLog();
+
+  const { createUser, isLoading } = useCreateUser();
+
+  const handleFormDataChange = (data: Partial<CreateUserFormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      console.log('Creating new user with data:', formData);
-      
-      // Generate a UUID for the new profile
-      const userId = crypto.randomUUID();
-
-      // Create user profile with generated UUID
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone || null,
-          status: 'active'
-        })
-        .select()
-        .single();
-
-      if (profileError) {
-        console.error('Profile creation error:', profileError);
-        throw profileError;
-      }
-
-      console.log('Profile created:', profile);
-
-      // Set user role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: userId,
-          role: formData.role
-        });
-
-      if (roleError) {
-        console.error('Role assignment error:', roleError);
-        throw roleError;
-      }
-
-      console.log('Role assigned successfully');
-
-      // Log the user creation
-      await logAction({
-        action: 'CREATE_USER',
-        resource_type: 'user_profile',
-        resource_id: userId,
-        details: {
-          created_user: {
-            id: userId,
-            email: formData.email,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            role: formData.role
-          }
-        }
-      });
-
-      toast({
-        title: 'Success',
-        description: 'User created successfully'
-      });
-
+    
+    const success = await createUser(formData);
+    if (success) {
       onUserCreated();
       onOpenChange(false);
       setFormData({
@@ -107,15 +39,6 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
         phone: '',
         role: 'customer'
       });
-    } catch (error) {
-      console.error('Error creating user:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create user',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -127,63 +50,10 @@ export const UserCreateDialog: React.FC<UserCreateDialogProps> = ({
         </DialogHeader>
         
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="phone">Phone (Optional)</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="role">Role</Label>
-              <Select value={formData.role} onValueChange={(value) => setFormData(prev => ({ ...prev, role: value }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="customer">Customer</SelectItem>
-                  <SelectItem value="staff">Staff</SelectItem>
-                  <SelectItem value="power_user">Power User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <UserCreateForm 
+            formData={formData}
+            onFormDataChange={handleFormDataChange}
+          />
           
           <DialogFooter className="mt-6">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
