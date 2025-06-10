@@ -78,7 +78,7 @@ export const useSimpleAppointmentForm = () => {
     };
 
     loadLocations();
-  }, [toast]);
+  }, []);
 
   // Load services
   useEffect(() => {
@@ -107,7 +107,7 @@ export const useSimpleAppointmentForm = () => {
     };
 
     loadServices();
-  }, [toast]);
+  }, []);
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData(prev => ({

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, FileText, AlertCircle } from 'lucide-react';
@@ -22,6 +21,7 @@ const SimpleScheduleCard: React.FC<SimpleScheduleCardProps> = ({ onAppointmentRe
     validateForm,
     locations,
     locationsLoading,
+    locationsError,
     services,
     servicesLoading,
     servicesError
@@ -112,6 +112,7 @@ const SimpleScheduleCard: React.FC<SimpleScheduleCardProps> = ({ onAppointmentRe
               updateField={updateField}
               locations={locations}
               locationsLoading={locationsLoading}
+              locationsError={locationsError}
               services={services}
               servicesLoading={servicesLoading}
               servicesError={servicesError}
