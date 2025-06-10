@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,53 +43,76 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
+  // Fetch locations - now public access
   const {
     data: locations = [],
     isLoading: locationsLoading,
     error: locationsError,
   } = useQuery<Location[]>({
-    queryKey: ['simple-locations'],
+    queryKey: ['public-locations'],
     queryFn: async (): Promise<Location[]> => {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name, address')
-        .order('name');
+      console.log('Fetching locations for public access...');
+      
+      try {
+        const { data, error } = await supabase
+          .from('locations')
+          .select('id, name, address')
+          .order('name');
 
-      if (error) {
-        console.error('Supabase locations error:', error);
-        throw error;
+        if (error) {
+          console.error('Error fetching locations:', error);
+          throw new Error(`Failed to load locations: ${error.message}`);
+        }
+
+        console.log('Successfully fetched locations:', data?.length || 0);
+        return data || [];
+      } catch (err) {
+        console.error('Exception fetching locations:', err);
+        throw err;
       }
-      return data || [];
     },
-    retry: 1,
+    retry: 2,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
+  // Fetch services - now public access
   const {
     data: services = [],
     isLoading: servicesLoading,
     error: servicesError,
   } = useQuery<Service[]>({
-    queryKey: ['simple-services', formData.locationId],
+    queryKey: ['public-services', formData.locationId],
     queryFn: async (): Promise<Service[]> => {
-      if (!formData.locationId) return [];
-
-      const { data, error } = await supabase
-        .from('services')
-        .select('id, name, duration, description')
-        .eq('location_id', formData.locationId)
-        .eq('is_active', true)
-        .order('name');
-
-      if (error) {
-        console.error('Supabase services error:', error);
-        throw error;
+      if (!formData.locationId) {
+        console.log('No location selected, skipping services fetch');
+        return [];
       }
-      return data || [];
+
+      console.log('Fetching services for location:', formData.locationId);
+
+      try {
+        const { data, error } = await supabase
+          .from('services')
+          .select('id, name, duration, description')
+          .eq('location_id', formData.locationId)
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) {
+          console.error('Error fetching services:', error);
+          throw new Error(`Failed to load services: ${error.message}`);
+        }
+
+        console.log('Successfully fetched services:', data?.length || 0);
+        return data || [];
+      } catch (err) {
+        console.error('Exception fetching services:', err);
+        throw err;
+      }
     },
     enabled: Boolean(formData.locationId),
-    retry: 1,
+    retry: 2,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
@@ -97,7 +121,7 @@ export const useSimpleAppointmentForm = () => {
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
       if (field === 'locationId' && value !== prev.locationId) {
-        updated.serviceId = '';
+        updated.serviceId = ''; // Clear service when location changes
       }
       return updated;
     });

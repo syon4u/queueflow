@@ -1,11 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, Users } from 'lucide-react';
-import { useRealtimeAppointments } from '@/hooks/use-realtime-appointments';
-import { formatWaitTime } from '@/lib/queue';
 
 interface QueuePositionTrackerProps {
   currentPosition?: number;
@@ -14,59 +11,14 @@ interface QueuePositionTrackerProps {
 }
 
 const QueuePositionTracker: React.FC<QueuePositionTrackerProps> = ({
-  currentPosition: propPosition,
-  estimatedWaitTime: propWaitTime,
+  currentPosition,
+  estimatedWaitTime,
   onLeaveQueue
 }) => {
-  const { userPosition, estimatedWaitTime, isLoading, error } = useRealtimeAppointments();
-
-  // Use props if provided, otherwise fall back to hook data
-  const position = propPosition !== undefined ? propPosition : userPosition;
-  const waitTime = propWaitTime !== undefined ? propWaitTime : estimatedWaitTime;
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Queue Position
-          </CardTitle>
-          <CardDescription>
-            Your current position in the queue
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-4">
-            <div className="animate-pulse">Loading your queue position...</div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Queue Position
-          </CardTitle>
-          <CardDescription>
-            Your current position in the queue
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-4 text-muted-foreground">
-            Unable to load queue information
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (position === null || position === undefined) {
+  // Simplified component without real-time data fetching for now
+  // This avoids the authentication/verification code dependencies
+  
+  if (currentPosition === null || currentPosition === undefined) {
     return (
       <Card>
         <CardHeader>
@@ -87,6 +39,15 @@ const QueuePositionTracker: React.FC<QueuePositionTrackerProps> = ({
     );
   }
 
+  const formatWaitTime = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes}m`;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -101,14 +62,14 @@ const QueuePositionTracker: React.FC<QueuePositionTrackerProps> = ({
       <CardContent>
         <div className="space-y-4">
           <div className="text-center">
-            <div className="text-3xl font-bold text-primary">#{position}</div>
+            <div className="text-3xl font-bold text-primary">#{currentPosition}</div>
             <p className="text-sm text-muted-foreground">Position in queue</p>
           </div>
           
-          {waitTime !== null && waitTime !== undefined && (
+          {estimatedWaitTime !== null && estimatedWaitTime !== undefined && (
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
-              <span>Estimated wait: {formatWaitTime(waitTime)}</span>
+              <span>Estimated wait: {formatWaitTime(estimatedWaitTime)}</span>
             </div>
           )}
           

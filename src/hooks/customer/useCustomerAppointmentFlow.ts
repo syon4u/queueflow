@@ -9,20 +9,25 @@ export const useCustomerAppointmentFlow = () => {
 
   const createAppointment = async (customerData: CustomerAppointmentData): Promise<string | null> => {
     setIsSubmitting(true);
-    console.log('useCustomerAppointmentFlow - Creating appointment:', customerData);
+    console.log('Creating appointment for customer:', customerData);
 
     try {
-      // Check if customer exists by phone
+      // Check if customer exists by phone number
       let customerId: string;
-      const { data: existingCustomer } = await supabase
+      const { data: existingCustomer, error: searchError } = await supabase
         .from('customers')
         .select('id')
         .eq('phone', customerData.phone)
         .maybeSingle();
 
+      if (searchError) {
+        console.error('Error searching for existing customer:', searchError);
+        throw new Error(`Failed to check customer: ${searchError.message}`);
+      }
+
       if (existingCustomer) {
         customerId = existingCustomer.id;
-        console.log('useCustomerAppointmentFlow - Using existing customer:', customerId);
+        console.log('Using existing customer:', customerId);
       } else {
         // Create new customer
         const newCustomerId = crypto.randomUUID();
@@ -39,21 +44,21 @@ export const useCustomerAppointmentFlow = () => {
           .single();
 
         if (customerError) {
-          console.error('useCustomerAppointmentFlow - Customer creation error:', customerError);
+          console.error('Customer creation error:', customerError);
           throw new Error(`Failed to create customer: ${customerError.message}`);
         }
 
         customerId = newCustomer.id;
-        console.log('useCustomerAppointmentFlow - Created new customer:', customerId);
+        console.log('Created new customer:', customerId);
       }
 
-      // Create the appointment with proper date/time handling
+      // Create the appointment
       let scheduledDateTime: Date;
       
       if (customerData.preferredDate && customerData.preferredTime) {
         scheduledDateTime = new Date(`${customerData.preferredDate}T${customerData.preferredTime}`);
       } else {
-        // Default to next business day at 9 AM if no preference provided
+        // Default to next business day at 9 AM
         scheduledDateTime = new Date();
         scheduledDateTime.setDate(scheduledDateTime.getDate() + 1);
         scheduledDateTime.setHours(9, 0, 0, 0);
@@ -74,16 +79,17 @@ export const useCustomerAppointmentFlow = () => {
         .single();
 
       if (appointmentError) {
-        console.error('useCustomerAppointmentFlow - Appointment creation error:', appointmentError);
+        console.error('Appointment creation error:', appointmentError);
         throw new Error(`Failed to create appointment: ${appointmentError.message}`);
       }
 
+      // Generate simple confirmation code
       const confirmationCode = `APT-${appointment.id.slice(0, 8).toUpperCase()}`;
-      console.log('useCustomerAppointmentFlow - Created appointment:', appointment.id, 'with code:', confirmationCode);
+      console.log('Created appointment:', appointment.id, 'with confirmation:', confirmationCode);
 
       return confirmationCode;
     } catch (error: any) {
-      console.error('useCustomerAppointmentFlow - Error:', error);
+      console.error('Appointment creation failed:', error);
       toast({
         title: 'Error',
         description: error.message || 'Failed to create appointment. Please try again.',

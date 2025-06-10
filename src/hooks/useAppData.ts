@@ -27,7 +27,6 @@ export interface Appointment {
   reason_for_visit: string | null;
   created_at: string;
   updated_at: string;
-  // Relations
   customer?: Customer;
   service?: Service;
   location?: Location;
@@ -70,58 +69,7 @@ export interface AppData {
 }
 
 export const useAppData = (): AppData => {
-  // Fetch customers
-  const {
-    data: customers = [],
-    isLoading: customersLoading,
-    error: customersError,
-    refetch: refetchCustomers
-  } = useQuery({
-    queryKey: ['app-customers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as Customer[];
-    },
-    refetchInterval: 30000, // Refetch every 30 seconds for live data
-  });
-
-  // Fetch appointments with relations
-  const {
-    data: appointments = [],
-    isLoading: appointmentsLoading,
-    error: appointmentsError,
-    refetch: refetchAppointments
-  } = useQuery({
-    queryKey: ['app-appointments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          customers!appointments_customer_id_fkey (*),
-          services!appointments_service_id_fkey (*),
-          locations!appointments_location_id_fkey (*)
-        `)
-        .order('scheduled_time', { ascending: true });
-
-      if (error) throw error;
-      
-      return (data || []).map(appointment => ({
-        ...appointment,
-        customer: appointment.customers,
-        service: appointment.services,
-        location: appointment.locations
-      })) as Appointment[];
-    },
-    refetchInterval: 15000, // More frequent updates for appointments
-  });
-
-  // Fetch locations
+  // Fetch locations - now public
   const {
     data: locations = [],
     isLoading: locationsLoading,
@@ -130,18 +78,25 @@ export const useAppData = (): AppData => {
   } = useQuery({
     queryKey: ['app-locations'],
     queryFn: async () => {
+      console.log('Fetching locations for app data...');
+      
       const { data, error } = await supabase
         .from('locations')
         .select('*')
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching locations:', error);
+        throw error;
+      }
+      
+      console.log('App data locations loaded:', data?.length || 0);
       return data as Location[];
     },
     refetchInterval: 60000, // Less frequent updates for locations
   });
 
-  // Fetch services
+  // Fetch services - now public
   const {
     data: services = [],
     isLoading: servicesLoading,
@@ -150,24 +105,38 @@ export const useAppData = (): AppData => {
   } = useQuery({
     queryKey: ['app-services'],
     queryFn: async () => {
+      console.log('Fetching services for app data...');
+      
       const { data, error } = await supabase
         .from('services')
         .select('*')
         .eq('is_active', true)
         .order('name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching services:', error);
+        throw error;
+      }
+      
+      console.log('App data services loaded:', data?.length || 0);
       return data as Service[];
     },
     refetchInterval: 60000,
   });
 
-  const isLoading = customersLoading || appointmentsLoading || locationsLoading || servicesLoading;
-  const error = customersError || appointmentsError || locationsError || servicesError;
+  // Note: Customers and appointments are commented out since they require authentication
+  // and the customer portal should work without authentication
+  const customers: Customer[] = [];
+  const appointments: Appointment[] = [];
+  const customersLoading = false;
+  const appointmentsLoading = false;
+  const customersError = null;
+  const appointmentsError = null;
+
+  const isLoading = locationsLoading || servicesLoading;
+  const error = locationsError || servicesError;
 
   const refetch = () => {
-    refetchCustomers();
-    refetchAppointments();
     refetchLocations();
     refetchServices();
   };
