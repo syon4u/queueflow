@@ -45,7 +45,7 @@ export const useSimpleAppointmentForm = () => {
 
   console.log('useSimpleAppointmentForm - Hook initialized');
 
-  // Fetch locations - now public access
+  // Fetch locations - public access (no authentication required)
   const {
     data: locations = [],
     isLoading: locationsLoading,
@@ -86,7 +86,7 @@ export const useSimpleAppointmentForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch services - now public access
+  // Fetch services - public access (no authentication required)
   const {
     data: services = [],
     isLoading: servicesLoading,
@@ -152,7 +152,7 @@ export const useSimpleAppointmentForm = () => {
       const updated = { ...prev, [field]: value };
       if (field === 'locationId' && value !== prev.locationId) {
         console.log('useSimpleAppointmentForm - Location changed, clearing service selection');
-        updated.serviceId = ''; // Clear service when location changes
+        updated.serviceId = '';
       }
       return updated;
     });

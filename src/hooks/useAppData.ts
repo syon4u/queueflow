@@ -1,6 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 export interface Customer {
   id: string;
@@ -69,6 +70,8 @@ export interface AppData {
 }
 
 export const useAppData = (): AppData => {
+  const { user, role } = useAuth();
+
   // Fetch locations - now public
   const {
     data: locations = [],
@@ -93,7 +96,7 @@ export const useAppData = (): AppData => {
       console.log('App data locations loaded:', data?.length || 0);
       return data as Location[];
     },
-    refetchInterval: 60000, // Less frequent updates for locations
+    refetchInterval: 60000,
   });
 
   // Fetch services - now public
@@ -124,21 +127,75 @@ export const useAppData = (): AppData => {
     refetchInterval: 60000,
   });
 
-  // Note: Customers and appointments are commented out since they require authentication
-  // and the customer portal should work without authentication
-  const customers: Customer[] = [];
-  const appointments: Appointment[] = [];
-  const customersLoading = false;
-  const appointmentsLoading = false;
-  const customersError = null;
-  const appointmentsError = null;
+  // Fetch customers - only for authenticated staff
+  const {
+    data: customers = [],
+    isLoading: customersLoading,
+    error: customersError,
+    refetch: refetchCustomers
+  } = useQuery({
+    queryKey: ['app-customers'],
+    queryFn: async () => {
+      console.log('Fetching customers for app data...');
+      
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const isLoading = locationsLoading || servicesLoading;
-  const error = locationsError || servicesError;
+      if (error) {
+        console.error('Error fetching customers:', error);
+        throw error;
+      }
+      
+      console.log('App data customers loaded:', data?.length || 0);
+      return data as Customer[];
+    },
+    enabled: !!user && ['staff', 'power_user', 'admin'].includes(role || ''),
+    refetchInterval: 30000,
+  });
+
+  // Fetch appointments - only for authenticated staff
+  const {
+    data: appointments = [],
+    isLoading: appointmentsLoading,
+    error: appointmentsError,
+    refetch: refetchAppointments
+  } = useQuery({
+    queryKey: ['app-appointments'],
+    queryFn: async () => {
+      console.log('Fetching appointments for app data...');
+      
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          customers!appointments_customer_id_fkey(*),
+          services!appointments_service_id_fkey(*),
+          locations!appointments_location_id_fkey(*)
+        `)
+        .order('scheduled_time', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching appointments:', error);
+        throw error;
+      }
+      
+      console.log('App data appointments loaded:', data?.length || 0);
+      return data as Appointment[];
+    },
+    enabled: !!user && ['staff', 'power_user', 'admin'].includes(role || ''),
+    refetchInterval: 30000,
+  });
+
+  const isLoading = locationsLoading || servicesLoading || customersLoading || appointmentsLoading;
+  const error = locationsError || servicesError || customersError || appointmentsError;
 
   const refetch = () => {
     refetchLocations();
     refetchServices();
+    refetchCustomers();
+    refetchAppointments();
   };
 
   return {

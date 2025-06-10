@@ -22,7 +22,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { role, fetchUserRole, clearRole } = useUserRole();
 
   useEffect(() => {
-    // Set up auth state listener first
+    // Get initial session
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting initial session:', error);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('Initial session:', session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchUserRole(session.user.id);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to get initial session:', error);
+        setLoading(false);
+      }
+    };
+
+    getInitialSession();
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
@@ -41,125 +69,152 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      }
-      
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [fetchUserRole, clearRole]);
 
-  const signIn = async (email: string, password: string): Promise<{ error?: AuthError }> => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        console.error('Sign in error:', error);
-        return { error: { message: error.message } };
-      }
-      
-      return {};
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      return { error: { message: error.message || 'An unexpected error occurred' } };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signUp = async (email: string, password: string, userData?: any): Promise<{ error?: AuthError }> => {
+  const signUp = async (
+    email: string,
+    password: string,
+    options?: { data?: { first_name?: string; last_name?: string } }
+  ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData || {},
-          emailRedirectTo: `${window.location.origin}/`
+          emailRedirectTo: `${window.location.origin}/`,
+          data: options?.data || {}
         }
       });
-      
+
       if (error) {
-        console.error('Sign up error:', error);
-        return { error: { message: error.message } };
+        console.error('SignUp error:', error);
+        return { error };
       }
-      
-      return {};
+
+      return { error: null };
     } catch (error: any) {
-      console.error('Sign up error:', error);
-      return { error: { message: error.message || 'An unexpected error occurred' } };
+      console.error('SignUp exception:', error);
+      return { error };
     } finally {
       setLoading(false);
     }
   };
 
-  const signOut = async (): Promise<void> => {
+  const signIn = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error('SignIn error:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('SignIn exception:', error);
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = async (): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Sign out error:', error);
-      }
-    } catch (error) {
-      console.error('Sign out error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const signInWithGoogle = async (): Promise<{ error?: AuthError }> => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
-      });
-      
       if (error) {
-        console.error('Google sign in error:', error);
-        return { error: { message: error.message } };
+        console.error('SignOut error:', error);
+        return { error };
       }
-      
-      return {};
+
+      return { error: null };
     } catch (error: any) {
-      console.error('Google sign in error:', error);
-      return { error: { message: error.message || 'An unexpected error occurred' } };
+      console.error('SignOut exception:', error);
+      return { error };
     } finally {
       setLoading(false);
     }
   };
 
-  const value: AuthContextType = {
-    user,
-    session,
-    role,
-    loading,
-    signIn,
-    signUp,
-    signOut,
-    signInWithGoogle,
+  const resetPassword = async (email: string): Promise<{ error: AuthError | null }> => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) {
+        console.error('Reset password error:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('Reset password exception:', error);
+      return { error };
+    }
   };
 
-  console.log('AuthProvider: Current state:', {
-    hasUser: !!user,
-    hasSession: !!session,
-    role,
-    loading,
-    userId: user?.id
-  });
+  const updatePassword = async (password: string): Promise<{ error: AuthError | null }> => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+      if (error) {
+        console.error('Update password error:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('Update password exception:', error);
+      return { error };
+    }
+  };
+
+  const resendConfirmation = async (email: string): Promise<{ error: AuthError | null }> => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        console.error('Resend confirmation error:', error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('Resend confirmation exception:', error);
+      return { error };
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{
+      user,
+      session,
+      role,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      resetPassword,
+      updatePassword,
+      resendConfirmation,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

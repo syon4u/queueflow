@@ -24,7 +24,7 @@ const mapAppointmentStatusToCustomerStatus = (appointmentStatus: string, assigne
 };
 
 export const useQueueData = () => {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   
   const { data: appointmentsData = [] } = useQuery({
     queryKey: ['queue-appointments', user?.id],
@@ -78,7 +78,7 @@ export const useQueueData = () => {
       return transformedCustomers;
     },
     refetchInterval: 30000,
-    enabled: !!user
+    enabled: !!user && ['staff', 'power_user', 'admin'].includes(role || '')
   });
 
   return { customers: appointmentsData || [] };
