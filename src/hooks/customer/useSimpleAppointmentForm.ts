@@ -42,7 +42,6 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
-  // Simplified state declarations without explicit boolean typing
   const [locations, setLocations] = useState<Location[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(true);
@@ -50,73 +49,81 @@ export const useSimpleAppointmentForm = () => {
   const [locationsError, setLocationsError] = useState<string | null>(null);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
-  // Load locations - simplified without complex dependency tracking
+  // Load locations
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
     
-    const loadLocations = async () => {
+    const fetchLocations = async (): Promise<void> => {
       try {
-        const { data, error } = await supabase
+        const response = await supabase
           .from('locations')
           .select('id, name, address')
           .eq('is_active', true);
 
-        if (!mounted) return;
+        if (!isMounted) return;
 
-        if (error) throw error;
-        setLocations(data || []);
+        if (response.error) {
+          throw response.error;
+        }
+        
+        const locationData: Location[] = response.data || [];
+        setLocations(locationData);
         setLocationsError(null);
-      } catch (error) {
-        if (!mounted) return;
-        console.error('Error loading locations:', error);
+      } catch (err) {
+        if (!isMounted) return;
+        console.error('Error loading locations:', err);
         setLocationsError('Failed to load locations');
       } finally {
-        if (mounted) {
+        if (isMounted) {
           setLocationsLoading(false);
         }
       }
     };
 
-    loadLocations();
+    fetchLocations();
     
     return () => {
-      mounted = false;
+      isMounted = false;
     };
-  }, []); // Empty dependency array
+  }, []);
 
-  // Load services - simplified without complex dependency tracking
+  // Load services
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
     
-    const loadServices = async () => {
+    const fetchServices = async (): Promise<void> => {
       try {
-        const { data, error } = await supabase
+        const response = await supabase
           .from('services')
           .select('id, name, description, duration')
           .eq('is_active', true);
 
-        if (!mounted) return;
+        if (!isMounted) return;
 
-        if (error) throw error;
-        setServices(data || []);
+        if (response.error) {
+          throw response.error;
+        }
+        
+        const serviceData: Service[] = response.data || [];
+        setServices(serviceData);
         setServicesError(null);
-      } catch (error) {
-        if (!mounted) return;
-        console.error('Error loading services:', error);
+      } catch (err) {
+        if (!isMounted) return;
+        console.error('Error loading services:', err);
         setServicesError('Failed to load services');
       } finally {
-        if (mounted) {
+        if (isMounted) {
           setServicesLoading(false);
         }
       }
     };
 
-    loadServices();
+    fetchServices();
     
     return () => {
-      mounted = false;
+      isMounted = false;
     };
-  }, []); // Empty dependency array
+  }, []);
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData(prev => ({
