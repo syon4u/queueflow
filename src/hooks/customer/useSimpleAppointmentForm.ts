@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface CustomerAppointmentData {
@@ -30,7 +29,6 @@ interface Service {
 }
 
 export const useSimpleAppointmentForm = () => {
-  const { toast } = useToast();
   const [formData, setFormData] = useState<CustomerAppointmentData>({
     firstName: '',
     lastName: '',
@@ -67,18 +65,13 @@ export const useSimpleAppointmentForm = () => {
         console.error('Error loading locations:', error);
         const errorMessage = 'Failed to load locations';
         setLocationsError(errorMessage);
-        toast({
-          title: 'Error',
-          description: errorMessage,
-          variant: 'destructive',
-        });
       } finally {
         setLocationsLoading(false);
       }
     };
 
     loadLocations();
-  }, []); // Removed toast from dependencies
+  }, []);
 
   // Load services
   useEffect(() => {
@@ -96,18 +89,13 @@ export const useSimpleAppointmentForm = () => {
         console.error('Error loading services:', error);
         const errorMessage = 'Failed to load services';
         setServicesError(errorMessage);
-        toast({
-          title: 'Error',
-          description: errorMessage,
-          variant: 'destructive',
-        });
       } finally {
         setServicesLoading(false);
       }
     };
 
     loadServices();
-  }, []); // Removed toast from dependencies
+  }, []);
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData(prev => ({
@@ -131,67 +119,32 @@ export const useSimpleAppointmentForm = () => {
     });
   };
 
-  const validateForm = (): string | null => {
+  const validateForm = () => {
     if (!formData.firstName.trim()) {
-      toast({
-        title: 'Validation Error',
-        description: 'First name is required',
-        variant: 'destructive',
-      });
       return 'First name is required';
     }
 
     if (!formData.lastName.trim()) {
-      toast({
-        title: 'Validation Error',
-        description: 'Last name is required',
-        variant: 'destructive',
-      });
       return 'Last name is required';
     }
 
     if (!formData.phone.trim()) {
-      toast({
-        title: 'Validation Error',
-        description: 'Phone number is required',
-        variant: 'destructive',
-      });
       return 'Phone number is required';
     }
 
     if (!formData.locationId) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please select a location',
-        variant: 'destructive',
-      });
       return 'Location is required';
     }
 
     if (!formData.serviceId) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please select a service',
-        variant: 'destructive',
-      });
       return 'Service is required';
     }
 
     if (!formData.preferredDate) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please select a preferred date',
-        variant: 'destructive',
-      });
       return 'Preferred date is required';
     }
 
     if (!formData.preferredTime) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please select a preferred time',
-        variant: 'destructive',
-      });
       return 'Preferred time is required';
     }
 
