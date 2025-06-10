@@ -40,8 +40,8 @@ export const useSimpleAppointmentForm = () => {
 
   const { 
     services, 
-    isLoading: servicesLoading, 
-    error: servicesError 
+    servicesLoading, 
+    servicesError 
   } = useServices();
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
