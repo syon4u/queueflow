@@ -43,6 +43,8 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
+  console.log('useSimpleAppointmentForm - Hook initialized');
+
   // Fetch locations - now public access
   const {
     data: locations = [],
@@ -51,27 +53,35 @@ export const useSimpleAppointmentForm = () => {
   } = useQuery<Location[]>({
     queryKey: ['public-locations'],
     queryFn: async (): Promise<Location[]> => {
-      console.log('Fetching locations for public access...');
+      console.log('useSimpleAppointmentForm - Starting locations fetch...');
       
       try {
+        console.log('useSimpleAppointmentForm - Making Supabase query for locations...');
+        
         const { data, error } = await supabase
           .from('locations')
           .select('id, name, address')
           .order('name');
 
+        console.log('useSimpleAppointmentForm - Locations query completed:', { 
+          data: data || [], 
+          error: error || null,
+          dataLength: data?.length || 0
+        });
+
         if (error) {
-          console.error('Error fetching locations:', error);
+          console.error('useSimpleAppointmentForm - Locations query error:', error);
           throw new Error(`Failed to load locations: ${error.message}`);
         }
 
-        console.log('Successfully fetched locations:', data?.length || 0);
+        console.log('useSimpleAppointmentForm - Successfully returning locations:', data?.length || 0);
         return data || [];
       } catch (err) {
-        console.error('Exception fetching locations:', err);
+        console.error('useSimpleAppointmentForm - Exception in locations fetch:', err);
         throw err;
       }
     },
-    retry: 2,
+    retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
@@ -85,13 +95,15 @@ export const useSimpleAppointmentForm = () => {
     queryKey: ['public-services', formData.locationId],
     queryFn: async (): Promise<Service[]> => {
       if (!formData.locationId) {
-        console.log('No location selected, skipping services fetch');
+        console.log('useSimpleAppointmentForm - No location selected, skipping services fetch');
         return [];
       }
 
-      console.log('Fetching services for location:', formData.locationId);
+      console.log('useSimpleAppointmentForm - Starting services fetch for location:', formData.locationId);
 
       try {
+        console.log('useSimpleAppointmentForm - Making Supabase query for services...');
+        
         const { data, error } = await supabase
           .from('services')
           .select('id, name, duration, description')
@@ -99,28 +111,47 @@ export const useSimpleAppointmentForm = () => {
           .eq('is_active', true)
           .order('name');
 
+        console.log('useSimpleAppointmentForm - Services query completed:', { 
+          data: data || [], 
+          error: error || null,
+          dataLength: data?.length || 0,
+          locationId: formData.locationId
+        });
+
         if (error) {
-          console.error('Error fetching services:', error);
+          console.error('useSimpleAppointmentForm - Services query error:', error);
           throw new Error(`Failed to load services: ${error.message}`);
         }
 
-        console.log('Successfully fetched services:', data?.length || 0);
+        console.log('useSimpleAppointmentForm - Successfully returning services:', data?.length || 0);
         return data || [];
       } catch (err) {
-        console.error('Exception fetching services:', err);
+        console.error('useSimpleAppointmentForm - Exception in services fetch:', err);
         throw err;
       }
     },
     enabled: Boolean(formData.locationId),
-    retry: 2,
+    retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
+  console.log('useSimpleAppointmentForm - Current state:', {
+    locationsCount: locations?.length || 0,
+    locationsLoading,
+    locationsError: locationsError?.message || null,
+    servicesCount: services?.length || 0,
+    servicesLoading,
+    servicesError: servicesError?.message || null,
+    selectedLocationId: formData.locationId
+  });
+
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
+    console.log('useSimpleAppointmentForm - Updating field:', field, 'to:', value);
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
       if (field === 'locationId' && value !== prev.locationId) {
+        console.log('useSimpleAppointmentForm - Location changed, clearing service selection');
         updated.serviceId = ''; // Clear service when location changes
       }
       return updated;
@@ -128,6 +159,7 @@ export const useSimpleAppointmentForm = () => {
   };
 
   const resetForm = () => {
+    console.log('useSimpleAppointmentForm - Resetting form');
     setFormData({
       firstName: '',
       lastName: '',
@@ -143,6 +175,7 @@ export const useSimpleAppointmentForm = () => {
   };
 
   const validateForm = (): string | null => {
+    console.log('useSimpleAppointmentForm - Validating form:', formData);
     if (!formData.firstName.trim()) return 'First name is required';
     if (!formData.lastName.trim()) return 'Last name is required';
     if (!formData.phone.trim()) return 'Phone number is required';
