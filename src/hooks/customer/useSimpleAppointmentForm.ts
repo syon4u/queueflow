@@ -26,6 +26,7 @@ interface Service {
   id: string;
   name: string;
   description: string;
+  duration: number;
 }
 
 export const useSimpleAppointmentForm = () => {
@@ -47,6 +48,7 @@ export const useSimpleAppointmentForm = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [locationsLoading, setLocationsLoading] = useState(true);
   const [servicesLoading, setServicesLoading] = useState(true);
+  const [locationsError, setLocationsError] = useState<string | null>(null);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
   // Load locations
@@ -60,11 +62,14 @@ export const useSimpleAppointmentForm = () => {
 
         if (error) throw error;
         setLocations(data || []);
+        setLocationsError(null);
       } catch (error) {
         console.error('Error loading locations:', error);
+        const errorMessage = 'Failed to load locations';
+        setLocationsError(errorMessage);
         toast({
           title: 'Error',
-          description: 'Failed to load locations',
+          description: errorMessage,
           variant: 'destructive',
         });
       } finally {
@@ -81,17 +86,19 @@ export const useSimpleAppointmentForm = () => {
       try {
         const { data, error } = await supabase
           .from('services')
-          .select('id, name, description')
+          .select('id, name, description, duration')
           .eq('is_active', true);
 
         if (error) throw error;
         setServices(data || []);
+        setServicesError(null);
       } catch (error) {
         console.error('Error loading services:', error);
-        setServicesError('Failed to load services');
+        const errorMessage = 'Failed to load services';
+        setServicesError(errorMessage);
         toast({
           title: 'Error',
-          description: 'Failed to load services',
+          description: errorMessage,
           variant: 'destructive',
         });
       } finally {
@@ -107,6 +114,21 @@ export const useSimpleAppointmentForm = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      firstName: '',
+      lastName: '',
+      phone: '',
+      email: '',
+      locationId: '',
+      serviceId: '',
+      preferredDate: '',
+      preferredTime: '',
+      reasonForVisit: '',
+      additionalNotes: '',
+    });
   };
 
   const validateForm = () => {
@@ -179,11 +201,13 @@ export const useSimpleAppointmentForm = () => {
   return {
     formData,
     updateField,
+    resetForm,
     validateForm,
     locations,
     services,
     locationsLoading,
     servicesLoading,
+    locationsError,
     servicesError,
   };
 };
