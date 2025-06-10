@@ -44,8 +44,8 @@ export const useSimpleAppointmentForm = () => {
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [locationsLoading, setLocationsLoading] = useState(true);
-  const [servicesLoading, setServicesLoading] = useState(true);
+  const [locationsLoading, setLocationsLoading] = useState<boolean>(true);
+  const [servicesLoading, setServicesLoading] = useState<boolean>(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
@@ -63,7 +63,7 @@ export const useSimpleAppointmentForm = () => {
         setLocationsError(null);
       } catch (error) {
         console.error('Error loading locations:', error);
-        const errorMessage = 'Failed to load locations';
+        const errorMessage: string = 'Failed to load locations';
         setLocationsError(errorMessage);
       } finally {
         setLocationsLoading(false);
@@ -87,7 +87,7 @@ export const useSimpleAppointmentForm = () => {
         setServicesError(null);
       } catch (error) {
         console.error('Error loading services:', error);
-        const errorMessage = 'Failed to load services';
+        const errorMessage: string = 'Failed to load services';
         setServicesError(errorMessage);
       } finally {
         setServicesLoading(false);
@@ -119,7 +119,7 @@ export const useSimpleAppointmentForm = () => {
     });
   };
 
-  const validateForm = () => {
+  const validateForm = (): string | null => {
     if (!formData.firstName.trim()) {
       return 'First name is required';
     }
