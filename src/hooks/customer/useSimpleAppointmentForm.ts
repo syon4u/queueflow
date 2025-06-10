@@ -42,15 +42,18 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
+  // Simplified state declarations without explicit boolean typing
   const [locations, setLocations] = useState<Location[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [locationsLoading, setLocationsLoading] = useState<boolean>(true);
-  const [servicesLoading, setServicesLoading] = useState<boolean>(true);
+  const [locationsLoading, setLocationsLoading] = useState(true);
+  const [servicesLoading, setServicesLoading] = useState(true);
   const [locationsError, setLocationsError] = useState<string | null>(null);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
-  // Load locations
+  // Load locations - simplified without complex dependency tracking
   useEffect(() => {
+    let mounted = true;
+    
     const loadLocations = async () => {
       try {
         const { data, error } = await supabase
@@ -58,23 +61,33 @@ export const useSimpleAppointmentForm = () => {
           .select('id, name, address')
           .eq('is_active', true);
 
+        if (!mounted) return;
+
         if (error) throw error;
         setLocations(data || []);
         setLocationsError(null);
       } catch (error) {
+        if (!mounted) return;
         console.error('Error loading locations:', error);
-        const errorMessage: string = 'Failed to load locations';
-        setLocationsError(errorMessage);
+        setLocationsError('Failed to load locations');
       } finally {
-        setLocationsLoading(false);
+        if (mounted) {
+          setLocationsLoading(false);
+        }
       }
     };
 
     loadLocations();
-  }, []);
+    
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty dependency array
 
-  // Load services
+  // Load services - simplified without complex dependency tracking
   useEffect(() => {
+    let mounted = true;
+    
     const loadServices = async () => {
       try {
         const { data, error } = await supabase
@@ -82,20 +95,28 @@ export const useSimpleAppointmentForm = () => {
           .select('id, name, description, duration')
           .eq('is_active', true);
 
+        if (!mounted) return;
+
         if (error) throw error;
         setServices(data || []);
         setServicesError(null);
       } catch (error) {
+        if (!mounted) return;
         console.error('Error loading services:', error);
-        const errorMessage: string = 'Failed to load services';
-        setServicesError(errorMessage);
+        setServicesError('Failed to load services');
       } finally {
-        setServicesLoading(false);
+        if (mounted) {
+          setServicesLoading(false);
+        }
       }
     };
 
     loadServices();
-  }, []);
+    
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty dependency array
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData(prev => ({
