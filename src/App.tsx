@@ -1,158 +1,135 @@
 
-import { Suspense, lazy } from 'react';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/context/AuthContext';
-import ProtectedRoute, { AdminRoute, StaffRoute, PowerUserRoute } from '@/components/ProtectedRoute';
-import Index from './pages/Index';
-import { Loader2 } from 'lucide-react';
+import { Suspense, lazy } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
+import { QueueProvider } from "@/context/QueueContext";
+import { SessionProvider } from "@/context/SessionContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-// Lazy load components for better performance
-const AdminPage = lazy(() => import('./pages/AdminPage'));
-const StaffPage = lazy(() => import('./pages/StaffPage'));
-const PowerUserPage = lazy(() => import('./pages/PowerUserPage'));
-const CustomerPage = lazy(() => import('./pages/CustomerPage'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
-const Login = lazy(() => import('./pages/Login'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const NewAppointmentPage = lazy(() => import('./pages/NewAppointmentPage'));
-const CheckInPage = lazy(() => import('./pages/CheckInPage'));
-const StatusPage = lazy(() => import('./pages/StatusPage'));
-const KioskPage = lazy(() => import('./pages/KioskPage'));
-const DigitalSignagePage = lazy(() => import('./pages/DigitalSignagePage'));
-const VirtualQueuePage = lazy(() => import('./pages/VirtualQueuePage'));
-const MobileQueuePage = lazy(() => import('./pages/MobileQueuePage'));
-const PerformanceReportPage = lazy(() => import('./pages/PerformanceReportPage'));
-const BrowardIndex = lazy(() => import('./pages/BrowardIndex'));
-const BrowardDesignSystem = lazy(() => import('./pages/BrowardDesignSystem'));
-const BackendHealthPage = lazy(() => import('./pages/BackendHealthPage'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Unauthorized = lazy(() => import('./pages/Unauthorized'));
+// Lazy load components
+const Index = lazy(() => import("./pages/Index"));
+const CustomerPage = lazy(() => import("./pages/CustomerPage"));
+const StaffPage = lazy(() => import("./pages/StaffPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const PowerUserPage = lazy(() => import("./pages/PowerUserPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const Login = lazy(() => import("./pages/Login"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const CheckInPage = lazy(() => import("./pages/CheckInPage"));
+const KioskPage = lazy(() => import("./pages/KioskPage"));
+const VirtualQueuePage = lazy(() => import("./pages/VirtualQueuePage"));
+const MobileQueuePage = lazy(() => import("./pages/MobileQueuePage"));
+const DigitalSignagePage = lazy(() => import("./pages/DigitalSignagePage"));
+const NewAppointmentPage = lazy(() => import("./pages/NewAppointmentPage"));
+const PerformanceReportPage = lazy(() => import("./pages/PerformanceReportPage"));
+const StatusPage = lazy(() => import("./pages/StatusPage"));
+const BackendHealthPage = lazy(() => import("./pages/BackendHealthPage"));
+const BrowardIndex = lazy(() => import("./pages/BrowardIndex"));
+const BrowardDesignSystem = lazy(() => import("./pages/BrowardDesignSystem"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center">
-      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-      <p className="text-gray-600">Loading...</p>
-    </div>
-  </div>
-);
-
-function App() {
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <BrowserRouter>
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-              <Suspense fallback={<LoadingFallback />}>
-                <Routes>
-                  {/* Public routes - no authentication required */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/check-in" element={<CheckInPage />} />
-                  <Route path="/status" element={<StatusPage />} />
-                  <Route path="/kiosk" element={<KioskPage />} />
-                  <Route path="/signage" element={<DigitalSignagePage />} />
-                  <Route path="/virtual-queue" element={<VirtualQueuePage />} />
-                  <Route path="/mobile-queue" element={<MobileQueuePage />} />
-                  <Route path="/broward" element={<BrowardIndex />} />
-                  <Route path="/design-system" element={<BrowardDesignSystem />} />
-                  <Route path="/unauthorized" element={<Unauthorized />} />
-                  
-                  {/* Protected routes - require authentication and specific roles */}
-                  <Route 
-                    path="/staff" 
-                    element={
-                      <StaffRoute>
-                        <StaffPage />
-                      </StaffRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/power-user" 
-                    element={
-                      <PowerUserRoute>
-                        <PowerUserPage />
-                      </PowerUserRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/admin" 
-                    element={
-                      <AdminRoute>
-                        <AdminPage />
-                      </AdminRoute>
-                    } 
-                  />
-                  
-                  {/* General protected routes - require any authenticated user */}
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <ProfilePage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/appointments/new" 
-                    element={
-                      <ProtectedRoute>
-                        <NewAppointmentPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/customer" 
-                    element={
-                      <ProtectedRoute>
-                        <CustomerPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/performance-report" 
-                    element={
-                      <ProtectedRoute requiredRole={['staff', 'power_user', 'admin']}>
-                        <PerformanceReportPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/backend-health" 
-                    element={
-                      <ProtectedRoute requiredRole={['power_user', 'admin']}>
-                        <BackendHealthPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  
-                  {/* Catch all route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-              <Toaster />
-              <Sonner />
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <SessionProvider>
+              <QueueProvider>
+                <div className="min-h-screen bg-background font-sans antialiased">
+                  <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<Index />} />
+                      <Route path="/customer" element={<CustomerPage />} />
+                      <Route path="/check-in" element={<CheckInPage />} />
+                      <Route path="/kiosk" element={<KioskPage />} />
+                      <Route path="/virtual-queue" element={<VirtualQueuePage />} />
+                      <Route path="/mobile-queue" element={<MobileQueuePage />} />
+                      <Route path="/signage" element={<DigitalSignagePage />} />
+                      <Route path="/status" element={<StatusPage />} />
+                      <Route path="/health" element={<BackendHealthPage />} />
+                      <Route path="/broward" element={<BrowardIndex />} />
+                      <Route path="/broward/design-system" element={<BrowardDesignSystem />} />
+                      
+                      {/* Auth Routes */}
+                      <Route path="/auth" element={<AuthPage />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/auth/reset-password" element={<ResetPassword />} />
+                      
+                      {/* Protected Routes */}
+                      <Route 
+                        path="/profile" 
+                        element={
+                          <ProtectedRoute>
+                            <ProfilePage />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/staff" 
+                        element={
+                          <ProtectedRoute requiredRole={['staff', 'power_user', 'admin']}>
+                            <StaffPage />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/admin" 
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <AdminPage />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/power-user" 
+                        element={
+                          <ProtectedRoute requiredRole={['power_user', 'admin']}>
+                            <PowerUserPage />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/appointments/new" 
+                        element={
+                          <ProtectedRoute requiredRole={['staff', 'power_user', 'admin']}>
+                            <NewAppointmentPage />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/reports/performance" 
+                        element={
+                          <ProtectedRoute requiredRole={['staff', 'power_user', 'admin']}>
+                            <PerformanceReportPage />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      
+                      {/* Error Routes */}
+                      <Route path="/unauthorized" element={<Unauthorized />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </div>
+                <Toaster />
+                <Sonner />
+              </QueueProvider>
+            </SessionProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;

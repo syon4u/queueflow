@@ -1,222 +1,120 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+
+import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/layout/PageLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { User, Mail, Calendar, Shield } from 'lucide-react';
+import { ChangePasswordForm } from '@/components/auth/ChangePasswordForm';
+import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 
 const ProfilePage = () => {
   const { user, role } = useAuth();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: user?.email || '',
-    phone: ''
-  });
-  
-  // Load user profile data
-  React.useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!user?.id) return;
-      
-      setIsLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('customers')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-          
-        if (error) throw error;
-        
-        if (data) {
-          setFormData({
-            firstName: data.first_name || '',
-            lastName: data.last_name || '',
-            email: data.email || user.email || '',
-            phone: data.phone || ''
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: t('common.error'),
-          description: t('profile.errorFetching'),
-          variant: 'destructive'
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchUserProfile();
-  }, [user?.id, toast, t, user?.email]);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+  if (!user) {
+    return (
+      <PageLayout 
+        headerTitle="Profile"
+        headerSubtitle="Manage your account settings"
+      >
+        <div className="container mx-auto px-4 py-6">
+          <p>Please sign in to view your profile.</p>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Not available';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user?.id) return;
-    
-    setIsLoading(true);
-    
-    try {
-      const { error } = await supabase
-        .from('customers')
-        .upsert({
-          id: user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone
-        });
-        
-      if (error) throw error;
-      
-      toast({
-        title: t('profile.success'),
-        description: t('profile.profileUpdated')
-      });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: t('common.error'),
-        description: t('profile.errorUpdating'),
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
+
+  const getRoleBadgeVariant = (userRole: string | null) => {
+    switch (userRole) {
+      case 'admin': return 'destructive';
+      case 'power_user': return 'default';
+      case 'staff': return 'secondary';
+      default: return 'outline';
     }
   };
-  
+
   return (
-    <div className="min-h-screen bg-pattern-grid bg-gradient-overlay-teal">
-      <div className="container mx-auto p-6">
-        <div className="bg-image bg-image-overlay rounded-xl mb-6" 
-             style={{ backgroundImage: "url('https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg')" }}>
-          <div className="p-6">
-            <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
-          </div>
-        </div>
+    <PageLayout 
+      headerTitle="Profile"
+      headerSubtitle="Manage your account settings and security"
+    >
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        <EmailVerificationBanner />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="col-span-2 bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Profile Information */}
+          <Card>
             <CardHeader>
-              <CardTitle>{t('profile.personalInfo')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">{t('profile.firstName')}</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      placeholder={t('profile.firstNamePlaceholder')}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">{t('profile.lastName')}</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      placeholder={t('profile.lastNamePlaceholder')}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">{t('profile.email')}</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder={t('profile.emailPlaceholder')}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">{t('profile.phone')}</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder={t('profile.phonePlaceholder')}
-                  />
-                </div>
-                
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? t('common.saving') : t('common.save')}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white/90 backdrop-filter backdrop-blur-sm border border-gray-200/50">
-            <CardHeader>
-              <CardTitle>{t('profile.accountInfo')}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Profile Information
+              </CardTitle>
+              <CardDescription>
+                Your account details and role information
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{t('profile.userRole')}</p>
-                <p className="font-medium capitalize">{role}</p>
+              <div className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Email</p>
+                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  {user.email_confirmed_at ? (
+                    <Badge variant="secondary" className="mt-1">Verified</Badge>
+                  ) : (
+                    <Badge variant="outline" className="mt-1">Unverified</Badge>
+                  )}
+                </div>
               </div>
-              
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">{t('profile.userId')}</p>
-                <p className="font-mono text-xs">{user?.id}</p>
+
+              <div className="flex items-center gap-3">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Role</p>
+                  <Badge variant={getRoleBadgeVariant(role)} className="mt-1">
+                    {role || 'customer'}
+                  </Badge>
+                </div>
               </div>
-              
-              <div className="pt-4 space-y-2">
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/">{t('common.backToHome')}</Link>
-                </Button>
-                
-                {role === 'customer' && (
-                  <Button asChild className="w-full">
-                    <Link to="/customer">{t('common.customerDashboard')}</Link>
-                  </Button>
-                )}
-                
-                {(role === 'staff' || role === 'admin') && (
-                  <Button asChild className="w-full">
-                    <Link to="/staff">{t('common.staffDashboard')}</Link>
-                  </Button>
-                )}
-                
-                {role === 'admin' && (
-                  <Button asChild className="w-full">
-                    <Link to="/admin">{t('admin.dashboard')}</Link>
-                  </Button>
-                )}
+
+              <div className="flex items-center gap-3">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Account Created</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDate(user.created_at)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">Last Sign In</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatDate(user.last_sign_in_at)}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Change Password */}
+          <ChangePasswordForm />
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

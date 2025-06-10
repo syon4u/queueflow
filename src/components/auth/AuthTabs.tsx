@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
+import { ForgotPasswordForm } from './ForgotPasswordForm';
 
 interface AuthTabsProps {
   error: string | null;
@@ -25,12 +26,17 @@ export const AuthTabs: React.FC<AuthTabsProps> = ({
   onSignIn,
   onSignUp
 }) => {
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Authentication</CardTitle>
         <CardDescription>
-          Sign in to your staff account or create a new one
+          {showForgotPassword 
+            ? 'Reset your password to regain access to your account'
+            : 'Sign in to your staff account or create a new one'
+          }
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -40,20 +46,28 @@ export const AuthTabs: React.FC<AuthTabsProps> = ({
           </Alert>
         )}
 
-        <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
+        {showForgotPassword ? (
+          <ForgotPasswordForm onBackToLogin={() => setShowForgotPassword(false)} />
+        ) : (
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="signin" className="space-y-4">
-            <SignInForm onSubmit={onSignIn} isLoading={isLoading} />
-          </TabsContent>
+            <TabsContent value="signin" className="space-y-4">
+              <SignInForm 
+                onSubmit={onSignIn} 
+                isLoading={isLoading}
+                onForgotPassword={() => setShowForgotPassword(true)}
+              />
+            </TabsContent>
 
-          <TabsContent value="signup" className="space-y-4">
-            <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="signup" className="space-y-4">
+              <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />
+            </TabsContent>
+          </Tabs>
+        )}
       </CardContent>
     </Card>
   );
