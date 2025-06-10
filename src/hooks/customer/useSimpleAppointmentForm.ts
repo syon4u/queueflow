@@ -78,7 +78,7 @@ export const useSimpleAppointmentForm = () => {
     };
 
     loadLocations();
-  }, []);
+  }, []); // Removed toast from dependencies
 
   // Load services
   useEffect(() => {
@@ -107,7 +107,7 @@ export const useSimpleAppointmentForm = () => {
     };
 
     loadServices();
-  }, []);
+  }, []); // Removed toast from dependencies
 
   const updateField = (field: keyof CustomerAppointmentData, value: string) => {
     setFormData(prev => ({
