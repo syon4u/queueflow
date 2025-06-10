@@ -131,7 +131,7 @@ export const useSimpleAppointmentForm = () => {
     });
   };
 
-  const validateForm = () => {
+  const validateForm = (): string | null => {
     if (!formData.firstName.trim()) {
       toast({
         title: 'Validation Error',
