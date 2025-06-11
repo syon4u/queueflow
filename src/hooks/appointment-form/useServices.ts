@@ -1,19 +1,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Service {
-  id: string;
-  name: string;
-  description: string; // Make required to match ServiceRow
-  duration: number;
-  location_id?: string;
-}
+import { ServiceRow } from '@/types/supabase';
 
 export const useServices = (locationId?: string) => {
   const { data: services = [], isLoading, error } = useQuery({
     queryKey: ['services', locationId],
-    queryFn: async (): Promise<Service[]> => {
+    queryFn: async (): Promise<ServiceRow[]> => {
       console.log('useServices - Starting service fetch for location:', locationId);
       
       try {
@@ -36,11 +29,11 @@ export const useServices = (locationId?: string) => {
           throw new Error(`Failed to load services: ${error.message}`);
         }
         
-        // Ensure description is not null to match the interface
+        // Ensure description is not null to match the ServiceRow interface
         const servicesWithDescription = (data ?? []).map(service => ({
           ...service,
           description: service.description || '' // Default to empty string if null
-        }));
+        })) as ServiceRow[];
         
         return servicesWithDescription;
         
