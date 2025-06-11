@@ -133,7 +133,10 @@ const NewAppointmentPage = () => {
               reasonForVisit={reasonForVisit}
               setReasonForVisit={setReasonForVisit}
               locations={locations}
-              services={services}
+              services={services.map(service => ({
+                ...service,
+                description: service.description || ''
+              }))}
               servicesLoading={servicesLoading}
               servicesError={servicesError}
             />

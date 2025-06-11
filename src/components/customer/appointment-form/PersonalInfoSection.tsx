@@ -13,27 +13,15 @@ const PersonalInfoSection = ({ formData, updateField }: PersonalInfoSectionProps
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Personal Information</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="firstName">First Name *</Label>
-          <Input
-            id="firstName"
-            value={formData.firstName}
-            onChange={(e) => updateField('firstName', e.target.value)}
-            placeholder="Enter your first name"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name *</Label>
-          <Input
-            id="lastName"
-            value={formData.lastName}
-            onChange={(e) => updateField('lastName', e.target.value)}
-            placeholder="Enter your last name"
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="name">Full Name *</Label>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => updateField('name', e.target.value)}
+          placeholder="Enter your full name"
+          required
+        />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
