@@ -5,108 +5,36 @@ import { supabase } from '@/integrations/supabase/client';
 interface Location {
   id: string;
   name: string;
-  address: string; // Make required to match LocationRow
+  address: string;
   isCustom?: boolean;
   originalLocationId?: string;
 }
 
 export const useLocations = () => {
-  const { data: locations = [], isLoading, error } = useQuery({
-    queryKey: ['locations'],
+  // Query for standard locations
+  const { data: standardLocations = [], isLoading: standardLoading, error: standardError } = useQuery({
+    queryKey: ['locations', 'standard'],
     queryFn: async (): Promise<Location[]> => {
-      console.log('useLocations - Starting location fetch...');
+      console.log('useLocations - Fetching standard locations...');
       
-      try {
-        // Fetch standard locations
-        const { data: standardLocations, error: standardError } = await supabase
-          .from('locations')
-          .select('id, name, address')
-          .order('name');
-        
-        if (standardError) {
-          console.error('useLocations - Standard locations error:', standardError);
-          throw new Error(`Failed to load locations: ${standardError.message}`);
-        }
-        
-        // Fetch customer location services for custom locations
-        const { data: customerLocationServices, error: customerError } = await supabase
-          .from('customer_location_services')
-          .select(`
-            id,
-            location_id,
-            custom_location_name,
-            custom_location_address,
-            is_custom_location,
-            locations:location_id (
-              id,
-              name,
-              address
-            )
-          `)
-          .order('created_at', { ascending: false });
-        
-        if (customerError) {
-          console.error('useLocations - Customer locations error:', customerError);
-          // Don't throw error for customer locations, just log and continue
-        }
-        
-        console.log('useLocations - Raw query results:', { 
-          standardLocations, 
-          customerLocationServices 
-        });
-        
-        const allLocations: Location[] = [];
-        
-        // Add standard locations
-        if (standardLocations) {
-          standardLocations.forEach(location => {
-            allLocations.push({
-              ...location,
-              address: location.address || '',
-              isCustom: false
-            });
-          });
-        }
-        
-        // Add custom locations from customer location services
-        if (customerLocationServices) {
-          customerLocationServices.forEach(cls => {
-            if (cls.is_custom_location && cls.custom_location_name) {
-              allLocations.push({
-                id: cls.id,
-                name: cls.custom_location_name,
-                address: cls.custom_location_address || '',
-                isCustom: true,
-                originalLocationId: cls.location_id
-              });
-            } else if (!cls.is_custom_location && cls.locations) {
-              // Also include linked standard locations if not already present
-              const existsInStandard = allLocations.some(loc => 
-                loc.id === cls.locations?.id && !loc.isCustom
-              );
-              if (!existsInStandard) {
-                allLocations.push({
-                  id: cls.locations.id,
-                  name: cls.locations.name,
-                  address: cls.locations.address || '',
-                  isCustom: false
-                });
-              }
-            }
-          });
-        }
-        
-        // Remove duplicates based on id and isCustom combination
-        const uniqueLocations = allLocations.filter((location, index, self) => 
-          index === self.findIndex(l => l.id === location.id && l.isCustom === location.isCustom)
-        );
-        
-        return uniqueLocations;
-        
-      } catch (err) {
-        console.error('useLocations - Fetch error:', err);
-        throw err;
+      const { data, error } = await supabase
+        .from('locations')
+        .select('id, name, address')
+        .order('name');
+      
+      if (error) {
+        console.error('useLocations - Standard locations error:', error);
+        throw new Error(`Failed to load locations: ${error.message}`);
       }
+      
+      const locations = (data || []).map(location => ({
+        ...location,
+        address: location.address || '',
+        isCustom: false
+      }));
+      
+      console.log('useLocations - Standard locations loaded:', locations.length);
+      return locations;
     },
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -114,16 +42,68 @@ export const useLocations = () => {
     refetchOnWindowFocus: false,
   });
 
-  console.log('useLocations - Hook final state:', {
-    locationsCount: locations?.length || 0,
-    locations: locations,
-    isLoading,
-    error: error?.message || null
+  // Query for custom locations (runs in parallel)
+  const { data: customLocations = [] } = useQuery({
+    queryKey: ['locations', 'custom'],
+    queryFn: async (): Promise<Location[]> => {
+      console.log('useLocations - Fetching custom locations...');
+      
+      try {
+        const { data, error } = await supabase
+          .from('customer_location_services')
+          .select(`
+            id,
+            custom_location_name,
+            custom_location_address,
+            is_custom_location
+          `)
+          .eq('is_custom_location', true)
+          .not('custom_location_name', 'is', null)
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('useLocations - Custom locations error:', error);
+          return []; // Don't throw error, just return empty array
+        }
+        
+        const locations = (data || []).map(cls => ({
+          id: cls.id,
+          name: cls.custom_location_name || '',
+          address: cls.custom_location_address || '',
+          isCustom: true
+        }));
+        
+        console.log('useLocations - Custom locations loaded:', locations.length);
+        return locations;
+      } catch (err) {
+        console.error('useLocations - Custom locations fetch error:', err);
+        return []; // Return empty array on error
+      }
+    },
+    retry: 1, // Less retries for custom locations
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Combine both sets of locations
+  const allLocations = [...standardLocations, ...customLocations];
+  
+  // Remove duplicates based on id and isCustom combination
+  const uniqueLocations = allLocations.filter((location, index, self) => 
+    index === self.findIndex(l => l.id === location.id && l.isCustom === location.isCustom)
+  );
+
+  console.log('useLocations - Final state:', {
+    standardCount: standardLocations.length,
+    customCount: customLocations.length,
+    totalCount: uniqueLocations.length,
+    isLoading: standardLoading,
+    error: standardError?.message || null
   });
 
   return { 
-    data: locations,
-    isLoading,
-    error: error?.message || null
+    data: uniqueLocations,
+    isLoading: standardLoading, // Only wait for standard locations
+    error: standardError?.message || null
   };
 };
