@@ -38,3 +38,12 @@ port = 54331
 
 [functions.customer-history]
 verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false
+
+[functions.customer-appointments]
+verify_jwt = false
+
+[functions.customer-check-in]
+verify_jwt = false
