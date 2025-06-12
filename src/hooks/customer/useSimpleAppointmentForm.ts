@@ -1,10 +1,11 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useLocations } from '@/hooks/appointment-form/useLocations';
 import { useServices } from '@/hooks/appointment-form/useServices';
 
 export interface CustomerAppointmentData {
-  name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email: string;
   locationId: string;
@@ -17,7 +18,8 @@ export interface CustomerAppointmentData {
 
 export const useSimpleAppointmentForm = () => {
   const [formData, setFormData] = useState<CustomerAppointmentData>({
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     email: '',
     locationId: '',
@@ -28,42 +30,30 @@ export const useSimpleAppointmentForm = () => {
     additionalNotes: '',
   });
 
-  console.log('useSimpleAppointmentForm - Hook state:', {
-    locationId: formData.locationId,
-    serviceId: formData.serviceId
-  });
+  // Use existing hooks with proper typing
+  const { 
+    data: locations, 
+    isLoading: locationsLoading, 
+    error: locationsError 
+  } = useLocations();
 
-  // Always call hooks in the same order
-  const { data: locations, isLoading: locationsLoading, error: locationsError } = useLocations();
-  const { data: services, isLoading: servicesLoading, error: servicesError } = useServices(formData.locationId || undefined);
+  const { 
+    data: services, 
+    isLoading: servicesLoading, 
+    error: servicesError 
+  } = useServices();
 
-  console.log('useSimpleAppointmentForm - Hook results:', {
-    locationsCount: locations?.length || 0,
-    locationsLoading,
-    locationsError,
-    servicesCount: services?.length || 0,
-    servicesLoading,
-    servicesError,
-    formDataLocationId: formData.locationId
-  });
+  const updateField = (field: keyof CustomerAppointmentData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
-  const updateField = useCallback((field: keyof CustomerAppointmentData, value: string) => {
-    console.log('useSimpleAppointmentForm - Updating field:', field, 'with value:', value);
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      
-      // Clear service when location changes
-      if (field === 'locationId' && value !== prev.locationId) {
-        newData.serviceId = '';
-      }
-      
-      return newData;
-    });
-  }, []);
-
-  const resetForm = useCallback(() => {
+  const resetForm = () => {
     setFormData({
-      name: '',
+      firstName: '',
+      lastName: '',
       phone: '',
       email: '',
       locationId: '',
@@ -73,28 +63,50 @@ export const useSimpleAppointmentForm = () => {
       reasonForVisit: '',
       additionalNotes: '',
     });
-  }, []);
+  };
 
-  const validateForm = useCallback((): string | null => {
-    if (!formData.name.trim()) return 'Please enter your name';
-    if (!formData.phone.trim()) return 'Please enter your phone number';
-    if (!formData.locationId) return 'Please select a location';
-    if (!formData.serviceId) return 'Please select a service';
-    if (!formData.preferredDate) return 'Please select a preferred date';
-    if (!formData.preferredTime) return 'Please select a preferred time';
+  const validateForm = (): string | null => {
+    if (!formData.firstName.trim()) {
+      return 'First name is required';
+    }
+
+    if (!formData.lastName.trim()) {
+      return 'Last name is required';
+    }
+
+    if (!formData.phone.trim()) {
+      return 'Phone number is required';
+    }
+
+    if (!formData.locationId) {
+      return 'Location is required';
+    }
+
+    if (!formData.serviceId) {
+      return 'Service is required';
+    }
+
+    if (!formData.preferredDate) {
+      return 'Preferred date is required';
+    }
+
+    if (!formData.preferredTime) {
+      return 'Preferred time is required';
+    }
+
     return null;
-  }, [formData]);
+  };
 
   return {
     formData,
     updateField,
     resetForm,
     validateForm,
-    locations: locations || [],
+    locations,
+    services,
     locationsLoading,
-    locationsError,
-    services: services || [],
     servicesLoading,
+    locationsError,
     servicesError,
   };
 };

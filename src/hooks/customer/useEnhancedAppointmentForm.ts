@@ -83,16 +83,12 @@ export const useEnhancedAppointmentForm = () => {
       if (existingCustomer) {
         customerId = existingCustomer.id;
       } else {
-        // Create new customer - split the name into first and last name
-        const nameParts = customerData.name.trim().split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-
+        // Create new customer
         const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
-            first_name: firstName,
-            last_name: lastName,
+            first_name: customerData.firstName,
+            last_name: customerData.lastName,
             phone: customerData.phone,
             email: customerData.email || null,
           })
@@ -133,6 +129,22 @@ export const useEnhancedAppointmentForm = () => {
         .single();
 
       const confirmationCode = customerWithConfirmation?.confirmation_number || 'APT-' + appointment.id.substring(0, 8).toUpperCase();
+
+      // Send SMS confirmation if phone provided
+      if (customerData.phone) {
+        try {
+          await supabase.functions.invoke('send-communication', {
+            body: {
+              customerId: customerId,
+              type: 'sms',
+              message: `Your appointment is confirmed! Confirmation code: ${confirmationCode}. Scheduled for ${appointmentDateTime.toLocaleDateString()} at ${appointmentDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`
+            }
+          });
+        } catch (smsError) {
+          console.error('SMS confirmation failed:', smsError);
+          // Don't fail the appointment creation if SMS fails
+        }
+      }
 
       toast({
         title: 'Appointment Scheduled!',

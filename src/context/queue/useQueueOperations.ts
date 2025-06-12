@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/MinimalAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useStaffActions } from '@/hooks/use-staff-actions';
 import { Customer } from './types';
 
@@ -24,14 +24,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
   };
 
   const callNextCustomer = async () => {
-    if (!user) {
-      toast({
-        title: 'Not Available',
-        description: 'Authentication required for queue operations.',
-        variant: 'destructive'
-      });
-      return;
-    }
+    if (!user) return;
 
     // Check if staff member already has a customer
     if (currentCustomer) {
@@ -45,22 +38,20 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
       return;
     }
 
-    // Check staff availability - skip if no user
-    if (user?.id) {
-      const { data: staffProfile } = await supabase
-        .from('profiles')
-        .select('availability_status')
-        .eq('id', user.id)
-        .single();
+    // Check staff availability
+    const { data: staffProfile } = await supabase
+      .from('profiles')
+      .select('availability_status')
+      .eq('id', user.id)
+      .single();
 
-      if (staffProfile?.availability_status !== 'available') {
-        toast({
-          title: 'Not Available',
-          description: 'You must be marked as available to serve customers.',
-          variant: 'destructive'
-        });
-        return;
-      }
+    if (staffProfile?.availability_status !== 'available') {
+      toast({
+        title: 'Not Available',
+        description: 'You must be marked as available to serve customers.',
+        variant: 'destructive'
+      });
+      return;
     }
 
     const waitingCustomers = customers
@@ -96,7 +87,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
           .update({ 
             status: 'in_progress',
             start_time: new Date().toISOString(),
-            assigned_staff_id: user?.id || null
+            assigned_staff_id: user.id
           })
           .eq('id', nextCustomer.id)
           .eq('status', 'checked_in'); // Ensure customer is still checked in
@@ -106,33 +97,29 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
           throw error;
         }
 
-        // Log the action for undo functionality - only if user exists
-        if (user?.id) {
-          await logAction(
-            'call_customer',
-            'appointment',
-            nextCustomer.id,
-            currentData,
-            { 
-              status: 'in_progress',
-              start_time: new Date().toISOString(),
-              assigned_staff_id: user.id
-            }
-          );
-        }
+        // Log the action for undo functionality
+        await logAction(
+          'call_customer',
+          'appointment',
+          nextCustomer.id,
+          currentData,
+          { 
+            status: 'in_progress',
+            start_time: new Date().toISOString(),
+            assigned_staff_id: user.id
+          }
+        );
 
-        // Create notification for other staff - only if user exists
-        if (user?.id) {
-          await supabase
-            .from('staff_notification_queue')
-            .insert({
-              staff_id: user.id,
-              type: 'customer_called',
-              title: 'Customer Called',
-              message: `${nextCustomer.name} is now being served`,
-              data: { customer_id: nextCustomer.id, customer_name: nextCustomer.name }
-            });
-        }
+        // Create notification for other staff
+        await supabase
+          .from('staff_notification_queue')
+          .insert({
+            staff_id: user.id,
+            type: 'customer_called',
+            title: 'Customer Called',
+            message: `${nextCustomer.name} is now being served`,
+            data: { customer_id: nextCustomer.id, customer_name: nextCustomer.name }
+          });
 
       } catch (error) {
         console.error(`Call attempt ${retryCount + 1} failed:`, error);
@@ -201,7 +188,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
             end_time: new Date().toISOString()
           })
           .eq('id', currentCustomer.id)
-          .eq('assigned_staff_id', user?.id || null)
+          .eq('assigned_staff_id', user.id)
           .eq('status', 'in_progress');
 
         if (error) {
@@ -209,19 +196,17 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
           throw new Error(`Database error: ${error.message}`);
         }
 
-        // Log the action for undo functionality - only if user exists
-        if (user?.id) {
-          await logAction(
-            'mark_served',
-            'appointment',
-            currentCustomer.id,
-            currentData,
-            { 
-              status: 'completed',
-              end_time: new Date().toISOString()
-            }
-          );
-        }
+        // Log the action for undo functionality
+        await logAction(
+          'mark_served',
+          'appointment',
+          currentCustomer.id,
+          currentData,
+          { 
+            status: 'completed',
+            end_time: new Date().toISOString()
+          }
+        );
 
       } catch (error) {
         console.error(`Mark served attempt ${retryCount + 1} failed:`, error);
@@ -297,7 +282,7 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
             end_time: new Date().toISOString()
           })
           .eq('id', currentCustomer.id)
-          .eq('assigned_staff_id', user?.id || null)
+          .eq('assigned_staff_id', user.id)
           .in('status', ['checked_in', 'in_progress']);
 
         if (error) {
@@ -305,19 +290,17 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
           throw new Error(`Database error: ${error.message}`);
         }
 
-        // Log the action for undo functionality - only if user exists
-        if (user?.id) {
-          await logAction(
-            'mark_no_show',
-            'appointment',
-            currentCustomer.id,
-            currentData,
-            { 
-              status: 'no_show',
-              end_time: new Date().toISOString()
-            }
-          );
-        }
+        // Log the action for undo functionality
+        await logAction(
+          'mark_no_show',
+          'appointment',
+          currentCustomer.id,
+          currentData,
+          { 
+            status: 'no_show',
+            end_time: new Date().toISOString()
+          }
+        );
 
       } catch (error) {
         console.error(`Mark no-show attempt ${retryCount + 1} failed:`, error);

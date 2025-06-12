@@ -29,18 +29,14 @@ export const useCustomerAppointmentFlow = () => {
         customerId = existingCustomer.id;
         console.log('Using existing customer:', customerId);
       } else {
-        // Create new customer - split the name into first and last name
-        const nameParts = customerData.name.trim().split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-        
+        // Create new customer
         const newCustomerId = crypto.randomUUID();
         const { data: newCustomer, error: customerError } = await supabase
           .from('customers')
           .insert({
             id: newCustomerId,
-            first_name: firstName,
-            last_name: lastName,
+            first_name: customerData.firstName,
+            last_name: customerData.lastName,
             phone: customerData.phone,
             email: customerData.email || null,
           })
