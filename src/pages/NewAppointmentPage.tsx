@@ -60,6 +60,12 @@ const NewAppointmentPage = () => {
   const handleBackNavigation = () => {
     navigate('/customer');
   };
+
+  // Convert Service[] to ServiceRow[] format expected by the form
+  const formattedServices = services.map(service => ({
+    ...service,
+    description: service.description || '' // Ensure description is always a string
+  }));
   
   return (
     <PageLayout 
@@ -133,7 +139,7 @@ const NewAppointmentPage = () => {
               reasonForVisit={reasonForVisit}
               setReasonForVisit={setReasonForVisit}
               locations={locations}
-              services={services}
+              services={formattedServices}
               servicesLoading={servicesLoading}
               servicesError={servicesError}
             />
