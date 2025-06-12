@@ -134,22 +134,6 @@ export const useEnhancedAppointmentForm = () => {
 
       const confirmationCode = customerWithConfirmation?.confirmation_number || 'APT-' + appointment.id.substring(0, 8).toUpperCase();
 
-      // Send SMS confirmation if phone provided
-      if (customerData.phone) {
-        try {
-          await supabase.functions.invoke('send-communication', {
-            body: {
-              customerId: customerId,
-              type: 'sms',
-              message: `Your appointment is confirmed! Confirmation code: ${confirmationCode}. Scheduled for ${appointmentDateTime.toLocaleDateString()} at ${appointmentDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`
-            }
-          });
-        } catch (smsError) {
-          console.error('SMS confirmation failed:', smsError);
-          // Don't fail the appointment creation if SMS fails
-        }
-      }
-
       toast({
         title: 'Appointment Scheduled!',
         description: `Your appointment has been confirmed. Confirmation code: ${confirmationCode}`,
