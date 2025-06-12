@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMinimalAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 
+type AppointmentStatus = 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
+
 export const useStaffActions = () => {
   const { user } = useMinimalAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +38,7 @@ export const useStaffActions = () => {
 
   const updateAppointmentStatus = async (
     appointmentId: string,
-    newStatus: string,
+    newStatus: AppointmentStatus,
     additionalData?: Record<string, any>
   ) => {
     if (!user?.id) {
@@ -57,8 +59,8 @@ export const useStaffActions = () => {
         .eq('id', appointmentId)
         .single();
 
-      // Update appointment
-      const updateData = {
+      // Update appointment with proper typing
+      const updateData: Record<string, any> = {
         status: newStatus,
         ...additionalData,
       };
@@ -98,9 +100,91 @@ export const useStaffActions = () => {
     }
   };
 
+  const getRecentActions = async (limit: number = 10) => {
+    if (!user?.id) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('staff_actions')
+        .select('*')
+        .eq('staff_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching recent actions:', error);
+      return [];
+    }
+  };
+
+  const undoAction = async (actionId: string) => {
+    if (!user?.id) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to perform this action',
+        variant: 'destructive',
+      });
+      return false;
+    }
+
+    setIsLoading(true);
+    try {
+      // Get the action to undo
+      const { data: action, error: fetchError } = await supabase
+        .from('staff_actions')
+        .select('*')
+        .eq('id', actionId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (action.resource_type === 'appointment') {
+        // Undo appointment changes
+        const { error: undoError } = await supabase
+          .from('appointments')
+          .update(action.old_data)
+          .eq('id', action.resource_id);
+
+        if (undoError) throw undoError;
+      }
+
+      // Log the undo action
+      await logAction(
+        'undo_action',
+        action.resource_type,
+        action.resource_id,
+        action.new_data,
+        action.old_data
+      );
+
+      toast({
+        title: 'Success',
+        description: 'Action has been undone',
+      });
+
+      return true;
+    } catch (error: any) {
+      console.error('Error undoing action:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to undo action',
+        variant: 'destructive',
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     updateAppointmentStatus,
     logAction,
+    getRecentActions,
+    undoAction,
     isLoading,
   };
 };

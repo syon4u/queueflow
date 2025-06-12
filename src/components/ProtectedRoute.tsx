@@ -74,7 +74,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       customer: '/'
     };
     
-    const redirectPath = role ? roleRedirects[role] : '/';
+    const redirectPath = role ? roleRedirects[role as UserRoleType] : '/';
     return <Navigate to={redirectPath} replace />;
   }
 

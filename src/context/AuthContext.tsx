@@ -2,12 +2,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { UserRoleType } from '@/types/auth';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  role: string | null;
+  role: UserRoleType | null;
   loading: boolean;
+  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, userData?: any) => Promise<{ error?: any }>;
+  signInWithGoogle: () => Promise<{ error?: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -16,8 +20,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<UserRoleType | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchUserRole = async (userId: string): Promise<UserRoleType> => {
+    try {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      return (roleData?.role as UserRoleType) || 'customer';
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return 'customer';
+    }
+  };
 
   useEffect(() => {
     console.log('AuthProvider - Setting up auth state listener');
@@ -32,18 +51,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           // Use setTimeout to avoid recursion issues
           setTimeout(async () => {
-            try {
-              const { data: roleData } = await supabase
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', session.user.id)
-                .maybeSingle();
-              
-              setRole(roleData?.role || 'customer');
-            } catch (error) {
-              console.error('Error fetching user role:', error);
-              setRole('customer');
-            }
+            const userRole = await fetchUserRole(session.user.id);
+            setRole(userRole);
           }, 0);
         } else {
           setRole(null);
@@ -54,26 +63,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        setTimeout(async () => {
-          try {
-            const { data: roleData } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            setRole(roleData?.role || 'customer');
-          } catch (error) {
-            console.error('Error fetching user role:', error);
-            setRole('customer');
-          }
-        }, 0);
+        const userRole = await fetchUserRole(session.user.id);
+        setRole(userRole);
       } else {
         setRole(null);
       }
@@ -86,6 +83,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscription.unsubscribe();
     };
   }, []);
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
+
+  const signUp = async (email: string, password: string, userData?: any) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData,
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      });
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
 
   const signOut = async () => {
     try {
@@ -106,6 +145,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     role,
     loading,
+    signIn,
+    signUp,
+    signInWithGoogle,
     signOut,
   };
 
@@ -127,7 +169,7 @@ export const useAuth = (): AuthContextType => {
 };
 
 // Minimal auth context for components that don't need full auth
-export const MinimalAuthContext = createContext<{ user: User | null; role: string | null }>({
+export const MinimalAuthContext = createContext<{ user: User | null; role: UserRoleType | null }>({
   user: null,
   role: null,
 });
