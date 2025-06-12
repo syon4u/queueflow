@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/MinimalAuthContext';
 import { Customer } from './types';
 
 // Helper function to map appointment status to customer status
@@ -78,7 +78,8 @@ export const useQueueData = () => {
       return transformedCustomers;
     },
     refetchInterval: 30000,
-    enabled: !!user && ['staff', 'power_user', 'admin'].includes(role || '')
+    // Always enabled since auth is disabled
+    enabled: true
   });
 
   return { customers: appointmentsData || [] };

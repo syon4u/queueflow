@@ -4,7 +4,7 @@ import React, { createContext, useContext } from 'react';
 interface MinimalAuthContextType {
   user: null;
   role: null;
-  loading: false;
+  loading: boolean;
 }
 
 const MinimalAuthContext = createContext<MinimalAuthContextType | undefined>(undefined);
