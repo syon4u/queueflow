@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/MinimalAuthContext';
 
 interface StaffAction {
   id: string;
@@ -30,7 +30,7 @@ export const useStaffActions = () => {
     oldData: any,
     newData: any
   ) => {
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
       const { error } = await supabase
@@ -51,7 +51,7 @@ export const useStaffActions = () => {
   };
 
   const getRecentActions = async (limit = 10) => {
-    if (!user) return [];
+    if (!user?.id) return [];
 
     try {
       const { data, error } = await supabase
