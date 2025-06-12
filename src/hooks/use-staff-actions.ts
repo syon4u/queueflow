@@ -142,11 +142,27 @@ export const useStaffActions = () => {
 
       if (fetchError) throw fetchError;
 
-      if (action.resource_type === 'appointment') {
+      if (action.resource_type === 'appointment' && action.old_data) {
+        // Type cast the JSON data to the expected appointment update format
+        const oldAppointmentData = action.old_data as Record<string, any>;
+        
+        // Extract only the fields we want to update (excluding id and other system fields)
+        const updateFields: Record<string, any> = {};
+        const allowedFields = [
+          'status', 'scheduled_time', 'check_in_time', 'start_time', 'end_time',
+          'notes', 'reason_for_visit', 'staff_id', 'assigned_staff_id'
+        ];
+        
+        allowedFields.forEach(field => {
+          if (oldAppointmentData[field] !== undefined) {
+            updateFields[field] = oldAppointmentData[field];
+          }
+        });
+
         // Undo appointment changes
         const { error: undoError } = await supabase
           .from('appointments')
-          .update(action.old_data)
+          .update(updateFields)
           .eq('id', action.resource_id);
 
         if (undoError) throw undoError;
