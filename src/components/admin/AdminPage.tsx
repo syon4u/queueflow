@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
@@ -21,9 +20,8 @@ import BackendHealthCheck from './BackendHealthCheck';
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const { role } = useAuth();
 
-  // Role checks disabled - always allow admin access
+  // Since auth is disabled, always allow admin access
   const isAdminUser = true;
 
   const handleRefresh = () => {

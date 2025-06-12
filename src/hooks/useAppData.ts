@@ -70,7 +70,9 @@ export interface AppData {
 }
 
 export const useAppData = (): AppData => {
-  const { user, role } = useAuth();
+  // Remove auth dependency since auth is disabled
+  const user = null;
+  const role = null;
 
   // Fetch locations - now public
   const {
@@ -127,7 +129,7 @@ export const useAppData = (): AppData => {
     refetchInterval: 60000,
   });
 
-  // Fetch customers - only for authenticated staff
+  // Fetch customers - always enabled since auth is disabled
   const {
     data: customers = [],
     isLoading: customersLoading,
@@ -151,11 +153,10 @@ export const useAppData = (): AppData => {
       console.log('App data customers loaded:', data?.length || 0);
       return data as Customer[];
     },
-    enabled: !!user && ['staff', 'power_user', 'admin'].includes(role || ''),
     refetchInterval: 30000,
   });
 
-  // Fetch appointments - only for authenticated staff
+  // Fetch appointments - always enabled since auth is disabled
   const {
     data: appointments = [],
     isLoading: appointmentsLoading,
@@ -184,7 +185,6 @@ export const useAppData = (): AppData => {
       console.log('App data appointments loaded:', data?.length || 0);
       return data as Appointment[];
     },
-    enabled: !!user && ['staff', 'power_user', 'admin'].includes(role || ''),
     refetchInterval: 30000,
   });
 
