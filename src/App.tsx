@@ -8,10 +8,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import CustomerPage from "./pages/CustomerPage";
 import NewAppointmentPage from "./pages/NewAppointmentPage";
-import CustomerAppointmentPage from "./pages/CustomerAppointmentPage";
-import StaffDashboard from "./pages/StaffDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import PowerUserDashboard from "./pages/PowerUserDashboard";
+import StaffPage from "./pages/StaffPage";
+import AdminPage from "./pages/AdminPage";
+import PowerUserPage from "./pages/PowerUserPage";
 import ProfilePage from "./pages/ProfilePage";
 import Login from "./pages/Login";
 import AuthPage from "./pages/AuthPage";
@@ -30,10 +29,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/customer" element={<CustomerPage />} />
           <Route path="/new-appointment" element={<NewAppointmentPage />} />
-          <Route path="/customer-appointment" element={<CustomerAppointmentPage />} />
-          <Route path="/staff" element={<StaffDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/power-user" element={<PowerUserDashboard />} />
+          <Route path="/staff" element={<StaffPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/power-user" element={<PowerUserPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth" element={<AuthPage />} />
