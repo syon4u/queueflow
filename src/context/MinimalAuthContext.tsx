@@ -1,8 +1,12 @@
 
 import React, { createContext, useContext } from 'react';
 
+interface MinimalUser {
+  id: string;
+}
+
 interface MinimalAuthContextType {
-  user: null;
+  user: MinimalUser | null;
   role: null;
   loading: boolean;
 }
@@ -14,7 +18,7 @@ export const useAuth = (): MinimalAuthContextType => {
   if (context === undefined) {
     // Return default values when no provider is present
     return {
-      user: null,
+      user: { id: 'mock-user-id' }, // Provide a mock user for development
       role: null,
       loading: false
     };
@@ -24,7 +28,7 @@ export const useAuth = (): MinimalAuthContextType => {
 
 export const MinimalAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const value = {
-    user: null,
+    user: { id: 'mock-user-id' }, // Provide a mock user for development
     role: null,
     loading: false
   };
