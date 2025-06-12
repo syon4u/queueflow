@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/MinimalAuthContext';
 import { useStaffActions } from '@/hooks/use-staff-actions';
 import { Customer } from './types';
 
@@ -24,7 +23,14 @@ export const useQueueOperations = (customers: Customer[], currentCustomer: Custo
   };
 
   const callNextCustomer = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: 'Not Available',
+        description: 'Authentication required for queue operations.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     // Check if staff member already has a customer
     if (currentCustomer) {

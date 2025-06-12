@@ -27,7 +27,7 @@ export const useQueueData = () => {
   const { user, role } = useAuth();
   
   const { data: appointmentsData = [] } = useQuery({
-    queryKey: ['queue-appointments', user?.id],
+    queryKey: ['queue-appointments', user?.id || 'no-user'],
     queryFn: async () => {
       const today = new Date().toISOString().split('T')[0];
       
