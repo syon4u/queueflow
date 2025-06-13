@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Service } from '@/hooks/appointment-form/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Globe } from 'lucide-react';
 
 interface ServiceStepProps {
   serviceId: string;
@@ -32,16 +32,27 @@ const ServiceStep: React.FC<ServiceStepProps> = ({
 }) => {
   const { t } = useTranslation();
   
+  // Filter services: show global services and location-specific services
+  const filteredServices = React.useMemo(() => {
+    if (!services) return [];
+    
+    // Show both global services (no location_id) and location-specific services
+    return services.filter(service => 
+      !service.location_id || service.location_id === locationId
+    );
+  }, [services, locationId]);
+  
   console.log('ServiceStep - Props:', {
     serviceId,
     locationId,
-    servicesCount: services.length,
+    servicesCount: filteredServices.length,
+    globalServicesCount: services.filter(s => !s.location_id).length,
     isLoading,
     error,
     services
   });
   
-  const selectedService = services.find(s => s.id === serviceId);
+  const selectedService = filteredServices.find(s => s.id === serviceId);
 
   // Show error state
   if (error) {
@@ -58,20 +69,6 @@ const ServiceStep: React.FC<ServiceStepProps> = ({
     );
   }
 
-  // Show location required message
-  if (!locationId) {
-    return (
-      <div className="space-y-4">
-        <Label>{t('appointments.selectService')}</Label>
-        <Alert>
-          <AlertDescription>
-            Please select a location first to see available services.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <Label>{t('appointments.selectService')} *</Label>
@@ -79,14 +76,14 @@ const ServiceStep: React.FC<ServiceStepProps> = ({
       <Select 
         value={serviceId || ''} 
         onValueChange={onServiceChange}
-        disabled={isLoading || !locationId || services.length === 0}
+        disabled={isLoading || filteredServices.length === 0}
       >
         <SelectTrigger className="w-full">
           <SelectValue 
             placeholder={
               isLoading 
                 ? "Loading services..." 
-                : services.length === 0 
+                : filteredServices.length === 0 
                   ? "No services available"
                   : t('appointments.selectServicePlaceholder')
             } 
@@ -94,12 +91,20 @@ const ServiceStep: React.FC<ServiceStepProps> = ({
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         </SelectTrigger>
         <SelectContent>
-          {services.map(service => (
+          {filteredServices.map(service => (
             <SelectItem key={service.id} value={service.id}>
               <div className="flex flex-col">
-                <span>{service.name}</span>
+                <div className="flex items-center gap-2">
+                  <span>{service.name}</span>
+                  {!service.location_id && (
+                    <Globe className="h-3 w-3 text-blue-500" title="Global service" />
+                  )}
+                </div>
                 <span className="text-sm text-muted-foreground">
                   {service.duration} {t('appointments.minutes')}
+                  {!service.location_id && (
+                    <span className="ml-2 text-blue-600">(Available at all locations)</span>
+                  )}
                 </span>
               </div>
             </SelectItem>
@@ -121,6 +126,9 @@ const ServiceStep: React.FC<ServiceStepProps> = ({
         <div className="mt-2 text-sm text-muted-foreground">
           <span className="font-medium">{t('appointments.duration')}: </span>
           {selectedService.duration} {t('appointments.minutes')}
+          {!selectedService.location_id && (
+            <span className="ml-2 text-blue-600 font-medium">(Global Service)</span>
+          )}
         </div>
       )}
 
@@ -130,7 +138,8 @@ const ServiceStep: React.FC<ServiceStepProps> = ({
           <strong>Debug Info:</strong><br />
           Location ID: {locationId || 'None'}<br />
           Service ID: {serviceId || 'None'}<br />
-          Services Available: {services.length}<br />
+          Filtered Services: {filteredServices.length}<br />
+          Global Services: {services.filter(s => !s.location_id).length}<br />
           Loading: {isLoading ? 'Yes' : 'No'}
         </div>
       )}

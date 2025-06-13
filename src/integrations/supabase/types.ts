@@ -1593,7 +1593,7 @@ export type Database = {
           duration: number
           id: string
           is_active: boolean | null
-          location_id: string
+          location_id: string | null
           max_appointments_per_slot: number | null
           name: string
           updated_at: string
@@ -1604,7 +1604,7 @@ export type Database = {
           duration: number
           id?: string
           is_active?: boolean | null
-          location_id: string
+          location_id?: string | null
           max_appointments_per_slot?: number | null
           name: string
           updated_at?: string
@@ -1615,7 +1615,7 @@ export type Database = {
           duration?: number
           id?: string
           is_active?: boolean | null
-          location_id?: string
+          location_id?: string | null
           max_appointments_per_slot?: number | null
           name?: string
           updated_at?: string

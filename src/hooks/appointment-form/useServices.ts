@@ -7,28 +7,33 @@ interface Service {
   name: string;
   duration: number;
   description?: string;
+  location_id?: string; // Now optional since services can be global
   isCustom?: boolean;
   originalServiceId?: string;
 }
 
 export const useServices = (locationId?: string) => {
-  // Query for standard services
+  // Query for standard services (both global and location-specific)
   const { data: standardServices = [], isLoading: standardLoading, error: standardError } = useQuery({
     queryKey: ['services', 'standard', locationId],
     queryFn: async (): Promise<Service[]> => {
       console.log('useServices - Fetching standard services for location:', locationId);
       
-      if (!locationId) {
-        console.log('useServices - No location ID provided');
-        return [];
-      }
-      
-      const { data, error } = await supabase
+      let query = supabase
         .from('services')
-        .select('id, name, duration, description')
-        .eq('location_id', locationId)
+        .select('id, name, duration, description, location_id')
         .eq('is_active', true)
         .order('name');
+      
+      // If locationId is provided, get both global services (location_id is null) and location-specific services
+      if (locationId) {
+        query = query.or(`location_id.is.null,location_id.eq.${locationId}`);
+      } else {
+        // If no locationId, only get global services
+        query = query.is('location_id', null);
+      }
+      
+      const { data, error } = await query;
       
       if (error) {
         console.error('useServices - Standard services error:', error);
@@ -43,14 +48,13 @@ export const useServices = (locationId?: string) => {
       console.log('useServices - Standard services loaded:', services.length);
       return services;
     },
-    enabled: !!locationId,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
-  // Query for custom services (runs in parallel)
+  // Query for custom services (runs in parallel) - only if locationId is provided
   const { data: customServices = [] } = useQuery({
     queryKey: ['services', 'custom', locationId],
     queryFn: async (): Promise<Service[]> => {

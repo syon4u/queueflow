@@ -2,7 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Globe } from 'lucide-react';
 import { CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentForm';
 
 interface Location {
@@ -16,6 +16,7 @@ interface Service {
   name: string;
   duration: number;
   description?: string;
+  location_id?: string; // Now optional for global services
 }
 
 interface LocationServiceSectionProps {
@@ -39,6 +40,16 @@ const LocationServiceSection = ({
   servicesLoading,
   servicesError
 }: LocationServiceSectionProps) => {
+  // Filter services: show global services and location-specific services
+  const filteredServices = React.useMemo(() => {
+    if (!services) return [];
+    
+    // Show both global services (no location_id) and location-specific services
+    return services.filter(service => 
+      !service.location_id || service.location_id === formData.locationId
+    );
+  }, [services, formData.locationId]);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium flex items-center gap-2">
@@ -82,25 +93,31 @@ const LocationServiceSection = ({
           <Select 
             value={formData.serviceId} 
             onValueChange={(value) => updateField('serviceId', value)}
-            disabled={!formData.locationId || servicesLoading}
+            disabled={servicesLoading}
           >
             <SelectTrigger>
               <SelectValue placeholder={
-                !formData.locationId 
-                  ? "Select a location first"
-                  : servicesLoading 
-                    ? "Loading services..."
-                    : "Select a service"
+                servicesLoading 
+                  ? "Loading services..."
+                  : "Select a service"
               } />
               {servicesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             </SelectTrigger>
             <SelectContent>
-              {services?.map((service) => (
+              {filteredServices?.map((service) => (
                 <SelectItem key={service.id} value={service.id}>
                   <div className="flex flex-col">
-                    <span>{service.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{service.name}</span>
+                      {!service.location_id && (
+                        <Globe className="h-3 w-3 text-blue-500" title="Global service" />
+                      )}
+                    </div>
                     <span className="text-sm text-muted-foreground">
                       {service.duration} min
+                      {!service.location_id && (
+                        <span className="ml-2 text-blue-600">(Available at all locations)</span>
+                      )}
                     </span>
                   </div>
                 </SelectItem>

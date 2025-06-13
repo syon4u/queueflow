@@ -21,11 +21,19 @@ interface ServiceSelectorProps {
 const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) => {
   const { services, isLoading, error } = useAppData();
 
-  // Filter services by location if locationId is provided
+  // Filter services: show global services and location-specific services if locationId is provided
   const filteredServices = React.useMemo(() => {
     if (!services) return [];
-    if (!locationId) return services;
-    return services.filter(service => service.location_id === locationId);
+    
+    // If no locationId, show only global services (location_id is null)
+    if (!locationId) {
+      return services.filter(service => !service.location_id);
+    }
+    
+    // If locationId is provided, show both global and location-specific services
+    return services.filter(service => 
+      !service.location_id || service.location_id === locationId
+    );
   }, [services, locationId]);
 
   console.log('ServiceSelector - Component state:', {
@@ -33,7 +41,9 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
     locationId,
     servicesCount: filteredServices?.length || 0,
     isLoading,
-    error: error?.message
+    error: error?.message,
+    globalServices: services?.filter(s => !s.location_id)?.length || 0,
+    locationServices: locationId ? services?.filter(s => s.location_id === locationId)?.length || 0 : 0
   });
 
   // Show error state
@@ -59,18 +69,16 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
         <Select 
           value={value || ''} 
           onValueChange={onChange} 
-          disabled={isLoading || !locationId}
+          disabled={isLoading}
         >
           <SelectTrigger>
             <SelectValue 
               placeholder={
-                !locationId 
-                  ? "Select a location first"
-                  : isLoading 
-                    ? "Loading services..."
-                    : filteredServices && filteredServices.length === 0
-                      ? "No services available"
-                      : "Select a service"
+                isLoading 
+                  ? "Loading services..."
+                  : filteredServices && filteredServices.length === 0
+                    ? "No services available"
+                    : "Select a service"
               } 
             />
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -83,14 +91,19 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
                     <span>{service.name}</span>
                     <span className="text-sm text-muted-foreground">
                       {service.duration} min
+                      {!service.location_id && (
+                        <span className=" ml-2 px-1 bg-blue-100 text-blue-600 rounded text-xs">
+                          Global
+                        </span>
+                      )}
                     </span>
                   </div>
                 </SelectItem>
               ))
             ) : (
-              !isLoading && locationId && (
+              !isLoading && (
                 <SelectItem value="no-services" disabled>
-                  No services available for this location
+                  No services available
                 </SelectItem>
               )
             )}
@@ -105,7 +118,9 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
           <strong>ServiceSelector Debug:</strong><br />
           Location ID: {locationId || 'None'}<br />
           Current Value: {value || 'None'}<br />
-          Services Count: {filteredServices?.length || 0}<br />
+          Filtered Services Count: {filteredServices?.length || 0}<br />
+          Global Services: {services?.filter(s => !s.location_id)?.length || 0}<br />
+          Location Services: {locationId ? services?.filter(s => s.location_id === locationId)?.length || 0 : 0}<br />
           Loading: {isLoading ? 'Yes' : 'No'}<br />
           Error: {error?.message || 'None'}
         </div>
