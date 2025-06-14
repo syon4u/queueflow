@@ -132,7 +132,7 @@ const LocationServiceSelector: React.FC<LocationServiceSelectorProps> = ({
                   <div className="flex items-center gap-2">
                     <span>{service.name}</span>
                     {!service.location_id && (
-                      <Globe className="h-3 w-3 text-blue-500" title="Global service" />
+                      <Globe className="h-3 w-3 text-blue-500" />
                     )}
                   </div>
                   <span className="text-sm text-muted-foreground">
