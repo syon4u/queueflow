@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import PageLayout from '@/components/layout/PageLayout';
 import Navigation from '@/components/landing/Navigation';
-import HeroSection from '@/components/landing/HeroSection';
-import CustomerServiceCards from '@/components/landing/CustomerServiceCards';
-import FeaturesSection from '@/components/landing/FeaturesSection';
+import ModernHeroSection from '@/components/landing/ModernHeroSection';
+import ServiceCardsGrid from '@/components/landing/ServiceCardsGrid';
+import FeaturesShowcase from '@/components/landing/FeaturesShowcase';
 import StatsSection from '@/components/landing/StatsSection';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import CTASection from '@/components/landing/CTASection';
@@ -25,7 +25,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Navigation */}
       <Navigation 
         showStaffAccess={showStaffAccess}
@@ -34,14 +34,14 @@ const Index = () => {
       
       {/* Main Content */}
       <div className="w-full">
-        {/* Hero Section */}
-        <HeroSection onShowGuide={handleShowGuide} />
+        {/* Modern Hero Section */}
+        <ModernHeroSection onShowGuide={handleShowGuide} />
         
-        {/* Customer-Focused Cards */}
-        <CustomerServiceCards />
+        {/* Service Cards Grid */}
+        <ServiceCardsGrid />
         
-        {/* Features Section */}
-        <FeaturesSection />
+        {/* Features Showcase */}
+        <FeaturesShowcase />
         
         {/* Stats Section */}
         <StatsSection />
