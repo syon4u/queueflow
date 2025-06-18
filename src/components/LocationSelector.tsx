@@ -13,13 +13,30 @@ import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/f
 interface LocationSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  availableLocationIds?: string[];
 }
 
-const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
+const LocationSelector = ({ value, onChange, availableLocationIds }: LocationSelectorProps) => {
   const { locations, isLoading, error } = useAppData();
 
+  // Filter locations based on available location IDs from service selection
+  const filteredLocations = React.useMemo(() => {
+    if (!locations) return [];
+    
+    // If no service is selected or service selection doesn't limit locations, show all
+    if (!availableLocationIds || availableLocationIds.length === 0) {
+      return locations;
+    }
+    
+    // Filter to only show locations that are available for the selected service
+    return locations.filter(location => 
+      availableLocationIds.includes(location.id)
+    );
+  }, [locations, availableLocationIds]);
+
   console.log('LocationSelector - Component state:', {
-    locationsCount: locations?.length || 0,
+    locationsCount: filteredLocations?.length || 0,
+    availableLocationIds,
     isLoading,
     error,
     currentValue: value
@@ -57,19 +74,22 @@ const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
     );
   }
 
-  if (!locations || locations.length === 0) {
-    console.warn('LocationSelector - No locations available');
+  if (!filteredLocations || filteredLocations.length === 0) {
+    const message = availableLocationIds?.length === 0 
+      ? "Select a service first" 
+      : "No locations available for selected service";
+    
     return (
       <FormItem>
         <FormLabel>Location</FormLabel>
         <FormControl>
           <Select disabled>
             <SelectTrigger>
-              <SelectValue placeholder="No locations available" />
+              <SelectValue placeholder={message} />
             </SelectTrigger>
           </Select>
         </FormControl>
-        <FormMessage>No locations are currently available</FormMessage>
+        <FormMessage>{message}</FormMessage>
       </FormItem>
     );
   }
@@ -83,7 +103,7 @@ const LocationSelector = ({ value, onChange }: LocationSelectorProps) => {
             <SelectValue placeholder="Select a location" />
           </SelectTrigger>
           <SelectContent>
-            {locations.map((location) => (
+            {filteredLocations.map((location) => (
               <SelectItem key={location.id} value={location.id}>
                 {location.name}
               </SelectItem>

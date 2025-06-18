@@ -15,35 +15,47 @@ import { Loader2, AlertCircle } from 'lucide-react';
 interface ServiceSelectorProps {
   value: string;
   onChange: (value: string) => void;
-  locationId?: string;
+  onServiceLocationChange?: (locationIds: string[]) => void;
 }
 
-const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) => {
+const ServiceSelector = ({ value, onChange, onServiceLocationChange }: ServiceSelectorProps) => {
   const { services, isLoading, error } = useAppData();
 
-  // Filter services: show all services if no locationId, otherwise show global and location-specific services
+  // Show all services without location filtering
   const filteredServices = React.useMemo(() => {
     if (!services) return [];
+    return services;
+  }, [services]);
+
+  // When service changes, notify parent about available locations for this service
+  const handleServiceChange = (serviceId: string) => {
+    onChange(serviceId);
     
-    // If no locationId, show ALL services
-    if (!locationId) {
-      return services;
+    if (onServiceLocationChange && services) {
+      const selectedService = services.find(s => s.id === serviceId);
+      if (selectedService) {
+        if (!selectedService.location_id) {
+          // Global service - available at all locations
+          const allLocationIds = services
+            .map(s => s.location_id)
+            .filter((id, index, self) => id && self.indexOf(id) === index) as string[];
+          onServiceLocationChange(allLocationIds);
+        } else {
+          // Location-specific service
+          onServiceLocationChange([selectedService.location_id]);
+        }
+      } else {
+        onServiceLocationChange([]);
+      }
     }
-    
-    // If locationId is provided, show both global and location-specific services
-    return services.filter(service => 
-      !service.location_id || service.location_id === locationId
-    );
-  }, [services, locationId]);
+  };
 
   console.log('ServiceSelector - Component state:', {
     value,
-    locationId,
     servicesCount: filteredServices?.length || 0,
     isLoading,
     error: error?.message,
-    globalServices: services?.filter(s => !s.location_id)?.length || 0,
-    locationServices: locationId ? services?.filter(s => s.location_id === locationId)?.length || 0 : 0
+    globalServices: services?.filter(s => !s.location_id)?.length || 0
   });
 
   // Show error state
@@ -68,7 +80,7 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
       <FormControl>
         <Select 
           value={value || ''} 
-          onValueChange={onChange} 
+          onValueChange={handleServiceChange} 
           disabled={isLoading}
         >
           <SelectTrigger>
@@ -116,11 +128,9 @@ const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) 
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-2 p-2 bg-yellow-100 rounded text-xs">
           <strong>ServiceSelector Debug:</strong><br />
-          Location ID: {locationId || 'None'}<br />
           Current Value: {value || 'None'}<br />
-          Filtered Services Count: {filteredServices?.length || 0}<br />
+          Services Count: {filteredServices?.length || 0}<br />
           Global Services: {services?.filter(s => !s.location_id)?.length || 0}<br />
-          Location Services: {locationId ? services?.filter(s => s.location_id === locationId)?.length || 0 : 0}<br />
           Loading: {isLoading ? 'Yes' : 'No'}<br />
           Error: {error?.message || 'None'}
         </div>
