@@ -21,13 +21,13 @@ interface ServiceSelectorProps {
 const ServiceSelector = ({ value, onChange, locationId }: ServiceSelectorProps) => {
   const { services, isLoading, error } = useAppData();
 
-  // Filter services: show global services and location-specific services if locationId is provided
+  // Filter services: show all services if no locationId, otherwise show global and location-specific services
   const filteredServices = React.useMemo(() => {
     if (!services) return [];
     
-    // If no locationId, show only global services (location_id is null)
+    // If no locationId, show ALL services
     if (!locationId) {
-      return services.filter(service => !service.location_id);
+      return services;
     }
     
     // If locationId is provided, show both global and location-specific services

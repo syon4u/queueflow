@@ -28,10 +28,9 @@ export const useServices = (locationId?: string) => {
       // If locationId is provided, get both global services (location_id is null) and location-specific services
       if (locationId) {
         query = query.or(`location_id.is.null,location_id.eq.${locationId}`);
-      } else {
-        // If no locationId, only get global services
-        query = query.is('location_id', null);
       }
+      // If no locationId, get ALL services (don't filter by location)
+      // This ensures services are available even when no location is selected
       
       const { data, error } = await query;
       
