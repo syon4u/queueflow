@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,6 +44,7 @@ const ExistingCustomerForm = ({
   isSubmitting
 }: ExistingCustomerFormProps) => {
   const { t } = useTranslation();
+  const [availableLocationIds, setAvailableLocationIds] = useState<string[]>([]);
 
   const form = useForm<ExistingCustomerFormValues>({
     resolver: zodResolver(existingCustomerFormSchema),
@@ -54,6 +55,15 @@ const ExistingCustomerForm = ({
       reason_for_visit: "",
     },
   });
+
+  const handleServiceLocationChange = (locationIds: string[]) => {
+    setAvailableLocationIds(locationIds);
+    // Clear location if it's no longer available
+    const currentLocationId = form.getValues('location_id');
+    if (currentLocationId && !locationIds.includes(currentLocationId)) {
+      form.setValue('location_id', '');
+    }
+  };
 
   return (
     <Form {...form}>
@@ -66,23 +76,24 @@ const ExistingCustomerForm = ({
         
         <FormField
           control={form.control}
-          name="location_id"
+          name="service_id"
           render={({ field }) => (
-            <LocationSelector 
+            <ServiceSelector 
               value={field.value} 
-              onChange={field.onChange} 
+              onChange={field.onChange}
+              onServiceLocationChange={handleServiceLocationChange}
             />
           )}
         />
         
         <FormField
           control={form.control}
-          name="service_id"
+          name="location_id"
           render={({ field }) => (
-            <ServiceSelector 
+            <LocationSelector 
               value={field.value} 
               onChange={field.onChange}
-              locationId={form.watch('location_id')}
+              availableLocationIds={availableLocationIds}
             />
           )}
         />
