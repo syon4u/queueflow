@@ -29,9 +29,11 @@ const CustomerPage = () => {
     }
   };
 
-  const handleConfirmationClose = () => {
-    setConfirmationCode(null);
-    navigate('/');
+  const handleConfirmationClose = (open: boolean) => {
+    if (!open) {
+      setConfirmationCode(null);
+      navigate('/');
+    }
   };
 
   return (
@@ -49,8 +51,8 @@ const CustomerPage = () => {
 
       {confirmationCode && (
         <AppointmentConfirmationDialog
-          isOpen={true}
-          onClose={handleConfirmationClose}
+          open={true}
+          onOpenChange={handleConfirmationClose}
           confirmationCode={confirmationCode}
         />
       )}
