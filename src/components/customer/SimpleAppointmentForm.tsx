@@ -41,14 +41,18 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     locationsError,
     servicesCount: services?.length || 0,
     servicesLoading,
-    servicesError
+    servicesError,
+    formData
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('SimpleAppointmentForm - Form submitted:', formData);
+    
     const validationError = validateForm();
     if (validationError) {
+      console.log('SimpleAppointmentForm - Validation error:', validationError);
       toast({
         title: 'Missing Information',
         description: validationError,
@@ -58,6 +62,8 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     }
 
     setIsSubmitting(true);
+    console.log('SimpleAppointmentForm - Calling onSubmit with:', formData);
+    
     try {
       await onSubmit(formData);
       toast({
@@ -67,6 +73,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
       
       resetForm();
     } catch (error) {
+      console.error('SimpleAppointmentForm - Submission error:', error);
       toast({
         title: 'Error',
         description: 'There was a problem submitting your request. Please try again.',
