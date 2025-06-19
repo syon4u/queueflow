@@ -20,9 +20,15 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           playsInline
           className="w-full h-full object-cover"
           poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234F46E5;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%237C3AED;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%231E40AF;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)' /%3E%3C/svg%3E"
+          onError={(e) => {
+            // Hide video on error and show fallback
+            e.currentTarget.style.display = 'none';
+            const fallback = e.currentTarget.parentElement?.nextElementSibling as HTMLElement;
+            if (fallback) fallback.style.opacity = '1';
+          }}
         >
-          {/* Placeholder for video source - user will need to provide video URL */}
-          <source src="" type="video/mp4" />
+          {/* Using a stock video URL for demonstration - replace with your actual video */}
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         
@@ -38,15 +44,15 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
         </div>
       </div>
 
-      {/* Fallback Background (when video doesn't load) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 opacity-0 transition-opacity duration-1000 [&:has(+_video:not([src]))]:opacity-100"></div>
+      {/* Enhanced Fallback Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 opacity-0 transition-opacity duration-1000"></div>
 
-      {/* Floating Elements - More subtle for video background */}
+      {/* Optimized Floating Elements - Reduced for better mobile performance */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-blue-300/10 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-32 left-1/4 w-16 h-16 bg-purple-300/10 rounded-full animate-ping"></div>
-        <div className="absolute bottom-20 right-1/3 w-20 h-20 bg-indigo-300/10 rounded-full animate-pulse"></div>
+        <div className="absolute top-20 left-10 w-24 h-24 bg-white/5 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-blue-300/10 rounded-full animate-pulse delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-12 h-12 bg-purple-300/10 rounded-full animate-pulse delay-2000"></div>
+        <div className="absolute bottom-20 right-1/3 w-14 h-14 bg-indigo-300/10 rounded-full animate-pulse delay-3000"></div>
       </div>
 
       {/* Content */}
@@ -80,11 +86,11 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons with improved touch targets for mobile */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
           <Button 
             size="lg" 
-            className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 backdrop-blur-sm" 
+            className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 backdrop-blur-sm min-h-[48px] touch-manipulation" 
             asChild
           >
             <Link to="/customer">
@@ -96,7 +102,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           <Button 
             size="lg" 
             variant="outline"
-            className="w-full sm:w-auto border-2 border-white/80 text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300" 
+            className="w-full sm:w-auto border-2 border-white/80 text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300 min-h-[48px] touch-manipulation" 
             asChild
           >
             <Link to="/status">Check Status</Link>
@@ -105,7 +111,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           <Button 
             size="lg" 
             variant="ghost"
-            className="w-full sm:w-auto text-white hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300" 
+            className="w-full sm:w-auto text-white hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300 min-h-[48px] touch-manipulation" 
             onClick={onShowGuide}
           >
             Learn More
