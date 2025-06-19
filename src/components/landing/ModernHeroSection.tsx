@@ -19,7 +19,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           loop
           playsInline
           className="w-full h-full object-cover"
-          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234F46E5;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%237C3AED;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%231E40AF;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)' /%3E%3C/svg%3E"
+          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234F46E5;stop-opacity:1' /%3E%3Cstop offset='30%25' style='stop-color:%237C3AED;stop-opacity:1' /%3E%3Cstop offset='70%25' style='stop-color:%231E40AF;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232563EB;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)' /%3E%3Cg opacity='0.1'%3E%3Ccircle cx='300' cy='200' r='60' fill='white' /%3E%3Ccircle cx='600' cy='150' r='40' fill='white' /%3E%3Ccircle cx='900' cy='300' r='50' fill='white' /%3E%3Ccircle cx='1200' cy='180' r='35' fill='white' /%3E%3Ccircle cx='1500' cy='250' r='45' fill='white' /%3E%3Crect x='400' y='500' width='200' height='120' rx='10' fill='white' opacity='0.3' /%3E%3Crect x='800' y='450' width='180' height='100' rx='8' fill='white' opacity='0.25' /%3E%3Crect x='1100' y='520' width='160' height='90' rx='6' fill='white' opacity='0.2' /%3E%3Ctext x='960' y='540' font-family='Inter' font-size='24' fill='white' text-anchor='middle' opacity='0.4'%3EQueue Management%3C/text%3E%3Ctext x='960' y='580' font-family='Inter' font-size='16' fill='white' text-anchor='middle' opacity='0.3'%3ESmart. Efficient. Simple.%3C/text%3E%3C/g%3E%3C/svg%3E"
           onError={(e) => {
             // Hide video on error and show fallback
             e.currentTarget.style.display = 'none';
@@ -27,24 +27,24 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
             if (fallback) fallback.style.opacity = '1';
           }}
         >
-          {/* Using a stock video URL for demonstration - replace with your actual video */}
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+          {/* Using a customer service/business focused video */}
+          <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         
-        {/* Elegant Dark Overlay - Withings inspired */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60"></div>
+        {/* Elegant Dark Overlay - Queue management theme */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
         
-        {/* Subtle Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10">
+        {/* Queue-themed Pattern Overlay */}
+        <div className="absolute inset-0 opacity-8">
           <div className="w-full h-full" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '50px 50px'
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)`,
+            backgroundSize: '40px 40px'
           }}></div>
         </div>
       </div>
 
-      {/* Enhanced Fallback Background */}
+      {/* Enhanced Fallback Background with Queue Theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-700 to-indigo-800 opacity-0 transition-opacity duration-1000"></div>
 
       {/* Optimized Floating Elements - Reduced for better mobile performance */}
@@ -60,13 +60,13 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
         {/* Main Heading */}
         <div className="mb-8">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            Queue Management
+            Smart Queue Management
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
-              Reimagined
+              For Modern Business
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
-            Skip the wait, schedule smart, and experience the future of customer service with our intelligent queue system.
+            Eliminate waiting rooms, reduce customer frustration, and boost efficiency with our AI-powered queue management system.
           </p>
         </div>
 
@@ -118,7 +118,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           </Button>
         </div>
 
-        {/* Stats Bar - Enhanced for video background */}
+        {/* Stats Bar - Enhanced for queue management theme */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
             <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">85%</div>
