@@ -27,8 +27,9 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
             if (fallback) fallback.style.opacity = '1';
           }}
         >
-          {/* Using a customer service/business focused video */}
-          <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4" />
+          {/* Using a tech-forward video more aligned with queue management systems */}
+          <source src="https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_25fps.mp4" type="video/mp4" />
+          <source src="https://videos.pexels.com/video-files/6963944/6963944-uhd_2560_1440_30fps.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         
