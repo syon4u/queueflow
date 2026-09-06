@@ -5,6 +5,8 @@ import { AuthProvider } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProtectedRoute, AdminRoute, StaffRoute, PowerUserRoute } from '@/components/ProtectedRoute';
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
 
 // Public pages
 import Index from '@/pages/Index';
@@ -66,8 +68,8 @@ function App() {
                 <Route path="/virtual-queue" element={<VirtualQueuePage />} />
                 
                 {/* Design system routes */}
-                <Route path="/broward-design-system" element={<BrowardDesignSystem />} />
-                <Route path="/broward-index" element={<BrowardIndex />} />
+                <Route path="/broward-design-system" element={<AdminRoute><BrowardDesignSystem /></AdminRoute>} />
+                <Route path="/broward-index" element={<AdminRoute><BrowardIndex /></AdminRoute>} />
                 
                 {/* Protected routes - require authentication */}
                 <Route path="/profile" element={
@@ -118,6 +120,8 @@ function App() {
                 {/* Catch-all route for 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <Toaster />
+              <Sonner />
             </QueueProvider>
           </QueryClientProvider>
         </AuthProvider>
