@@ -16,6 +16,14 @@ if (!container) {
   throw new Error('Root element not found. Make sure there is a div with id "root" in your HTML.');
 }
 
+// Restore a deep link captured by public/404.html on GitHub Pages.
+const pendingRedirect = sessionStorage.getItem('qf:redirect');
+if (pendingRedirect) {
+  sessionStorage.removeItem('qf:redirect');
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  window.history.replaceState(null, '', base + pendingRedirect);
+}
+
 // Create root and render app
 const root = createRoot(container);
 root.render(

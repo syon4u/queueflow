@@ -42,7 +42,7 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <div className="min-h-screen bg-background">
         <AuthProvider>
           <QueryClientProvider client={queryClient}>

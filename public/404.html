@@ -1,0 +1,11 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>QueueFlow</title>
+<script>
+// GitHub Pages SPA fallback: preserve the deep link and hand it to index.html.
+(function () {
+  var base = location.pathname.split('/').slice(0, 2).join('/'); // "/queueflow-demo" or ""
+  var rest = location.pathname.slice(base.length) + location.search + location.hash;
+  sessionStorage.setItem('qf:redirect', rest);
+  location.replace(base + '/');
+})();
+</script></head><body></body></html>
