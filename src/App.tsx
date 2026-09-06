@@ -19,6 +19,7 @@ import DigitalSignagePage from '@/pages/DigitalSignagePage';
 import MobileQueuePage from '@/pages/MobileQueuePage';
 import VirtualQueuePage from '@/pages/VirtualQueuePage';
 import StatusPage from '@/pages/StatusPage';
+import PricingPage from '@/pages/PricingPage';
 import Unauthorized from '@/pages/Unauthorized';
 import NotFound from '@/pages/NotFound';
 
@@ -55,6 +56,7 @@ function App() {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/check-in" element={<CheckInPage />} />
                 <Route path="/status" element={<StatusPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 
                 {/* Kiosk and signage routes */}

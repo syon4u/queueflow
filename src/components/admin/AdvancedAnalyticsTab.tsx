@@ -6,6 +6,7 @@ import PredictiveAnalytics from './analytics/PredictiveAnalytics';
 import { PredictiveSchedulingDashboard } from './PredictiveSchedulingDashboard';
 import { QueueOptimizationDashboard } from './QueueOptimizationDashboard';
 import { CustomerSatisfactionAnalytics } from './CustomerSatisfactionAnalytics';
+import { BusinessInsightsPanel } from './analytics/BusinessInsightsPanel';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -83,14 +84,7 @@ export const AdvancedAnalyticsTab = () => {
         </TabsContent>
         
         <TabsContent value="insights" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Business insights components would go here */}
-            <div className="col-span-full text-center py-12 text-gray-500">
-              <PieChart className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium">Business Insights Dashboard</p>
-              <p className="text-sm mt-2">Advanced business intelligence features coming soon</p>
-            </div>
-          </div>
+          <BusinessInsightsPanel />
         </TabsContent>
       </Tabs>
     </div>

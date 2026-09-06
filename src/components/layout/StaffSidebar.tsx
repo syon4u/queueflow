@@ -5,7 +5,8 @@ import {
   Calendar,
   Settings,
   Activity,
-  Search
+  Search,
+  FileText
 } from 'lucide-react';
 import { BaseSidebar } from './BaseSidebar';
 
@@ -52,6 +53,12 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
           label: 'Customer Search',
           icon: Search,
           description: 'Search and view customer history'
+        },
+        {
+          id: 'documents',
+          label: 'Documents',
+          icon: FileText,
+          description: 'Upload and manage appointment documents'
         }
       ]
     }

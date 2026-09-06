@@ -9,6 +9,7 @@ import EnhancedAppointmentTable from './EnhancedAppointmentTable';
 import { UnifiedQueueManagement } from '@/components/shared/queue/UnifiedQueueManagement';
 import { UndoActionButton } from './UndoActionButton';
 import { StaffAvailabilityControl } from './StaffAvailabilityControl';
+import DocumentsPanel from '@/components/documents/DocumentsPanel';
 import { useStaffNotifications } from '@/hooks/use-staff-notifications';
 
 interface StaffMainContentProps {
@@ -49,6 +50,9 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
 
       case 'appointments':
         return <EnhancedAppointmentTable />;
+
+      case 'documents':
+        return <DocumentsPanel />;
 
       default:
         return (

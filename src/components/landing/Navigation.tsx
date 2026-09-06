@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Clock, Menu, X, User, Calendar, Search, BarChart3, Settings } from 'lucide-react';
+import { Clock, Menu, X, User, Calendar, Search, BarChart3, Settings, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -48,6 +48,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
     { to: '/appointment-lookup', icon: Search, label: 'Find Appointment' },
     { to: '/check-in', icon: Calendar, label: "I'm Here" },
     { to: '/status', icon: Clock, label: 'Queue Status' },
+    { to: '/pricing', icon: Tag, label: 'Pricing' },
   ];
 
   return (

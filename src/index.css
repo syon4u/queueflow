@@ -4,6 +4,7 @@
 @import './styles/design-system.css';
 /* Import background patterns */
 @import './styles/background-patterns.css';
+@import './styles/hero-animations.css';
 
 @tailwind base;
 @tailwind components;
@@ -177,4 +178,3 @@
   }
 }
 
-@import url('./styles/hero-animations.css');

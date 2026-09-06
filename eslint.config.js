@@ -12,7 +12,6 @@ export default tseslint.config(
     extends: [
       js.configs.recommended, 
       ...tseslint.configs.recommended,
-      ...jsxA11y.configs.recommended
     ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
@@ -26,6 +25,10 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // eslint-plugin-jsx-a11y@6.10.2's flat-config preset predates the
+      // current ESLint flat-config parserOptions shape and cannot be spread
+      // into `extends` directly (see repo notes) — apply its rules here instead.
+      ...jsxA11y.configs.recommended.rules,
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
