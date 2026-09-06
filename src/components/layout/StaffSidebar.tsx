@@ -76,7 +76,7 @@ export const StaffSidebar: React.FC<StaffSidebarProps> = ({
   return (
     <BaseSidebar
       title="Staff Portal"
-      subtitle="Broward QueuePro"
+      subtitle="QueueFlow"
       userRole="Staff Member"
       navigationGroups={navigationGroups}
       quickActions={quickActions}
