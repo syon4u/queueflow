@@ -1,4 +1,3 @@
-
 {
   "loading": "Loading...",
   "error": "Error",
@@ -24,5 +23,14 @@
   "years": "years",
   "clearFilters": "Clear Filters",
   "actions": "Actions",
-  "close": "Close"
+  "close": "Close",
+  "creating": "Creating...",
+  "notAvailable": "N/A",
+  "refresh": "Refresh",
+  "saving": "Saving...",
+  "sending": "Sending...",
+  "settings": "Settings",
+  "submitting": "Submitting...",
+  "update": "Update",
+  "warning": "Warning"
 }

@@ -13,6 +13,7 @@ import profile from './profile.json';
 import queue from './queue.json';
 import unauthorized from './unauthorized.json';
 import landing from './landing.json';
+import services from './services.json';
 
 export default {
   auth,
@@ -28,5 +29,6 @@ export default {
   profile,
   queue,
   unauthorized,
-  landing
+  landing,
+  services
 };

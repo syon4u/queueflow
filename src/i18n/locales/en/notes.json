@@ -1,9 +1,17 @@
-
 {
   "manageNotes": "Manage Notes",
   "customerNotes": "Customer Notes",
   "addNote": "Add Note",
   "new": "New Note",
   "existingNotes": "Existing Notes",
-  "noNotes": "No notes found"
+  "noNotes": "No notes found",
+  "addError": "Could not save note",
+  "category": "Category",
+  "markImportant": "Mark as important",
+  "note": "Note",
+  "noteAdded": "Note added",
+  "notePlaceholder": "Write a note about this customer...",
+  "saveNote": "Save Note",
+  "tags": "Tags",
+  "tagsPlaceholder": "Comma-separated tags"
 }

@@ -85,12 +85,19 @@ export const useStaffNotifications = () => {
     };
   }, [user, toast, queryClient]);
 
-  // Request notification permission
-  useEffect(() => {
+  // Request browser notification permission. Only ever call this from a user
+  // gesture (e.g. clicking the notifications bell): prompting automatically on
+  // page load throws a modal permission dialog at every staff member the moment
+  // the dashboard opens, and Chrome deprioritises/blocks non-gesture requests.
+  const requestNotificationPermission = async () => {
     if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
+      try {
+        await Notification.requestPermission();
+      } catch (error) {
+        console.error('Notification permission request failed:', error);
+      }
     }
-  }, []);
+  };
 
   const markAsRead = async (notificationId: string) => {
     try {
@@ -138,6 +145,7 @@ export const useStaffNotifications = () => {
     unreadCount,
     isLoading,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    requestNotificationPermission
   };
 };

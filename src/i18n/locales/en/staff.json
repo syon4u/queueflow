@@ -1,4 +1,3 @@
-
 {
   "dashboard": "Staff Dashboard",
   "managementDescription": "Manage appointments, queue, and staff settings.",
@@ -61,5 +60,31 @@
   "statusFetchError": "Failed to fetch staff status",
   "statusUpdated": "Status updated",
   "statusUpdatedDescription": "Your status has been updated to {{status}}",
-  "statusUpdateError": "Failed to update status"
+  "statusUpdateError": "Failed to update status",
+  "manageQueue": "Manage your queue, appointments, and availability",
+  "notifications": "Notifications",
+  "blackoutPeriod": {
+    "active": "Blackout period active",
+    "confirm": "Confirm",
+    "description": "Temporarily stop accepting new customers for this location.",
+    "disable": "End blackout",
+    "disabled": "Blackout period ended",
+    "enable": "Start blackout",
+    "enabled": "Blackout period started",
+    "estimatedEnd": "Estimated end",
+    "estimatedEndTime": "Estimated end time",
+    "reason": "Reason",
+    "reasonPlaceholder": "e.g., System maintenance, staff meeting"
+  },
+  "status": {
+    "available": "Available",
+    "break": "On Break",
+    "breakDescription": "Step away and optionally hand over your customers.",
+    "breakDuration": "Break duration",
+    "endBreak": "End Break",
+    "handoverNotes": "Handover notes",
+    "handoverPlaceholder": "Anything the covering colleague should know...",
+    "startBreak": "Start Break",
+    "takeBreak": "Take a Break"
+  }
 }

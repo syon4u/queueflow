@@ -1,4 +1,3 @@
-
 {
   "headerTitle": "Consumer Protection Division",
   "headerSubtitle": "Protecting Broward County residents through education, mediation, and enforcement",
@@ -26,5 +25,7 @@
     "title": "Welcome to QueueFlow",
     "description": "QueueFlow helps you manage your time better by allowing you to schedule appointments in advance or check wait times for walk-in services. No more standing in long lines!",
     "button": "Got it"
-  }
+  },
+  "servicesTitle": "How can we help you today?",
+  "servicesSubtitle": "Choose the option that fits your visit"
 }

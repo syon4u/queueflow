@@ -1,4 +1,3 @@
-
 {
   "title": "Queue Management",
   "currentQueue": "Current Queue",
@@ -71,5 +70,6 @@
   "calledAt": "Called At",
   "notes": "Notes",
   "served": "Served",
-  "noShows": "No Shows"
+  "noShows": "No Shows",
+  "customerCalled": "Customer called"
 }

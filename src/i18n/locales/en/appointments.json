@@ -1,4 +1,3 @@
-
 {
   "title": "Appointments",
   "newAppointment": "New Appointment",
@@ -36,7 +35,7 @@
   },
   "steps": {
     "location": "Choose Location",
-    "service": "Select Service", 
+    "service": "Select Service",
     "dateTime": "Pick Date & Time",
     "confirm": "Confirm Details"
   },
@@ -53,5 +52,17 @@
   "reasonForVisit": "Reason for Visit",
   "reasonPlaceholder": "Brief description of your visit",
   "notes": "Additional Notes",
-  "notesPlaceholder": "Any additional information or special requests"
+  "notesPlaceholder": "Any additional information or special requests",
+  "create": "Create Appointment",
+  "createNew": "New Appointment",
+  "date": "Date",
+  "time": "Time",
+  "hour": "Hour",
+  "minute": "Minute",
+  "location": "Location",
+  "searchCustomer": "Search customer",
+  "selectDatePlaceholder": "Pick a date",
+  "selectTime": "Select a time",
+  "statusUpdated": "Appointment status updated",
+  "statusUpdateError": "Could not update appointment status"
 }

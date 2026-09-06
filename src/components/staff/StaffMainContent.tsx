@@ -30,7 +30,7 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
   onStatusChange
 }) => {
   const { t } = useTranslation();
-  const { unreadCount } = useStaffNotifications();
+  const { unreadCount, requestNotificationPermission } = useStaffNotifications();
 
   const renderSectionContent = () => {
     switch (activeSection) {
@@ -97,7 +97,10 @@ export const StaffMainContent: React.FC<StaffMainContentProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onNotificationClick}
+              onClick={() => {
+                requestNotificationPermission();
+                onNotificationClick();
+              }}
               className="relative gap-2"
             >
               <Bell className="h-4 w-4" />
