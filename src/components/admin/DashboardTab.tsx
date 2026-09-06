@@ -146,7 +146,7 @@ export const DashboardTab: React.FC = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('appointments')
-        .select('id, status, updated_at, location:locations(name)')
+        .select('id, status, updated_at, location:locations!appointments_location_id_fkey(name)')
         .order('updated_at', { ascending: false })
         .limit(6);
       if (error) throw error;
