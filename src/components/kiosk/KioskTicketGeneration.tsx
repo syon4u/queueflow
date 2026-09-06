@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, Printer, QrCode, Home, MapPin, Clock, User } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { findPublicAppointment } from '@/lib/publicQueue';
 import QRCode from 'qrcode';
 
 interface KioskTicketGenerationProps {
@@ -67,49 +67,26 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch appointment details with explicit column hints
-  const { data: appointmentDetails } = useQuery({
+  // Appointment details + live queue position (one public RPC, refreshed while the ticket is shown)
+  const { data: appointment } = useQuery({
     queryKey: ['kiosk-appointment', appointmentId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          locations!appointments_location_id_fkey(name, address),
-          services!appointments_service_id_fkey(name, duration)
-        `)
-        .eq('id', appointmentId)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => findPublicAppointment({ appointmentId }),
+    refetchInterval: 15000,
   });
 
-  // Get queue position
-  const { data: queuePosition } = useQuery({
-    queryKey: ['queue-position', appointmentId],
-    queryFn: async () => {
-      // Get all checked-in appointments for this location
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('id, check_in_time')
-        .eq('location_id', locationId)
-        .eq('status', 'checked_in')
-        .order('check_in_time', { ascending: true });
-      
-      if (error) throw error;
-      
-      const position = data.findIndex(apt => apt.id === appointmentId) + 1;
-      return position > 0 ? position : 1;
-    },
-  });
+  const appointmentDetails = appointment
+    ? {
+        locations: { name: appointment.location_name, address: appointment.location_address },
+        services: { name: appointment.service_name, duration: appointment.service_duration },
+      }
+    : undefined;
+  const queuePosition = appointment?.position ?? 1;
 
   const handlePrint = () => {
     window.print();
   };
 
-  const ticketId = appointmentId.slice(-8).toUpperCase();
+  const ticketId = appointment?.ticket_number ?? appointmentId.slice(-8).toUpperCase();
 
   return (
     <div className="max-w-4xl mx-auto">

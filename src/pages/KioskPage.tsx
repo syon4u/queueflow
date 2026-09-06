@@ -6,7 +6,7 @@ import { KioskLocationSelector } from '@/components/kiosk/KioskLocationSelector'
 import { KioskTicketGeneration } from '@/components/kiosk/KioskTicketGeneration';
 import { KioskCustomerForm } from '@/components/kiosk/KioskCustomerForm';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { createPublicAppointment } from '@/lib/publicQueue';
 import { useAppData } from '@/hooks/useAppData';
 
 export type KioskStep = 'location' | 'service' | 'customer' | 'ticket';
@@ -89,55 +89,22 @@ const KioskPage = () => {
     }
 
     try {
-      // First, create or find customer
-      let customerId: string;
-      
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('phone', customerData.phone)
-        .maybeSingle();
-
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
-      } else {
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert([{
-            first_name: customerData.firstName,
-            last_name: customerData.lastName,
-            phone: customerData.phone,
-            email: customerData.email || null,
-          }])
-          .select('id')
-          .single();
-
-        if (customerError) throw customerError;
-        customerId = newCustomer.id;
-      }
-
-      // Create appointment as walk-in (immediate scheduling)
-      const now = new Date().toISOString();
-      const { data: appointment, error: appointmentError } = await supabase
-        .from('appointments')
-        .insert([{
-          customer_id: customerId,
-          service_id: kioskState.selectedService,
-          location_id: kioskState.selectedLocation,
-          scheduled_time: now,
-          check_in_time: now,
-          status: 'checked_in',
-          reason_for_visit: 'Walk-in service',
-        }])
-        .select('id')
-        .single();
-
-      if (appointmentError) throw appointmentError;
+      // Walk-in: create (or reuse) the customer and join the queue right away.
+      const appointment = await createPublicAppointment({
+        firstName: customerData.firstName,
+        lastName: customerData.lastName,
+        phone: customerData.phone,
+        email: customerData.email,
+        serviceId: kioskState.selectedService,
+        locationId: kioskState.selectedLocation,
+        reason: 'Walk-in service',
+        checkIn: true,
+      });
 
       setKioskState(prev => ({
         ...prev,
         customerData,
-        appointmentId: appointment.id,
+        appointmentId: appointment.appointment_id,
         step: 'ticket',
       }));
 
@@ -150,7 +117,7 @@ const KioskPage = () => {
       console.error('Error creating appointment:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create appointment. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to create appointment. Please try again.',
         variant: 'destructive',
       });
     }

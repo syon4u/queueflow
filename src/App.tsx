@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProtectedRoute, AdminRoute, StaffRoute, PowerUserRoute } from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Public pages
 import Index from '@/pages/Index';
@@ -47,6 +48,7 @@ function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <QueueProvider>
+              <ErrorBoundary>
               <Suspense fallback={<div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">Loading…</div>}>
               <Routes>
                 {/* Public routes */}
@@ -122,6 +124,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </Suspense>
+              </ErrorBoundary>
               <Toaster />
               <Sonner />
             </QueueProvider>

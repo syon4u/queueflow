@@ -83,7 +83,7 @@ const AppointmentLookupPage: React.FC = () => {
 
   return (
     <PageLayout 
-      headerTitle="Consumer Protection Division"
+      headerTitle="QueueFlow"
       headerSubtitle="View and manage your appointments"
     >
       <div className="min-h-screen bg-gray-50 py-8 px-4">

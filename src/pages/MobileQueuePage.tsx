@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { findPublicAppointment } from '@/lib/publicQueue';
 
 const MobileQueuePage = () => {
   const [searchParams] = useSearchParams();
@@ -20,13 +22,19 @@ const MobileQueuePage = () => {
   // Get appointment ID from URL params
   const appointmentId = searchParams.get('appointment');
   
-  // Mock data for progress component (in real app, this would come from API)
-  const [progressData, setProgressData] = useState({
-    currentPosition: 3,
-    totalInQueue: 8,
-    estimatedWaitTime: 25,
-    averageServiceTime: 15
+  // Live position for the progress tab (the Position tab has its own tracker).
+  const { data: appointment } = useQuery({
+    queryKey: ['mobile-queue-appointment', appointmentId],
+    queryFn: () => findPublicAppointment({ appointmentId: appointmentId! }),
+    enabled: !!appointmentId,
+    refetchInterval: 30000,
   });
+  const progressData = {
+    currentPosition: appointment?.position ?? 0,
+    totalInQueue: appointment?.total_in_queue ?? 0,
+    estimatedWaitTime: appointment?.estimated_wait_minutes ?? 0,
+    averageServiceTime: appointment?.service_duration ?? 15,
+  };
 
   useEffect(() => {
     if (!appointmentId) {

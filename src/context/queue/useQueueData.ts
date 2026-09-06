@@ -57,8 +57,13 @@ export const useQueueData = () => {
 
       console.log('QueueContext - Raw appointments data:', data);
 
+      // Only people who have actually arrived (or been resolved today) belong in the
+      // queue. A booking that is still 'scheduled' has not checked in yet — it used to
+      // render as "Waiting -56 min" and inflate "Currently Waiting".
+      const arrived = data.filter(appointment => appointment.status !== 'scheduled' && appointment.status !== 'cancelled');
+
       // Transform database data to Customer interface
-      const transformedCustomers = data.map(appointment => ({
+      const transformedCustomers = arrived.map(appointment => ({
         id: appointment.id,
         name: `${appointment.customers?.first_name || ''} ${appointment.customers?.last_name || ''}`.trim(),
         phone: appointment.customers?.phone,

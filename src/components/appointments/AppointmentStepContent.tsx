@@ -53,7 +53,7 @@ const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
       case 1:
         return {
           title: 'Choose Your Service Location',
-          description: 'Select the Broward County office where you\'d like to receive service'
+          description: 'Select the office where you\'d like to receive service'
         };
       case 2:
         return {

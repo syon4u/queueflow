@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { QrCode, CheckCircle, Loader2, User, MapPin, Calendar, Clock, Users } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { checkInPublicAppointment, customerName, listPublicAppointments } from '@/lib/publicQueue';
 
 interface AppointmentInfo {
   id: string;
+  code: string;
   customer_name: string;
   service_name: string;
   location_name: string;
@@ -54,126 +55,44 @@ const StepCheckInCard = () => {
     }
 
     setIsLoading(true);
-    console.log('Finding appointment with method:', lookupMethod);
 
     try {
-      let appointment = null;
+      const matches = await listPublicAppointments(
+        lookupMethod === 'confirmation'
+          ? { code: confirmationCode }
+          : { lastName, phone }
+      );
 
-      if (lookupMethod === 'confirmation') {
-        const code = confirmationCode.trim().toUpperCase();
-
-        if (code.startsWith('CUST-')) {
-          // Look up by customer confirmation number
-          const { data: customerData, error: customerError } = await supabase
-            .from('customers')
-            .select(`
-              id,
-              appointments!appointments_customer_id_fkey(
-                id,
-                status,
-                scheduled_time,
-                location_id,
-                customers!appointments_customer_id_fkey(first_name, last_name),
-                services!appointments_service_id_fkey(name, duration),
-                locations!appointments_location_id_fkey(name)
-              )
-            `)
-            .eq('confirmation_number', code)
-            .maybeSingle();
-
-          if (customerError) throw customerError;
-
-          if (customerData && customerData.appointments && customerData.appointments.length > 0) {
-            const validAppointment = customerData.appointments.find(apt => apt.status === 'scheduled');
-            if (validAppointment) {
-              appointment = validAppointment;
-            }
-          }
-        } else if (code.startsWith('APT-')) {
-          // Look up by appointment ID prefix
-          const appointmentIdPrefix = code.substring(4).toLowerCase();
-          
-          const { data: appointments, error: searchError } = await supabase
-            .from('appointments')
-            .select(`
-              id,
-              status,
-              scheduled_time,
-              location_id,
-              customers!appointments_customer_id_fkey(first_name, last_name),
-              services!appointments_service_id_fkey(name, duration),
-              locations!appointments_location_id_fkey(name)
-            `)
-            .eq('status', 'scheduled');
-
-          if (searchError) throw searchError;
-
-          appointment = appointments?.find(apt => 
-            apt.id.toLowerCase().startsWith(appointmentIdPrefix)
-          );
-        }
-      } else {
-        // Look up by customer details
-        const cleanPhone = phone.replace(/\D/g, '');
-        
-        const { data: customers, error: lookupError } = await supabase
-          .from('customers')
-          .select(`
-            id,
-            phone,
-            appointments!appointments_customer_id_fkey(
-              id,
-              scheduled_time,
-              status,
-              location_id,
-              services!appointments_service_id_fkey(name, duration),
-              locations!appointments_location_id_fkey(name),
-              customers!appointments_customer_id_fkey(first_name, last_name)
-            )
-          `)
-          .ilike('last_name', lastName)
-          .order('created_at', { ascending: false })
-          .limit(10);
-
-        if (lookupError) throw lookupError;
-
-        if (customers && customers.length > 0) {
-          const matchingCustomer = customers.find(customer => {
-            const customerPhone = customer.phone?.replace(/\D/g, '') || '';
-            return customerPhone.includes(cleanPhone) || cleanPhone.includes(customerPhone);
-          });
-
-          if (matchingCustomer && matchingCustomer.appointments && matchingCustomer.appointments.length > 0) {
-            const validAppointment = matchingCustomer.appointments.find(apt => apt.status === 'scheduled');
-            if (validAppointment) {
-              appointment = validAppointment;
-            }
-          }
-        }
+      if (matches.length === 0) {
+        throw new Error('No appointment found with the provided information. Please check your details and try again.');
       }
 
+      const appointment = matches.find(apt => apt.status === 'scheduled');
       if (!appointment) {
-        throw new Error('No scheduled appointment found with the provided information');
+        const latest = matches[0];
+        if (latest.status === 'checked_in' || latest.status === 'in_progress') {
+          throw new Error(`You are already checked in${latest.position ? ` and #${latest.position} in line` : ''}. Use "Check Status" to follow your place in the queue.`);
+        }
+        throw new Error(`Your most recent appointment is ${latest.status.replace('_', ' ')}. Please book a new appointment or see a staff member.`);
       }
 
-      console.log('Found appointment:', appointment.id);
-      
       setAppointmentInfo({
-        id: appointment.id,
-        customer_name: `${appointment.customers?.first_name} ${appointment.customers?.last_name}`.trim(),
-        service_name: appointment.services?.name || 'Service',
-        location_name: appointment.locations?.name || 'Location',
-        location_id: appointment.location_id,
+        id: appointment.appointment_id,
+        code: appointment.confirmation_code,
+        customer_name: customerName(appointment),
+        service_name: appointment.service_name || 'Service',
+        location_name: appointment.location_name || 'Location',
+        location_id: appointment.location_id || '',
         scheduled_time: appointment.scheduled_time
       });
 
       setStep('confirm');
-      
-    } catch (error: any) {
+
+    } catch (error) {
       console.error('Error finding appointment:', error);
       toast({
         title: 'Appointment Not Found',
-        description: error.message || 'Unable to find appointment. Please verify your information and try again.',
+        description: error instanceof Error ? error.message : 'Unable to find appointment. Please verify your information and try again.',
         variant: 'destructive',
       });
     } finally {
@@ -185,53 +104,20 @@ const StepCheckInCard = () => {
     if (!appointmentInfo) return;
 
     setIsLoading(true);
-    console.log('Checking in appointment:', appointmentInfo.id);
 
     try {
-      // Update appointment status and check-in time
-      const { error: updateError } = await supabase
-        .from('appointments')
-        .update({ 
-          status: 'checked_in',
-          check_in_time: new Date().toISOString()
-        })
-        .eq('id', appointmentInfo.id);
-
-      if (updateError) throw updateError;
-
-      // Get queue position and calculate wait time based on actual service durations
-      const { data: queueData, error: queueError } = await supabase
-        .from('appointments')
-        .select(`
-          id, 
-          check_in_time,
-          services!appointments_service_id_fkey(duration)
-        `)
-        .eq('location_id', appointmentInfo.location_id)
-        .in('status', ['checked_in', 'in_progress'])
-        .order('check_in_time', { ascending: true });
-
-      if (queueError) throw queueError;
-
-      const position = queueData.findIndex(apt => apt.id === appointmentInfo.id) + 1;
-      
-      // Calculate estimated wait time using actual service durations
-      const appointmentsAhead = queueData.slice(0, position - 1);
-      const estimatedWaitTime = appointmentsAhead.reduce((total, apt) => {
-        const serviceDuration = apt.services?.duration || 15; // fallback to 15 min
-        return total + serviceDuration;
-      }, 0);
-
-      setQueueInfo({ position, estimatedWaitTime });
+      const checkedIn = await checkInPublicAppointment(appointmentInfo.id, appointmentInfo.code);
+      setQueueInfo({
+        position: checkedIn.position ?? 1,
+        estimatedWaitTime: checkedIn.estimated_wait_minutes ?? 0,
+      });
       setStep('success');
 
-      console.log('Check-in successful, position:', position, 'estimated wait:', estimatedWaitTime);
-      
-    } catch (error: any) {
+    } catch (error) {
       console.error('Check-in error:', error);
       toast({
         title: 'Check-in Failed',
-        description: error.message || 'Unable to check in. Please try again.',
+        description: error instanceof Error ? error.message : 'Unable to check in. Please try again.',
         variant: 'destructive',
       });
     } finally {

@@ -69,8 +69,8 @@ const NewAppointmentPage = () => {
   
   return (
     <PageLayout 
-      headerTitle="Consumer Protection Division"
-      headerSubtitle="Schedule your appointment with Broward County services"
+      headerTitle="QueueFlow"
+      headerSubtitle="Schedule your appointment in a few quick steps"
     >
       <div className="min-h-screen bg-pattern-bubbles bg-gradient-overlay-blue">
         <div className="container mx-auto px-4 py-8">

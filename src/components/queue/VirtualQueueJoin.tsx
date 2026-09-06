@@ -10,6 +10,7 @@ import { MapPin, Clock, Users, Smartphone, QrCode } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { createPublicAppointment, getQueueSnapshot } from '@/lib/publicQueue';
 
 interface VirtualQueueJoinProps {
   onJoinSuccess: (ticketData: any) => void;
@@ -57,29 +58,14 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
     enabled: !!selectedLocation
   });
 
-  // Get current queue length for selected service
+  // Live queue depth at the selected location
   const { data: queueStats } = useQuery({
-    queryKey: ['queue-stats', selectedLocation, selectedService],
+    queryKey: ['queue-snapshot', selectedLocation],
     queryFn: async () => {
-      if (!selectedLocation || !selectedService) return null;
-      
-      const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('status')
-        .eq('location_id', selectedLocation)
-        .eq('service_id', selectedService)
-        .gte('scheduled_time', `${today}T00:00:00`)
-        .lt('scheduled_time', `${today}T23:59:59`);
-      
-      if (error) throw error;
-      
-      const waiting = data.filter(a => a.status === 'checked_in').length;
-      const estimatedWait = waiting * 15; // 15 minutes per person estimate
-      
-      return { waiting, estimatedWait };
+      const snapshot = await getQueueSnapshot(selectedLocation);
+      return { waiting: snapshot.waiting, estimatedWait: snapshot.estimated_wait_minutes };
     },
-    enabled: !!(selectedLocation && selectedService),
+    enabled: !!selectedLocation,
     refetchInterval: 30000
   });
 
@@ -95,79 +81,58 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
 
     setIsJoining(true);
     try {
-      // First create or find customer
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('phone', customerPhone)
-        .single();
-
-      let customerId = existingCustomer?.id;
-
-      if (!customerId) {
-        const [firstName, ...lastNameParts] = customerName.split(' ');
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert({
-            first_name: firstName,
-            last_name: lastNameParts.join(' ') || '',
-            phone: customerPhone
-          })
-          .select('id')
-          .single();
-
-        if (customerError) throw customerError;
-        customerId = newCustomer.id;
+      const [firstName, ...lastNameParts] = customerName.trim().split(/\s+/);
+      const lastName = lastNameParts.join(' ');
+      if (!lastName) {
+        throw new Error('Please enter your first and last name.');
       }
 
-      // Create appointment for virtual queue
-      const { data: appointment, error: appointmentError } = await supabase
-        .from('appointments')
-        .insert({
-          customer_id: customerId,
-          service_id: selectedService,
-          location_id: selectedLocation,
-          scheduled_time: new Date().toISOString(),
-          status: 'scheduled',
-          notes: 'Virtual queue - remote join'
-        })
-        .select(`
-          *,
-          customers!appointments_customer_id_fkey(first_name, last_name, phone),
-          services!appointments_service_id_fkey(name),
-          locations!appointments_location_id_fkey(name)
-        `)
-        .single();
+      // Remote join: a scheduled appointment the customer checks in on arrival.
+      const appointment = await createPublicAppointment({
+        firstName,
+        lastName,
+        phone: customerPhone,
+        serviceId: selectedService,
+        locationId: selectedLocation,
+        notes: 'Virtual queue - remote join',
+      });
 
-      if (appointmentError) throw appointmentError;
-
-      // Generate QR code data
+      // QR payload carries the appointment id + code so /check-in can verify it.
       const qrData = JSON.stringify({
-        appointmentId: appointment.id,
-        customerId: customerId,
+        appointmentId: appointment.appointment_id,
+        confirmationCode: appointment.confirmation_code,
         timestamp: Date.now()
       });
 
       const ticketData = {
-        ...appointment,
+        id: appointment.appointment_id,
+        status: appointment.status,
+        confirmationCode: appointment.confirmation_code,
+        customers: {
+          first_name: appointment.first_name,
+          last_name: appointment.last_name,
+          phone: appointment.phone,
+        },
+        services: { name: appointment.service_name },
+        locations: { name: appointment.location_name },
         qrCode: qrData,
-        ticketId: appointment.id.split('-')[0].toUpperCase(),
+        ticketId: appointment.confirmation_code,
         position: (queueStats?.waiting || 0) + 1,
         estimatedWait: queueStats?.estimatedWait || 15
       };
 
       onJoinSuccess(ticketData);
-      
+
       toast({
         title: 'Successfully Joined Queue',
-        description: `You're #${ticketData.position} in line for ${appointment.services.name}`,
+        description: `You're expected to be #${ticketData.position} in line for ${appointment.service_name}. Check in when you arrive.`,
       });
 
     } catch (error) {
       console.error('Error joining queue:', error);
       toast({
         title: 'Error',
-        description: 'Failed to join queue. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to join queue. Please try again.',
         variant: 'destructive'
       });
     } finally {
