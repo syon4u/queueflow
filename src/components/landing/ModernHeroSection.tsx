@@ -103,7 +103,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           <Button 
             size="lg" 
             variant="outline"
-            className="w-full sm:w-auto border-2 border-white/80 text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300 min-h-[48px] touch-manipulation" 
+            className="w-full sm:w-auto bg-transparent border-2 border-white/80 text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300 min-h-[48px] touch-manipulation" 
             asChild
           >
             <Link to="/status">Check Status</Link>
