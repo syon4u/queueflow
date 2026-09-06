@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
@@ -10,33 +10,33 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 
 // Public pages
 import Index from '@/pages/Index';
-import CustomerPage from '@/pages/CustomerPage';
-import AppointmentLookupPage from './pages/AppointmentLookupPage';
-import AuthPage from '@/pages/AuthPage';
-import Login from '@/pages/Login';
-import ResetPassword from '@/pages/ResetPassword';
-import CheckInPage from '@/pages/CheckInPage';
-import KioskPage from '@/pages/KioskPage';
-import DigitalSignagePage from '@/pages/DigitalSignagePage';
-import MobileQueuePage from '@/pages/MobileQueuePage';
-import VirtualQueuePage from '@/pages/VirtualQueuePage';
-import StatusPage from '@/pages/StatusPage';
-import PricingPage from '@/pages/PricingPage';
-import Unauthorized from '@/pages/Unauthorized';
-import NotFound from '@/pages/NotFound';
+const CustomerPage = React.lazy(() => import('@/pages/CustomerPage'));
+const AppointmentLookupPage = React.lazy(() => import('./pages/AppointmentLookupPage'));
+const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
+const Login = React.lazy(() => import('@/pages/Login'));
+const ResetPassword = React.lazy(() => import('@/pages/ResetPassword'));
+const CheckInPage = React.lazy(() => import('@/pages/CheckInPage'));
+const KioskPage = React.lazy(() => import('@/pages/KioskPage'));
+const DigitalSignagePage = React.lazy(() => import('@/pages/DigitalSignagePage'));
+const MobileQueuePage = React.lazy(() => import('@/pages/MobileQueuePage'));
+const VirtualQueuePage = React.lazy(() => import('@/pages/VirtualQueuePage'));
+const StatusPage = React.lazy(() => import('@/pages/StatusPage'));
+const PricingPage = React.lazy(() => import('@/pages/PricingPage'));
+const Unauthorized = React.lazy(() => import('@/pages/Unauthorized'));
+const NotFound = React.lazy(() => import('@/pages/NotFound'));
 
 // Protected pages
-import AdminPage from '@/pages/AdminPage';
-import StaffPage from '@/pages/StaffPage';
-import PowerUserPage from '@/pages/PowerUserPage';
-import ProfilePage from '@/pages/ProfilePage';
-import NewAppointmentPage from '@/pages/NewAppointmentPage';
-import PerformanceReportPage from '@/pages/PerformanceReportPage';
-import BackendHealthPage from '@/pages/BackendHealthPage';
+const AdminPage = React.lazy(() => import('@/pages/AdminPage'));
+const StaffPage = React.lazy(() => import('@/pages/StaffPage'));
+const PowerUserPage = React.lazy(() => import('@/pages/PowerUserPage'));
+const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
+const NewAppointmentPage = React.lazy(() => import('@/pages/NewAppointmentPage'));
+const PerformanceReportPage = React.lazy(() => import('@/pages/PerformanceReportPage'));
+const BackendHealthPage = React.lazy(() => import('@/pages/BackendHealthPage'));
 
 // Design system pages
-import BrowardDesignSystem from '@/pages/BrowardDesignSystem';
-import BrowardIndex from '@/pages/BrowardIndex';
+const BrowardDesignSystem = React.lazy(() => import('@/pages/BrowardDesignSystem'));
+const BrowardIndex = React.lazy(() => import('@/pages/BrowardIndex'));
 
 // Create a query client instance
 const queryClient = new QueryClient();
@@ -48,6 +48,7 @@ function App() {
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <QueueProvider>
+              <Suspense fallback={<div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">Loading…</div>}>
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
@@ -120,6 +121,7 @@ function App() {
                 {/* Catch-all route for 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
               <Toaster />
               <Sonner />
             </QueueProvider>
