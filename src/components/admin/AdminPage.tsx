@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
@@ -23,8 +24,36 @@ export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const { role } = useAuth();
 
-  // Role checks disabled - always allow admin access
-  const isAdminUser = true;
+  const isAdminUser = role === 'admin';
+
+  const { data: totalUsers = 0 } = useQuery({
+    queryKey: ['admin-header-total-users'],
+    queryFn: async () => {
+      const { count, error } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+  const { data: activeStaff = 0 } = useQuery({
+    queryKey: ['admin-header-active-staff'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('user_roles').select('*', { count: 'exact', head: true }).in('role', ['staff', 'power_user', 'admin']);
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+  const { data: todayAppointments = 0 } = useQuery({
+    queryKey: ['admin-header-today-appointments'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { count, error } = await supabase
+        .from('appointments').select('*', { count: 'exact', head: true })
+        .gte('scheduled_time', `${today}T00:00:00`).lt('scheduled_time', `${today}T23:59:59`);
+      if (error) throw error;
+      return count || 0;
+    },
+  });
 
   const handleRefresh = () => {
     window.location.reload();
@@ -54,9 +83,9 @@ export const AdminPage: React.FC = () => {
       <div className="p-6">
         <AdminDashboardHeader 
           systemStatus="healthy"
-          totalUsers={247}
-          activeStaff={24}
-          todayAppointments={156}
+          totalUsers={totalUsers}
+          activeStaff={activeStaff}
+          todayAppointments={todayAppointments}
           onRefresh={handleRefresh}
           onNotificationClick={handleNotificationClick}
           onSettingsClick={handleSettingsClick}

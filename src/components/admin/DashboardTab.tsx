@@ -9,6 +9,16 @@ import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+function formatRelativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const minutes = Math.max(0, Math.round(diffMs / 60000));
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hr ago`;
+  return `${Math.round(hours / 24)} d ago`;
+}
+
 export const DashboardTab: React.FC = () => {
   const navigate = useNavigate();
   
@@ -62,29 +72,130 @@ export const DashboardTab: React.FC = () => {
     }
   });
 
-  // Mock data for demonstration
+  // Live metrics (replaces the previous hardcoded demo numbers)
+  const { data: activeQueues = 0 } = useQuery({
+    queryKey: ['dashboard-active-queues'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('locations')
+        .select('*', { count: 'exact', head: true })
+        .eq('queue_status', 'open');
+      if (error) throw error;
+      return count || 0;
+    },
+    refetchInterval: 30000,
+  });
+
+  const { data: checkedInCustomers = 0 } = useQuery({
+    queryKey: ['dashboard-checked-in'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'checked_in');
+      if (error) throw error;
+      return count || 0;
+    },
+    refetchInterval: 30000,
+  });
+
+  const { data: missedAppointments = 0 } = useQuery({
+    queryKey: ['dashboard-missed-today'],
+    queryFn: async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'no_show')
+        .gte('scheduled_time', `${today}T00:00:00`)
+        .lt('scheduled_time', `${today}T23:59:59`);
+      if (error) throw error;
+      return count || 0;
+    },
+    refetchInterval: 60000,
+  });
+
+  const { data: averageWaitMinutes = null } = useQuery({
+    queryKey: ['dashboard-average-wait'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('check_in_time, start_time')
+        .not('check_in_time', 'is', null)
+        .not('start_time', 'is', null)
+        .order('start_time', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      const waits = (data || [])
+        .map((a) => (new Date(a.start_time as string).getTime() - new Date(a.check_in_time as string).getTime()) / 60000)
+        .filter((m) => Number.isFinite(m) && m >= 0 && m <= 8 * 60);
+      if (waits.length === 0) return null;
+      return Math.round(waits.reduce((sum, m) => sum + m, 0) / waits.length);
+    },
+    refetchInterval: 60000,
+  });
+
+  type ActivityRow = {
+    id: string;
+    status: string;
+    updated_at: string;
+    location: { name: string } | null;
+  };
+  const { data: recentActivity = [] } = useQuery({
+    queryKey: ['dashboard-recent-activity'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('id, status, updated_at, location:locations(name)')
+        .order('updated_at', { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      const label: Record<string, { action: string; type: string }> = {
+        scheduled: { action: 'New appointment scheduled', type: 'appointment' },
+        checked_in: { action: 'Customer checked in', type: 'staff' },
+        in_progress: { action: 'Service started', type: 'staff' },
+        completed: { action: 'Service completed', type: 'completion' },
+        cancelled: { action: 'Appointment cancelled', type: 'alert' },
+        no_show: { action: 'Customer did not show', type: 'alert' },
+      };
+      return ((data || []) as unknown as ActivityRow[]).map((row) => ({
+        id: row.id,
+        action: label[row.status]?.action ?? `Status changed to ${row.status}`,
+        type: label[row.status]?.type ?? 'appointment',
+        location: row.location?.name ?? 'Unknown location',
+        time: formatRelativeTime(row.updated_at),
+      }));
+    },
+    refetchInterval: 30000,
+  });
+
+  type LocationRow = { id: string; name: string; queue_status: string; current_capacity: number | null; max_capacity: number | null };
+  const { data: locationStatus = [] } = useQuery({
+    queryKey: ['dashboard-location-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('id, name, queue_status, current_capacity, max_capacity')
+        .order('name');
+      if (error) throw error;
+      return ((data || []) as LocationRow[]).map((loc) => ({
+        id: loc.id,
+        name: loc.name,
+        status: loc.queue_status === 'open' ? 'active' : loc.queue_status || 'closed',
+        queue: loc.current_capacity ?? 0,
+        capacity: loc.max_capacity ?? null,
+      }));
+    },
+    refetchInterval: 30000,
+  });
+
   const systemMetrics = {
     totalAppointments: appointmentsToday,
-    activeQueues: 8,
-    checkedInCustomers: 23,
-    missedAppointments: 2,
-    averageWaitTime: '12 min',
-    systemUptime: '99.8%'
+    activeQueues,
+    checkedInCustomers,
+    missedAppointments,
+    averageWaitTime: averageWaitMinutes === null ? 'No data yet' : `${averageWaitMinutes} min`,
   };
-
-  const recentActivity = [
-    { id: 1, action: 'New appointment scheduled', location: 'Downtown Branch', time: '2 minutes ago', type: 'appointment' },
-    { id: 2, action: 'Queue threshold reached', location: 'North Center', time: '5 minutes ago', type: 'alert' },
-    { id: 3, action: 'Staff member checked in', location: 'West Office', time: '8 minutes ago', type: 'staff' },
-    { id: 4, action: 'Service completed', location: 'Downtown Branch', time: '12 minutes ago', type: 'completion' }
-  ];
-
-  const locationStatus = [
-    { name: 'Downtown Branch', status: 'active', queue: 8, waitTime: '15 min' },
-    { name: 'North Center', status: 'active', queue: 12, waitTime: '22 min' },
-    { name: 'West Office', status: 'active', queue: 5, waitTime: '8 min' },
-    { name: 'South Branch', status: 'maintenance', queue: 0, waitTime: 'N/A' }
-  ];
 
   return (
     <div className="space-y-6">
@@ -162,6 +273,9 @@ export const DashboardTab: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {recentActivity.length === 0 && (
+                <p className="text-sm text-gray-500">No recent activity yet.</p>
+              )}
               {recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                   <div className={`w-2 h-2 rounded-full ${
@@ -190,12 +304,15 @@ export const DashboardTab: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {locationStatus.map((location, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
+              {locationStatus.length === 0 && (
+                <p className="text-sm text-gray-500">No locations configured.</p>
+              )}
+              {locationStatus.map((location) => (
+                <div key={location.id} className="flex items-center justify-between p-3 rounded-lg border">
                   <div className="flex-1">
                     <p className="font-medium text-sm text-gray-900">{location.name}</p>
                     <p className="text-xs text-gray-500">
-                      {location.queue} in queue • {location.waitTime} wait
+                      {location.queue} in queue{location.capacity ? ` • capacity ${location.capacity}` : ''}
                     </p>
                   </div>
                   <Badge 
@@ -226,19 +343,7 @@ export const DashboardTab: React.FC = () => {
                   {systemMetrics.averageWaitTime}
                 </Badge>
               </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium">System Uptime</span>
-                <Badge variant="outline" className="bg-green-50 text-green-700">
-                  {systemMetrics.systemUptime}
-                </Badge>
               </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium">Active Staff</span>
-                <Badge variant="outline" className="bg-purple-50 text-purple-700">
-                  {staffCount} online
-                </Badge>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
