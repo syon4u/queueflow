@@ -1,0 +1,16 @@
+-- Bug: new user signup failed with Supabase Auth's generic
+-- "Database error saving new user".
+--
+-- Root cause: the on_auth_user_created trigger (handle_new_user) inserts a row
+-- into public.user_roles for every new signup. That insert fires
+-- audit_user_roles_trigger -> audit_user_roles_changes() -> log_admin_action(),
+-- which runs `INSERT INTO audit_log (user_id, ...) VALUES (auth.uid(), ...)`.
+-- During self-service signup there is no authenticated session yet, so
+-- auth.uid() is NULL, which violated audit_log.user_id's NOT NULL constraint
+-- and rolled back the entire auth.users insert -- meaning no new user could
+-- ever successfully sign up.
+--
+-- Fix: allow audit_log.user_id to be NULL so system-initiated changes (like
+-- the default role assignment made on signup, with no admin actor) can still
+-- be recorded, with NULL meaning "system", instead of blocking signup entirely.
+ALTER TABLE public.audit_log ALTER COLUMN user_id DROP NOT NULL;
