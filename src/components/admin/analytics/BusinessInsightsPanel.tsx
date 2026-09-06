@@ -48,6 +48,7 @@ const TrendBadge: React.FC<{ direction: 'up' | 'down' | 'flat' | null }> = ({ di
  */
 export const BusinessInsightsPanel: React.FC = () => {
   const insights = useBusinessInsights();
+  const serviceTotal = insights.serviceShare.reduce((sum, entry) => sum + entry.value, 0);
 
   if (insights.isLoading) {
     return (
@@ -155,16 +156,25 @@ export const BusinessInsightsPanel: React.FC = () => {
                   dataKey="value"
                   nameKey="name"
                   cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  cy="45%"
+                  outerRadius={80}
+                  labelLine={false}
+                  label={false}
                 >
                   {insights.serviceShare.map((entry, index) => (
                     <Cell key={entry.name} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend />
+                <Tooltip formatter={(value: number, name: string) => [`${value} (${serviceTotal ? Math.round((value / serviceTotal) * 100) : 0}%)`, name]} />
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  formatter={(value: string, entry) => {
+                    const v = (entry?.payload as { value?: number } | undefined)?.value ?? 0;
+                    const pct = serviceTotal ? Math.round((v / serviceTotal) * 100) : 0;
+                    return <span className="text-xs text-foreground">{value} · {pct}%</span>;
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>

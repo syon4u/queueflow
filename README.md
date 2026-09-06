@@ -53,6 +53,30 @@ are documented with priority and effort estimates in
 [`docs/gap-analysis.md`](docs/gap-analysis.md). See also
 [`PITCH.md`](PITCH.md) for the product/market summary.
 
+### Verified end-to-end (2026-09-06)
+
+Against the live Supabase project, with a real admin account:
+
+- Public: landing, pricing, appointment booking form (live locations/services),
+  check-in lookup, status page, staff/customer sign-in
+- Auth: self-service signup, role assignment, protected-route gating
+- Staff dashboard: queue controls, availability, Documents (private-bucket
+  upload/list/delete via signed URLs)
+- Admin portal: live dashboard metrics, activity feed, location status, and
+  every section reachable from the tab strip, including Analytics → Business
+  Insights (wait-time trend, weekday demand, service mix, next-wait estimate)
+
+### Known gaps to close before handoff
+
+- `src/test/*` — 6 of 13 unit tests render components without the
+  `QueryClientProvider`/`AuthProvider` they need and fail; they predate this
+  consolidation and need test-harness wrappers.
+- `.env` (public anon key only) is tracked in git history; rotate the anon
+  key and add `.env` to `.gitignore` before granting a third party repo access.
+- The live database contains demo history tagged `notes = 'Demo seed data'`
+  (60 completed visits + 3 no-shows). Remove with
+  `DELETE FROM public.appointments WHERE notes = 'Demo seed data';`.
+
 ## Technology Stack
 
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui (Radix primitives)
@@ -129,6 +153,16 @@ docs/
 The app builds to static assets (`npm run build`) and is deployable to any
 static host or CDN in front of the Supabase backend (Vercel, Netlify,
 Cloudflare Pages, etc.).
+
+A public demo build is hosted on GitHub Pages from the separate
+`queueflow-demo` repository (compiled output only, no source). To host under a
+sub-path, build with `vite build --base=/<path>/` and pass the same value as
+the `basename` of the `BrowserRouter` in `src/App.tsx`; include a `404.html`
+SPA fallback for direct links.
+
+Database migrations in `supabase/migrations/` are **not** applied
+automatically. Run `supabase db push` (or apply them in the Supabase SQL
+editor) when deploying to a fresh project.
 
 ## License
 
