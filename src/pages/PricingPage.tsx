@@ -44,7 +44,7 @@ const PLANS: Plan[] = [
       'Staff dashboard with RBAC (clerk/manager/admin)',
       'Advanced analytics & AI-assisted scheduling (in progress)',
       'Digital signage & kiosk mode',
-      'Spanish localization (customer-facing pages)',
+      'Language switcher: Spanish, Portuguese, Haitian Creole (partial coverage today)',
       'Priority email + chat support',
     ],
     cta: 'Talk to sales',
