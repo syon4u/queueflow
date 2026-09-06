@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
 import Navigation from '@/components/landing/Navigation';
 import ModernHeroSection from '@/components/landing/ModernHeroSection';
@@ -13,22 +14,22 @@ import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   const [showGuide, setShowGuide] = useState(false);
-  const [showStaffAccess, setShowStaffAccess] = useState(false);
   const { t } = useTranslation();
+  const navigate = useNavigate();
   
   const handleShowGuide = () => {
     setShowGuide(true);
   };
 
   const handleToggleStaffAccess = () => {
-    setShowStaffAccess(!showStaffAccess);
+    navigate('/login');
   };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Navigation */}
       <Navigation 
-        showStaffAccess={showStaffAccess}
+        showStaffAccess={false}
         onToggleStaffAccess={handleToggleStaffAccess}
       />
       
