@@ -49,16 +49,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Use setTimeout to avoid recursion issues
+          // Use setTimeout to avoid recursion issues. IMPORTANT: keep
+          // `loading` true until the role has actually been resolved --
+          // otherwise ProtectedRoute evaluates access with role === null
+          // and bounces authenticated staff/admins off deep links.
           setTimeout(async () => {
             const userRole = await fetchUserRole(session.user.id);
             setRole(userRole);
+            setLoading(false);
           }, 0);
         } else {
           setRole(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 

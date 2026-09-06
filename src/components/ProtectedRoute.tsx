@@ -27,8 +27,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     path: location.pathname
   });
 
-  // Show loading while auth state is being determined
-  if (loading) {
+  // Show loading while auth state is being determined. A signed-in user whose
+  // role hasn't been fetched yet is still "loading", not "unauthorized".
+  if (loading || (user && role === null)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
