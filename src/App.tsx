@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,7 +13,6 @@ import Index from '@/pages/Index';
 const CustomerPage = React.lazy(() => import('@/pages/CustomerPage'));
 const AppointmentLookupPage = React.lazy(() => import('./pages/AppointmentLookupPage'));
 const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
-const Login = React.lazy(() => import('@/pages/Login'));
 const ResetPassword = React.lazy(() => import('@/pages/ResetPassword'));
 const CheckInPage = React.lazy(() => import('@/pages/CheckInPage'));
 const KioskPage = React.lazy(() => import('@/pages/KioskPage'));
@@ -55,7 +54,8 @@ function App() {
                 <Route path="/customer" element={<CustomerPage />} />
                 <Route path="/appointment-lookup" element={<AppointmentLookupPage />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/login" element={<Login />} />
+                {/* /login was a second, divergent sign-in page; /auth is canonical. */}
+                <Route path="/login" element={<Navigate to="/auth" replace />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/check-in" element={<CheckInPage />} />
                 <Route path="/status" element={<StatusPage />} />
