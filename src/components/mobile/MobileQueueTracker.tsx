@@ -227,11 +227,9 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
                   #{queueData.position}
                 </div>
                 <p className="text-gray-600">Your position in line</p>
-                {queueData.total_in_queue && (
-                  <p className="text-sm text-gray-500">
-                    {queueData.total_in_queue - queueData.position} people ahead of you
-                  </p>
-                )}
+                <p className="text-sm text-gray-500">
+                  {queueData.position - 1 === 1 ? '1 person' : `${queueData.position - 1} people`} ahead of you
+                </p>
               </div>
             </CardContent>
           </Card>
