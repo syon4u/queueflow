@@ -135,11 +135,6 @@ const ServiceCardsGrid = () => {
                 Digital Signage →
               </Button>
             </Link>
-            <Link to="/broward-design-system">
-              <Button variant="ghost" className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-6 py-3">
-                Design System →
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

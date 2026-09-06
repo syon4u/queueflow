@@ -81,7 +81,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
           {/* Trust Badge */}
           <div className="flex items-center justify-center text-sm text-gray-500 animate-fade-in-up font-sans" style={{ animationDelay: '0.6s' }}>
             <Shield className="h-4 w-4 text-slate-600 mr-1" />
-            <span>HIPAA Compliant</span>
+            <span>Encrypted &amp; access-controlled</span>
           </div>
         </div>
       </div>

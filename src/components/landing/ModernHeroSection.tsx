@@ -122,16 +122,16 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
         {/* Stats Bar - Enhanced for queue management theme */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">85%</div>
-            <div className="text-blue-100">Time Saved</div>
+            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">Live</div>
+            <div className="text-blue-100">Queue position &amp; wait estimates</div>
           </div>
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">10k+</div>
-            <div className="text-blue-100">Happy Customers</div>
+            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">4</div>
+            <div className="text-blue-100">Languages for customers</div>
           </div>
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">24/7</div>
-            <div className="text-blue-100">Available</div>
+            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">PWA</div>
+            <div className="text-blue-100">Installable, works on any device</div>
           </div>
         </div>
       </div>
