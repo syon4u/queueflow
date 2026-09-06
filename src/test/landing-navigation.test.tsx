@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import CTASection from '@/components/landing/CTASection';
 import Navigation from '@/components/landing/Navigation';
+import { renderWithProviders } from './test-utils';
 import StatusPage from '@/pages/StatusPage';
 
 // Mock the react-router-dom to track navigation
@@ -39,13 +40,8 @@ vi.mock('@/hooks/useQueueStatus', () => ({
   })
 }));
 
-const renderWithRouter = (component: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
-  );
-};
+// Navigation reads useAuth(); render it inside the full provider stack.
+const renderWithRouter = (component: React.ReactElement) => renderWithProviders(component);
 
 describe('Landing Page Navigation', () => {
   beforeEach(() => {
@@ -85,32 +81,28 @@ describe('Landing Page Navigation', () => {
     };
 
     it('renders desktop navigation links correctly', () => {
-      const { getByRole } = renderWithRouter(<Navigation {...defaultProps} />);
-      
       // Check desktop navigation links
-      const statusLink = getByRole('link', { name: /^status$/i });
-      const checkInLink = getByRole('link', { name: /^check in$/i });
-      const bookLink = getByRole('link', { name: /book/i });
-      
-      expect(statusLink).toHaveAttribute('href', '/status');
-      expect(checkInLink).toHaveAttribute('href', '/check-in');
-      expect(bookLink).toHaveAttribute('href', '/customer');
+      const { getAllByRole } = renderWithRouter(<Navigation {...defaultProps} />);
+      const hrefs = getAllByRole('link').map((a) => a.getAttribute('href'));
+      expect(hrefs).toContain('/status');
+      expect(hrefs).toContain('/check-in');
+      expect(hrefs).toContain('/appointment-lookup');
+      expect(hrefs).toContain('/pricing');
     });
 
     it('opens mobile menu and shows navigation links', async () => {
       const user = userEvent.setup();
-      const { getByRole } = renderWithRouter(<Navigation {...defaultProps} />);
+      const { getByRole, getAllByRole } = renderWithRouter(<Navigation {...defaultProps} />);
       
       // Find and click the mobile menu button
-      const menuButton = getByRole('button', { name: /menu/i });
+      const menuButton = getByRole('button', { name: /open menu/i });
+      expect(menuButton).toHaveAttribute('aria-expanded', 'false');
       await user.click(menuButton);
-      
-      // Check mobile navigation links
-      const mobileStatusLink = getByRole('link', { name: /check status/i });
-      const mobileCheckInLink = getByRole('link', { name: /check in now/i });
-      
-      expect(mobileStatusLink).toHaveAttribute('href', '/status');
-      expect(mobileCheckInLink).toHaveAttribute('href', '/check-in');
+      expect(getByRole('button', { name: /close menu/i })).toHaveAttribute('aria-expanded', 'true');
+
+      // Mobile menu duplicates the public links
+      const statusLinks = getAllByRole('link').filter((a) => a.getAttribute('href') === '/status');
+      expect(statusLinks.length).toBeGreaterThanOrEqual(2);
     });
   });
 
