@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatWaitTime } from '@/lib/queue';
+import { customerName, findPublicAppointment } from '@/lib/publicQueue';
 
 interface MobileQueueTrackerProps {
   appointmentId: string;
@@ -40,21 +41,28 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
   const { data: queueData, isLoading, error } = useQuery({
     queryKey: ['queue-position', appointmentId],
     queryFn: async (): Promise<QueuePosition> => {
-      const response = await fetch(
-        `https://diadwozorwkzhexhjfgb.supabase.co/functions/v1/queue-position/${appointmentId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpYWR3b3pvcndremhleGhqZmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5MTQyODEsImV4cCI6MjA2MjQ5MDI4MX0.WGtQJCeSW99Dklx0bu1b6KoNb2utGaCAfsWY46xuHbw'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch queue position');
+      // The queue-position edge function rejects anonymous callers (401); the
+      // public RPC is scoped to this one appointment id instead.
+      const appointment = await findPublicAppointment({ appointmentId });
+      if (!appointment) {
+        throw new Error('Appointment not found');
       }
-      
-      return response.json();
+      const currentWait = appointment.check_in_time
+        ? Math.max(0, Math.floor((Date.now() - new Date(appointment.check_in_time).getTime()) / 60000))
+        : undefined;
+      return {
+        appointment_id: appointment.appointment_id,
+        status: appointment.status,
+        position: appointment.position ?? undefined,
+        total_in_queue: appointment.total_in_queue,
+        estimated_wait_time_minutes: appointment.estimated_wait_minutes,
+        current_wait_time_minutes: currentWait,
+        customer_name: customerName(appointment),
+        service_name: appointment.service_name || 'Service',
+        check_in_time: appointment.check_in_time || undefined,
+        ticket_number: appointment.ticket_number,
+        location_id: appointment.location_id || '',
+      };
     },
     refetchInterval: 30000, // Refetch every 30 seconds
     enabled: !!appointmentId
@@ -151,6 +159,8 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
 
   const getStatusDisplay = (status: string) => {
     switch (status) {
+      case 'scheduled':
+        return { text: 'Booked – check in on arrival', color: 'bg-amber-100 text-amber-800', emoji: '📅' };
       case 'checked_in':
         return { text: 'In Queue', color: 'bg-blue-100 text-blue-800', emoji: '⏳' };
       case 'in_progress':

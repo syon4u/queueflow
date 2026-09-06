@@ -200,7 +200,7 @@ const AppointmentLookupPage: React.FC = () => {
                         {appointment.customer?.first_name} {appointment.customer?.last_name}
                       </h3>
                       <Badge className={getStatusColor(appointment.status)}>
-                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).replace(/_/g, ' ')}
                       </Badge>
                     </div>
                     {qrCodeUrl && (

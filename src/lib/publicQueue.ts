@@ -116,6 +116,30 @@ export async function listPublicAppointments(params: LookupParams): Promise<Publ
   return data ?? [];
 }
 
+export interface SignageBoard {
+  location_id: string;
+  location_name: string;
+  currently_serving: number;
+  total_waiting: number;
+  completed_today: number;
+  average_wait_time_minutes: number;
+  queue_status: 'active' | 'empty' | 'closed';
+  capacity: { current: number; maximum: number; utilization_percentage: number };
+  queue: {
+    waiting: Array<{ ticket_number: string; customer_name: string; service_name: string; position: number; current_wait_time_minutes: number }>;
+    currently_serving: Array<{ ticket_number: string; customer_name: string; service_name: string }>;
+  };
+  last_updated: string;
+}
+
+/** Lobby display board for one location; names are already reduced to first name + initial. */
+export async function getSignageBoard(locationId: string): Promise<SignageBoard> {
+  const { data, error } = await rpc<SignageBoard | null>('public_signage_board', { p_location_id: locationId });
+  if (error) throw new Error(friendly(error.message));
+  if (!data) throw new Error('Location not found');
+  return data;
+}
+
 export async function getQueueSnapshot(locationId: string): Promise<QueueSnapshot> {
   const { data, error } = await rpc<QueueSnapshot>('public_queue_snapshot', { p_location_id: locationId });
   if (error) throw new Error(friendly(error.message));
