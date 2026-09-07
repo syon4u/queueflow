@@ -36,7 +36,7 @@ export const PowerUserStatsCards: React.FC = () => {
       title: "Today's Appointments",
       value: stats?.totalAppointments || 0,
       icon: Calendar,
-      description: "Scheduled for today",
+      description: "Scheduled today (local day), any status",
       color: "text-blue-600"
     },
     {
@@ -64,7 +64,7 @@ export const PowerUserStatsCards: React.FC = () => {
       title: "Completion Rate",
       value: `${stats?.completionRate || 0}%`,
       icon: TrendingUp,
-      description: "Today's completion",
+      description: "Served today / scheduled today",
       color: "text-emerald-600"
     }
   ];

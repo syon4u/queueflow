@@ -1,5 +1,6 @@
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
@@ -8,6 +9,7 @@ type AppointmentStatus = 'scheduled' | 'checked_in' | 'in_progress' | 'completed
 
 export const useStaffActions = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const logAction = async (
@@ -15,7 +17,8 @@ export const useStaffActions = () => {
     resourceType: string,
     resourceId: string,
     oldData?: any,
-    newData?: any
+    newData?: any,
+    options: { canUndo?: boolean } = {}
   ) => {
     if (!user?.id) {
       console.warn('No user ID available for logging action');
@@ -30,6 +33,7 @@ export const useStaffActions = () => {
         resource_id: resourceId,
         old_data: oldData,
         new_data: newData,
+        can_undo: options.canUndo ?? true,
       });
     } catch (error) {
       console.error('Failed to log staff action:', error);
@@ -100,8 +104,12 @@ export const useStaffActions = () => {
     }
   };
 
-  const getRecentActions = async (limit: number = 10) => {
-    if (!user?.id) {
+  // Only actions that can still be undone: can_undo = true and not yet undone.
+  // Stable identity (useCallback) so UndoActionButton's effect does not re-run
+  // on every render.
+  const userId = user?.id;
+  const getRecentActions = useCallback(async (limit: number = 10) => {
+    if (!userId) {
       return [];
     }
 
@@ -109,7 +117,9 @@ export const useStaffActions = () => {
       const { data, error } = await supabase
         .from('staff_actions')
         .select('*')
-        .eq('staff_id', user.id)
+        .eq('staff_id', userId)
+        .eq('can_undo', true)
+        .is('undone_at', null)
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -119,7 +129,7 @@ export const useStaffActions = () => {
       console.error('Error fetching recent actions:', error);
       return [];
     }
-  };
+  }, [userId]);
 
   const undoAction = async (actionId: string) => {
     if (!user?.id) {
@@ -141,6 +151,14 @@ export const useStaffActions = () => {
         .single();
 
       if (fetchError) throw fetchError;
+
+      if (action.undone_at || action.can_undo === false) {
+        toast({
+          title: 'Nothing to undo',
+          description: 'This action has already been undone',
+        });
+        return false;
+      }
 
       if (action.resource_type === 'appointment' && action.old_data) {
         // Type cast the JSON data to the expected appointment update format
@@ -168,14 +186,26 @@ export const useStaffActions = () => {
         if (undoError) throw undoError;
       }
 
-      // Log the undo action
+      // Mark the original as undone so it is not offered again (F38).
+      const { error: markError } = await supabase
+        .from('staff_actions')
+        .update({ undone_at: new Date().toISOString(), can_undo: false })
+        .eq('id', actionId);
+
+      if (markError) throw markError;
+
+      // Log the undo itself as a non-undoable action.
       await logAction(
         'undo_action',
         action.resource_type,
         action.resource_id,
         action.new_data,
-        action.old_data
+        action.old_data,
+        { canUndo: false }
       );
+
+      // Refresh the queue dashboard now instead of waiting for the 30 s poll.
+      await queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
 
       toast({
         title: 'Success',

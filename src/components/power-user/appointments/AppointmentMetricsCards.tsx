@@ -24,7 +24,7 @@ export const AppointmentMetricsCards: React.FC<AppointmentMetricsCardsProps> = (
             <div>
               <p className="text-sm font-medium text-blue-700 mb-1">Today's Schedule</p>
               <p className="text-3xl font-bold text-blue-900">{todaysCount}</p>
-              <p className="text-xs text-blue-600 mt-1">Total appointments</p>
+              <p className="text-xs text-blue-600 mt-1">Scheduled today, any status</p>
             </div>
             <div className="p-3 bg-blue-200 rounded-lg">
               <Calendar className="h-6 w-6 text-blue-700" />
@@ -39,7 +39,7 @@ export const AppointmentMetricsCards: React.FC<AppointmentMetricsCardsProps> = (
             <div>
               <p className="text-sm font-medium text-amber-700 mb-1">In Queue</p>
               <p className="text-3xl font-bold text-amber-900">{queueWaiting}</p>
-              <p className="text-xs text-amber-600 mt-1">Customers waiting</p>
+              <p className="text-xs text-amber-600 mt-1">Checked in, last 24 h</p>
             </div>
             <div className="p-3 bg-amber-200 rounded-lg">
               <Users className="h-6 w-6 text-amber-700" />
@@ -54,7 +54,7 @@ export const AppointmentMetricsCards: React.FC<AppointmentMetricsCardsProps> = (
             <div>
               <p className="text-sm font-medium text-green-700 mb-1">Completed</p>
               <p className="text-3xl font-bold text-green-900">{completed}</p>
-              <p className="text-xs text-green-600 mt-1">Today's total</p>
+              <p className="text-xs text-green-600 mt-1">Served today</p>
             </div>
             <div className="p-3 bg-green-200 rounded-lg">
               <CheckCircle className="h-6 w-6 text-green-700" />

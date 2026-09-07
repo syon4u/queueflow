@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { isAppointmentToday, isServedToday, localDayRangeIso } from '@/lib/dateRanges';
 
 export interface StaffPerformanceMetrics {
   todayStats: {
@@ -72,14 +73,18 @@ export const useStaffPerformance = () => {
     
     setIsLoading(true);
     try {
-      // Fetch today's appointments for this staff member
-      const today = new Date().toISOString().split('T')[0];
+      // Today's appointments for this staff member, using the shared local-day
+      // definition (src/lib/dateRanges.ts). Rows are matched on either staff
+      // column: the queue dashboard assigns via assigned_staff_id, the
+      // scheduler via staff_id. Fetch anything scheduled today or finished
+      // today, then classify below.
+      const now = new Date();
+      const { start, end } = localDayRangeIso(now);
       const { data: todayAppointments, error: todayError } = await supabase
         .from('appointments')
         .select('*')
-        .eq('staff_id', user.id)
-        .gte('scheduled_time', `${today}T00:00:00`)
-        .lt('scheduled_time', `${today}T23:59:59`);
+        .or(`staff_id.eq.${user.id},assigned_staff_id.eq.${user.id}`)
+        .or(`and(scheduled_time.gte."${start}",scheduled_time.lt."${end}"),and(status.eq.completed,end_time.gte."${start}",end_time.lt."${end}")`);
 
       if (todayError) throw todayError;
 
@@ -94,9 +99,10 @@ export const useStaffPerformance = () => {
 
       if (weeklyError) throw weeklyError;
 
-      // Calculate today's stats
-      const servedToday = todayAppointments?.filter(a => a.status === 'completed') || [];
-      const totalToday = todayAppointments?.length || 0;
+      // Served Today = completed with end_time in the local day;
+      // total = Appointments Today (scheduled_time in the local day, any status).
+      const servedToday = todayAppointments?.filter(a => isServedToday(a, now)) || [];
+      const totalToday = todayAppointments?.filter(a => isAppointmentToday(a, now)).length || 0;
       
       const avgServiceTime = servedToday.length > 0 
         ? servedToday.reduce((acc, apt) => {

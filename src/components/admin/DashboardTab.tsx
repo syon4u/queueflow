@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { localDayRangeIso, queueWindowStartIso } from '@/lib/dateRanges';
 
 function formatRelativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -19,14 +20,8 @@ function formatRelativeTime(iso: string): string {
   return `${Math.round(hours / 24)} d ago`;
 }
 
-
-// Local-calendar day bounds (the previous toISOString() slice used UTC, so a
-// Florida evening rolled "today" over five hours early).
-const localDayRange = () => {
-  const start = new Date(); start.setHours(0, 0, 0, 0);
-  const end = new Date(start); end.setDate(end.getDate() + 1);
-  return { start: start.toISOString(), end: end.toISOString() };
-};
+// "Today" / queue-window definitions are shared with /staff and /power-user
+// via src/lib/dateRanges.ts.
 
 export const DashboardTab: React.FC = () => {
   const navigate = useNavigate();
@@ -58,7 +53,8 @@ export const DashboardTab: React.FC = () => {
   const { data: appointmentsToday = 0 } = useQuery({
     queryKey: ['dashboard-appointments-today'],
     queryFn: async () => {
-      const { start, end } = localDayRange();
+      // Appointments Today = scheduled_time within the local day, any status.
+      const { start, end } = localDayRangeIso();
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
@@ -98,16 +94,15 @@ export const DashboardTab: React.FC = () => {
   const { data: checkedInCustomers = 0 } = useQuery({
     queryKey: ['dashboard-checked-in'],
     queryFn: async () => {
-      // Only today's check-ins. Unscoped, this counted every appointment ever
-      // left in 'checked_in' — 12 stale rows showed as "waiting" while today's
-      // appointment count was 0.
-      const { start, end } = localDayRange();
+      // Waiting Now = checked_in with check_in_time within the last 24 h — the
+      // same window public_queue_snapshot uses, so this matches the kiosk and
+      // the staff dashboard. Unscoped, this counted every appointment ever
+      // left in 'checked_in' — 12 stale rows showed as "waiting".
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'checked_in')
-        .gte('scheduled_time', start)
-        .lt('scheduled_time', end);
+        .gte('check_in_time', queueWindowStartIso());
       if (error) throw error;
       return count || 0;
     },
@@ -117,13 +112,14 @@ export const DashboardTab: React.FC = () => {
   const { data: missedAppointments = 0 } = useQuery({
     queryKey: ['dashboard-missed-today'],
     queryFn: async () => {
-      const { start, end } = localDayRange();
+      // No-shows Today = status no_show with updated_at within the local day.
+      const { start, end } = localDayRangeIso();
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'no_show')
-        .gte('scheduled_time', start)
-        .lt('scheduled_time', end);
+        .gte('updated_at', start)
+        .lt('updated_at', end);
       if (error) throw error;
       return count || 0;
     },
@@ -259,7 +255,7 @@ export const DashboardTab: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-900">{systemMetrics.checkedInCustomers}</div>
-            <p className="text-xs text-purple-600 mt-1">Checked in today, not yet served</p>
+            <p className="text-xs text-purple-600 mt-1">Checked in, last 24 h, not yet called</p>
           </CardContent>
         </Card>
         
@@ -270,7 +266,7 @@ export const DashboardTab: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-900">{systemMetrics.missedAppointments}</div>
-            <p className="text-xs text-orange-600 mt-1">Requires follow-up</p>
+            <p className="text-xs text-orange-600 mt-1">Marked no-show today</p>
           </CardContent>
         </Card>
       </div>
