@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Undo2 } from 'lucide-react';
 import { useStaffActions } from '@/hooks/use-staff-actions';
@@ -8,18 +8,25 @@ export const UndoActionButton: React.FC = () => {
   const { getRecentActions, undoAction, isLoading } = useStaffActions();
   const [recentActions, setRecentActions] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchRecentActions = async () => {
-      const actions = await getRecentActions(1);
-      setRecentActions(actions);
-    };
+  const fetchRecentActions = useCallback(async () => {
+    // getRecentActions already filters to can_undo = true and undone_at is null.
+    const actions = await getRecentActions(1);
+    setRecentActions(actions);
+  }, [getRecentActions]);
 
+  useEffect(() => {
     fetchRecentActions();
     
     // Refresh every 10 seconds
     const interval = setInterval(fetchRecentActions, 10000);
     return () => clearInterval(interval);
-  }, [getRecentActions]);
+  }, [fetchRecentActions]);
+
+  const handleUndo = async (actionId: string) => {
+    await undoAction(actionId);
+    // Drop the button immediately rather than on the next 10 s refresh.
+    await fetchRecentActions();
+  };
 
   const latestAction = recentActions[0];
 
@@ -44,7 +51,7 @@ export const UndoActionButton: React.FC = () => {
     <Button
       variant="outline"
       size="sm"
-      onClick={() => undoAction(latestAction.id)}
+      onClick={() => handleUndo(latestAction.id)}
       disabled={isLoading}
       className="flex items-center gap-2"
     >
