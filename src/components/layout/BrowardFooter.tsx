@@ -113,9 +113,9 @@ const BrowardFooter: React.FC = () => {
           <div>
             <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">Contact Information</h4>
             <address className="not-italic text-white/95">
-              <p className="font-medium drop-shadow">Phone: <span className="text-white font-bold">(555) 123-4567</span></p>
+              
               <p className="font-medium drop-shadow">Email: <span className="text-white font-bold">support@queueflow.com</span></p>
-              <p className="mt-2 font-medium drop-shadow">Available 24/7 for customer support</p>
+              <p className="mt-2 font-medium drop-shadow">Support hours: Mon–Fri, 9am–5pm ET</p>
             </address>
           </div>
         </div>

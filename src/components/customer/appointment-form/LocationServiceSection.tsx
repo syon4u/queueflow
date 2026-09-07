@@ -42,6 +42,18 @@ const LocationServiceSection = ({
 }: LocationServiceSectionProps) => {
   const [availableLocationIds, setAvailableLocationIds] = useState<string[]>([]);
 
+  // Services are stored one row per location. Group by name so the customer
+  // sees each service once; a service is available at every location that has
+  // a row with that name (or everywhere, if any row is global).
+  const uniqueServices = React.useMemo(() => {
+    if (!services) return [];
+    const seen = new Map<string, Service>();
+    for (const svc of services) {
+      if (!seen.has(svc.name)) seen.set(svc.name, svc);
+    }
+    return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [services]);
+
   // Get available locations for selected service
   useEffect(() => {
     if (!services || !formData.serviceId) {
@@ -50,19 +62,31 @@ const LocationServiceSection = ({
     }
 
     const selectedService = services.find(s => s.id === formData.serviceId);
-    if (selectedService) {
-      if (!selectedService.location_id) {
-        // Global service - available at all locations
-        const allLocationIds = locations.map(l => l.id);
-        setAvailableLocationIds(allLocationIds);
-      } else {
-        // Location-specific service
-        setAvailableLocationIds([selectedService.location_id]);
-      }
-    } else {
+    if (!selectedService) {
       setAvailableLocationIds([]);
+      return;
+    }
+    const siblings = services.filter(s => s.name === selectedService.name);
+    if (siblings.some(s => !s.location_id)) {
+      setAvailableLocationIds(locations.map(l => l.id));
+    } else {
+      setAvailableLocationIds(Array.from(new Set(siblings.map(s => s.location_id as string))));
     }
   }, [formData.serviceId, services, locations]);
+
+  // Once a location is chosen, point serviceId at the row for that location
+  // so the appointment is stored against the correct service/location pair.
+  useEffect(() => {
+    if (!services || !formData.serviceId || !formData.locationId) return;
+    const current = services.find(s => s.id === formData.serviceId);
+    if (!current || current.location_id === formData.locationId) return;
+    const match = services.find(
+      s => s.name === current.name && s.location_id === formData.locationId
+    );
+    if (match && match.id !== formData.serviceId) {
+      updateField('serviceId', match.id);
+    }
+  }, [formData.locationId, formData.serviceId, services, updateField]);
 
   // Clear location if it's no longer available for selected service
   useEffect(() => {
@@ -110,7 +134,7 @@ const LocationServiceSection = ({
               {servicesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             </SelectTrigger>
             <SelectContent>
-              {services?.map((service) => (
+              {uniqueServices.map((service) => (
                 <SelectItem key={service.id} value={service.id}>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">

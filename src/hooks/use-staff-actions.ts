@@ -1,13 +1,13 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useMinimalAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 
 type AppointmentStatus = 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
 
 export const useStaffActions = () => {
-  const { user } = useMinimalAuth();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const logAction = async (

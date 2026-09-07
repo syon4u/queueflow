@@ -6,6 +6,8 @@ import { Clock, Users, MapPin, Wifi, WifiOff, Settings } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatTime } from '@/lib/queue';
+import { useSearchParams } from 'react-router-dom';
+import { getSignageBoard } from '@/lib/publicQueue';
 import { Button } from '@/components/ui/button';
 
 interface QueueDisplayData {
@@ -43,7 +45,25 @@ export const DigitalSignageDisplay: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [refreshInterval, setRefreshInterval] = useState(10000); // 10 seconds
   const [displayMode, setDisplayMode] = useState<'full' | 'compact'>('full');
-  const [selectedLocationId] = useState('550e8400-e29b-41d4-a716-446655440000'); // Default location
+  // ?location=<uuid> pins the board to one site; otherwise the first open location.
+  const [searchParams] = useSearchParams();
+  const requestedLocationId = searchParams.get('location');
+  const { data: defaultLocationId } = useQuery({
+    queryKey: ['signage-default-location'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('id')
+        .eq('queue_status', 'open')
+        .order('name')
+        .limit(1);
+      if (error) throw error;
+      return data?.[0]?.id ?? null;
+    },
+    enabled: !requestedLocationId,
+    staleTime: 5 * 60 * 1000,
+  });
+  const selectedLocationId = requestedLocationId ?? defaultLocationId ?? '';
   const queryClient = useQueryClient();
 
   // Update current time every second
@@ -69,25 +89,11 @@ export const DigitalSignageDisplay: React.FC = () => {
   // Fetch queue data from our edge function
   const { data: queueData, isLoading, error } = useQuery({
     queryKey: ['digital-signage', selectedLocationId],
-    queryFn: async (): Promise<QueueDisplayData> => {
-      const response = await fetch(
-        `https://diadwozorwkzhexhjfgb.supabase.co/functions/v1/queue-stats/${selectedLocationId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpYWR3b3pvcndremhleGhqZmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5MTQyODEsImV4cCI6MjA2MjQ5MDI4MX0.WGtQJCeSW99Dklx0bu1b6KoNb2utGaCAfsWY46xuHbw'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch queue data');
-      }
-      
-      return response.json();
-    },
+    // Public RPC: the lobby screen has no user session, so the edge function's
+    // bearer-token fetch always failed with 401.
+    queryFn: (): Promise<QueueDisplayData> => getSignageBoard(selectedLocationId),
     refetchInterval: refreshInterval,
-    enabled: isOnline
+    enabled: isOnline && !!selectedLocationId
   });
 
   // Set up real-time subscription for queue updates

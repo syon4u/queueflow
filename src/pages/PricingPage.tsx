@@ -30,7 +30,7 @@ const PLANS: Plan[] = [
       'CSAT survey after each visit',
       'Email support',
     ],
-    cta: 'Start with Starter',
+    cta: 'Talk to sales',
   },
   {
     name: 'Growth',
@@ -42,12 +42,12 @@ const PLANS: Plan[] = [
       'Up to 15 staff seats, multiple locations',
       'Everything in Starter',
       'Staff dashboard with RBAC (clerk/manager/admin)',
-      'Advanced analytics & AI-assisted scheduling',
+      'Advanced analytics & AI-assisted scheduling (in progress)',
       'Digital signage & kiosk mode',
-      'English/Spanish localization',
+      'Language switcher: Spanish, Portuguese, Haitian Creole (partial coverage today)',
       'Priority email + chat support',
     ],
-    cta: 'Start with Growth',
+    cta: 'Talk to sales',
   },
   {
     name: 'Enterprise',
@@ -57,7 +57,7 @@ const PLANS: Plan[] = [
     features: [
       'Unlimited staff seats & locations',
       'Everything in Growth',
-      'SSO / SAML & custom RBAC policies',
+      'SSO / SAML (roadmap) & custom RBAC policies',
       'SLA-backed support & onboarding',
       'Custom integrations (CRM/POS/signage)',
       'Dedicated success manager',
@@ -122,21 +122,24 @@ const PricingPage: React.FC = () => {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Link to="/auth" className="w-full">
+                  <a
+                    href={`mailto:sales@queueflow.app?subject=${encodeURIComponent(`QueueFlow ${plan.name} plan`)}`}
+                    className="w-full"
+                  >
                     <Button
                       className={`w-full ${plan.highlighted ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}`}
                       variant={plan.highlighted ? 'default' : 'outline'}
                     >
                       {plan.cta}
                     </Button>
-                  </Link>
+                  </a>
                 </CardFooter>
               </Card>
             ))}
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-12">
-            Prices shown are illustrative for evaluation purposes. Contact us for a tailored quote.
+            Billed monthly. Volume and public-sector pricing available on request.
           </p>
         </div>
       </div>

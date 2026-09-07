@@ -13,7 +13,9 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffAccess }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, role, signOut } = useAuth();
+  const { user, role, loading, signOut } = useAuth();
+  // Role resolves a beat after the session; don't render '()' or pop links in later.
+  const roleResolving = !!user && role === null && loading;
 
   const handleSignOut = async () => {
     await signOut();
@@ -78,6 +80,13 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
             ))}
 
             {/* Role-based Links */}
+            {roleResolving && (
+              <div className="flex items-center space-x-2" aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className="h-8 w-24 rounded-md bg-gray-100 animate-pulse" />
+                ))}
+              </div>
+            )}
             {getRoleBasedLinks().map((link) => (
               <Link
                 key={link.to}
@@ -95,7 +104,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               {user ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">
-                    {user.email} ({role})
+                    {user.email}{role ? ` (${role})` : ''}
                   </span>
                   <Button variant="outline" size="sm" onClick={handleSignOut}>
                     Sign Out
@@ -122,6 +131,8 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
             size="icon"
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -165,7 +176,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                 {user ? (
                   <div className="space-y-2">
                     <div className="text-sm text-gray-600">
-                      {user.email} ({role})
+                      {user.email}{role ? ` (${role})` : ''}
                     </div>
                     <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
                       Sign Out

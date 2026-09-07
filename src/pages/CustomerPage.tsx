@@ -12,21 +12,14 @@ const CustomerPage = () => {
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const { createAppointment, isSubmitting } = useCustomerAppointmentFlow();
 
-  console.log('CustomerPage - Component rendering');
-
-  const handleAppointmentSubmit = async (customerData: CustomerAppointmentData) => {
-    console.log('CustomerPage - Handling appointment submission:', customerData);
-    
-    try {
-      const result = await createAppointment(customerData);
-      console.log('CustomerPage - Appointment creation result:', result);
-      
-      if (result) {
-        setConfirmationCode(result);
-      }
-    } catch (error) {
-      console.error('CustomerPage - Error creating appointment:', error);
+  /** Returns true only when the booking was actually created. */
+  const handleAppointmentSubmit = async (customerData: CustomerAppointmentData): Promise<boolean> => {
+    const result = await createAppointment(customerData);
+    if (result) {
+      setConfirmationCode(result);
+      return true;
     }
+    return false;
   };
 
   const handleConfirmationClose = (open: boolean) => {
@@ -38,8 +31,8 @@ const CustomerPage = () => {
 
   return (
     <PageLayout 
-      headerTitle="Consumer Protection Division"
-      headerSubtitle="Schedule your appointment with Broward County services"
+      headerTitle="Book an Appointment"
+      headerSubtitle="Choose a service, location and time that works for you"
     >
       <div className="min-h-screen bg-pattern-bubbles bg-gradient-overlay-blue">
         <div className="container mx-auto px-4 py-8">

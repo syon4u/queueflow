@@ -7,6 +7,8 @@ import { Clock, Users, MapPin, Phone, CheckCircle } from 'lucide-react';
 import { VirtualQueueJoin } from '@/components/queue/VirtualQueueJoin';
 import { VirtualQueueTicket } from '@/components/queue/VirtualQueueTicket';
 import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
+import { checkInPublicAppointment } from '@/lib/publicQueue';
+import { toast } from '@/components/ui/use-toast';
 
 const VirtualQueuePage = () => {
   const [hasJoinedQueue, setHasJoinedQueue] = useState(false);
@@ -15,10 +17,9 @@ const VirtualQueuePage = () => {
   const [ticketData, setTicketData] = useState<any>(null);
 
   const handleJoinQueue = (ticketInfo: any) => {
-    console.log('Joining queue with:', ticketInfo);
     setHasJoinedQueue(true);
-    setQueuePosition(5);
-    setEstimatedWait(25);
+    setQueuePosition(ticketInfo?.position ?? 0);
+    setEstimatedWait(ticketInfo?.estimatedWait ?? 0);
     setTicketData(ticketInfo);
   };
 
@@ -29,9 +30,26 @@ const VirtualQueuePage = () => {
     setTicketData(null);
   };
 
-  const handleCheckIn = () => {
-    console.log('Checking in...');
-    // Handle check-in logic here
+  const handleCheckIn = async () => {
+    if (!ticketData?.id) return;
+    try {
+      const checkedIn = await checkInPublicAppointment(ticketData.id, ticketData.confirmationCode);
+      setTicketData({ ...ticketData, status: checkedIn.status, position: checkedIn.position ?? ticketData.position });
+      setQueuePosition(checkedIn.position ?? 0);
+      setEstimatedWait(checkedIn.estimated_wait_minutes ?? 0);
+      toast({
+        title: "You're checked in",
+        description: checkedIn.position
+          ? `You are #${checkedIn.position} in line. Estimated wait about ${checkedIn.estimated_wait_minutes} minutes.`
+          : 'A staff member will call you shortly.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Check-in failed',
+        description: error instanceof Error ? error.message : 'Please try again or see a staff member.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

@@ -30,7 +30,7 @@ const Footer: React.FC<FooterProps> = ({ onShowStaffAccess }) => {
         </div>
         
         <div className="border-t border-gray-700 mt-6 pt-6 text-center text-sm text-gray-400">
-          <p>&copy; 2024 Queue Flow. All rights reserved. | Broward County Queue Management System</p>
+          <p>&copy; 2026 QueueFlow. All rights reserved.</p>
         </div>
       </div>
     </footer>

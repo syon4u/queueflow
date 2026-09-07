@@ -71,7 +71,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   return (
     <BaseSidebar
       title="Admin Portal"
-      subtitle="Broward QueuePro"
+      subtitle="QueueFlow"
       userRole="Administrator"
       navigationGroups={navigationGroups}
       quickActions={quickActions}

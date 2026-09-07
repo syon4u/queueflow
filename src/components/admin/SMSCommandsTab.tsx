@@ -43,8 +43,13 @@ export const SMSCommandsTab: React.FC = () => {
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Two-Way SMS Commands</h2>
         <p className="text-gray-600">
-          Configure and manage SMS command responses for customer appointments.
+          Preview how customer text-message commands will be answered.
         </p>
+        <div className="mt-4 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <strong>Not yet live.</strong> No SMS number is connected to this deployment, so customers cannot
+          text these commands yet. The simulator below runs the same command parser against your live
+          appointment data.
+        </div>
       </div>
 
       {/* Command Reference */}
@@ -79,7 +84,7 @@ export const SMSCommandsTab: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Phone className="h-5 w-5" />
-            Test SMS Commands
+            Command Simulator
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">

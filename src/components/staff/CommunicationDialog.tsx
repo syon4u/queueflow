@@ -67,7 +67,7 @@ export const CommunicationDialog: React.FC<CommunicationDialogProps> = ({
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    if (!templateId) {
+    if (!templateId || templateId === 'none') {
       setSelectedTemplate('');
       return;
     }
@@ -126,7 +126,7 @@ export const CommunicationDialog: React.FC<CommunicationDialogProps> = ({
                 <SelectValue placeholder="Select a template..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No template</SelectItem>
+                <SelectItem value="none">No template</SelectItem>
                 {templates.map((template) => (
                   <SelectItem key={template.id} value={template.id}>
                     {template.name} ({template.type})

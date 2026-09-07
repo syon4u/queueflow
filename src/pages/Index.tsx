@@ -6,8 +6,6 @@ import Navigation from '@/components/landing/Navigation';
 import ModernHeroSection from '@/components/landing/ModernHeroSection';
 import ServiceCardsGrid from '@/components/landing/ServiceCardsGrid';
 import FeaturesShowcase from '@/components/landing/FeaturesShowcase';
-import StatsSection from '@/components/landing/StatsSection';
-import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import CTASection from '@/components/landing/CTASection';
 import WelcomeGuideModal from '@/components/landing/WelcomeGuideModal';
 import { useTranslation } from 'react-i18next';
@@ -43,12 +41,6 @@ const Index = () => {
         
         {/* Features Showcase */}
         <FeaturesShowcase />
-        
-        {/* Stats Section */}
-        <StatsSection />
-        
-        {/* Testimonials Section */}
-        <TestimonialsSection />
         
         {/* Call to Action Section */}
         <CTASection />

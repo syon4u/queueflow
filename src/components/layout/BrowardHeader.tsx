@@ -21,8 +21,8 @@ interface BrowardHeaderProps {
 }
 
 const BrowardHeader: React.FC<BrowardHeaderProps> = ({
-  title = "Consumer Protection Division",
-  subtitle = "Protecting Broward County residents through education, mediation, and enforcement"
+  title = "QueueFlow",
+  subtitle = "Smart queue and appointment management for service businesses"
 }) => {
   const { user, role } = useAuth();
 

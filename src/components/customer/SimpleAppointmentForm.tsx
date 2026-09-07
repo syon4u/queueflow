@@ -13,7 +13,8 @@ import VisitDetailsSection from './appointment-form/VisitDetailsSection';
 import { Spinner } from '@/components/ui/spinner';
 
 interface SimpleAppointmentFormProps {
-  onSubmit: (customerInfo: CustomerAppointmentData) => void;
+  /** Resolve false (or throw) when the booking was not created; the caller has already shown the reason. */
+  onSubmit: (customerInfo: CustomerAppointmentData) => Promise<boolean | void> | boolean | void;
 }
 
 const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
@@ -65,12 +66,15 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     console.log('SimpleAppointmentForm - Calling onSubmit with:', formData);
     
     try {
-      await onSubmit(formData);
+      const created = await onSubmit(formData);
+      if (created === false) {
+        return;
+      }
       toast({
-        title: 'Request Submitted!',
-        description: 'We will contact you soon to confirm your appointment.',
+        title: 'Appointment booked',
+        description: 'Keep your confirmation code to check in when you arrive.',
       });
-      
+
       resetForm();
     } catch (error) {
       console.error('SimpleAppointmentForm - Submission error:', error);

@@ -92,7 +92,7 @@ const AddCustomerForm: React.FC = () => {
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="" disabled>
+                  <SelectItem value="__none" disabled>
                     No services available
                   </SelectItem>
                 )}

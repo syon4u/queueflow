@@ -9,7 +9,7 @@ const CTASection: React.FC = () => {
     <section className="py-16 bg-blue-600">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold text-white mb-4">Ready to Move Faster?</h2>
-        <p className="text-xl text-blue-100 mb-8">Join thousands of organizations improving their customer experience</p>
+        <p className="text-xl text-blue-100 mb-8">Give your customers a queue they can wait in from anywhere</p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 px-8" asChild>

@@ -112,13 +112,13 @@ const FeaturesShowcase: React.FC = () => {
                 Cloud-Based
               </div>
               <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                99.9% Uptime
+                Row-level access control
               </div>
               <div className="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">
-                HIPAA Compliant
+                Encrypted in transit &amp; at rest
               </div>
               <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">
-                24/7 Support
+                Installable PWA
               </div>
             </div>
           </div>

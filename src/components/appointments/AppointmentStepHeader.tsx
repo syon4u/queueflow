@@ -15,7 +15,7 @@ const AppointmentStepHeader: React.FC = () => {
         {t('appointments.newAppointment')}
       </h1>
       <p className="text-lg text-broward-navy/80">
-        Schedule your appointment with Broward County services
+        Schedule your appointment in a few quick steps
       </p>
     </div>
   );
