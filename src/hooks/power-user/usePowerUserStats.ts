@@ -1,24 +1,33 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { localDayRangeIso } from '@/lib/dateRanges';
 
 export const usePowerUserStats = () => {
   return useQuery({
     queryKey: ['power-user-stats'],
     queryFn: async () => {
-      // Get today's date range
-      const today = new Date();
-      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      // Shared "today" definition (src/lib/dateRanges.ts): local calendar day.
+      const { start, end } = localDayRangeIso();
 
-      // Get total appointments for today
-      const { data: todayAppointments, error: appointmentsError } = await supabase
+      // Appointments Today = scheduled_time within the local day, any status.
+      const { count: totalToday, error: appointmentsError } = await supabase
         .from('appointments')
-        .select('id, status')
-        .gte('scheduled_time', startOfToday.toISOString())
-        .lt('scheduled_time', endOfToday.toISOString());
+        .select('*', { count: 'exact', head: true })
+        .gte('scheduled_time', start)
+        .lt('scheduled_time', end);
 
       if (appointmentsError) throw appointmentsError;
+
+      // Served Today = status completed with end_time within the local day.
+      const { count: completedToday, error: completedError } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'completed')
+        .gte('end_time', start)
+        .lt('end_time', end);
+
+      if (completedError) throw completedError;
 
       // Get total active users
       const { data: users, error: usersError } = await supabase
@@ -43,13 +52,12 @@ export const usePowerUserStats = () => {
 
       if (servicesError) throw servicesError;
 
-      // Calculate completion rate for today
-      const completedToday = todayAppointments?.filter(apt => apt.status === 'completed').length || 0;
-      const totalToday = todayAppointments?.length || 0;
-      const completionRate = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0;
+      // Completion rate = Served Today / Appointments Today
+      const completionRate = (totalToday ?? 0) > 0 ? Math.round(((completedToday ?? 0) / (totalToday ?? 0)) * 100) : 0;
 
       return {
-        totalAppointments: totalToday,
+        totalAppointments: totalToday ?? 0,
+        completedToday: completedToday ?? 0,
         activeUsers: users?.length || 0,
         totalLocations: locations?.length || 0,
         totalServices: services?.length || 0,

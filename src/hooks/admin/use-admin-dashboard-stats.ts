@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { localDayRangeIso } from '@/lib/dateRanges';
 
 interface AdminDashboardStats {
   totalUsers: number;
@@ -52,12 +53,13 @@ export const useAdminDashboardStats = () => {
   const { data: appointmentsData } = useQuery({
     queryKey: ['admin-today-appointments-count'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
+      // Appointments Today = scheduled_time within the local day (src/lib/dateRanges.ts).
+      const { start, end } = localDayRangeIso();
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
-        .gte('scheduled_time', `${today}T00:00:00`)
-        .lt('scheduled_time', `${today}T23:59:59`);
+        .gte('scheduled_time', start)
+        .lt('scheduled_time', end);
       
       if (error) throw error;
       return count || 0;

@@ -17,8 +17,13 @@ export interface ServiceMetric {
 
 export interface DailyMetric {
   date: string;
+  /** Appointments scheduled that day (local day), any status. */
   appointments: number;
   wait_time: number;
+  /** Completed that day, by end_time (fallback updated_at). */
+  completed: number;
+  /** Marked no_show that day, by updated_at. */
+  no_shows: number;
 }
 
 export interface TimePeriodOption {

@@ -102,7 +102,7 @@ export const PerformanceAnalyticsDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{metrics.todayStats.customersServed}</div>
-            <p className="text-xs text-muted-foreground">Today</p>
+            <p className="text-xs text-muted-foreground">Completed today (local day)</p>
           </CardContent>
         </Card>
 
@@ -128,6 +128,7 @@ export const PerformanceAnalyticsDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">{metrics.todayStats.completionRate}%</div>
+            <p className="text-xs text-muted-foreground">Served today / scheduled today</p>
             <Progress value={metrics.todayStats.completionRate} className="mt-2" />
           </CardContent>
         </Card>
