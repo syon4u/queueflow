@@ -68,18 +68,17 @@ export const CalledWords: React.FC<CalledWordsProps> = ({
       initial="hidden"
       {...(startOnView ? { whileInView: 'show', viewport: { once: true, amount: 0.6 } } : { animate: 'show' })}
     >
-      {words.map((w, i) => (
-        <React.Fragment key={i}>
-          <m.span
-            aria-hidden="true"
-            className={cn('inline-block will-change-transform', wordClassName, accent.includes(i) && accentClassName)}
-            variants={word}
-          >
-            {w}
-          </m.span>
-          {i < words.length - 1 ? ' ' : null}
-        </React.Fragment>
-      ))}
+      {words.flatMap((w, i) => [
+        <m.span
+          key={i}
+          aria-hidden="true"
+          className={cn('inline-block will-change-transform', wordClassName, accent.includes(i) && accentClassName)}
+          variants={word}
+        >
+          {w}
+        </m.span>,
+        i < words.length - 1 ? ' ' : null,
+      ])}
     </Tag>
   );
 };
