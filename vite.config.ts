@@ -34,14 +34,19 @@ export default defineConfig(({ mode }) => ({
         runtimeCaching: [],
       },
       manifest: {
-        name: 'QUEUE FLOW',
-        short_name: 'QUEUE FLOW',
+        name: 'QueueFlow',
+        short_name: 'QueueFlow',
+        description: 'Virtual queue and appointment management for service businesses.',
+        // Relative to the manifest URL, so the install works under a sub-path
+        // deploy (e.g. /queueflow-demo/) and from a domain root.
+        start_url: './',
+        scope: './',
+        display: 'standalone',
         theme_color: '#2563eb',
         background_color: '#ffffff',
-        display: 'standalone',
-        // Relative paths so the manifest works under a sub-path deploy (e.g. /queueflow-demo/).
+        lang: 'en',
         icons: [
-          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       }
