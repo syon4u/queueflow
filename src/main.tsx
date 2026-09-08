@@ -1,12 +1,82 @@
-
+/// <reference types="vite-plugin-pwa/client" />
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
 import './index.css';
 import './i18n/i18n.ts';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n/i18n';
 import { AuthProvider, MinimalAuthContext } from './context/AuthContext';
+
+// --- Service worker update strategy ----------------------------------------
+// sw.js is built with skipWaiting + clientsClaim (vite.config.ts), so a new
+// deploy activates as soon as the browser re-fetches sw.js, which it does on
+// every navigation. Once the new worker takes control, the bundle this page is
+// running is gone from the cache (hashed chunk names), so reload exactly once.
+//
+// Loop guard: at most one reload per page lifetime, and at most
+// MAX_AUTO_RELOADS within RELOAD_WINDOW_MS across page loads (sessionStorage).
+// A broken deploy therefore surfaces its error instead of spinning.
+const RELOAD_KEY = 'qf:sw-reload';
+const RELOAD_WINDOW_MS = 30_000;
+const MAX_AUTO_RELOADS = 3;
+let reloadedThisPage = false;
+
+function readReloadLog(): number[] {
+  try {
+    const parsed: unknown = JSON.parse(sessionStorage.getItem(RELOAD_KEY) ?? '[]');
+    return Array.isArray(parsed) ? parsed.filter((t): t is number => typeof t === 'number') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Reload the page for a new deploy; returns false when the loop guard refused. */
+function reloadForNewDeploy(): boolean {
+  if (reloadedThisPage) return false;
+  const now = Date.now();
+  const recent = readReloadLog().filter((t) => now - t < RELOAD_WINDOW_MS);
+  if (recent.length >= MAX_AUTO_RELOADS) return false;
+  reloadedThisPage = true;
+  try {
+    sessionStorage.setItem(RELOAD_KEY, JSON.stringify([...recent, now]));
+  } catch {
+    // Storage unavailable (private mode / quota): the per-page flag still applies.
+  }
+  window.location.reload();
+  return true;
+}
+
+if ('serviceWorker' in navigator) {
+  // On first install clientsClaim also fires controllerchange, but the page is
+  // already running the newest bundle, so only reload when replacing a worker.
+  let wasControlled = navigator.serviceWorker.controller !== null;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (wasControlled) reloadForNewDeploy();
+    wasControlled = true;
+  });
+
+  registerSW({
+    immediate: true,
+    onRegisteredSW(_swUrl, registration) {
+      if (!registration) return;
+      // Kiosk and signage screens stay open for days: poll for a new deploy.
+      setInterval(() => {
+        registration.update().catch(() => {
+          /* offline; the next navigation checks again */
+        });
+      }, 60 * 60 * 1000);
+    },
+  });
+}
+
+// A lazy route chunk from a previous deploy that no longer exists on the
+// server (e.g. an old tab opening /admin after a deploy): reload to pick up
+// the current bundle instead of rendering a blank page.
+window.addEventListener('vite:preloadError', (event) => {
+  if (reloadForNewDeploy()) event.preventDefault();
+});
 
 // Create a container for the app
 const container = document.getElementById('root');
@@ -37,3 +107,4 @@ root.render(
     </AuthProvider>
   </React.StrictMode>
 );
+

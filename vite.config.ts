@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -16,10 +15,23 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
     VitePWA({
+      // Update strategy: a new deploy takes effect on the next navigation.
+      // src/main.tsx registers the worker (virtual:pwa-register) and reloads
+      // the page once when a new worker takes control.
       registerType: 'autoUpdate',
+      injectRegister: false,
       includeAssets: ['favicon.ico', 'pwa-192.png', 'pwa-512.png'],
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB (increased from 3 MB)
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        // Resolved against the worker scope, so it follows `base`.
+        navigateFallback: 'index.html',
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        // Deliberately no runtimeCaching: only the precached build output is
+        // served by the worker. Cross-origin requests (Supabase REST, auth,
+        // realtime, storage on *.supabase.co) go straight to the network.
+        runtimeCaching: [],
       },
       manifest: {
         name: 'QUEUE FLOW',
