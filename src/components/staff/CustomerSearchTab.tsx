@@ -46,7 +46,8 @@ export const CustomerSearchTab: React.FC = () => {
       }
 
       return data || [];
-    }
+    },
+    staleTime: 30000
   });
 
   // Extract unique customers from appointments data with location and service info

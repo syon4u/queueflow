@@ -4,7 +4,8 @@ import AdminPageComponent from '@/components/admin/AdminPage';
 import { useAppData } from '@/hooks/useAppData';
 
 const AdminPage = () => {
-  const { isLoading } = useAppData();
+  // Warm the small public lists; tabs that need the appointments table fetch it on mount.
+  const { isLoading } = useAppData({ appointments: false });
 
   if (isLoading) {
     return (

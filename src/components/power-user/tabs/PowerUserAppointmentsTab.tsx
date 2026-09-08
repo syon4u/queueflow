@@ -15,7 +15,6 @@ import { isAppointmentToday, isServedToday, isWaitingNow } from '@/lib/dateRange
 export const PowerUserAppointmentsTab: React.FC = () => {
   const {
     appointments,
-    customers,
     isLoading,
     refetch
   } = useAppData();
