@@ -104,7 +104,7 @@ const ProductPreview: React.FC = () => {
                     {t(`public.preview.services.${row.service}`)}
                   </span>
                   {i === 0 ? (
-                    <span className="shrink-0 rounded-full bg-[rgba(245,158,11,0.15)] px-2.5 py-1 text-[11px] font-semibold text-[--amber]">
+                    <span className="shrink-0 rounded-full bg-[rgba(245,158,11,0.15)] px-2.5 py-1 text-[11px] font-semibold text-[--led]">
                       {t('public.board.nowServing')}
                     </span>
                   ) : (
@@ -151,7 +151,7 @@ const ProductPreview: React.FC = () => {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={55}
-          className="mt-4 h-2 overflow-hidden rounded-full bg-[--mist]"
+          className="mt-4 h-2 overflow-hidden rounded-full bg-[--cream]"
         >
           <div className="h-full w-[55%] rounded-full bg-[--brand]" />
         </div>

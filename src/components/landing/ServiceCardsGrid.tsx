@@ -22,7 +22,7 @@ const ServiceCardsGrid: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <LandingSection id="visitors" tone="mist" labelledBy="landing-actions-title">
+    <LandingSection id="visitors" tone="cream" labelledBy="landing-actions-title">
       <SectionHeading
         id="landing-actions-title"
         eyebrow={t('public.quickActions.eyebrow')}

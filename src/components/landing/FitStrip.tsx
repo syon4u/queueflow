@@ -16,7 +16,7 @@ const FitStrip: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <section aria-labelledby="landing-fit-title" className="border-b border-[--hairline] bg-[--mist] py-10 sm:py-12">
+    <section aria-labelledby="landing-fit-title" className="border-b border-[--hairline] bg-[--cream] py-10 sm:py-12">
       <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
         <h2 id="landing-fit-title" className="qf-eyebrow reveal text-center">
           {t('public.fit.eyebrow')}

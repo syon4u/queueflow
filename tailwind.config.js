@@ -39,6 +39,13 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ['"Plus Jakarta Sans"', "Inter", "sans-serif"],
+        // Landing page (src/styles/landing.css): signage display face + serif accent word
+        signage: ['"Bricolage Grotesque"', "Inter", "system-ui", "sans-serif"],
+        accent: ['"Instrument Serif"', "Georgia", "serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

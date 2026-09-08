@@ -6,14 +6,14 @@ import { cn } from '@/lib/utils';
  * vertical padding and the same container width, so cards in a row share
  * edges and the page reads as one system. Sections override only `tone`.
  *
- * Tones map to the landing palette: paper (white), mist (alternate), ink
+ * Tones map to the landing palette: paper (white), cream (thermal paper), ink
  * (navy ground for the hero, final CTA and footer).
  */
-type Tone = 'paper' | 'mist' | 'ink';
+type Tone = 'paper' | 'cream' | 'ink';
 
 const toneClass: Record<Tone, string> = {
   paper: 'bg-[--paper] text-[--text-1]',
-  mist: 'bg-[--mist] text-[--text-1]',
+  cream: 'bg-[--cream] text-[--text-1]',
   ink: 'on-ink bg-[--ink] text-white',
 };
 

@@ -9,7 +9,7 @@ import { LandingSection, SectionHeading } from '@/components/landing/LandingSect
  * Vignettes are decorative and hidden from assistive tech.
  */
 
-const vignetteFrame = 'qf-vignette pointer-events-none select-none rounded-xl border border-[--hairline] bg-[--mist] p-4';
+const vignetteFrame = 'qf-vignette pointer-events-none select-none rounded-xl border border-[--hairline] bg-[--cream] p-4';
 
 const TrackerVignette: React.FC = () => {
   const { t } = useTranslation();
@@ -179,7 +179,7 @@ const SignageVignette: React.FC = () => {
         <span>{t('public.board.nowServing')}</span>
       </div>
       <div className="mt-2 flex items-end justify-between">
-        <span className="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-[--amber]">A-042</span>
+        <span className="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-[--led]">A-042</span>
         <span className="text-[12px] text-[--on-ink-2]">{t('public.board.counter', { number: 3 })}</span>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-1.5">
@@ -207,7 +207,7 @@ const CapabilitiesBento: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <LandingSection id="capabilities" tone="mist" labelledBy="landing-capabilities-title">
+    <LandingSection id="capabilities" tone="cream" labelledBy="landing-capabilities-title">
       <SectionHeading
         id="landing-capabilities-title"
         eyebrow={t('public.capabilities.eyebrow')}

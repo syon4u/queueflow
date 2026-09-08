@@ -75,7 +75,7 @@ const LandingNav: React.FC = () => {
 
         <button
           type="button"
-          className="inline-flex size-11 items-center justify-center rounded-lg text-[--text-1] hover:bg-[--mist] lg:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-lg text-[--text-1] hover:bg-[--cream] lg:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? t('public.nav.closeMenu') : t('public.nav.openMenu')}
           aria-expanded={open}
@@ -96,7 +96,7 @@ const LandingNav: React.FC = () => {
               key={id}
               href={`#${id}`}
               onClick={(e) => jump(e, id)}
-              className="inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-[--text-1] hover:bg-[--mist]"
+              className="inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-[--text-1] hover:bg-[--cream]"
             >
               {t(`public.nav.${key}`)}
             </a>
@@ -107,7 +107,7 @@ const LandingNav: React.FC = () => {
             </div>
             <Link
               to="/auth"
-              className="inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-[--text-1] hover:bg-[--mist]"
+              className="inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-[--text-1] hover:bg-[--cream]"
               onClick={() => setOpen(false)}
             >
               {t('public.nav.signIn')}
