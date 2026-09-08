@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Home, ArrowLeft } from 'lucide-react';
 import type { KioskStep } from '@/pages/KioskPage';
@@ -10,13 +11,14 @@ interface KioskHeaderProps {
 }
 
 export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOver }) => {
+  const { t } = useTranslation();
   const getStepTitle = (step: KioskStep) => {
     switch (step) {
-      case 'location': return 'Select Location';
-      case 'service': return 'Choose Service';
-      case 'customer': return 'Enter Information';
-      case 'ticket': return 'Your Ticket';
-      default: return 'QueueFlow Kiosk';
+      case 'location': return t('public.kiosk.steps.location');
+      case 'service': return t('public.kiosk.steps.service');
+      case 'customer': return t('public.kiosk.steps.customer');
+      case 'ticket': return t('public.kiosk.steps.ticket');
+      default: return t('public.kiosk.title');
     }
   };
 
@@ -39,8 +41,8 @@ export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOv
               <span className="text-white font-bold text-2xl">Q</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-1">QueueFlow Kiosk</h1>
-              <p className="text-lg text-blue-600 font-medium">Self-Service Check-in</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1">{t('public.kiosk.title')}</h1>
+              <p className="text-lg text-blue-600 font-medium">{t('public.kiosk.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -51,17 +53,17 @@ export const KioskHeader: React.FC<KioskHeaderProps> = ({ currentStep, onStartOv
           className="flex items-center gap-3 text-xl px-8 py-4 border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
         >
           <Home className="h-6 w-6" />
-          Start Over
+          {t('public.kiosk.startOver')}
         </Button>
       </div>
       
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">
-            Step {getStepNumber(currentStep)}: {getStepTitle(currentStep)}
+            {t('public.kiosk.stepLabel', { number: getStepNumber(currentStep), title: getStepTitle(currentStep) })}
           </h2>
           <div className="text-lg text-gray-500 font-medium">
-            {getStepNumber(currentStep)} of 4
+            {t('public.kiosk.stepOf', { current: getStepNumber(currentStep), total: 4 })}
           </div>
         </div>
         

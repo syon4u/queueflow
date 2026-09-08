@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -33,6 +34,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
   });
   const [pushSupported, setPushSupported] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check if push notifications are supported
@@ -48,8 +50,8 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
   const requestPushPermission = async () => {
     if (!pushSupported) {
       toast({
-        title: 'Not Supported',
-        description: 'Push notifications are not supported on this device.',
+        title: t('public.mobileQueue.notifications.notSupported'),
+        description: t('public.mobileQueue.notifications.notSupportedDescription'),
         variant: 'destructive',
       });
       return;
@@ -60,21 +62,21 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
       if (permission === 'granted') {
         handlePreferenceChange('push', true);
         toast({
-          title: 'Notifications Enabled',
-          description: 'You\'ll receive push notifications for queue updates.',
+          title: t('public.mobileQueue.notifications.enabled'),
+          description: t('public.mobileQueue.notifications.enabledDescription'),
         });
       } else {
         toast({
-          title: 'Permission Denied',
-          description: 'Push notifications were not enabled.',
+          title: t('public.mobileQueue.notifications.denied'),
+          description: t('public.mobileQueue.notifications.deniedDescription'),
           variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Error requesting notification permission:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to enable push notifications.',
+        title: t('common.error'),
+        description: t('public.mobileQueue.notifications.enableFailed'),
         variant: 'destructive',
       });
     }
@@ -86,19 +88,19 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            Notification Preferences
+            {t('public.mobileQueue.notifications.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Notification Methods */}
           <div className="space-y-4">
-            <h4 className="font-medium text-gray-900">Notification Methods</h4>
+            <h4 className="font-medium text-gray-900">{t('public.mobileQueue.notifications.methods')}</h4>
             
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Smartphone className="h-4 w-4 text-gray-600" />
                 <Label htmlFor="push-notifications" className="text-sm">
-                  Push Notifications
+                  {t('public.mobileQueue.notifications.push')}
                 </Label>
               </div>
               <div className="flex items-center gap-2">
@@ -108,7 +110,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
                     size="sm"
                     onClick={requestPushPermission}
                   >
-                    Enable
+                    {t('public.mobileQueue.notifications.enable')}
                   </Button>
                 )}
                 <Switch
@@ -124,7 +126,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-4 w-4 text-gray-600" />
                 <Label htmlFor="sms-notifications" className="text-sm">
-                  SMS Notifications
+                  {t('public.mobileQueue.notifications.sms')}
                 </Label>
               </div>
               <Switch
@@ -138,7 +140,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-gray-600" />
                 <Label htmlFor="email-notifications" className="text-sm">
-                  Email Notifications
+                  {t('public.mobileQueue.notifications.email')}
                 </Label>
               </div>
               <Switch
@@ -151,11 +153,11 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
 
           {/* Notification Types */}
           <div className="space-y-4 border-t pt-4">
-            <h4 className="font-medium text-gray-900">What to notify me about</h4>
+            <h4 className="font-medium text-gray-900">{t('public.mobileQueue.notifications.types')}</h4>
             
             <div className="flex items-center justify-between">
               <Label htmlFor="position-updates" className="text-sm">
-                Position changes in queue
+                {t('public.mobileQueue.notifications.positionChanges')}
               </Label>
               <Switch
                 id="position-updates"
@@ -166,7 +168,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
 
             <div className="flex items-center justify-between">
               <Label htmlFor="status-changes" className="text-sm">
-                When I'm being called
+                {t('public.mobileQueue.notifications.beingCalled')}
               </Label>
               <Switch
                 id="status-changes"
@@ -177,7 +179,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
 
             <div className="flex items-center justify-between">
               <Label htmlFor="reminder-before-call" className="text-sm">
-                Reminder 5 minutes before my turn
+                {t('public.mobileQueue.notifications.reminder')}
               </Label>
               <Switch
                 id="reminder-before-call"
@@ -190,7 +192,7 @@ export const MobileQueueNotifications: React.FC<MobileQueueNotificationsProps> =
           {!pushSupported && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
               <p className="text-sm text-yellow-800">
-                Push notifications are not supported on this device. You can still receive SMS and email notifications.
+                {t('public.mobileQueue.notifications.unsupported')}
               </p>
             </div>
           )}
