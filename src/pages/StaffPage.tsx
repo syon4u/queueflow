@@ -12,7 +12,10 @@ import { useAppData } from '@/hooks/useAppData';
 
 const StaffPageContent = () => {
   const { user, role } = useAuth();
-  const { appointments, refetch: refreshAppointments, isLoading } = useAppData();
+  // Only the small public lists gate first paint. The Appointments and
+  // Customer Search sections fetch the appointments table themselves when
+  // they mount; `refetch` still invalidates whichever lists are on screen.
+  const { refetch: refreshAppointments, isLoading } = useAppData({ appointments: false });
   const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState('basic-queue');
   const [showShortcutsDialog, setShowShortcutsDialog] = useState(false);
@@ -20,13 +23,6 @@ const StaffPageContent = () => {
   // Enable staff notifications
   useStaffNotifications();
 
-  // Filter to only show active appointments (not completed or cancelled)
-  const activeAppointments = appointments.filter(
-    (appointment) => !['completed', 'cancelled', 'no_show'].includes(appointment.status)
-  );
-
-  console.log('StaffPage - activeAppointments count:', activeAppointments.length);
-  
   const handleStatusChange = () => {
     console.log('StaffPage - handleStatusChange called');
     refreshAppointments();
@@ -67,7 +63,6 @@ const StaffPageContent = () => {
         <SidebarInset className="flex-1">
           <StaffMainContent
             activeSection={activeSection}
-            activeAppointments={activeAppointments}
             onRefresh={handleRefresh}
             onNotificationClick={handleNotificationClick}
             onSettingsClick={handleSettingsClick}

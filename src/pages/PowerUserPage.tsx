@@ -6,7 +6,8 @@ import { PowerUserSidebar } from '@/components/layout/PowerUserSidebar';
 import { useAppData } from '@/hooks/useAppData';
 
 const PowerUserPage = () => {
-  const { isLoading } = useAppData();
+  // Warm the small public lists; tabs that need the appointments table fetch it on mount.
+  const { isLoading } = useAppData({ appointments: false });
   const [activeSection, setActiveSection] = useState('dashboard');
 
   // Sync sidebar navigation with dashboard tabs
