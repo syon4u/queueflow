@@ -218,7 +218,7 @@ export const CommunicationTemplatesTab: React.FC = () => {
 
   const availableVariables = getAvailableVariables();
 
-  const columns: Column[] = [
+  const columns: Column<CommunicationTemplate>[] = [
     {
       key: 'name',
       header: 'Name',

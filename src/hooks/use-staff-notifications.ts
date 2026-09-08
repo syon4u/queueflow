@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+import type { Json } from '@/integrations/supabase/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +11,7 @@ interface StaffNotification {
   type: string;
   title: string;
   message: string;
-  data: any;
+  data: Json | null;
   read: boolean;
   created_at: string;
   expires_at: string;

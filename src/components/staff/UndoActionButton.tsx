@@ -3,10 +3,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Undo2 } from 'lucide-react';
 import { useStaffActions } from '@/hooks/use-staff-actions';
+import type { Database } from '@/integrations/supabase/types';
+
+type StaffActionRow = Database['public']['Tables']['staff_actions']['Row'];
 
 export const UndoActionButton: React.FC = () => {
   const { getRecentActions, undoAction, isLoading } = useStaffActions();
-  const [recentActions, setRecentActions] = useState<any[]>([]);
+  const [recentActions, setRecentActions] = useState<StaffActionRow[]>([]);
 
   const fetchRecentActions = useCallback(async () => {
     // getRecentActions already filters to can_undo = true and undone_at is null.
@@ -34,7 +37,7 @@ export const UndoActionButton: React.FC = () => {
     return null;
   }
 
-  const getActionDescription = (action: any) => {
+  const getActionDescription = (action: StaffActionRow) => {
     switch (action.action_type) {
       case 'call_customer':
         return 'Called customer';

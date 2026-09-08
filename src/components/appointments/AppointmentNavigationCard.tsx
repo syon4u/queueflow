@@ -19,7 +19,7 @@ const AppointmentNavigationCard: React.FC<AppointmentNavigationCardProps> = ({
   isSubmitting
 }) => {
   return (
-    <Card className="bg-white/95 backdrop-blur-sm border-broward-teal/20 shadow-lg">
+    <Card className="bg-white/95 backdrop-blur-sm border-brand-teal/20 shadow-lg">
       <CardContent className="p-6">
         <AppointmentFormNavigation 
           currentStep={currentStep}

@@ -1,10 +1,10 @@
 import React from 'react';
-import BrowardHeader from '@/components/layout/BrowardHeader';
-import BrowardHero from '@/components/layout/BrowardHero';
-import BrowardFooter from '@/components/layout/BrowardFooter';
-import BrowardButton from '@/components/ui/broward-button';
-import BrowardCard from '@/components/ui/broward-card';
-import BrowardInput from '@/components/ui/broward-input';
+import SiteHeader from '@/components/layout/SiteHeader';
+import SiteHero from '@/components/layout/SiteHero';
+import SiteFooter from '@/components/layout/SiteFooter';
+import BrandButton from '@/components/ui/brand-button';
+import BrandCard from '@/components/ui/brand-card';
+import BrandInput from '@/components/ui/brand-input';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { 
   ShieldIcon, 
@@ -15,15 +15,15 @@ import {
   LandmarkCourthouse,
   LandmarkBeach,
   LandmarkPort
-} from '@/components/ui/broward-icons';
+} from '@/components/ui/brand-icons';
 
-const BrowardDesignSystem: React.FC = () => {
+const DesignSystemPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
-      <BrowardHeader />
+      <SiteHeader />
       
-      <BrowardHero 
-        title="Broward County Design System" 
+      <SiteHero 
+        title="QueueFlow Design System" 
         subtitle="A comprehensive design system for the Consumer Protection Division"
       />
       
@@ -166,27 +166,27 @@ const BrowardDesignSystem: React.FC = () => {
             <div className="space-y-4 bg-white dark:bg-neutral-100 p-6 rounded-lg shadow-md">
               <h3 className="font-serif text-xl mb-4">Primary</h3>
               <div className="space-y-4">
-                <BrowardButton variant="primary" size="lg">Large Button</BrowardButton>
-                <BrowardButton variant="primary" size="md">Medium Button</BrowardButton>
-                <BrowardButton variant="primary" size="sm">Small Button</BrowardButton>
+                <BrandButton variant="primary" size="lg">Large Button</BrandButton>
+                <BrandButton variant="primary" size="md">Medium Button</BrandButton>
+                <BrandButton variant="primary" size="sm">Small Button</BrandButton>
               </div>
             </div>
             
             <div className="space-y-4 bg-white dark:bg-neutral-100 p-6 rounded-lg shadow-md">
               <h3 className="font-serif text-xl mb-4">Secondary</h3>
               <div className="space-y-4">
-                <BrowardButton variant="secondary" size="lg">Large Button</BrowardButton>
-                <BrowardButton variant="secondary" size="md">Medium Button</BrowardButton>
-                <BrowardButton variant="secondary" size="sm">Small Button</BrowardButton>
+                <BrandButton variant="secondary" size="lg">Large Button</BrandButton>
+                <BrandButton variant="secondary" size="md">Medium Button</BrandButton>
+                <BrandButton variant="secondary" size="sm">Small Button</BrandButton>
               </div>
             </div>
             
             <div className="space-y-4 bg-white dark:bg-neutral-100 p-6 rounded-lg shadow-md">
               <h3 className="font-serif text-xl mb-4">Outline</h3>
               <div className="space-y-4">
-                <BrowardButton variant="outline" size="lg">Large Button</BrowardButton>
-                <BrowardButton variant="outline" size="md">Medium Button</BrowardButton>
-                <BrowardButton variant="outline" size="sm">Small Button</BrowardButton>
+                <BrandButton variant="outline" size="lg">Large Button</BrandButton>
+                <BrandButton variant="outline" size="md">Medium Button</BrandButton>
+                <BrandButton variant="outline" size="sm">Small Button</BrandButton>
               </div>
             </div>
           </div>
@@ -199,27 +199,27 @@ const BrowardDesignSystem: React.FC = () => {
             <div className="space-y-6 bg-white dark:bg-neutral-100 p-6 rounded-lg shadow-md">
               <h3 className="font-serif text-xl mb-4">Floating Labels</h3>
               
-              <BrowardInput 
+              <BrandInput 
                 label="Full Name" 
                 floating={true} 
                 placeholder="Enter your full name"
               />
               
-              <BrowardInput 
+              <BrandInput 
                 label="Email Address" 
                 type="email" 
                 floating={true} 
                 placeholder="Enter your email address"
               />
               
-              <BrowardInput 
+              <BrandInput 
                 label="Password" 
                 type="password" 
                 floating={true} 
                 placeholder="Enter your password"
               />
               
-              <BrowardInput 
+              <BrandInput 
                 label="Phone Number" 
                 type="tel" 
                 floating={true} 
@@ -231,27 +231,27 @@ const BrowardDesignSystem: React.FC = () => {
             <div className="space-y-6 bg-white dark:bg-neutral-100 p-6 rounded-lg shadow-md">
               <h3 className="font-serif text-xl mb-4">Standard Labels</h3>
               
-              <BrowardInput 
+              <BrandInput 
                 label="Full Name" 
                 floating={false} 
                 placeholder="Enter your full name"
               />
               
-              <BrowardInput 
+              <BrandInput 
                 label="Email Address" 
                 type="email" 
                 floating={false} 
                 placeholder="Enter your email address"
               />
               
-              <BrowardInput 
+              <BrandInput 
                 label="Password" 
                 type="password" 
                 floating={false} 
                 placeholder="Enter your password"
               />
               
-              <BrowardInput 
+              <BrandInput 
                 label="Phone Number" 
                 type="tel" 
                 floating={false} 
@@ -266,31 +266,31 @@ const BrowardDesignSystem: React.FC = () => {
           <h2 className="font-serif text-2xl mb-6 text-bc-navy dark:text-bc-blue">Cards</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <BrowardCard 
+            <BrandCard 
               title="Standard Card" 
               subtitle="With title and subtitle"
               elevation="sm"
             >
               <p className="mb-4">This is a standard card with a title and subtitle. It has minimal elevation.</p>
-              <BrowardButton variant="primary">Learn More</BrowardButton>
-            </BrowardCard>
+              <BrandButton variant="primary">Learn More</BrandButton>
+            </BrandCard>
             
-            <BrowardCard elevation="md">
+            <BrandCard elevation="md">
               <p className="mb-4">This card has no title or subtitle, but includes content and a medium elevation.</p>
               <p className="mb-4">Cards are versatile containers that can hold various types of content.</p>
-              <BrowardButton variant="secondary">View Details</BrowardButton>
-            </BrowardCard>
+              <BrandButton variant="secondary">View Details</BrandButton>
+            </BrandCard>
             
-            <BrowardCard 
+            <BrandCard 
               title="Featured Card" 
               elevation="lg"
               className="bg-gradient-to-br from-bc-blue-60 to-bc-teal-70 text-white"
             >
               <p className="mb-4">This is a featured card with a gradient background and high elevation.</p>
-              <BrowardButton variant="outline" className="bg-white text-bc-blue border-white hover:bg-bc-blue hover:text-white">
+              <BrandButton variant="outline" className="bg-white text-bc-blue border-white hover:bg-bc-blue hover:text-white">
                 Get Started
-              </BrowardButton>
-            </BrowardCard>
+              </BrandButton>
+            </BrandCard>
           </div>
         </section>
         
@@ -338,7 +338,7 @@ const BrowardDesignSystem: React.FC = () => {
           </div>
           
           <div className="bg-white dark:bg-neutral-100 p-6 rounded-lg shadow-md">
-            <h3 className="font-serif text-xl mb-4">Broward County Landmarks</h3>
+            <h3 className="font-serif text-xl mb-4">County Landmarks</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex flex-col items-center">
@@ -385,9 +385,9 @@ const BrowardDesignSystem: React.FC = () => {
         </section>
       </main>
       
-      <BrowardFooter />
+      <SiteFooter />
     </div>
   );
 }
 
-export default BrowardDesignSystem;
+export default DesignSystemPage;

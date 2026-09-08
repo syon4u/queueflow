@@ -24,10 +24,10 @@ const AppointmentProgressCard: React.FC<AppointmentProgressCardProps> = ({ curre
 
   return (
     <div className="mb-6">
-      <Card className="bg-white/95 backdrop-blur-sm border-broward-teal/20 shadow-lg">
+      <Card className="bg-white/95 backdrop-blur-sm border-brand-teal/20 shadow-lg">
         <CardContent className="p-4">
           <div className="text-center mb-2">
-            <span className="text-sm font-medium text-broward-navy/70">
+            <span className="text-sm font-medium text-brand-navy/70">
               Step {currentStep} of 4
             </span>
           </div>

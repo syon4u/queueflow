@@ -6,18 +6,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+export interface StaffFormData {
+  id?: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  role: 'admin' | 'staff' | 'customer';
+  email: string;
+}
+
 interface StaffFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  formData: {
-    id?: string;
-    first_name: string;
-    last_name: string;
-    phone: string;
-    role: 'admin' | 'staff' | 'customer';
-    email: string;
-  };
-  onFormDataChange: (data: any) => void;
+  formData: StaffFormData;
+  onFormDataChange: (data: StaffFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   isEditing: boolean;
   locations: Array<{ id: string; name: string }> | null;
@@ -86,7 +88,7 @@ export const StaffFormDialog: React.FC<StaffFormDialogProps> = ({
             <Label htmlFor="role">Role</Label>
             <Select
               value={formData.role}
-              onValueChange={(value) => onFormDataChange({ ...formData, role: value })}
+              onValueChange={(value) => onFormDataChange({ ...formData, role: value as StaffFormData['role'] })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select role" />

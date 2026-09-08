@@ -114,9 +114,9 @@ export const VoiceNotificationSystem: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select Appointment</label>
+              <label htmlFor="voice-appointment" className="text-sm font-medium">Select Appointment</label>
               <Select value={selectedAppointment} onValueChange={setSelectedAppointment}>
-                <SelectTrigger>
+                <SelectTrigger id="voice-appointment">
                   <SelectValue placeholder="Choose an appointment with phone number" />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,9 +130,9 @@ export const VoiceNotificationSystem: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Voice</label>
+              <label htmlFor="voice-voice" className="text-sm font-medium">Voice</label>
               <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                <SelectTrigger>
+                <SelectTrigger id="voice-voice">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -146,9 +146,9 @@ export const VoiceNotificationSystem: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Max Retries</label>
+              <label htmlFor="voice-max-retries" className="text-sm font-medium">Max Retries</label>
               <Select value={maxRetries.toString()} onValueChange={(value) => setMaxRetries(parseInt(value))}>
-                <SelectTrigger>
+                <SelectTrigger id="voice-max-retries">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -161,8 +161,9 @@ export const VoiceNotificationSystem: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Message</label>
+              <label htmlFor="voice-message" className="text-sm font-medium">Message</label>
               <Textarea
+                id="voice-message"
                 placeholder="Enter the message to be spoken during the call..."
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}

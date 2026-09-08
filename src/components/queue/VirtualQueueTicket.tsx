@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { QrCode, MapPin, Clock, Users, Phone, CheckCircle } from 'lucide-react';
 import QRCode from 'qrcode';
 
-interface TicketData {
+export interface TicketData {
   id: string;
+  confirmationCode?: string | null;
   ticketId: string;
   qrCode: string;
   position: number;

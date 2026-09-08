@@ -40,7 +40,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
           description: 'Check your email for password reset instructions.',
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred. Please try again.',

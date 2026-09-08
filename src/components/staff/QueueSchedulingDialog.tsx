@@ -107,7 +107,7 @@ const QueueSchedulingDialog: React.FC<QueueSchedulingDialogProps> = ({
       // Insert into database - Using a raw query since we can't use the typed client yet
       const { error } = await supabase
         .from('queue_schedule')
-        .insert(formattedEvent as any); // Type assertion needed until Supabase types are updated
+        .insert(formattedEvent);
 
       if (error) throw error;
 

@@ -8,7 +8,7 @@ export function useDemandPredictions() {
     queryKey: ['demand-predictions'],
     queryFn: async (): Promise<DemandPrediction[]> => {
       const { data, error } = await supabase
-        .from('demand_predictions' as any)
+        .from('demand_predictions')
         .select('*')
         .gte('prediction_date', new Date().toISOString().split('T')[0])
         .order('prediction_date', { ascending: true })
@@ -26,7 +26,7 @@ export function useDemandPatterns() {
     queryKey: ['demand-patterns'],
     queryFn: async (): Promise<DemandPattern[]> => {
       const { data, error } = await supabase
-        .from('demand_patterns' as any)
+        .from('demand_patterns')
         .select('*')
         .order('last_calculated', { ascending: false });
 
@@ -41,7 +41,7 @@ export function useSchedulingRecommendations() {
     queryKey: ['scheduling-recommendations'],
     queryFn: async (): Promise<SchedulingRecommendation[]> => {
       const { data, error } = await supabase
-        .from('scheduling_recommendations' as any)
+        .from('scheduling_recommendations')
         .select('*')
         .gte('recommendation_date', new Date().toISOString().split('T')[0])
         .order('recommendation_date', { ascending: true })
@@ -58,7 +58,7 @@ export function usePredictionAccuracy() {
     queryKey: ['prediction-accuracy'],
     queryFn: async (): Promise<PredictionAccuracy[]> => {
       const { data, error } = await supabase
-        .from('prediction_accuracy' as any)
+        .from('prediction_accuracy')
         .select('*')
         .order('prediction_date', { ascending: false })
         .limit(30);

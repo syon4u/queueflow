@@ -2,22 +2,23 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { DataTable } from '../DataTable';
-import { StaffFormDialog } from '../staff/StaffFormDialog';
+import { DataTable, type Column } from '../DataTable';
+import { StaffFormDialog, type StaffFormData } from '../staff/StaffFormDialog';
+import type { Profile } from '@/hooks/admin/use-profile-management';
 
 interface StaffManagementSectionProps {
-  staffMembers: any[];
-  staffColumns: any[];
+  staffMembers: Profile[] | undefined;
+  staffColumns: Column<Profile>[];
   staffLoading: boolean;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: StaffFormData;
+  setFormData: (data: StaffFormData) => void;
   isEditing: boolean;
-  locations: any[];
+  locations: Array<{ id: string; name: string }> | null | undefined;
   handleAddClick: () => void;
-  handleEditClick: (staff: any) => void;
-  handleDeleteClick: (staff: any) => void;
+  handleEditClick: (staff: Profile) => void;
+  handleDeleteClick: (staff: Profile) => void;
   handleSubmit: () => void;
 }
 

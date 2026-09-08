@@ -112,10 +112,10 @@ export const generateSecurityHeaders = (): Record<string, string> => {
   };
 };
 
-export const maskSensitiveData = (data: any): any => {
+export const maskSensitiveData = (data: unknown): unknown => {
   if (typeof data !== 'object' || data === null) return data;
   
-  const masked = { ...data };
+  const masked: Record<string, unknown> = { ...(data as Record<string, unknown>) };
   const sensitiveFields = ['password', 'token', 'secret', 'key', 'credential'];
   
   for (const [key, value] of Object.entries(masked)) {

@@ -1,14 +1,14 @@
 import React from 'react';
-import { ShieldCheckmarkAnimation } from '@/components/ui/broward-icons';
+import { ShieldCheckmarkAnimation } from '@/components/ui/brand-icons';
 
-interface BrowardHeroProps {
+interface SiteHeroProps {
   title: string;
   subtitle?: string;
   showAnimation?: boolean;
   backgroundStyle?: 'gradient' | 'pattern' | 'wave';
 }
 
-const BrowardHero: React.FC<BrowardHeroProps> = ({
+const SiteHero: React.FC<SiteHeroProps> = ({
   title,
   subtitle,
   showAnimation = true,
@@ -50,4 +50,4 @@ const BrowardHero: React.FC<BrowardHeroProps> = ({
   );
 };
 
-export default BrowardHero;
+export default SiteHero;

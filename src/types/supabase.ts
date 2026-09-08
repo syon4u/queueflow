@@ -1,4 +1,5 @@
 
+import type { Json } from '@/integrations/supabase/types';
 // Manual Supabase type definitions to resolve TS2589 errors
 export interface LocationRow {
   id: string;
@@ -11,7 +12,7 @@ export interface LocationRow {
   queue_status?: string;
   phone?: string;
   email?: string;
-  operating_hours?: Record<string, any>;
+  operating_hours?: Json | null;
   created_at?: string;
   updated_at?: string;
 }

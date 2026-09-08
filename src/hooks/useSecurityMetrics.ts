@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import type { Json } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
 import { SecurityMetrics } from '@/types/security';
 
@@ -9,7 +10,7 @@ interface SecurityAuditLogRecord {
   event_type: string;
   client_identifier: string;
   success: boolean;
-  details: any;
+  details: Json | null;
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;

@@ -81,7 +81,7 @@ const OperationalMetrics: React.FC<OperationalMetricsProps> = ({ data, dailyData
     }
     
     return acc;
-  }, [] as any[]) || [];
+  }, [] as Array<{ location: string; appointments: number; completed: number; avgWaitTime: number; efficiency: number }>) || [];
 
   const getEfficiencyColor = (score: number) => {
     if (score >= 90) return 'text-green-600 bg-green-100';
@@ -118,6 +118,7 @@ const OperationalMetrics: React.FC<OperationalMetricsProps> = ({ data, dailyData
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <Clock className="h-8 w-8 text-yellow-500" />
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- 'green'|'yellow'|'orange'|'red' are not Badge variants; the invalid value currently renders the un-variant base style and correcting it is a visual change, tracked in the lint report */}
               <Badge variant={getWaitTimeStatus(averageWaitTime).color as any}>
                 {getWaitTimeStatus(averageWaitTime).label}
               </Badge>

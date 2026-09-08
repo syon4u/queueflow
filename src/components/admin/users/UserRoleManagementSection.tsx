@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Shield, Plus } from 'lucide-react';
 import { UsersTable } from './UsersTable';
 import { UserSearchBox } from './UserSearchBox';
+import type { UserData } from '@/hooks/admin/use-user-management';
 
 interface UserRoleManagementSectionProps {
-  users: any[];
+  users: UserData[];
   usersLoading: boolean;
   searchQuery: string;
   setSearchQuery: (query: string) => void;

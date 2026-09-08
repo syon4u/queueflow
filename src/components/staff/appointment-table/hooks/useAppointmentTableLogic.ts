@@ -2,7 +2,8 @@
 import React, { useState, useMemo } from 'react';
 import { useAppData } from '@/hooks/useAppData';
 import { useAppointmentActions } from '@/hooks/use-appointment-actions';
-import type { Appointment } from '@/hooks/use-appointments';
+import type { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
+import type { AppointmentFilterOptions } from '@/components/staff/AppointmentFilters';
 
 export const useAppointmentTableLogic = () => {
   const { appointments, isLoading, refetch } = useAppData();
@@ -12,7 +13,7 @@ export const useAppointmentTableLogic = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<AppointmentFilterOptions>({});
 
   // Apply filters to appointments
   const filteredAppointments = useMemo(() => {
@@ -52,7 +53,7 @@ export const useAppointmentTableLogic = () => {
     };
 
     appointments.forEach(apt => {
-      if (counts.hasOwnProperty(apt.status)) {
+      if (Object.prototype.hasOwnProperty.call(counts, apt.status)) {
         counts[apt.status as keyof typeof counts]++;
       }
     });
@@ -71,7 +72,7 @@ export const useAppointmentTableLogic = () => {
       return;
     }
     
-    const statusMap: Record<string, string> = {
+    const statusMap: Record<string, AppointmentStatus> = {
       check_in: 'checked_in',
       start: 'in_progress',
       pause: 'checked_in',
@@ -80,11 +81,11 @@ export const useAppointmentTableLogic = () => {
     };
     
     if (statusMap[action]) {
-      updateAppointmentStatus(appointmentId, statusMap[action] as any);
+      updateAppointmentStatus(appointmentId, statusMap[action]);
     }
   };
 
-  const handleFiltersChange = (newFilters: any) => {
+  const handleFiltersChange = (newFilters: AppointmentFilterOptions) => {
     setFilters(newFilters);
   };
 

@@ -7,7 +7,16 @@ import tseslint from "typescript-eslint";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  {
+    ignores: [
+      "dist",
+      // Deno edge functions: URL imports and Deno globals, not the browser
+      // Vite app this config describes. They carry 34 no-explicit-any/
+      // no-case-declarations findings that are out of scope for the web
+      // lint gate; lint them with `deno lint` from supabase/ instead.
+      "supabase/functions",
+    ],
+  },
   {
     extends: [
       js.configs.recommended, 

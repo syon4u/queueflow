@@ -61,7 +61,7 @@ export const ChangePasswordForm = () => {
         setNewPassword('');
         setConfirmPassword('');
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred. Please try again.',

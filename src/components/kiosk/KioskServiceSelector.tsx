@@ -87,7 +87,15 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
               <div
                 key={service.id}
                 className={`relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer bg-gradient-to-br ${serviceColors[index % serviceColors.length]}`}
+                role="button"
+                tabIndex={0}
                 onClick={() => onServiceSelect(service.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onServiceSelect(service.id);
+                  }
+                }}
               >
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
                 <div className="relative p-8 text-white min-h-[280px] flex flex-col">

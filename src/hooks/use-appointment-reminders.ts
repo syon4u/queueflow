@@ -224,7 +224,7 @@ export function useAppointmentReminders() {
 
   // Calculate reminder schedule
   const getReminderSchedule = (appointmentTime: Date, timing: string) => {
-    const schedules: Record<string, any> = {};
+    const schedules: Record<string, Date> = {};
 
     switch (timing) {
       case '24h':

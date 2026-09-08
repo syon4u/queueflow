@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { getErrorMessage } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateAppointmentTime } from '@/utils/businessHours';
@@ -153,11 +154,11 @@ export const useEnhancedAppointmentForm = () => {
 
       return confirmationCode;
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating appointment:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to schedule appointment. Please try again.',
+        description: getErrorMessage(error) || 'Failed to schedule appointment. Please try again.',
         variant: 'destructive',
       });
       return null;

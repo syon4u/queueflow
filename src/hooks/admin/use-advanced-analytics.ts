@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
+import { getStringProp } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AdvancedAnalyticsData {
@@ -84,8 +85,8 @@ export function useAdvancedAnalytics(
       // Process the data to match expected format
       const processedData = data?.reduce((acc, appointment) => {
         const date = appointment.scheduled_time.split('T')[0];
-        const locationName = (appointment.locations as any)?.name || 'Unknown';
-        const serviceName = (appointment.services as any)?.name || 'Unknown';
+        const locationName = getStringProp(appointment.locations, 'name') || 'Unknown';
+        const serviceName = getStringProp(appointment.services, 'name') || 'Unknown';
         
         const existing = acc.find(item => 
           item.date === date && 
@@ -116,7 +117,7 @@ export function useAdvancedAnalytics(
           });
         }
         return acc;
-      }, [] as any[]) || [];
+      }, [] as AdvancedAnalyticsData['daily_data']) || [];
 
       const totalAppointments = processedData.reduce((sum, item) => sum + item.total_appointments, 0);
       const totalCompleted = processedData.reduce((sum, item) => sum + item.completed, 0);

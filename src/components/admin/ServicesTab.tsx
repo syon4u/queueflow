@@ -151,7 +151,7 @@ export const ServicesTab: React.FC = () => {
     }
   });
 
-  const columns: Column[] = [
+  const columns: Column<Service & { locations?: { name: string } | null }>[] = [
     { key: 'name', header: 'Name' },
     { 
       key: 'location_id', 

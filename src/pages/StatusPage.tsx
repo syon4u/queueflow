@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,17 @@ const StatusPage: React.FC = () => {
   const [confirmationNumber, setConfirmationNumber] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const confirmationInputRef = useRef<HTMLInputElement>(null);
+  const lastNameInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus the first field of the active lookup method (replaces autoFocus).
+  useEffect(() => {
+    if (lookupMethod === 'confirmation') {
+      confirmationInputRef.current?.focus();
+    } else {
+      lastNameInputRef.current?.focus();
+    }
+  }, [lookupMethod]);
   const {
     data: statusData,
     isLoading,
@@ -133,11 +144,11 @@ const StatusPage: React.FC = () => {
                   </label>
                   <Input 
                     id="confirmation" 
+                    ref={confirmationInputRef}
                     type="text" 
                     placeholder={t('public.status.codePlaceholder')} 
                     value={confirmationNumber} 
                     onChange={(e) => setConfirmationNumber(e.target.value)} 
-                    autoFocus 
                     className="uppercase" 
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -152,11 +163,11 @@ const StatusPage: React.FC = () => {
                     </label>
                     <Input 
                       id="lastName" 
+                      ref={lastNameInputRef}
                       type="text" 
                       placeholder={t('public.status.lastNamePlaceholder')} 
                       value={lastName} 
                       onChange={(e) => setLastName(e.target.value)} 
-                      autoFocus 
                     />
                   </div>
                   <div>

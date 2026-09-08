@@ -83,11 +83,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 };
 
 // Higher-order component for role-based protection
-export const withRoleProtection = (
-  Component: React.ComponentType, 
+export const withRoleProtection = <P extends object>(
+  Component: React.ComponentType<P>, 
   requiredRole?: UserRoleType | UserRoleType[]
 ) => {
-  return (props: any) => (
+  return (props: P) => (
     <ProtectedRoute requiredRole={requiredRole}>
       <Component {...props} />
     </ProtectedRoute>

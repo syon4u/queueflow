@@ -69,8 +69,9 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Search</label>
+          <label htmlFor="comm-search" className="text-sm font-medium">Search</label>
           <Input
+            id="comm-search"
             placeholder="Search messages..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -78,9 +79,9 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Type</label>
+          <label htmlFor="comm-type-filter" className="text-sm font-medium">Type</label>
           <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger id="comm-type-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -92,9 +93,9 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Status</label>
+          <label htmlFor="comm-status-filter" className="text-sm font-medium">Status</label>
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger id="comm-status-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -108,9 +109,9 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Staff Member</label>
+          <label htmlFor="comm-staff-filter" className="text-sm font-medium">Staff Member</label>
           <Select value={staffFilter} onValueChange={onStaffFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger id="comm-staff-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -123,10 +124,10 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Date Range</label>
+          <label htmlFor="comm-date-range" className="text-sm font-medium">Date Range</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal">
+              <Button id="comm-date-range" variant="outline" className="w-full justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {dateRange.from ? (
                   dateRange.to ? (
@@ -157,7 +158,7 @@ export const EnhancedCommunicationFilters: React.FC<EnhancedCommunicationFilters
 
         {hasActiveFilters && (
           <div className="space-y-2">
-            <label className="text-sm font-medium">Active Filters</label>
+            <span className="text-sm font-medium">Active Filters</span>
             <div className="flex flex-wrap gap-2">
               {searchTerm && (
                 <Badge variant="secondary">

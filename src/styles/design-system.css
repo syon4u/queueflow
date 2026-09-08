@@ -1,10 +1,10 @@
-/* Broward County Consumer Protection Division Design System
+/* QueueFlow Design System
  * A comprehensive design system that embodies trust, authority, and innovation
  * while maintaining accessibility and responsiveness.
  */
 
 :root {
-  /* Primary Colors - Broward County Official Palette */
+  /* Primary Colors - Brand Palette */
   --bc-blue: #005A9C;
   --bc-navy: #003366;
   --bc-teal: #00859B;
@@ -408,7 +408,7 @@ p {
   transform: scale(1);
 }
 
-/* Broward County Landmark Illustrations */
+/* Landmark Illustrations */
 .landmark-illustration {
   height: 120px;
   width: 100%;

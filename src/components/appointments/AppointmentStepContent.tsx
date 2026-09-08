@@ -80,10 +80,10 @@ const AppointmentStepContent: React.FC<AppointmentStepContentProps> = ({
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h3 className="text-xl font-semibold text-broward-navy mb-2">
+        <h3 className="text-xl font-semibold text-brand-navy mb-2">
           {stepHeader.title}
         </h3>
-        <p className="text-broward-navy/70">
+        <p className="text-brand-navy/70">
           {stepHeader.description}
         </p>
       </div>

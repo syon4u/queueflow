@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { MobileQueueTracker } from '@/components/mobile/MobileQueueTracker';
-import { MobileQueueNotifications } from '@/components/mobile/MobileQueueNotifications';
+import { MobileQueueNotifications, type NotificationPreferences } from '@/components/mobile/MobileQueueNotifications';
 import { MobileQueueProgress } from '@/components/mobile/MobileQueueProgress';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,7 +53,7 @@ const MobileQueuePage = () => {
     console.log('Notifications toggled:', enabled);
   };
 
-  const handleNotificationPreferences = (preferences: any) => {
+  const handleNotificationPreferences = (preferences: NotificationPreferences) => {
     console.log('Notification preferences updated:', preferences);
     toast({
       title: t('public.mobileQueue.preferencesUpdated'),
