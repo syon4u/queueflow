@@ -9,7 +9,7 @@
  */
 import React from 'react';
 import * as m from 'motion/react-m';
-import type { Transition } from 'motion/react';
+import { useReducedMotion, type Transition } from 'motion/react';
 import { cn } from '@/lib/utils';
 
 interface BorderBeamProps {
@@ -42,38 +42,49 @@ export const BorderBeam: React.FC<BorderBeamProps> = ({
   reverse = false,
   initialOffset = 0,
   borderWidth = 1,
-}) => (
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute inset-0 rounded-[inherit] border-transparent"
-    style={{
-      borderWidth,
-      borderStyle: 'solid',
-      WebkitMaskImage: 'linear-gradient(transparent, transparent), linear-gradient(#000, #000)',
-      WebkitMaskClip: 'padding-box, border-box',
-      WebkitMaskComposite: 'xor',
-      maskImage: 'linear-gradient(transparent, transparent), linear-gradient(#000, #000)',
-      maskClip: 'padding-box, border-box',
-      maskComposite: 'exclude',
-    }}
-  >
-    <m.div
-      className={cn('absolute aspect-square', className)}
+}) => {
+  // offsetDistance is not a transform, so MotionConfig's reducedMotion="user"
+  // would let it loop; hold the beam still ourselves.
+  const reduced = useReducedMotion();
+  const beamStyle: React.CSSProperties = {
+    width: size,
+    offsetPath: `rect(0 auto auto 0 round ${size}px)`,
+    backgroundImage: `linear-gradient(to left, ${colorFrom}, ${colorTo}, transparent)`,
+    ...style,
+  };
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 rounded-[inherit] border-transparent"
       style={{
-        width: size,
-        offsetPath: `rect(0 auto auto 0 round ${size}px)`,
-        backgroundImage: `linear-gradient(to left, ${colorFrom}, ${colorTo}, transparent)`,
-        ...style,
+        borderWidth,
+        borderStyle: 'solid',
+        // Two opaque layers, padding-box XOR border-box = the 1 px ring.
+        WebkitMaskImage: 'linear-gradient(#000, #000), linear-gradient(#000, #000)',
+        WebkitMaskClip: 'padding-box, border-box',
+        WebkitMaskComposite: 'xor',
+        maskImage: 'linear-gradient(#000, #000), linear-gradient(#000, #000)',
+        maskClip: 'padding-box, border-box',
+        maskComposite: 'exclude',
       }}
-      initial={{ offsetDistance: `${initialOffset}%` }}
-      animate={{
-        offsetDistance: reverse
-          ? [`${100 - initialOffset}%`, `${-initialOffset}%`]
-          : [`${initialOffset}%`, `${100 + initialOffset}%`],
-      }}
-      transition={{ repeat: Infinity, ease: 'linear', duration, delay: -delay, ...transition }}
-    />
-  </div>
-);
+    >
+      {reduced ? (
+        <div className={cn('absolute aspect-square', className)} style={{ ...beamStyle, offsetDistance: `${initialOffset}%` }} />
+      ) : (
+        <m.div
+          className={cn('absolute aspect-square', className)}
+          style={beamStyle}
+          initial={{ offsetDistance: `${initialOffset}%` }}
+          animate={{
+            offsetDistance: reverse
+              ? [`${100 - initialOffset}%`, `${-initialOffset}%`]
+              : [`${initialOffset}%`, `${100 + initialOffset}%`],
+          }}
+          transition={{ repeat: Infinity, ease: 'linear', duration, delay: -delay, ...transition }}
+        />
+      )}
+    </div>
+  );
+};
 
 export default BorderBeam;

@@ -1,36 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Smartphone } from 'lucide-react';
+import { BorderBeam, TicketNumber } from '@/components/landing/fx';
+import { useSplitTemplate } from '@/components/landing/useSplitTemplate';
+import {
+  COUNTER,
+  phonePosition,
+  phoneTicket,
+  servingTicket,
+  ticketLabel,
+} from '@/components/landing/useCallHeartbeat';
 
 const SERVICES = ['account', 'renewal', 'enquiry', 'payment', 'consultation'] as const;
 const ROWS = 5;
-const ADVANCE_MS = 4000;
-const FIRST_TICKET = 42;
 const WAITS = [0, 4, 8, 11, 15];
+const MINUTES_PER_PLACE = 4;
 
-const ticketLabel = (n: number) => `A-${String(n).padStart(3, '0')}`;
+interface ProductPreviewProps {
+  /** Heartbeat from `useCallHeartbeat` — how many tickets have been called. */
+  head: number;
+  /** The visitor pressed "Call next" in the mock. */
+  onCallNext: () => void;
+  /** id of the visually-hidden "example only" hint (aria-describedby). */
+  hintId: string;
+}
 
 /**
  * Markup-only mock of the staff dashboard inside a browser frame, with the
- * customer's phone ticket overlapping it. Example data only, labelled as such.
- * The "now serving" ticket advances every four seconds (paused under
- * prefers-reduced-motion) so the mock reads as a live product, not a picture.
+ * customer's phone ticket overlapping it. Example data only, labelled as
+ * such. The queue, the "now serving" row and the phone ticket all derive
+ * from the shared `head`, so they move with the LED board above; the only
+ * interactive element is the real "Call next" button, which advances the
+ * example and nothing else. Stays in Inter + tabular numerals so it reads
+ * as the real app, not the poster.
  */
-const ProductPreview: React.FC = () => {
+const ProductPreview: React.FC<ProductPreviewProps> = ({ head, onCallNext, hintId }) => {
   const { t } = useTranslation();
-  const [head, setHead] = useState(0);
-
-  useEffect(() => {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const id = window.setInterval(() => setHead((h) => (h + 1) % 900), ADVANCE_MS);
-    return () => window.clearInterval(id);
-  }, []);
+  const split = useSplitTemplate();
 
   const rows = Array.from({ length: ROWS }, (_, i) => {
-    const n = FIRST_TICKET + head + i;
+    const n = servingTicket(head) + i;
     return { n, ticket: ticketLabel(n), service: SERVICES[n % SERVICES.length], wait: WAITS[i] };
   });
   const serving = rows[0];
+
+  const position = phonePosition(head);
+  const yourTicket = ticketLabel(phoneTicket(head));
+  const [posBefore, posAfter] = split('public.preview.position', 'position');
 
   const stats = [
     { key: 'waiting', value: '6' },
@@ -75,9 +91,7 @@ const ProductPreview: React.FC = () => {
                 <dt className="text-[11px] font-medium uppercase tracking-[0.08em] text-[--on-ink-2]">
                   {t(`public.preview.stats.${key}`)}
                 </dt>
-                <dd className="font-display mt-1 whitespace-nowrap text-[20px] font-bold leading-none tabular-nums text-white">
-                  {value}
-                </dd>
+                <dd className="mt-1 whitespace-nowrap text-[20px] font-bold leading-none tabular-nums text-white">{value}</dd>
               </div>
             ))}
           </dl>
@@ -95,16 +109,14 @@ const ProductPreview: React.FC = () => {
                     'flex items-center gap-3 px-3 py-2.5 ' + (i === 0 ? 'bg-white/[0.06]' : i === ROWS - 1 ? 'qf-row-in' : '')
                   }
                 >
-                  <span
-                    className={'w-[52px] shrink-0 font-display text-[14px] font-bold tabular-nums ' + (i === 0 ? 'qf-ticket-swap' : '')}
-                  >
+                  <span className={'w-[52px] shrink-0 text-[14px] font-bold tabular-nums ' + (i === 0 ? 'qf-ticket-swap' : '')}>
                     {row.ticket}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-[13px] text-white/90">
                     {t(`public.preview.services.${row.service}`)}
                   </span>
                   {i === 0 ? (
-                    <span className="shrink-0 rounded-full bg-[rgba(245,158,11,0.15)] px-2.5 py-1 text-[11px] font-semibold text-[--led]">
+                    <span className="shrink-0 rounded-full bg-[rgba(255,176,32,0.14)] px-2.5 py-1 text-[11px] font-semibold text-[--led]">
                       {t('public.board.nowServing')}
                     </span>
                   ) : (
@@ -119,44 +131,54 @@ const ProductPreview: React.FC = () => {
 
           <div className="mt-4 flex items-center justify-between gap-3">
             <p className="text-[12px] text-[--on-ink-2]">
-              {t('public.board.counter', { number: 3 })} · {t('public.preview.nextUp', { ticket: rows[1].ticket })}
+              {t('public.board.counter', { number: COUNTER })} · {t('public.preview.nextUp', { ticket: rows[1].ticket })}
             </p>
-            <span
-              aria-hidden="true"
-              className="inline-flex h-9 items-center rounded-full bg-[--brand] px-4 text-[13px] font-semibold text-white shadow-[var(--shadow-card)]"
+            <button
+              type="button"
+              onClick={onCallNext}
+              aria-label={`${t('public.preview.callNext')} (${t('public.board.example')})`}
+              aria-describedby={hintId}
+              className="qf-call-btn inline-flex min-h-11 items-center rounded-full bg-[--brand] px-4 text-[13px] font-semibold text-white shadow-[var(--shadow-card)] hover:bg-[--brand-deep]"
             >
               {t('public.preview.callNext')}
-            </span>
+            </button>
           </div>
         </div>
         <figcaption className="sr-only">{t('public.preview.caption', { ticket: serving.ticket })}</figcaption>
+        <BorderBeam colorFrom="#FFB020" colorTo="#38BDF8" duration={9} size={160} />
       </figure>
 
-      {/* Customer ticket (phone view) */}
-      <figure
-        aria-label={t('public.preview.ticketAria')}
-        className="relative mx-auto mt-4 w-[240px] rounded-3xl bg-white p-4 text-[--text-1] shadow-[0_1px_2px_rgba(15,23,42,.06),0_24px_48px_-16px_rgba(15,23,42,.45)] lg:absolute lg:-bottom-14 lg:-left-10 lg:mt-0"
-      >
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-[--text-2]">
-          <Smartphone aria-hidden="true" className="size-3.5 text-[--brand]" />
-          {t('public.preview.yourTicket', { ticket: ticketLabel(FIRST_TICKET + head + 3) })}
-        </div>
-        <p className="font-display mt-3 text-[26px] font-bold leading-none tracking-[-0.02em]">
-          {t('public.preview.position', { position: 3 })}
-        </p>
-        <p className="mt-1.5 text-[14px] text-[--text-2]">{t('public.preview.eta', { minutes: 12 })}</p>
-        <div
-          role="progressbar"
-          aria-label={t('public.preview.progressLabel')}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={55}
-          className="mt-4 h-2 overflow-hidden rounded-full bg-[--cream]"
-        >
-          <div className="h-full w-[55%] rounded-full bg-[--brand]" />
-        </div>
-        <p className="mt-2 text-[12px] text-[--text-2]">{t('public.preview.ahead', { n: 2 })}</p>
-      </figure>
+      {/* Customer ticket (phone view): thermal paper with a torn top edge */}
+      <div className="qf-stub-shadow relative mx-auto mt-5 w-[240px] lg:absolute lg:-bottom-20 lg:-left-10 lg:mt-0">
+        <figure aria-label={t('public.preview.ticketAria')} className="qf-stub qf-perf-top rounded-2xl px-4 pb-4 pt-5">
+          <div key={yourTicket} className="qf-ticket-swap flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-[--text-2]">
+            <Smartphone aria-hidden="true" className="size-3.5 text-[--stamp]" />
+            {t('public.preview.yourTicket', { ticket: yourTicket })}
+          </div>
+          <p className="qf-stub-num mt-3 text-[26px]">
+            {posBefore}
+            <TicketNumber value={position} prefix="" digits={1} />
+            {posAfter}
+          </p>
+          <p className="mt-1.5 text-[14px] text-[--text-2]">
+            {t('public.preview.eta', { minutes: position * MINUTES_PER_PLACE })}
+          </p>
+          <div
+            role="progressbar"
+            aria-label={t('public.preview.progressLabel')}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={100 - position * 25}
+            className="mt-4 h-2 overflow-hidden rounded-full bg-[--hairline]"
+          >
+            <div
+              className="h-full rounded-full bg-[--brand] transition-[width] duration-700 [transition-timing-function:var(--ease-roll)] motion-reduce:transition-none"
+              style={{ width: `${100 - position * 25}%` }}
+            />
+          </div>
+          <p className="mt-2 text-[12px] text-[--text-2]">{t('public.preview.ahead', { n: position - 1 })}</p>
+        </figure>
+      </div>
     </div>
   );
 };
