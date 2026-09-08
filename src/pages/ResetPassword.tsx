@@ -80,7 +80,7 @@ const ResetPassword = () => {
           navigate('/auth');
         }, 3000);
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred. Please try again.',

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import type { Database } from '@/integrations/supabase/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,7 +44,7 @@ export const useStaffAvailability = () => {
 
     const attemptUpdate = async (): Promise<void> => {
       try {
-        const updateData: any = {
+        const updateData: Database['public']['Tables']['profiles']['Update'] = {
           availability_status: status,
           unavailable_reason: status === 'available' ? null : reason,
           unavailable_since: status === 'available' ? null : new Date().toISOString()

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,10 +9,22 @@ import { Link } from 'react-router-dom';
 import { useQueueStatus } from '@/hooks/useQueueStatus';
 
 const StatusPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [lookupMethod, setLookupMethod] = useState<'confirmation' | 'details'>('confirmation');
   const [confirmationNumber, setConfirmationNumber] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const confirmationInputRef = useRef<HTMLInputElement>(null);
+  const lastNameInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus the first field of the active lookup method (replaces autoFocus).
+  useEffect(() => {
+    if (lookupMethod === 'confirmation') {
+      confirmationInputRef.current?.focus();
+    } else {
+      lastNameInputRef.current?.focus();
+    }
+  }, [lookupMethod]);
   const {
     data: statusData,
     isLoading,
@@ -49,39 +62,34 @@ const StatusPage: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'checked_in':
-        return 'In Queue';
       case 'in_progress':
-        return 'Being Served';
       case 'completed':
-        return 'Completed';
       case 'scheduled':
-        return 'Scheduled';
       case 'cancelled':
-        return 'Cancelled';
       case 'no_show':
-        return 'No Show';
+        return t(`public.statusLabels.${status.toLowerCase()}`);
       default:
-        return 'Unknown';
+        return t('public.statusLabels.unknown');
     }
   };
 
   const getCheckInStatus = (isCheckedIn: boolean, status: string) => {
     if (status === 'completed') {
       return {
-        text: 'Service Completed',
+        text: t('public.status.serviceCompleted'),
         color: 'text-green-600',
         icon: CheckCircle
       };
     }
     if (isCheckedIn) {
       return {
-        text: 'Checked In',
+        text: t('public.status.checkedIn'),
         color: 'text-green-600',
         icon: CheckCircle
       };
     }
     return {
-      text: 'Not Checked In',
+      text: t('public.status.notCheckedIn'),
       color: 'text-red-600',
       icon: XCircle
     };
@@ -97,13 +105,13 @@ const StatusPage: React.FC = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Check Status</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('public.status.pageTitle')}</h1>
         </div>
 
         {/* Lookup Form */}
         <Card className="shadow-sm">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Find My Status</CardTitle>
+            <CardTitle className="text-lg">{t('public.status.findTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             {/* Method Selection */}
@@ -115,7 +123,7 @@ const StatusPage: React.FC = () => {
                 onClick={() => setLookupMethod('confirmation')} 
                 className="flex-1"
               >
-                Confirmation #
+                {t('public.status.methodCode')}
               </Button>
               <Button 
                 type="button" 
@@ -124,7 +132,7 @@ const StatusPage: React.FC = () => {
                 onClick={() => setLookupMethod('details')} 
                 className="flex-1"
               >
-                Name & Phone
+                {t('public.status.methodDetails')}
               </Button>
             </div>
 
@@ -132,39 +140,39 @@ const StatusPage: React.FC = () => {
               {lookupMethod === 'confirmation' ? (
                 <div>
                   <label htmlFor="confirmation" className="block text-sm font-medium text-gray-700 mb-1">
-                    Confirmation Number
+                    {t('public.status.codeLabel')}
                   </label>
                   <Input 
                     id="confirmation" 
+                    ref={confirmationInputRef}
                     type="text" 
-                    placeholder="Enter CUST-XXXXXXXX or APT-XXXXXXXX" 
+                    placeholder={t('public.status.codePlaceholder')} 
                     value={confirmationNumber} 
                     onChange={(e) => setConfirmationNumber(e.target.value)} 
-                    autoFocus 
                     className="uppercase" 
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Use your customer confirmation number (CUST-XXXXXXXX) or appointment code (APT-XXXXXXXX)
+                    {t('public.status.codeHint')}
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
+                      {t('public.status.lastName')}
                     </label>
                     <Input 
                       id="lastName" 
+                      ref={lastNameInputRef}
                       type="text" 
-                      placeholder="Enter your last name" 
+                      placeholder={t('public.status.lastNamePlaceholder')} 
                       value={lastName} 
                       onChange={(e) => setLastName(e.target.value)} 
-                      autoFocus 
                     />
                   </div>
                   <div>
                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number
+                      {t('public.status.phone')}
                     </label>
                     <Input 
                       id="phone" 
@@ -182,7 +190,7 @@ const StatusPage: React.FC = () => {
                 className="w-full" 
                 disabled={isLoading || (lookupMethod === 'confirmation' ? !confirmationNumber.trim() : !lastName.trim() || !phone.trim())}
               >
-                {isLoading ? 'Searching...' : 'Find My Status'}
+                {isLoading ? t('public.status.searching') : t('public.status.findButton')}
               </Button>
             </form>
           </CardContent>
@@ -194,13 +202,13 @@ const StatusPage: React.FC = () => {
             <CardContent className="pt-6">
               <div className="text-center">
                 <XCircle className="h-12 w-12 mx-auto text-red-600 mb-3" />
-                <p className="text-red-800 font-medium mb-2">Appointment Not Found</p>
+                <p className="text-red-800 font-medium mb-2">{t('public.status.notFoundTitle')}</p>
                 <p className="text-red-600 text-sm mb-4">
-                  We couldn't find an appointment with the information provided. Please check your confirmation number and try again.
+                  {t('public.status.notFoundDescription')}
                 </p>
                 <Link to="/customer">
                   <Button variant="outline" size="sm">
-                    Book New Appointment
+                    {t('public.status.bookNew')}
                   </Button>
                 </Link>
               </div>
@@ -210,7 +218,7 @@ const StatusPage: React.FC = () => {
 
         {/* Success Results */}
         {statusData && (
-          <Card className="mt-6 shadow-sm" role="region" aria-live="polite" aria-label="Queue status results">
+          <Card className="mt-6 shadow-sm" role="region" aria-live="polite" aria-label={t('public.status.resultsLabel')}>
             <CardContent className="pt-6">
               <div className="space-y-6">
                 {/* Check-In Status - Main Focus */}
@@ -238,11 +246,11 @@ const StatusPage: React.FC = () => {
                     <div className="text-4xl font-bold text-blue-600 mb-1">
                       #{statusData.position}
                     </div>
-                    <p className="text-gray-600">Your position in line</p>
+                    <p className="text-gray-600">{t('public.status.positionLabel')}</p>
                     {statusData.estimated_wait_time_minutes > 0 && (
                       <div className="flex items-center justify-center mt-2 text-blue-600">
                         <Clock className="h-4 w-4 mr-1" />
-                        <span>≈ {statusData.estimated_wait_time_minutes} min wait</span>
+                        <span>{t('public.status.waitApprox', { minutes: statusData.estimated_wait_time_minutes })}</span>
                       </div>
                     )}
                   </div>
@@ -260,7 +268,7 @@ const StatusPage: React.FC = () => {
                   <div className="flex items-start">
                     <MapPin className="h-4 w-4 mt-0.5 mr-3 text-gray-500" />
                     <div>
-                      <p className="font-medium text-gray-900 text-left">Location</p>
+                      <p className="font-medium text-gray-900 text-left">{t('public.status.location')}</p>
                       <p className="text-sm text-gray-600">{statusData.location_name}</p>
                     </div>
                   </div>
@@ -268,7 +276,7 @@ const StatusPage: React.FC = () => {
                   <div className="flex items-start">
                     <Calendar className="h-4 w-4 mt-0.5 mr-3 text-gray-500" />
                     <div>
-                      <p className="font-medium text-gray-900 text-left">Service</p>
+                      <p className="font-medium text-gray-900 text-left">{t('public.status.service')}</p>
                       <p className="text-sm text-gray-600">{statusData.service_name}</p>
                     </div>
                   </div>
@@ -276,9 +284,9 @@ const StatusPage: React.FC = () => {
                   <div className="flex items-start">
                     <Clock className="h-4 w-4 mt-0.5 mr-3 text-gray-500" />
                     <div>
-                      <p className="font-medium text-gray-900 text-left">Scheduled Time</p>
+                      <p className="font-medium text-gray-900 text-left">{t('public.status.scheduledTime')}</p>
                       <p className="text-sm text-gray-600">
-                        {new Date(statusData.scheduled_at).toLocaleString([], {
+                        {new Date(statusData.scheduled_at).toLocaleString(i18n.language, {
                           weekday: 'short',
                           month: 'short',
                           day: 'numeric',
@@ -293,9 +301,9 @@ const StatusPage: React.FC = () => {
                     <div className="flex items-start">
                       <CheckCircle className="h-4 w-4 mt-0.5 mr-3 text-green-500" />
                       <div>
-                        <p className="font-medium text-gray-900">Checked In</p>
+                        <p className="font-medium text-gray-900">{t('public.status.checkedIn')}</p>
                         <p className="text-sm text-gray-600">
-                          {new Date(statusData.check_in_time).toLocaleTimeString([], {
+                          {new Date(statusData.check_in_time).toLocaleTimeString(i18n.language, {
                             hour: '2-digit',
                             minute: '2-digit'
                           })}
@@ -310,7 +318,7 @@ const StatusPage: React.FC = () => {
                   <div className="text-center">
                     <Link to="/check-in">
                       <Button className="w-full">
-                        Check In Now
+                        {t('public.status.checkInNow')}
                       </Button>
                     </Link>
                   </div>
@@ -319,7 +327,7 @@ const StatusPage: React.FC = () => {
                 {/* Ticket Number */}
                 {statusData.ticket_number && (
                   <div className="text-center pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-500">Ticket Number</p>
+                    <p className="text-xs text-gray-500">{t('public.status.ticketNumber')}</p>
                     <p className="font-mono text-sm font-medium text-gray-900">
                       {statusData.ticket_number}
                     </p>

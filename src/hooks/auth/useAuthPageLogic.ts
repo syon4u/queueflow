@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { getErrorMessage } from '@/lib/utils';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
@@ -72,10 +73,10 @@ export const useAuthPageLogic = () => {
       const { error } = await signIn(email, password);
       
       if (error) {
-        setError(error.message || 'Failed to sign in');
+        setError(getErrorMessage(error) || 'Failed to sign in');
         toast({
           title: 'Sign In Failed',
-          description: error.message || 'Please check your credentials and try again',
+          description: getErrorMessage(error) || 'Please check your credentials and try again',
           variant: 'destructive'
         });
       } else {
@@ -124,10 +125,10 @@ export const useAuthPageLogic = () => {
       });
       
       if (error) {
-        setError(error.message || 'Failed to create account');
+        setError(getErrorMessage(error) || 'Failed to create account');
         toast({
           title: 'Sign Up Failed',
-          description: error.message || 'Please try again',
+          description: getErrorMessage(error) || 'Please try again',
           variant: 'destructive'
         });
       } else {

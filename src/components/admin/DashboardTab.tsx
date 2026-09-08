@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { localDayRangeIso, queueWindowStartIso } from '@/lib/dateRanges';
 
 function formatRelativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -18,6 +19,9 @@ function formatRelativeTime(iso: string): string {
   if (hours < 24) return `${hours} hr ago`;
   return `${Math.round(hours / 24)} d ago`;
 }
+
+// "Today" / queue-window definitions are shared with /staff and /power-user
+// via src/lib/dateRanges.ts.
 
 export const DashboardTab: React.FC = () => {
   const navigate = useNavigate();
@@ -49,12 +53,13 @@ export const DashboardTab: React.FC = () => {
   const { data: appointmentsToday = 0 } = useQuery({
     queryKey: ['dashboard-appointments-today'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
+      // Appointments Today = scheduled_time within the local day, any status.
+      const { start, end } = localDayRangeIso();
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
-        .gte('scheduled_time', `${today}T00:00:00`)
-        .lt('scheduled_time', `${today}T23:59:59`);
+        .gte('scheduled_time', start)
+        .lt('scheduled_time', end);
       if (error) throw error;
       return count || 0;
     }
@@ -89,10 +94,15 @@ export const DashboardTab: React.FC = () => {
   const { data: checkedInCustomers = 0 } = useQuery({
     queryKey: ['dashboard-checked-in'],
     queryFn: async () => {
+      // Waiting Now = checked_in with check_in_time within the last 24 h — the
+      // same window public_queue_snapshot uses, so this matches the kiosk and
+      // the staff dashboard. Unscoped, this counted every appointment ever
+      // left in 'checked_in' — 12 stale rows showed as "waiting".
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'checked_in');
+        .eq('status', 'checked_in')
+        .gte('check_in_time', queueWindowStartIso());
       if (error) throw error;
       return count || 0;
     },
@@ -102,13 +112,14 @@ export const DashboardTab: React.FC = () => {
   const { data: missedAppointments = 0 } = useQuery({
     queryKey: ['dashboard-missed-today'],
     queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
+      // No-shows Today = status no_show with updated_at within the local day.
+      const { start, end } = localDayRangeIso();
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'no_show')
-        .gte('scheduled_time', `${today}T00:00:00`)
-        .lt('scheduled_time', `${today}T23:59:59`);
+        .gte('updated_at', start)
+        .lt('updated_at', end);
       if (error) throw error;
       return count || 0;
     },
@@ -217,45 +228,45 @@ export const DashboardTab: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800">Total Appointments</CardTitle>
+            <CardTitle className="text-sm font-medium text-blue-800">Appointments Today</CardTitle>
             <Calendar className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-900">{systemMetrics.totalAppointments}</div>
-            <p className="text-xs text-blue-600 mt-1">Today's scheduled appointments</p>
+            <p className="text-xs text-blue-600 mt-1">Scheduled for today, any status</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-green-800">Active Queues</CardTitle>
+            <CardTitle className="text-sm font-medium text-green-800">Open Locations</CardTitle>
             <Users className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-900">{systemMetrics.activeQueues}</div>
-            <p className="text-xs text-green-600 mt-1">Across all locations</p>
+            <p className="text-xs text-green-600 mt-1">Locations currently accepting walk-ins</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-purple-800">Checked-in Customers</CardTitle>
+            <CardTitle className="text-sm font-medium text-purple-800">Waiting Now</CardTitle>
             <CheckCircle className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-900">{systemMetrics.checkedInCustomers}</div>
-            <p className="text-xs text-purple-600 mt-1">Currently waiting in queues</p>
+            <p className="text-xs text-purple-600 mt-1">Checked in, last 24 h, not yet called</p>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-orange-800">Missed Appointments</CardTitle>
+            <CardTitle className="text-sm font-medium text-orange-800">No-shows Today</CardTitle>
             <AlertTriangle className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-900">{systemMetrics.missedAppointments}</div>
-            <p className="text-xs text-orange-600 mt-1">Requires follow-up</p>
+            <p className="text-xs text-orange-600 mt-1">Marked no-show today</p>
           </CardContent>
         </Card>
       </div>
@@ -315,11 +326,24 @@ export const DashboardTab: React.FC = () => {
                       {location.queue} in queue{location.capacity ? ` • capacity ${location.capacity}` : ''}
                     </p>
                   </div>
-                  <Badge 
+                  <Badge
                     variant={location.status === 'active' ? 'default' : 'destructive'}
-                    className={location.status === 'active' ? 'bg-green-100 text-green-700' : ''}
+                    className={
+                      location.status === 'active'
+                        ? 'bg-green-100 text-green-700'
+                        : location.queue > 0
+                          ? 'bg-amber-100 text-amber-800'
+                          : ''
+                    }
+                    title={
+                      location.status !== 'active' && location.queue > 0
+                        ? `${location.queue} customer(s) still waiting at a closed location`
+                        : undefined
+                    }
                   >
-                    {location.status}
+                    {location.status !== 'active' && location.queue > 0
+                      ? `closed · ${location.queue} waiting`
+                      : location.status}
                   </Badge>
                 </div>
               ))}

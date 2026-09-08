@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,19 @@ const AppointmentLookupPage: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const confirmationInputRef = useRef<HTMLInputElement>(null);
+  const lastNameInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus the first field of the active lookup method (replaces autoFocus).
+  useEffect(() => {
+    if (lookupMethod === 'confirmation') {
+      confirmationInputRef.current?.focus();
+    } else {
+      lastNameInputRef.current?.focus();
+    }
+  }, [lookupMethod]);
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
 
   const {
     appointment,
@@ -41,13 +54,13 @@ const AppointmentLookupPage: React.FC = () => {
   const handleCancel = async () => {
     if (!appointment) return;
     
-    const confirmed = window.confirm('Are you sure you want to cancel this appointment?');
+    const confirmed = window.confirm(t('public.lookup.cancelConfirm'));
     if (confirmed) {
       const success = await cancelAppointment(appointment.id);
       if (success) {
         toast({
-          title: 'Appointment Cancelled',
-          description: 'Your appointment has been successfully cancelled.',
+          title: t('public.lookup.cancelledTitle'),
+          description: t('public.lookup.cancelledDescription'),
         });
       }
     }
@@ -83,8 +96,8 @@ const AppointmentLookupPage: React.FC = () => {
 
   return (
     <PageLayout 
-      headerTitle="Consumer Protection Division"
-      headerSubtitle="View and manage your appointments"
+      headerTitle="QueueFlow"
+      headerSubtitle={t('public.lookup.headerSubtitle')}
     >
       <div className="min-h-screen bg-gray-50 py-8 px-4">
         <div className="max-w-2xl mx-auto">
@@ -95,13 +108,13 @@ const AppointmentLookupPage: React.FC = () => {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Find My Appointment</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('public.lookup.pageTitle')}</h1>
           </div>
 
           {/* Lookup Form */}
           <Card className="shadow-sm mb-6">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Search for Your Appointment</CardTitle>
+              <CardTitle className="text-lg">{t('public.lookup.searchTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               {/* Method Selection */}
@@ -113,7 +126,7 @@ const AppointmentLookupPage: React.FC = () => {
                   onClick={() => setLookupMethod('confirmation')} 
                   className="flex-1"
                 >
-                  Confirmation Number
+                  {t('public.lookup.methodCode')}
                 </Button>
                 <Button 
                   type="button" 
@@ -122,7 +135,7 @@ const AppointmentLookupPage: React.FC = () => {
                   onClick={() => setLookupMethod('details')} 
                   className="flex-1"
                 >
-                  Name & Phone
+                  {t('public.lookup.methodDetails')}
                 </Button>
               </div>
 
@@ -130,35 +143,35 @@ const AppointmentLookupPage: React.FC = () => {
                 {lookupMethod === 'confirmation' ? (
                   <div>
                     <label htmlFor="confirmation" className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirmation Number
+                      {t('public.lookup.codeLabel')}
                     </label>
                     <Input 
                       id="confirmation" 
+                      ref={confirmationInputRef}
                       type="text" 
-                      placeholder="Enter your confirmation number" 
+                      placeholder={t('public.lookup.codePlaceholder')} 
                       value={confirmationNumber} 
                       onChange={(e) => setConfirmationNumber(e.target.value)} 
-                      autoFocus 
                     />
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <div>
                       <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                        Last Name
+                        {t('public.lookup.lastName')}
                       </label>
                       <Input 
                         id="lastName" 
+                        ref={lastNameInputRef}
                         type="text" 
-                        placeholder="Enter your last name" 
+                        placeholder={t('public.lookup.lastNamePlaceholder')} 
                         value={lastName} 
                         onChange={(e) => setLastName(e.target.value)} 
-                        autoFocus 
                       />
                     </div>
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
+                        {t('public.lookup.phone')}
                       </label>
                       <Input 
                         id="phone" 
@@ -176,7 +189,7 @@ const AppointmentLookupPage: React.FC = () => {
                   className="w-full" 
                   disabled={isLoading || (lookupMethod === 'confirmation' ? !confirmationNumber.trim() : !lastName.trim() || !phone.trim())}
                 >
-                  {isLoading ? 'Searching...' : 'Find Appointment'}
+                  {isLoading ? t('public.lookup.searching') : t('public.lookup.findButton')}
                 </Button>
               </form>
 
@@ -200,13 +213,13 @@ const AppointmentLookupPage: React.FC = () => {
                         {appointment.customer?.first_name} {appointment.customer?.last_name}
                       </h3>
                       <Badge className={getStatusColor(appointment.status)}>
-                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                        {t(`public.statusLabels.${appointment.status}`, appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).replace(/_/g, ' '))}
                       </Badge>
                     </div>
                     {qrCodeUrl && (
                       <div className="text-center">
-                        <img src={qrCodeUrl} alt="QR Code" className="w-16 h-16 mx-auto" />
-                        <p className="text-xs text-gray-500 mt-1">QR Code</p>
+                        <img src={qrCodeUrl} alt={t('public.lookup.qrCode')} className="w-16 h-16 mx-auto" />
+                        <p className="text-xs text-gray-500 mt-1">{t('public.lookup.qrCode')}</p>
                       </div>
                     )}
                   </div>
@@ -216,12 +229,14 @@ const AppointmentLookupPage: React.FC = () => {
                     <div className="flex items-start space-x-3">
                       <Calendar className="h-5 w-5 text-gray-400 mt-0.5" />
                       <div>
-                        <p className="font-medium text-gray-900">Date & Time</p>
+                        <p className="font-medium text-gray-900">{t('public.lookup.dateTime')}</p>
                         <p className="text-sm text-gray-600">
-                          {new Date(appointment.scheduled_time).toLocaleDateString()} at{' '}
-                          {new Date(appointment.scheduled_time).toLocaleTimeString([], { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                          {t('public.lookup.dateAt', {
+                            date: new Date(appointment.scheduled_time).toLocaleDateString(i18n.language),
+                            time: new Date(appointment.scheduled_time).toLocaleTimeString(i18n.language, {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }),
                           })}
                         </p>
                       </div>
@@ -230,7 +245,7 @@ const AppointmentLookupPage: React.FC = () => {
                     <div className="flex items-start space-x-3">
                       <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
                       <div>
-                        <p className="font-medium text-gray-900">Location</p>
+                        <p className="font-medium text-gray-900">{t('public.lookup.location')}</p>
                         <p className="text-sm text-gray-600">{appointment.location?.name}</p>
                       </div>
                     </div>
@@ -238,7 +253,7 @@ const AppointmentLookupPage: React.FC = () => {
                     <div className="flex items-start space-x-3">
                       <User className="h-5 w-5 text-gray-400 mt-0.5" />
                       <div>
-                        <p className="font-medium text-gray-900">Service</p>
+                        <p className="font-medium text-gray-900">{t('public.lookup.service')}</p>
                         <p className="text-sm text-gray-600">{appointment.service?.name}</p>
                       </div>
                     </div>
@@ -246,7 +261,7 @@ const AppointmentLookupPage: React.FC = () => {
                     <div className="flex items-start space-x-3">
                       <QrCode className="h-5 w-5 text-gray-400 mt-0.5" />
                       <div>
-                        <p className="font-medium text-gray-900">Confirmation</p>
+                        <p className="font-medium text-gray-900">{t('public.lookup.confirmation')}</p>
                         <p className="text-sm text-gray-600 font-mono">{appointment.confirmation_number}</p>
                       </div>
                     </div>
@@ -255,7 +270,7 @@ const AppointmentLookupPage: React.FC = () => {
                       <div className="flex items-start space-x-3">
                         <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
                         <div>
-                          <p className="font-medium text-gray-900">Phone</p>
+                          <p className="font-medium text-gray-900">{t('public.lookup.phoneLabel')}</p>
                           <p className="text-sm text-gray-600">{appointment.customer.phone}</p>
                         </div>
                       </div>
@@ -265,7 +280,7 @@ const AppointmentLookupPage: React.FC = () => {
                       <div className="flex items-start space-x-3">
                         <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
                         <div>
-                          <p className="font-medium text-gray-900">Email</p>
+                          <p className="font-medium text-gray-900">{t('public.lookup.email')}</p>
                           <p className="text-sm text-gray-600">{appointment.customer.email}</p>
                         </div>
                       </div>
@@ -275,7 +290,7 @@ const AppointmentLookupPage: React.FC = () => {
                   {/* Notes */}
                   {appointment.reason_for_visit && (
                     <div>
-                      <p className="font-medium text-gray-900 mb-1">Reason for Visit</p>
+                      <p className="font-medium text-gray-900 mb-1">{t('public.lookup.reason')}</p>
                       <p className="text-sm text-gray-600">{appointment.reason_for_visit}</p>
                     </div>
                   )}
@@ -288,13 +303,13 @@ const AppointmentLookupPage: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isCancelling}
                       >
-                        {isCancelling ? 'Cancelling...' : 'Cancel Appointment'}
+                        {isCancelling ? t('public.lookup.cancelling') : t('public.lookup.cancelAppointment')}
                       </Button>
                     )}
                     
                     <Link to="/status" className="flex-1">
                       <Button variant="outline" className="w-full">
-                        Check Queue Status
+                        {t('public.lookup.checkQueueStatus')}
                       </Button>
                     </Link>
                   </div>

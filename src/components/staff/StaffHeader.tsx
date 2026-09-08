@@ -15,9 +15,10 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { supabase } from '@/integrations/supabase/client';
+import type { User as AuthUser } from '@supabase/supabase-js';
 
 interface StaffHeaderProps {
-  user: any;
+  user: AuthUser | null;
   role: string;
   onToggleShortcuts: () => void;
 }
@@ -29,7 +30,7 @@ const StaffHeader: React.FC<StaffHeaderProps> = ({
 }) => {
   const { t } = useTranslation();
   
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
     if (!name) return 'U';
     return name.charAt(0).toUpperCase();
   };

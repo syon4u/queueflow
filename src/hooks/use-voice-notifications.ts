@@ -41,7 +41,7 @@ export function useVoiceNotifications() {
     queryKey: ['voice-notifications'],
     queryFn: async (): Promise<VoiceNotification[]> => {
       const { data, error } = await supabase
-        .from('voice_notifications' as any)
+        .from('voice_notifications')
         .select('*')
         .order('scheduled_for', { ascending: true });
 
@@ -59,7 +59,7 @@ export function useVoiceNotifications() {
       const now = new Date().toISOString();
       
       const { data, error } = await supabase
-        .from('voice_notifications' as any)
+        .from('voice_notifications')
         .select('*')
         .in('status', ['pending', 'failed'])
         .lte('scheduled_for', now)
@@ -78,7 +78,7 @@ export function useVoiceNotifications() {
     
     try {
       const { error } = await supabase
-        .from('voice_notifications' as any)
+        .from('voice_notifications')
         .insert({
           customer_id: request.customerId,
           appointment_id: request.appointmentId,
@@ -121,7 +121,7 @@ export function useVoiceNotifications() {
       try {
         // Update status to calling
         await supabase
-          .from('voice_notifications' as any)
+          .from('voice_notifications')
           .update({ status: 'calling' })
           .eq('id', notification.id);
 
@@ -155,7 +155,7 @@ export function useVoiceNotifications() {
   const cancelVoiceNotification = async (notificationId: string) => {
     try {
       const { error } = await supabase
-        .from('voice_notifications' as any)
+        .from('voice_notifications')
         .update({ status: 'failed', error_message: 'Cancelled by user' })
         .eq('id', notificationId);
 

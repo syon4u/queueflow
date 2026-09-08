@@ -166,9 +166,9 @@ export const WorkloadDistribution: React.FC = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Customer</label>
+              <label htmlFor="workload-customer" className="text-sm font-medium">Customer</label>
               <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
-                <SelectTrigger>
+                <SelectTrigger id="workload-customer">
                   <SelectValue placeholder="Select customer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -180,9 +180,9 @@ export const WorkloadDistribution: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Assign to Staff</label>
+              <label htmlFor="workload-staff" className="text-sm font-medium">Assign to Staff</label>
               <Select value={selectedStaff} onValueChange={setSelectedStaff}>
-                <SelectTrigger>
+                <SelectTrigger id="workload-staff">
                   <SelectValue placeholder="Select staff member" />
                 </SelectTrigger>
                 <SelectContent>

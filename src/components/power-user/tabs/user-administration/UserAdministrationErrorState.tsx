@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 
 interface UserAdministrationErrorStateProps {
-  error: any;
+  error: Error;
   onRetry: () => void;
 }
 

@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +11,11 @@ import { MapPin, Clock, Users, Smartphone, QrCode } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { createPublicAppointment, getQueueSnapshot } from '@/lib/publicQueue';
+import type { TicketData } from './VirtualQueueTicket';
 
 interface VirtualQueueJoinProps {
-  onJoinSuccess: (ticketData: any) => void;
+  onJoinSuccess: (ticketData: TicketData) => void;
 }
 
 export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSuccess }) => {
@@ -22,6 +25,7 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
   const [customerPhone, setCustomerPhone] = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Fetch locations
   const { data: locations = [] } = useQuery({
@@ -57,37 +61,22 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
     enabled: !!selectedLocation
   });
 
-  // Get current queue length for selected service
+  // Live queue depth at the selected location
   const { data: queueStats } = useQuery({
-    queryKey: ['queue-stats', selectedLocation, selectedService],
+    queryKey: ['queue-snapshot', selectedLocation],
     queryFn: async () => {
-      if (!selectedLocation || !selectedService) return null;
-      
-      const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
-        .from('appointments')
-        .select('status')
-        .eq('location_id', selectedLocation)
-        .eq('service_id', selectedService)
-        .gte('scheduled_time', `${today}T00:00:00`)
-        .lt('scheduled_time', `${today}T23:59:59`);
-      
-      if (error) throw error;
-      
-      const waiting = data.filter(a => a.status === 'checked_in').length;
-      const estimatedWait = waiting * 15; // 15 minutes per person estimate
-      
-      return { waiting, estimatedWait };
+      const snapshot = await getQueueSnapshot(selectedLocation);
+      return { waiting: snapshot.waiting, estimatedWait: snapshot.estimated_wait_minutes };
     },
-    enabled: !!(selectedLocation && selectedService),
+    enabled: !!selectedLocation,
     refetchInterval: 30000
   });
 
   const handleJoinQueue = async () => {
     if (!selectedLocation || !selectedService || !customerName || !customerPhone) {
       toast({
-        title: 'Missing Information',
-        description: 'Please fill in all required fields',
+        title: t('public.virtualQueue.join.missingInfo'),
+        description: t('public.virtualQueue.join.fillRequired'),
         variant: 'destructive'
       });
       return;
@@ -95,79 +84,58 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
 
     setIsJoining(true);
     try {
-      // First create or find customer
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('phone', customerPhone)
-        .single();
-
-      let customerId = existingCustomer?.id;
-
-      if (!customerId) {
-        const [firstName, ...lastNameParts] = customerName.split(' ');
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert({
-            first_name: firstName,
-            last_name: lastNameParts.join(' ') || '',
-            phone: customerPhone
-          })
-          .select('id')
-          .single();
-
-        if (customerError) throw customerError;
-        customerId = newCustomer.id;
+      const [firstName, ...lastNameParts] = customerName.trim().split(/\s+/);
+      const lastName = lastNameParts.join(' ');
+      if (!lastName) {
+        throw new Error(t('public.virtualQueue.join.fullNameRequired'));
       }
 
-      // Create appointment for virtual queue
-      const { data: appointment, error: appointmentError } = await supabase
-        .from('appointments')
-        .insert({
-          customer_id: customerId,
-          service_id: selectedService,
-          location_id: selectedLocation,
-          scheduled_time: new Date().toISOString(),
-          status: 'scheduled',
-          notes: 'Virtual queue - remote join'
-        })
-        .select(`
-          *,
-          customers!appointments_customer_id_fkey(first_name, last_name, phone),
-          services!appointments_service_id_fkey(name),
-          locations!appointments_location_id_fkey(name)
-        `)
-        .single();
+      // Remote join: a scheduled appointment the customer checks in on arrival.
+      const appointment = await createPublicAppointment({
+        firstName,
+        lastName,
+        phone: customerPhone,
+        serviceId: selectedService,
+        locationId: selectedLocation,
+        notes: 'Virtual queue - remote join',
+      });
 
-      if (appointmentError) throw appointmentError;
-
-      // Generate QR code data
+      // QR payload carries the appointment id + code so /check-in can verify it.
       const qrData = JSON.stringify({
-        appointmentId: appointment.id,
-        customerId: customerId,
+        appointmentId: appointment.appointment_id,
+        confirmationCode: appointment.confirmation_code,
         timestamp: Date.now()
       });
 
       const ticketData = {
-        ...appointment,
+        id: appointment.appointment_id,
+        status: appointment.status,
+        confirmationCode: appointment.confirmation_code,
+        customers: {
+          first_name: appointment.first_name,
+          last_name: appointment.last_name,
+          phone: appointment.phone,
+        },
+        services: { name: appointment.service_name },
+        locations: { name: appointment.location_name },
         qrCode: qrData,
-        ticketId: appointment.id.split('-')[0].toUpperCase(),
+        ticketId: appointment.confirmation_code,
         position: (queueStats?.waiting || 0) + 1,
         estimatedWait: queueStats?.estimatedWait || 15
       };
 
       onJoinSuccess(ticketData);
-      
+
       toast({
-        title: 'Successfully Joined Queue',
-        description: `You're #${ticketData.position} in line for ${appointment.services.name}`,
+        title: t('public.virtualQueue.join.joinedTitle'),
+        description: t('public.virtualQueue.join.joinedDescription', { position: ticketData.position, service: appointment.service_name }),
       });
 
     } catch (error) {
       console.error('Error joining queue:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to join queue. Please try again.',
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('public.virtualQueue.join.joinFailed'),
         variant: 'destructive'
       });
     } finally {
@@ -180,15 +148,15 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Smartphone className="h-5 w-5" />
-          Join Virtual Queue
+          {t('public.virtualQueue.join.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="location">Select Location</Label>
+          <Label htmlFor="location">{t('public.virtualQueue.join.selectLocation')}</Label>
           <Select value={selectedLocation} onValueChange={setSelectedLocation}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a location" />
+              <SelectValue placeholder={t('public.virtualQueue.join.chooseLocation')} />
             </SelectTrigger>
             <SelectContent>
               {locations.map((location) => (
@@ -205,10 +173,10 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
 
         {selectedLocation && (
           <div className="space-y-2">
-            <Label htmlFor="service">Select Service</Label>
+            <Label htmlFor="service">{t('public.virtualQueue.join.selectService')}</Label>
             <Select value={selectedService} onValueChange={setSelectedService}>
               <SelectTrigger>
-                <SelectValue placeholder="Choose a service" />
+                <SelectValue placeholder={t('public.virtualQueue.join.chooseService')} />
               </SelectTrigger>
               <SelectContent>
                 {services.map((service) => (
@@ -227,11 +195,11 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4 text-blue-600" />
-                  <span>{queueStats.waiting} waiting</span>
+                  <span>{t('public.virtualQueue.join.waiting', { count: queueStats.waiting })}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4 text-blue-600" />
-                  <span>~{queueStats.estimatedWait} min wait</span>
+                  <span>{t('public.virtualQueue.join.waitApprox', { minutes: queueStats.estimatedWait })}</span>
                 </div>
               </div>
             </CardContent>
@@ -239,17 +207,17 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="name">Full Name *</Label>
+          <Label htmlFor="name">{t('public.virtualQueue.join.fullName')}</Label>
           <Input
             id="name"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="Enter your full name"
+            placeholder={t('public.virtualQueue.join.fullNamePlaceholder')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number *</Label>
+          <Label htmlFor="phone">{t('public.virtualQueue.join.phone')}</Label>
           <Input
             id="phone"
             type="tel"
@@ -264,16 +232,16 @@ export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSucces
           disabled={isJoining || !selectedLocation || !selectedService || !customerName || !customerPhone}
           className="w-full"
         >
-          {isJoining ? 'Joining Queue...' : 'Join Virtual Queue'}
+          {isJoining ? t('public.virtualQueue.join.joining') : t('public.virtualQueue.join.joinButton')}
         </Button>
 
         <div className="text-xs text-gray-500 space-y-1">
           <div className="flex items-center gap-1">
             <QrCode className="h-3 w-3" />
-            <span>You'll receive a QR code for easy check-in</span>
+            <span>{t('public.virtualQueue.join.qrNote')}</span>
           </div>
-          <div>• SMS updates on your queue position</div>
-          <div>• Check in when you arrive at the location</div>
+          <div>{t('public.virtualQueue.join.smsNote')}</div>
+          <div>{t('public.virtualQueue.join.arriveNote')}</div>
         </div>
       </CardContent>
     </Card>

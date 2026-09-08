@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { MobileQueueTracker } from '@/components/mobile/MobileQueueTracker';
-import { MobileQueueNotifications } from '@/components/mobile/MobileQueueNotifications';
+import { MobileQueueNotifications, type NotificationPreferences } from '@/components/mobile/MobileQueueNotifications';
 import { MobileQueueProgress } from '@/components/mobile/MobileQueueProgress';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,44 +11,53 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import { findPublicAppointment } from '@/lib/publicQueue';
 
 const MobileQueuePage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('position');
   
   // Get appointment ID from URL params
   const appointmentId = searchParams.get('appointment');
   
-  // Mock data for progress component (in real app, this would come from API)
-  const [progressData, setProgressData] = useState({
-    currentPosition: 3,
-    totalInQueue: 8,
-    estimatedWaitTime: 25,
-    averageServiceTime: 15
+  // Live position for the progress tab (the Position tab has its own tracker).
+  const { data: appointment } = useQuery({
+    queryKey: ['mobile-queue-appointment', appointmentId],
+    queryFn: () => findPublicAppointment({ appointmentId: appointmentId! }),
+    enabled: !!appointmentId,
+    refetchInterval: 30000,
   });
+  const progressData = {
+    currentPosition: appointment?.position ?? 0,
+    totalInQueue: appointment?.total_in_queue ?? 0,
+    estimatedWaitTime: appointment?.estimated_wait_minutes ?? 0,
+    averageServiceTime: appointment?.service_duration ?? 15,
+  };
 
   useEffect(() => {
     if (!appointmentId) {
       toast({
-        title: 'No Appointment Found',
-        description: 'Please scan your QR code or check your confirmation.',
+        title: t('public.mobileQueue.noAppointmentTitle'),
+        description: t('public.mobileQueue.noAppointmentToast'),
         variant: 'destructive',
       });
       return;
     }
-  }, [appointmentId, toast]);
+  }, [appointmentId, toast, t]);
 
   const handleNotificationToggle = (enabled: boolean) => {
     console.log('Notifications toggled:', enabled);
   };
 
-  const handleNotificationPreferences = (preferences: any) => {
+  const handleNotificationPreferences = (preferences: NotificationPreferences) => {
     console.log('Notification preferences updated:', preferences);
     toast({
-      title: 'Preferences Updated',
-      description: 'Your notification settings have been saved.',
+      title: t('public.mobileQueue.preferencesUpdated'),
+      description: t('public.mobileQueue.preferencesSaved'),
     });
   };
 
@@ -58,14 +68,14 @@ const MobileQueuePage = () => {
           <Card>
             <CardContent className="p-8 text-center">
               <h2 className="text-xl font-semibold text-red-800 mb-4">
-                No Appointment Found
+                {t('public.mobileQueue.noAppointmentTitle')}
               </h2>
               <p className="text-red-600 mb-6">
-                Please scan your QR code or check your confirmation details.
+                {t('public.mobileQueue.noAppointmentDescription')}
               </p>
               <Button onClick={() => navigate('/')} variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Go Home
+                {t('public.mobileQueue.goHome')}
               </Button>
             </CardContent>
           </Card>
@@ -82,10 +92,10 @@ const MobileQueuePage = () => {
           <div className="max-w-md mx-auto">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="position" className="text-xs">
-                Position
+                {t('public.mobileQueue.tabs.position')}
               </TabsTrigger>
               <TabsTrigger value="progress" className="text-xs">
-                Progress
+                {t('public.mobileQueue.tabs.progress')}
               </TabsTrigger>
               <TabsTrigger value="settings" className="text-xs">
                 <Settings className="h-4 w-4" />

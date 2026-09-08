@@ -1,13 +1,13 @@
 import React from 'react';
 
-interface BrowardButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface BrandButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   children: React.ReactNode;
 }
 
-const BrowardButton: React.FC<BrowardButtonProps> = ({
+const BrandButton: React.FC<BrandButtonProps> = ({
   variant = 'primary',
   size = 'md',
   className = '',
@@ -37,4 +37,4 @@ const BrowardButton: React.FC<BrowardButtonProps> = ({
   );
 };
 
-export default BrowardButton;
+export default BrandButton;

@@ -64,7 +64,7 @@ export const StatsTab: React.FC = () => {
   const dailyData = React.useMemo(() => {
     if (!dailyStats.length) return [];
     
-    return dailyStats.map((day: any) => ({
+    return dailyStats.map((day) => ({
       date: format(new Date(day.date), 'MMM dd'),
       served: day.customers_served,
       avgWait: day.average_wait_time,
@@ -77,11 +77,11 @@ export const StatsTab: React.FC = () => {
   const serviceData = React.useMemo(() => {
     if (!queueStats.length || !services.length) return [];
     
-    const serviceMap = new Map();
+    const serviceMap = new Map<string, { name: string; value: number }>();
     
-    queueStats.forEach((stat: any) => {
+    queueStats.forEach((stat) => {
       if (!serviceMap.has(stat.service_id)) {
-        const service = services.find((s: any) => s.id === stat.service_id);
+        const service = services.find((s) => s.id === stat.service_id);
         serviceMap.set(stat.service_id, {
           name: service ? service.name : 'Unknown Service',
           value: 0
@@ -102,11 +102,11 @@ export const StatsTab: React.FC = () => {
   const locationData = React.useMemo(() => {
     if (!queueStats.length || !locations.length) return [];
     
-    const locationMap = new Map();
+    const locationMap = new Map<string, { name: string; avgWait: number; served: number; waiting: number; count: number }>();
     
-    queueStats.forEach((stat: any) => {
+    queueStats.forEach((stat) => {
       if (!locationMap.has(stat.location_id)) {
-        const location = locations.find((l: any) => l.id === stat.location_id);
+        const location = locations.find((l) => l.id === stat.location_id);
         locationMap.set(stat.location_id, {
           name: location ? location.name : 'Unknown Location',
           avgWait: 0,
@@ -127,7 +127,7 @@ export const StatsTab: React.FC = () => {
     });
     
     // Calculate averages
-    return Array.from(locationMap.values()).map((item: any) => ({
+    return Array.from(locationMap.values()).map((item) => ({
       ...item,
       avgWait: Math.round(item.avgWait / Math.max(item.count, 1))
     }));
@@ -180,7 +180,7 @@ export const StatsTab: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map((location: any) => (
+                  {locations.map((location) => (
                     <SelectItem key={location.id} value={location.id}>
                       {location.name}
                     </SelectItem>
@@ -210,7 +210,7 @@ export const StatsTab: React.FC = () => {
                       <Skeleton className="h-8 w-20" />
                     ) : (
                       <div className="text-3xl font-bold">
-                        {dailyStats.reduce((sum: number, day: any) => sum + (day.customers_served || 0), 0)}
+                        {dailyStats.reduce((sum: number, day) => sum + (day.customers_served || 0), 0)}
                       </div>
                     )}
                   </CardContent>
@@ -226,7 +226,7 @@ export const StatsTab: React.FC = () => {
                     ) : (
                       <div className="text-3xl font-bold">
                         {Math.round(
-                          dailyStats.reduce((sum: number, day: any) => sum + (day.average_wait_time || 0), 0) / 
+                          dailyStats.reduce((sum: number, day) => sum + (day.average_wait_time || 0), 0) / 
                           Math.max(dailyStats.length, 1)
                         )}
                         <span className="text-lg font-normal ml-1">min</span>
@@ -244,7 +244,7 @@ export const StatsTab: React.FC = () => {
                       <Skeleton className="h-8 w-20" />
                     ) : (
                       <div className="text-3xl font-bold">
-                        {dailyStats.reduce((sum: number, day: any) => sum + (day.no_shows || 0), 0)}
+                        {dailyStats.reduce((sum: number, day) => sum + (day.no_shows || 0), 0)}
                       </div>
                     )}
                   </CardContent>
@@ -365,12 +365,12 @@ export const StatsTab: React.FC = () => {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, value, percent }: any) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }: { name?: string; percent?: number }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                           outerRadius={100}
                           fill="#8884d8"
                           dataKey="value"
                         >
-                          {serviceData.map((entry: any, index: number) => (
+                          {serviceData.map((entry, index: number) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>

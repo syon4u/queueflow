@@ -1,4 +1,3 @@
-
 {
   "common": {
     "loading": "Chajman...",
@@ -13,8 +12,8 @@
     "cancel": "Anile"
   },
   "landing": {
-    "headerTitle": "Divizyon Pwoteksyon Konsèmatè",
-    "headerSubtitle": "Pwoteje rezidan Broward County yo nan edikasyon, medyasyon, ak aplikasyon",
+    "headerTitle": "QueueFlow",
+    "headerSubtitle": "Jesyon entèlijan pou liy datant ak randevou pou biznis sèvis",
     "hero": {
       "title": "QueueFlow",
       "subtitle": "Evite tann nan, pwograme vizit ou, epi jwenn èd ou bezwen an pi vit ak sistèm fil entèlijan nou an.",
@@ -182,5 +181,666 @@
   "unauthorized": {
     "title": "Aksè San Otorizasyon",
     "description": "Ou pa gen pèmisyon pou wè paj sa a"
+  },
+  "public": {
+    "layout": {
+      "menu": "Meni",
+      "staffDashboard": "Tablo Anplwaye",
+      "staffDashboardDescription": "Jere randevou ak liy lan",
+      "adminPortal": "Pòtay Administrasyon",
+      "adminPortalDescription": "Administrasyon sistèm nan",
+      "performanceReports": "Rapò Pèfòmans",
+      "performanceReportsDescription": "Analiz ak enfòmasyon",
+      "footer": {
+        "tagline": "Sistèm Entèlijan pou Jere Liy",
+        "description": "N ap fè sèvis kliyan an pi rapid gras a yon jesyon entèlijan liy yo",
+        "quickLinks": "Lyen Rapid",
+        "home": "Akèy",
+        "services": "Sèvis",
+        "appointments": "Randevou",
+        "contact": "Kontakte Nou",
+        "contactInfo": "Enfòmasyon pou Kontakte Nou",
+        "email": "Imèl:",
+        "supportHours": "Lè sipò: lendi–vandredi, 9am–5pm ET",
+        "rights": "© {{year}} Queue Flow. Tout dwa rezève.",
+        "motto": "N ap revolisyone jesyon sèvis kliyan"
+      }
+    },
+    "nav": {
+      "findAppointment": "Jwenn Randevou",
+      "imHere": "Mwen La",
+      "queueStatus": "Eta Liy lan",
+      "pricing": "Pri",
+      "profile": "Pwofil",
+      "newAppointment": "Nouvo Randevou",
+      "adminDashboard": "Tablo Administrasyon",
+      "systemHealth": "Sante Sistèm nan",
+      "powerUserDashboard": "Tablo Itilizatè Avanse",
+      "staffDashboard": "Tablo Anplwaye",
+      "performanceReport": "Rapò Pèfòmans",
+      "signOut": "Dekonekte",
+      "signIn": "Konekte",
+      "employeeLogin": "Aksè pou Anplwaye",
+      "openMenu": "Ouvri meni an",
+      "closeMenu": "Fèmen meni an"
+    },
+    "hero": {
+      "titleLine1": "Jesyon Liy Entèlijan",
+      "titleLine2": "Pou Biznis Modèn",
+      "subtitle": "Elimine sal datant, diminye fristrasyon kliyan yo, epi ogmante efikasite ak sistèm jesyon liy nou an ki mache ak entèlijans atifisyèl.",
+      "pillRealtime": "Mizajou an Tan Reyèl",
+      "pillScheduling": "Pwogramasyon Entèlijan",
+      "pillNoLines": "Pa Gen Liy Ankò",
+      "bookAppointment": "Pran Randevou",
+      "checkStatus": "Verifye Eta",
+      "learnMore": "Aprann Plis",
+      "statLive": "An dirèk",
+      "statLiveDescription": "Plas nan liy lan ak estimasyon tan datant",
+      "statLanguages": "4",
+      "statLanguagesDescription": "Lang pou kliyan yo",
+      "statPwa": "PWA",
+      "statPwaDescription": "Ou ka enstale l, li mache sou nenpòt aparèy",
+      "videoUnsupported": "Navigatè ou a pa sipòte videyo."
+    },
+    "serviceCards": {
+      "title": "Kijan Nou Ka Ede Ou Jodi a?",
+      "subtitle": "Chwazi opsyon ki pi bon pou ou epi jwi yon sèvis san pwoblèm",
+      "schedule": {
+        "title": "Pran Randevou",
+        "description": "Rezève vizit ou davans epi evite tann",
+        "button": "Pran Randevou Kounye a"
+      },
+      "find": {
+        "title": "Jwenn Randevou Mwen",
+        "description": "Chèche, modifye oswa anile randevou ou deja genyen an",
+        "button": "Jwenn Randevou"
+      },
+      "checkIn": {
+        "title": "Mwen La",
+        "description": "Anrejistre pou randevou ou lè ou rive",
+        "button": "Anrejistre"
+      },
+      "status": {
+        "title": "Eta Liy lan",
+        "description": "Gade tan datant kounye a ak eta liy lan",
+        "button": "Gade Eta"
+      },
+      "mobile": {
+        "title": "Liy sou Telefòn",
+        "description": "Antre nan liy vityèl la sou telefòn ou",
+        "button": "Antre nan Liy lan"
+      },
+      "kiosk": {
+        "title": "Kyòs san Randevou",
+        "description": "Sèvi ak kyòs otomatik nou an pou vizit san randevou",
+        "button": "Sèvi ak Kyòs la"
+      },
+      "virtualQueue": "Liy Vityèl →",
+      "digitalSignage": "Ekran Dijital →"
+    },
+    "features": {
+      "title": "Fonksyon Pwisan pou Tout Moun",
+      "subtitle": "Sistèm jesyon liy nou an fèt pou rann eksperyans ou pi fasil, kit ou se kliyan kit ou se manm pèsonèl la.",
+      "realtime": {
+        "title": "Mizajou an Tan Reyèl",
+        "description": "Resevwa mizajou an dirèk sou tan datant ak plas ou nan liy lan pa SMS ak notifikasyon sou entènèt."
+      },
+      "scheduling": {
+        "title": "Pwogramasyon Entèlijan",
+        "description": "Pran randevou davans epi chwazi lè ou prefere pou ou pa tann."
+      },
+      "queue": {
+        "title": "Jesyon Liy",
+        "description": "Antre nan liy vityèl kote ou ye a epi swiv plas ou an tan reyèl."
+      },
+      "notifications": {
+        "title": "Notifikasyon Imedya",
+        "description": "Resevwa alèt lè se prèske tou pa ou, pou ou pa janm rate randevou ou."
+      },
+      "secure": {
+        "title": "Sekirize ak Prive",
+        "description": "Enfòmasyon pèsonèl ou pwoteje ak mezi sekirite nivo antrepriz."
+      },
+      "analytics": {
+        "title": "Tablo Analiz",
+        "description": "Pèsonèl la ka swiv mezi pèfòmans epi amelyore livrezon sèvis la."
+      },
+      "multiLocation": {
+        "title": "Plizyè Lokal",
+        "description": "Jere randevou nan plizyè lokal apati yon sèl platfòm."
+      },
+      "mobileFirst": {
+        "title": "Fèt pou Telefòn",
+        "description": "Eksperyans mobil optimize pou kliyan ak pèsonèl sou nenpòt aparèy."
+      },
+      "highlightTitle": "Tout Sa Ou Bezwen nan yon Sèl Platfòm",
+      "highlightDescription": "Depi nan pran randevou rive nan jesyon liy an tan reyèl, nou kouvri ou ak teknoloji dènye kri ak yon konsepsyon fasil pou itilize.",
+      "badgeCloud": "Sou Nwaj la",
+      "badgeRls": "Kontwòl aksè nivo liy",
+      "badgeEncrypted": "Chifre pandan transpò ak nan depo",
+      "badgePwa": "PWA ou ka enstale"
+    },
+    "cta": {
+      "title": "Ou Pare pou Ale Pi Vit?",
+      "subtitle": "Bay kliyan ou yo yon liy yo ka tann ladan l kote yo ye a",
+      "bookAppointment": "Pran Randevou",
+      "checkStatus": "Verifye Eta",
+      "checkInNow": "Anrejistre Kounye a"
+    },
+    "pricing": {
+      "badge": "Pri senp e klè",
+      "title": "Plan ki grandi ak liy ou",
+      "subtitle": "Kit ou gen yon sèl biwo resepsyon kit ou gen yon rezo lokal, QueueFlow grandi avèk ou. Pa gen frè enstalasyon, ou ka anile nenpòt lè.",
+      "mostPopular": "Pi Popilè",
+      "perMonth": "/ mwa",
+      "contactUs": "kontakte nou",
+      "custom": "Sou mezi",
+      "talkToSales": "Pale ak ekip lavant",
+      "contactSales": "Kontakte Ekip Lavant",
+      "footnote": "Faktire chak mwa. Pri pou gwo volim ak sektè piblik disponib sou demann.",
+      "starter": {
+        "name": "Starter",
+        "tagline": "Yon sèl lokal, liy pou vizit san randevou ak vizit ak randevou",
+        "features": [
+          "Jiska 2 kont anplwaye",
+          "Liy vityèl + anrejistreman ak kòd QR",
+          "Paj eta pou kliyan ak PWA",
+          "Sondaj satisfaksyon apre chak vizit",
+          "Sipò pa imèl"
+        ]
+      },
+      "growth": {
+        "name": "Growth",
+        "tagline": "Ekip ak plizyè lokal ki bezwen vrè analiz ak kontwòl",
+        "features": [
+          "Jiska 15 kont anplwaye, plizyè lokal",
+          "Tout sa ki nan Starter",
+          "Tablo anplwaye ak RBAC (anplwaye/manadjè/administratè)",
+          "Analiz avanse ak pwogramasyon ak èd entèlijans atifisyèl (an devlopman)",
+          "Ekran dijital ak mòd kyòs",
+          "Panyòl, Pòtigè ak Kreyòl Ayisyen sou tout paj pou kliyan yo (zouti pèsonèl yo an Anglè)",
+          "Sipò pryorite pa imèl ak chat"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "Gwo òganizasyon oswa òganizasyon reglemante ki gen bezwen espesyal",
+        "features": [
+          "Kont anplwaye ak lokal san limit",
+          "Tout sa ki nan Growth",
+          "SSO / SAML (nan plan) ak politik RBAC sou mezi",
+          "Sipò ak entegrasyon garanti pa SLA",
+          "Entegrasyon sou mezi (CRM/POS/ekran)",
+          "Manadjè siksè dedye"
+        ]
+      }
+    },
+    "statusLabels": {
+      "scheduled": "Pwograme",
+      "checked_in": "Nan Liy lan",
+      "in_progress": "Y ap Sèvi Ou",
+      "completed": "Fini",
+      "cancelled": "Anile",
+      "no_show": "Pa Vini",
+      "unknown": "Enkoni"
+    },
+    "booking": {
+      "pageTitle": "Pran yon Randevou",
+      "pageSubtitle": "Chwazi sèvis, lokal ak lè ki bon pou ou",
+      "formTitle": "Mande yon Randevou",
+      "formDescription": "Ranpli fòm sa a epi n ap kontakte ou pou pwograme randevou ou",
+      "loadingForm": "N ap chaje fòm randevou a...",
+      "loadingLocations": "N ap chaje lokal yo...",
+      "loadFailed": "Nou pa t kapab chaje fòm randevou a",
+      "loadLocationsError": "Nou pa t kapab chaje lokal yo: {{error}}",
+      "retry": "Eseye Ankò",
+      "refresh": "Rafrechi",
+      "noLocations": "Pa gen lokal disponib",
+      "noLocationsMessage": "Pou kounye a pa gen lokal disponib pou pran randevou. Tanpri tounen pita oswa kontakte sipò.",
+      "submit": "Voye Demann Randevou",
+      "submitting": "N ap voye...",
+      "requiredNote": "* Chan obligatwa. N ap kontakte ou nan 1 jou travay pou konfime randevou ou.",
+      "toast": {
+        "missingInfo": "Enfòmasyon Manke",
+        "booked": "Randevou pran",
+        "bookedDescription": "Kenbe kòd konfimasyon ou pou anrejistre lè ou rive.",
+        "submitError": "Te gen yon pwoblèm pandan n ap voye demann ou an. Tanpri eseye ankò.",
+        "bookingFailed": "Randevou a pa t pase",
+        "createFailed": "Nou pa t kapab kreye randevou a. Tanpri eseye ankò."
+      },
+      "validation": {
+        "firstNameRequired": "Prenon an obligatwa",
+        "lastNameRequired": "Siyati a obligatwa",
+        "phoneRequired": "Nimewo telefòn nan obligatwa",
+        "locationRequired": "Lokal la obligatwa",
+        "serviceRequired": "Sèvis la obligatwa",
+        "dateRequired": "Dat ou prefere a obligatwa",
+        "timeRequired": "Lè ou prefere a obligatwa"
+      },
+      "personal": {
+        "title": "Enfòmasyon Pèsonèl",
+        "firstName": "Prenon *",
+        "firstNamePlaceholder": "Antre prenon ou",
+        "lastName": "Siyati *",
+        "lastNamePlaceholder": "Antre siyati ou",
+        "phone": "Nimewo Telefòn *",
+        "email": "Adrès Imèl"
+      },
+      "serviceLocation": {
+        "title": "Sèvis ak Lokal",
+        "service": "Sèvis *",
+        "servicesError": "Erè pandan chajman sèvis yo: {{error}}",
+        "loadingServices": "N ap chaje sèvis yo...",
+        "selectService": "Chwazi yon sèvis",
+        "minutes": "{{count}} min",
+        "allLocations": "(Disponib nan tout lokal yo)",
+        "location": "Lokal *",
+        "locationsError": "Erè pandan chajman lokal yo: {{error}}",
+        "loadingLocations": "N ap chaje lokal yo...",
+        "selectServiceFirst": "Chwazi yon sèvis anvan",
+        "noLocationsAvailable": "Pa gen lokal disponib",
+        "selectLocation": "Chwazi yon lokal"
+      },
+      "preferences": {
+        "title": "Preferans Randevou",
+        "preferredDate": "Dat Ou Prefere *",
+        "preferredTime": "Lè Ou Prefere *"
+      },
+      "visit": {
+        "title": "Detay Vizit la",
+        "reason": "Rezon Vizit la",
+        "reasonPlaceholder": "Tanpri dekri rezon vizit ou a...",
+        "notes": "Nòt Adisyonèl",
+        "notesPlaceholder": "Nenpòt lòt enfòmasyon oswa demann espesyal..."
+      },
+      "confirmation": {
+        "title": "Randevou Konfime!",
+        "description": "Randevou ou pwograme avèk siksè. Tanpri sere kòd konfimasyon ou.",
+        "codeLabel": "Kòd Konfimasyon",
+        "keepCode": "Kenbe kòd sa a pou anrejistre epi swiv eta ou. Sèvi avè l pou verifye plas ou nan liy lan.",
+        "gotIt": "Mwen Konprann"
+      }
+    },
+    "checkIn": {
+      "pageTitle": "Mwen La",
+      "helpLine1": "Ou deja rive pou randevou ou?",
+      "helpLine2": "Antre kòd konfimasyon ou pou fè nou konnen ou rive.",
+      "findTitle": "Jwenn Randevou Ou",
+      "findDescription": "Antre kòd konfimasyon ou oswa enfòmasyon kontak ou",
+      "methodCode": "Nimewo Konfimasyon",
+      "methodDetails": "Non ak Telefòn",
+      "codeLabel": "Kòd Konfimasyon",
+      "codeHint": "Sèvi ak nimewo konfimasyon kliyan ou oswa kòd randevou a",
+      "or": "– OSWA –",
+      "lastName": "Siyati",
+      "lastNamePlaceholder": "Antre siyati ou",
+      "phone": "Nimewo Telefòn",
+      "searching": "N ap chèche...",
+      "findButton": "Jwenn Randevou",
+      "confirmTitle": "Konfime Anrejistreman",
+      "confirmDescription": "Tanpri verifye detay randevou ou",
+      "service": "Sèvis",
+      "location": "Lokal",
+      "scheduledTime": "Lè Pwograme",
+      "back": "Retounen",
+      "checkingIn": "N ap anrejistre...",
+      "checkMeIn": "Anrejistre Mwen",
+      "successTitle": "Ou anrejistre!",
+      "successDescription": "Byenveni! Men enfòmasyon liy ou",
+      "positionLabel": "Plas ou nan liy lan",
+      "aheadOfYou": "devan ou",
+      "estimatedWait": "tan datant estime",
+      "waitShort": "≈ {{minutes}} min",
+      "refreshNote": "Enfòmasyon yo rafrechi chak 30 segonn",
+      "done": "Fini",
+      "fallbackService": "Sèvis",
+      "fallbackLocation": "Lokal",
+      "errors": {
+        "enterCode": "Tanpri antre kòd konfimasyon ou.",
+        "enterNameAndPhone": "Tanpri antre siyati ou ak nimewo telefòn ou.",
+        "notFound": "Nou pa jwenn okenn randevou ak enfòmasyon ou bay yo. Tanpri verifye enfòmasyon ou yo epi eseye ankò.",
+        "alreadyCheckedIn": "Ou deja anrejistre. Sèvi ak \"Verifye Eta\" pou swiv plas ou nan liy lan.",
+        "alreadyCheckedInWithPosition": "Ou deja anrejistre epi ou se nimewo {{position}} nan liy lan. Sèvi ak \"Verifye Eta\" pou swiv plas ou nan liy lan.",
+        "latestStatus": "Dènye randevou ou a {{status}}. Tanpri pran yon nouvo randevou oswa wè yon manm pèsonèl la.",
+        "notFoundTitle": "Randevou Pa Jwenn",
+        "notFoundFallback": "Nou pa t kapab jwenn randevou a. Tanpri verifye enfòmasyon ou yo epi eseye ankò.",
+        "checkInFailed": "Anrejistreman an Pa Pase",
+        "checkInFallback": "Nou pa t kapab anrejistre ou. Tanpri eseye ankò."
+      },
+      "codePlaceholder": "CUST-XXXXXXXX oswa APT-XXXXXXXX"
+    },
+    "status": {
+      "pageTitle": "Verifye Eta",
+      "findTitle": "Jwenn Eta Mwen",
+      "methodCode": "Nimewo Konfimasyon",
+      "methodDetails": "Non ak Telefòn",
+      "codeLabel": "Nimewo Konfimasyon",
+      "codePlaceholder": "Antre CUST-XXXXXXXX oswa APT-XXXXXXXX",
+      "codeHint": "Sèvi ak nimewo konfimasyon kliyan ou (CUST-XXXXXXXX) oswa kòd randevou a (APT-XXXXXXXX)",
+      "lastName": "Siyati",
+      "lastNamePlaceholder": "Antre siyati ou",
+      "phone": "Nimewo Telefòn",
+      "searching": "N ap chèche...",
+      "findButton": "Jwenn Eta Mwen",
+      "notFoundTitle": "Randevou Pa Jwenn",
+      "notFoundDescription": "Nou pa t kapab jwenn yon randevou ak enfòmasyon ou bay yo. Tanpri verifye nimewo konfimasyon ou epi eseye ankò.",
+      "bookNew": "Pran yon Nouvo Randevou",
+      "resultsLabel": "Rezilta eta liy lan",
+      "serviceCompleted": "Sèvis Fini",
+      "checkedIn": "Anrejistre",
+      "notCheckedIn": "Pa Anrejistre",
+      "positionLabel": "Plas ou nan liy lan",
+      "waitApprox": "≈ {{minutes}} min datant",
+      "location": "Lokal",
+      "service": "Sèvis",
+      "scheduledTime": "Lè Pwograme",
+      "checkInNow": "Anrejistre Kounye a",
+      "ticketNumber": "Nimewo Tikè",
+      "errors": {
+        "provideInfo": "Tanpri bay swa yon nimewo konfimasyon, swa siyati ou ak nimewo telefòn ou",
+        "notFound": "Nou pa jwenn okenn randevou ak enfòmasyon ou bay yo",
+        "fetchFailed": "Nou pa t kapab jwenn eta liy lan. Tanpri eseye ankò.",
+        "unknownService": "Sèvis Enkoni",
+        "mainOffice": "Biwo Prensipal"
+      }
+    },
+    "lookup": {
+      "headerSubtitle": "Gade epi jere randevou ou yo",
+      "pageTitle": "Jwenn Randevou Mwen",
+      "searchTitle": "Chèche Randevou Ou",
+      "methodCode": "Nimewo Konfimasyon",
+      "methodDetails": "Non ak Telefòn",
+      "codeLabel": "Nimewo Konfimasyon",
+      "codePlaceholder": "Antre nimewo konfimasyon ou",
+      "lastName": "Siyati",
+      "lastNamePlaceholder": "Antre siyati ou",
+      "phone": "Nimewo Telefòn",
+      "searching": "N ap chèche...",
+      "findButton": "Jwenn Randevou",
+      "cancelConfirm": "Èske ou sèten ou vle anile randevou sa a?",
+      "cancelledTitle": "Randevou Anile",
+      "cancelledDescription": "Randevou ou anile avèk siksè.",
+      "qrCode": "Kòd QR",
+      "dateTime": "Dat ak Lè",
+      "dateAt": "{{date}} a {{time}}",
+      "location": "Lokal",
+      "service": "Sèvis",
+      "confirmation": "Konfimasyon",
+      "phoneLabel": "Telefòn",
+      "email": "Imèl",
+      "reason": "Rezon Vizit la",
+      "cancelling": "N ap anile...",
+      "cancelAppointment": "Anile Randevou",
+      "checkQueueStatus": "Verifye Eta Liy lan",
+      "errors": {
+        "notFoundByCode": "Nou pa jwenn randevou ak nimewo konfimasyon sa a",
+        "notFoundByDetails": "Nou pa jwenn randevou ak non sa a ak nimewo telefòn sa a",
+        "lookupFailed": "Nou pa t kapab jwenn randevou a",
+        "cancelFailed": "Nou pa t kapab anile randevou a. Tanpri eseye ankò."
+      }
+    },
+    "kiosk": {
+      "title": "Kyòs QueueFlow",
+      "subtitle": "Anrejistreman Otomatik",
+      "startOver": "Rekòmanse",
+      "stepLabel": "Etap {{number}}: {{title}}",
+      "stepOf": "{{current}} sou {{total}}",
+      "steps": {
+        "location": "Chwazi Lokal",
+        "service": "Chwazi Sèvis",
+        "customer": "Antre Enfòmasyon",
+        "ticket": "Tikè Ou"
+      },
+      "toast": {
+        "missingInfo": "Enfòmasyon obligatwa manke",
+        "success": "Siksè",
+        "ticketGenerated": "Tikè ou kreye!",
+        "createFailed": "Nou pa t kapab kreye randevou a. Tanpri eseye ankò."
+      },
+      "location": {
+        "noneTitle": "Pa Gen Lokal Disponib",
+        "noneDescription": "Tout lokal sèvis yo fèmen pou kounye a. Tanpri eseye ankò pita.",
+        "title": "Chwazi Lokal Sèvis Ou",
+        "subtitle": "Chwazi lokal kote ou ta renmen resevwa sèvis la",
+        "select": "Chwazi Lokal"
+      },
+      "service": {
+        "back": "Retounen",
+        "title": "Chwazi Kalite Sèvis",
+        "subtitle": "Chwazi sèvis ou bezwen jodi a",
+        "noneTitle": "Pa Gen Sèvis Disponib",
+        "noneDescription": "Pa gen sèvis disponib nan lokal sa a pou kounye a.",
+        "select": "Chwazi Sèvis",
+        "durationMinutes": "{{minutes}} min",
+        "durationHours": "{{hours}} è",
+        "durationHoursMinutes": "{{hours}} è {{minutes}} min"
+      },
+      "customer": {
+        "back": "Retounen",
+        "title": "Antre Enfòmasyon Ou",
+        "subtitle": "Nou bezwen kèk enfòmasyon pou kreye tikè sèvis ou",
+        "notice": "Tanpri bay enfòmasyon kontak ou pou nou kreye tikè sèvis ou.",
+        "firstName": "Prenon *",
+        "firstNamePlaceholder": "Antre prenon ou",
+        "lastName": "Siyati *",
+        "lastNamePlaceholder": "Antre siyati ou",
+        "phone": "Nimewo Telefòn *",
+        "email": "Adrès Imèl (Si ou vle)",
+        "generateTicket": "Kreye Tikè",
+        "validation": {
+          "firstNameRequired": "Prenon an obligatwa",
+          "lastNameRequired": "Siyati a obligatwa",
+          "phoneRequired": "Nimewo telefòn nan obligatwa",
+          "phoneInvalid": "Tanpri antre yon nimewo telefòn valab",
+          "emailInvalid": "Tanpri antre yon adrès imèl valab"
+        }
+      },
+      "ticket": {
+        "successTitle": "Tikè Kreye avèk Siksè!",
+        "successDescription": "Ou nan liy lan kounye a. Tanpri tann yo rele nimewo ou.",
+        "header": "Tikè Sèvis QueueFlow",
+        "keep": "Kenbe tikè sa a jiskaske yo sèvi ou",
+        "customer": "Kliyan",
+        "location": "Lokal",
+        "service": "Sèvis",
+        "estimatedMinutes": "Apeprè {{minutes}} minit",
+        "queuePosition": "Plas nan Liy lan",
+        "inLine": "nan liy lan",
+        "qrCode": "Kòd QR",
+        "qrAlt": "Kòd QR tikè a",
+        "scanToCheck": "Eskane pou verifye eta",
+        "checkInTime": "Lè anrejistreman: {{time}}",
+        "stayNote": "Tanpri rete nan sal datant lan. N ap rele ou lè se tou pa ou.",
+        "print": "Enprime Tikè",
+        "newTicket": "Nouvo Tikè ({{seconds}}s)"
+      }
+    },
+    "virtualQueue": {
+      "title": "Liy Vityèl",
+      "subtitle": "Antre nan liy lan kote ou ye a epi swiv plas ou an tan reyèl",
+      "checkedInTitle": "Ou anrejistre",
+      "checkedInWithPosition": "Ou se nimewo {{position}} nan liy lan. Tan datant estime apeprè {{minutes}} minit.",
+      "checkedInNoPosition": "Yon manm pèsonèl la ap rele ou talè.",
+      "checkInFailed": "Anrejistreman an pa pase",
+      "checkInFallback": "Tanpri eseye ankò oswa wè yon manm pèsonèl la.",
+      "features": {
+        "sms": {
+          "title": "Mizajou pa SMS",
+          "description": "Resevwa mizajou an tan reyèl sou plas ou nan liy lan pa SMS"
+        },
+        "location": {
+          "title": "Fleksibilite Lokal",
+          "description": "Ou pa bezwen tann sou plas. Antre nan liy lan kote ou ye a!"
+        },
+        "tracking": {
+          "title": "Swivi an Tan Reyèl",
+          "description": "Swiv plas ou ak tan datant estime a an tan reyèl"
+        }
+      },
+      "join": {
+        "title": "Antre nan Liy Vityèl la",
+        "missingInfo": "Enfòmasyon Manke",
+        "fillRequired": "Tanpri ranpli tout chan obligatwa yo",
+        "fullNameRequired": "Tanpri antre prenon ak siyati ou.",
+        "joinedTitle": "Ou Antre nan Liy lan",
+        "joinedDescription": "Ou ta dwe nimewo {{position}} nan liy lan pou {{service}}. Anrejistre lè ou rive.",
+        "joinFailed": "Nou pa t kapab mete ou nan liy lan. Tanpri eseye ankò.",
+        "selectLocation": "Chwazi Lokal",
+        "chooseLocation": "Chwazi yon lokal",
+        "selectService": "Chwazi Sèvis",
+        "chooseService": "Chwazi yon sèvis",
+        "waiting": "{{count}} moun k ap tann",
+        "waitApprox": "~{{minutes}} min datant",
+        "fullName": "Non Konplè *",
+        "fullNamePlaceholder": "Antre non konplè ou",
+        "phone": "Nimewo Telefòn *",
+        "joining": "N ap mete ou nan liy lan...",
+        "joinButton": "Antre nan Liy Vityèl la",
+        "qrNote": "W ap resevwa yon kòd QR pou anrejistre fasil",
+        "smsNote": "• Mizajou pa SMS sou plas ou nan liy lan",
+        "arriveNote": "• Anrejistre lè ou rive nan lokal la"
+      },
+      "ticket": {
+        "title": "Tikè Liy Ou",
+        "qrAlt": "Kòd QR tikè liy lan",
+        "checkedIn": "Anrejistre",
+        "virtualQueue": "Liy Vityèl",
+        "position": "Plas",
+        "estimatedWait": "Tan Datant Est.",
+        "service": "Sèvis: {{name}}",
+        "checkInButton": "Mwen La - Anrejistre",
+        "checkedInTitle": "Ou anrejistre!",
+        "checkedInDescription": "Tanpri tann yo rele ou pou sèvis la",
+        "tip1": "• Kenbe tikè sa a tou pre ou pou anrejistreman",
+        "tip2": "• W ap resevwa mizajou pa SMS sou plas ou",
+        "tip3": "• Eskane kòd QR la nan kyòs la oswa montre l bay pèsonèl la"
+      },
+      "tracker": {
+        "title": "Plas nan Liy lan",
+        "description": "Plas ou kounye a nan liy lan",
+        "noActive": "Nou pa jwenn okenn randevou aktif",
+        "positionLabel": "Plas nan liy lan",
+        "estimatedWait": "Tan datant estime: {{time}}",
+        "inQueue": "Nan Liy lan",
+        "leave": "Kite Liy lan",
+        "waitMinutes": "{{minutes}} min",
+        "waitHoursMinutes": "{{hours}} è {{minutes}} min"
+      }
+    },
+    "mobileQueue": {
+      "noAppointmentTitle": "Randevou Pa Jwenn",
+      "noAppointmentToast": "Tanpri eskane kòd QR ou oswa verifye konfimasyon ou.",
+      "noAppointmentDescription": "Tanpri eskane kòd QR ou oswa verifye detay konfimasyon ou.",
+      "goHome": "Ale nan Akèy",
+      "preferencesUpdated": "Preferans Mete Ajou",
+      "preferencesSaved": "Paramèt notifikasyon ou yo anrejistre.",
+      "tabs": {
+        "position": "Plas",
+        "progress": "Pwogrè"
+      },
+      "tracker": {
+        "notFound": "Randevou pa jwenn",
+        "fallbackService": "Sèvis",
+        "calledTitle": "Y ap Rele Ou! 🔔",
+        "calledDescription": "Tanpri ale nan kontwa sèvis la.",
+        "notificationsEnabled": "Notifikasyon Aktive",
+        "notificationsDisabled": "Notifikasyon Dezaktive",
+        "enabledDescription": "W ap resevwa mizajou sou plas ou nan liy lan",
+        "disabledDescription": "Notifikasyon liy yo fèmen",
+        "loading": "N ap chaje plas ou nan liy lan...",
+        "loadFailed": "Nou pa t kapab chaje enfòmasyon liy lan",
+        "tryAgain": "Eseye Ankò",
+        "status": {
+          "scheduled": "Rezève – anrejistre lè ou rive",
+          "checked_in": "Nan Liy lan",
+          "in_progress": "Y ap Rele Ou!",
+          "completed": "Fini",
+          "unknown": "Enkoni"
+        },
+        "title": "Plas nan Liy lan",
+        "ticket": "Tikè #{{number}}",
+        "positionLabel": "Plas ou nan liy lan",
+        "onePersonAhead": "1 moun devan ou",
+        "peopleAhead": "{{count}} moun devan ou",
+        "estimatedWait": "Tan datant estime",
+        "currentWait": "Tan ou tann deja",
+        "serviceDetails": "Detay Sèvis la",
+        "customer": "Kliyan: {{name}}",
+        "checkedInAt": "Anrejistre: {{time}}",
+        "beingCalled": "🔔 Y ap rele ou!",
+        "proceed": "Tanpri ale nan kontwa sèvis la kounye a.",
+        "showQr": "Montre Kòd QR"
+      },
+      "progress": {
+        "title": "Pwogrè nan Liy lan",
+        "joined": "Antre",
+        "yourTurn": "Tou Pa Ou",
+        "peopleAhead": "Moun Devan Ou",
+        "estimatedTime": "Tan Est.",
+        "averageService": "Sèvis Mwayèn",
+        "visualization": "Imaj Liy lan",
+        "you": "Ou",
+        "more": "+{{count}} lòt",
+        "breakdown": "Detay Tan an",
+        "peopleAheadLabel": "Moun devan ou:",
+        "averageServiceLabel": "Tan sèvis mwayèn:",
+        "estimatedWaitLabel": "Tan datant estime:",
+        "minutes": "{{count}} min"
+      },
+      "notifications": {
+        "title": "Preferans Notifikasyon",
+        "methods": "Fason pou Resevwa Notifikasyon",
+        "push": "Notifikasyon Push",
+        "enable": "Aktive",
+        "sms": "Notifikasyon pa SMS",
+        "email": "Notifikasyon pa Imèl",
+        "types": "Sou kisa pou yo avèti m",
+        "positionChanges": "Chanjman plas nan liy lan",
+        "beingCalled": "Lè y ap rele m",
+        "reminder": "Rapèl 5 minit anvan tou pa m",
+        "unsupported": "Aparèy sa a pa sipòte notifikasyon push. Ou ka toujou resevwa notifikasyon pa SMS ak imèl.",
+        "notSupported": "Pa Sipòte",
+        "notSupportedDescription": "Aparèy sa a pa sipòte notifikasyon push.",
+        "enabled": "Notifikasyon Aktive",
+        "enabledDescription": "W ap resevwa notifikasyon push pou mizajou liy lan.",
+        "denied": "Pèmisyon Refize",
+        "deniedDescription": "Notifikasyon push yo pa t aktive.",
+        "enableFailed": "Nou pa t kapab aktive notifikasyon push yo."
+      },
+      "scanner": {
+        "cameraDenied": "Aksè Kamera Refize",
+        "cameraDeniedDescription": "Tanpri pèmèt aksè kamera a oswa antre kòd la manyèlman.",
+        "found": "Plas nan Liy lan Jwenn",
+        "loadingPosition": "N ap chaje plas ou kounye a...",
+        "title": "Eskane Tikè Liy",
+        "frameHint": "Mete kòd QR la anndan kad la",
+        "enterCode": "Antre Kòd Konfimasyon",
+        "codeLabel": "Kòd Konfimasyon",
+        "codePlaceholder": "Antre kòd konfimasyon ou",
+        "codeHint": "W ap jwenn li sou konfimasyon randevou ou",
+        "findPosition": "Jwenn Plas Mwen",
+        "scan": "Eskane Kòd QR",
+        "manual": "Antre Manyèlman",
+        "cancelScan": "Anile Eskanè a",
+        "useCamera": "Sèvi ak Kamera"
+      }
+    },
+    "errors": {
+      "locationNotFound": "Lokal pa jwenn",
+      "createFailed": "Nou pa t kapab kreye randevou a. Tanpri eseye ankò.",
+      "checkInFailed": "Anrejistreman an pa pase. Tanpri wè yon manm pèsonèl la.",
+      "cancelFailed": "Nou pa t kapab anile randevou a.",
+      "db": {
+        "nameRequired": "Prenon ak siyati obligatwa",
+        "phoneRequired": "Yon nimewo telefòn valab obligatwa",
+        "serviceLocationRequired": "Sèvis ak lokal obligatwa",
+        "unknownLocation": "Lokal enkoni",
+        "unknownService": "Sèvis enkoni oswa inaktif",
+        "appointmentNotFound": "Randevou pa jwenn",
+        "codeMismatch": "Kòd konfimasyon an pa koresponn ak randevou sa a",
+        "cannotCheckIn": "Randevou sa a {{status}} epi li pa ka anrejistre",
+        "cannotCancel": "Randevou sa a {{status}} epi li pa ka anile"
+      }
+    }
   }
 }

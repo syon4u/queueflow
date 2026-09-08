@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'placeholder.svg'],
+      includeAssets: ['favicon.ico', 'pwa-192.png', 'pwa-512.png'],
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB (increased from 3 MB)
       },
@@ -27,18 +27,10 @@ export default defineConfig(({ mode }) => ({
         theme_color: '#2563eb',
         background_color: '#ffffff',
         display: 'standalone',
+        // Relative paths so the manifest works under a sub-path deploy (e.g. /queueflow-demo/).
         icons: [
-          {
-            src: '/favicon.ico',
-            sizes: '48x48',
-            type: 'image/x-icon'
-          },
-          {
-            src: '/placeholder.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml',
-            purpose: 'any maskable'
-          }
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       }
     })
@@ -47,5 +39,9 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  esbuild: {
+    // Keep console.error/warn; strip debug logging from production bundles.
+    pure: mode === 'production' ? ['console.log', 'console.debug', 'console.info'] : [],
   },
 }));

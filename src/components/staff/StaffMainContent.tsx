@@ -11,10 +11,11 @@ import { UndoActionButton } from './UndoActionButton';
 import { StaffAvailabilityControl } from './StaffAvailabilityControl';
 import DocumentsPanel from '@/components/documents/DocumentsPanel';
 import { useStaffNotifications } from '@/hooks/use-staff-notifications';
+import type { Appointment } from '@/hooks/useAppData';
 
 interface StaffMainContentProps {
   activeSection: string;
-  activeAppointments: any[];
+  activeAppointments: Appointment[];
   onRefresh: () => void;
   onNotificationClick: () => void;
   onSettingsClick: () => void;

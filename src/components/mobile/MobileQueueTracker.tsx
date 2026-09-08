@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatWaitTime } from '@/lib/queue';
+import { customerName, findPublicAppointment } from '@/lib/publicQueue';
 
 interface MobileQueueTrackerProps {
   appointmentId: string;
@@ -35,26 +37,34 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t, i18n } = useTranslation();
 
   // Fetch queue position data
   const { data: queueData, isLoading, error } = useQuery({
     queryKey: ['queue-position', appointmentId],
     queryFn: async (): Promise<QueuePosition> => {
-      const response = await fetch(
-        `https://diadwozorwkzhexhjfgb.supabase.co/functions/v1/queue-position/${appointmentId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpYWR3b3pvcndremhleGhqZmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5MTQyODEsImV4cCI6MjA2MjQ5MDI4MX0.WGtQJCeSW99Dklx0bu1b6KoNb2utGaCAfsWY46xuHbw'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch queue position');
+      // The queue-position edge function rejects anonymous callers (401); the
+      // public RPC is scoped to this one appointment id instead.
+      const appointment = await findPublicAppointment({ appointmentId });
+      if (!appointment) {
+        throw new Error(t('public.mobileQueue.tracker.notFound'));
       }
-      
-      return response.json();
+      const currentWait = appointment.check_in_time
+        ? Math.max(0, Math.floor((Date.now() - new Date(appointment.check_in_time).getTime()) / 60000))
+        : undefined;
+      return {
+        appointment_id: appointment.appointment_id,
+        status: appointment.status,
+        position: appointment.position ?? undefined,
+        total_in_queue: appointment.total_in_queue,
+        estimated_wait_time_minutes: appointment.estimated_wait_minutes,
+        current_wait_time_minutes: currentWait,
+        customer_name: customerName(appointment),
+        service_name: appointment.service_name || t('public.mobileQueue.tracker.fallbackService'),
+        check_in_time: appointment.check_in_time || undefined,
+        ticket_number: appointment.ticket_number,
+        location_id: appointment.location_id || '',
+      };
     },
     refetchInterval: 30000, // Refetch every 30 seconds
     enabled: !!appointmentId
@@ -82,8 +92,8 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
           if (payload.eventType === 'UPDATE' && payload.new.status !== payload.old?.status) {
             if (payload.new.status === 'in_progress') {
               toast({
-                title: "You're Being Called! 🔔",
-                description: "Please proceed to the service counter.",
+                title: t('public.mobileQueue.tracker.calledTitle'),
+                description: t('public.mobileQueue.tracker.calledDescription'),
                 className: "bg-green-50 border-green-200",
               });
             }
@@ -95,7 +105,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [appointmentId, queryClient, toast]);
+  }, [appointmentId, queryClient, toast, t]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -109,10 +119,10 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
     onNotificationToggle?.(newState);
     
     toast({
-      title: newState ? 'Notifications Enabled' : 'Notifications Disabled',
-      description: newState 
-        ? 'You\'ll receive updates about your queue position' 
-        : 'Queue notifications have been turned off',
+      title: newState ? t('public.mobileQueue.tracker.notificationsEnabled') : t('public.mobileQueue.tracker.notificationsDisabled'),
+      description: newState
+        ? t('public.mobileQueue.tracker.enabledDescription')
+        : t('public.mobileQueue.tracker.disabledDescription'),
     });
   };
 
@@ -123,7 +133,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
           <Card>
             <CardContent className="p-8 text-center">
               <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading your queue position...</p>
+              <p className="text-gray-600">{t('public.mobileQueue.tracker.loading')}</p>
             </CardContent>
           </Card>
         </div>
@@ -137,10 +147,10 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
         <div className="max-w-md mx-auto pt-20">
           <Card>
             <CardContent className="p-8 text-center">
-              <p className="text-red-600 mb-4">Unable to load queue information</p>
+              <p className="text-red-600 mb-4">{t('public.mobileQueue.tracker.loadFailed')}</p>
               <Button onClick={handleRefresh} variant="outline">
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Try Again
+                {t('public.mobileQueue.tracker.tryAgain')}
               </Button>
             </CardContent>
           </Card>
@@ -151,14 +161,16 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
 
   const getStatusDisplay = (status: string) => {
     switch (status) {
+      case 'scheduled':
+        return { text: t('public.mobileQueue.tracker.status.scheduled'), color: 'bg-amber-100 text-amber-800', emoji: '📅' };
       case 'checked_in':
-        return { text: 'In Queue', color: 'bg-blue-100 text-blue-800', emoji: '⏳' };
+        return { text: t('public.mobileQueue.tracker.status.checked_in'), color: 'bg-blue-100 text-blue-800', emoji: '⏳' };
       case 'in_progress':
-        return { text: 'Being Called!', color: 'bg-green-100 text-green-800', emoji: '🔔' };
+        return { text: t('public.mobileQueue.tracker.status.in_progress'), color: 'bg-green-100 text-green-800', emoji: '🔔' };
       case 'completed':
-        return { text: 'Completed', color: 'bg-gray-100 text-gray-800', emoji: '✅' };
+        return { text: t('public.mobileQueue.tracker.status.completed'), color: 'bg-gray-100 text-gray-800', emoji: '✅' };
       default:
-        return { text: 'Unknown', color: 'bg-gray-100 text-gray-800', emoji: '❓' };
+        return { text: t('public.mobileQueue.tracker.status.unknown'), color: 'bg-gray-100 text-gray-800', emoji: '❓' };
     }
   };
 
@@ -171,8 +183,8 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
         <div className="max-w-md mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">Queue Position</h1>
-              <p className="text-sm text-gray-600">Ticket #{queueData.ticket_number}</p>
+              <h1 className="text-lg font-semibold text-gray-900">{t('public.mobileQueue.tracker.title')}</h1>
+              <p className="text-sm text-gray-600">{t('public.mobileQueue.tracker.ticket', { number: queueData.ticket_number })}</p>
             </div>
             <div className="flex gap-2">
               <Button
@@ -216,12 +228,12 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
                 <div className="text-6xl font-bold text-blue-600">
                   #{queueData.position}
                 </div>
-                <p className="text-gray-600">Your position in line</p>
-                {queueData.total_in_queue && (
-                  <p className="text-sm text-gray-500">
-                    {queueData.total_in_queue - queueData.position} people ahead of you
-                  </p>
-                )}
+                <p className="text-gray-600">{t('public.mobileQueue.tracker.positionLabel')}</p>
+                <p className="text-sm text-gray-500">
+                  {queueData.position - 1 === 1
+                    ? t('public.mobileQueue.tracker.onePersonAhead')
+                    : t('public.mobileQueue.tracker.peopleAhead', { count: queueData.position - 1 })}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -236,7 +248,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
                 <p className="text-2xl font-bold text-orange-900">
                   {formatWaitTime(queueData.estimated_wait_time_minutes)}
                 </p>
-                <p className="text-sm text-gray-600">Est. wait time</p>
+                <p className="text-sm text-gray-600">{t('public.mobileQueue.tracker.estimatedWait')}</p>
               </CardContent>
             </Card>
           )}
@@ -248,7 +260,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
                 <p className="text-2xl font-bold text-blue-900">
                   {formatWaitTime(queueData.current_wait_time_minutes)}
                 </p>
-                <p className="text-sm text-gray-600">Current wait</p>
+                <p className="text-sm text-gray-600">{t('public.mobileQueue.tracker.currentWait')}</p>
               </CardContent>
             </Card>
           )}
@@ -257,7 +269,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
         {/* Service Details */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Service Details</CardTitle>
+            <CardTitle className="text-lg">{t('public.mobileQueue.tracker.serviceDetails')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-2">
@@ -265,11 +277,11 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
               <span className="text-sm">{queueData.service_name}</span>
             </div>
             <div className="text-sm text-gray-600">
-              Customer: {queueData.customer_name}
+              {t('public.mobileQueue.tracker.customer', { name: queueData.customer_name })}
             </div>
             {queueData.check_in_time && (
               <div className="text-sm text-gray-600">
-                Checked in: {new Date(queueData.check_in_time).toLocaleTimeString()}
+                {t('public.mobileQueue.tracker.checkedInAt', { time: new Date(queueData.check_in_time).toLocaleTimeString(i18n.language) })}
               </div>
             )}
           </CardContent>
@@ -281,10 +293,10 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="text-green-600 font-semibold mb-2">
-                  🔔 You're being called!
+                  {t('public.mobileQueue.tracker.beingCalled')}
                 </div>
                 <p className="text-green-700 text-sm">
-                  Please proceed to the service counter now.
+                  {t('public.mobileQueue.tracker.proceed')}
                 </p>
               </div>
             </CardContent>
@@ -296,7 +308,7 @@ export const MobileQueueTracker: React.FC<MobileQueueTrackerProps> = ({
           <CardContent className="pt-4">
             <Button variant="outline" className="w-full" size="lg">
               <QrCode className="h-5 w-5 mr-2" />
-              Show QR Code
+              {t('public.mobileQueue.tracker.showQr')}
             </Button>
           </CardContent>
         </Card>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import BrowardHeader from '@/components/layout/BrowardHeader';
-import BrowardHero from '@/components/layout/BrowardHero';
-import BrowardFooter from '@/components/layout/BrowardFooter';
-import BrowardButton from '@/components/ui/broward-button';
-import BrowardCard from '@/components/ui/broward-card';
+import SiteHeader from '@/components/layout/SiteHeader';
+import SiteHero from '@/components/layout/SiteHero';
+import SiteFooter from '@/components/layout/SiteFooter';
+import BrandButton from '@/components/ui/brand-button';
+import BrandCard from '@/components/ui/brand-card';
 import { 
   ShieldIcon, 
   HandshakeIcon, 
@@ -13,15 +13,15 @@ import {
   LandmarkCourthouse,
   LandmarkBeach,
   LandmarkPort
-} from '@/components/ui/broward-icons';
+} from '@/components/ui/brand-icons';
 
-const BrowardIndex: React.FC = () => {
+const DesignSystemIndexPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
-      <BrowardHeader />
+      <SiteHeader />
       
-      <BrowardHero 
-        title="Protecting Broward County Consumers" 
+      <SiteHero 
+        title="Protecting County Consumers" 
         subtitle="Ensuring fair business practices and consumer rights through education, mediation, and enforcement"
       />
       
@@ -32,12 +32,12 @@ const BrowardIndex: React.FC = () => {
             <h2 className="font-serif text-3xl text-bc-navy dark:text-bc-blue mb-4">Our Services</h2>
             <p className="max-w-2xl mx-auto text-neutral-600 dark:text-neutral-400">
               The Consumer Protection Division provides a variety of services to help protect 
-              Broward County residents from unfair business practices.
+              county residents from unfair business practices.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <div className="flex justify-center mb-4">
                 <ShieldIcon size={48} className="text-bc-blue" />
               </div>
@@ -45,10 +45,10 @@ const BrowardIndex: React.FC = () => {
               <p className="mb-4 text-neutral-600 dark:text-neutral-400">
                 File complaints against businesses for unfair practices, fraud, or deceptive advertising.
               </p>
-              <BrowardButton variant="primary">File a Complaint</BrowardButton>
-            </BrowardCard>
+              <BrandButton variant="primary">File a Complaint</BrandButton>
+            </BrandCard>
             
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <div className="flex justify-center mb-4">
                 <HandshakeIcon size={48} className="text-bc-teal" />
               </div>
@@ -56,10 +56,10 @@ const BrowardIndex: React.FC = () => {
               <p className="mb-4 text-neutral-600 dark:text-neutral-400">
                 Our mediators help resolve disputes between consumers and businesses.
               </p>
-              <BrowardButton variant="secondary">Request Mediation</BrowardButton>
-            </BrowardCard>
+              <BrandButton variant="secondary">Request Mediation</BrandButton>
+            </BrandCard>
             
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <div className="flex justify-center mb-4">
                 <DocumentIcon size={48} className="text-bc-navy" />
               </div>
@@ -67,8 +67,8 @@ const BrowardIndex: React.FC = () => {
               <p className="mb-4 text-neutral-600 dark:text-neutral-400">
                 Apply for or renew business licenses and permits required by county ordinances.
               </p>
-              <BrowardButton variant="outline">Apply for License</BrowardButton>
-            </BrowardCard>
+              <BrandButton variant="outline">Apply for License</BrandButton>
+            </BrandCard>
           </div>
         </section>
         
@@ -76,9 +76,9 @@ const BrowardIndex: React.FC = () => {
         <section className="mb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 className="font-serif text-3xl text-bc-navy dark:text-bc-blue mb-4">About Broward County</h2>
+              <h2 className="font-serif text-3xl text-bc-navy dark:text-bc-blue mb-4">About the County</h2>
               <p className="mb-4 text-neutral-600 dark:text-neutral-400">
-                Broward County is home to nearly 2 million residents and millions of annual visitors. 
+                Our county is home to nearly 2 million residents and millions of annual visitors. 
                 Our Consumer Protection Division works to ensure fair treatment for all consumers 
                 and businesses in our diverse community.
               </p>
@@ -87,7 +87,7 @@ const BrowardIndex: React.FC = () => {
                 we're committed to maintaining the highest standards of consumer protection 
                 throughout the county.
               </p>
-              <BrowardButton variant="primary">Learn More</BrowardButton>
+              <BrandButton variant="primary">Learn More</BrandButton>
             </div>
             
             <div className="grid grid-cols-1 gap-6">
@@ -115,18 +115,18 @@ const BrowardIndex: React.FC = () => {
               and other consumer protection matters.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <BrowardButton 
+              <BrandButton 
                 variant="primary" 
                 className="bg-bc-gold text-bc-navy hover:bg-bc-sand"
               >
                 Schedule an Appointment
-              </BrowardButton>
-              <BrowardButton 
+              </BrandButton>
+              <BrandButton 
                 variant="outline"
                 className="border-white text-white hover:bg-white hover:text-bc-navy"
               >
                 Contact Us
-              </BrowardButton>
+              </BrandButton>
             </div>
           </div>
         </section>
@@ -137,7 +137,7 @@ const BrowardIndex: React.FC = () => {
             <h2 className="font-serif text-2xl text-bc-navy mb-6 text-center">Recent Updates</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <BrowardCard>
+              <BrandCard>
                 <p className="text-sm text-bc-teal mb-2">May 15, 2025</p>
                 <h3 className="font-serif text-lg mb-2">Consumer Alert: Home Repair Scams</h3>
                 <p className="text-neutral-600 dark:text-neutral-400 mb-4">
@@ -146,9 +146,9 @@ const BrowardIndex: React.FC = () => {
                 <Link to="/alerts" className="text-bc-blue dark:text-bc-teal font-medium hover:underline">
                   Read More
                 </Link>
-              </BrowardCard>
+              </BrandCard>
               
-              <BrowardCard>
+              <BrandCard>
                 <p className="text-sm text-bc-teal mb-2">May 10, 2025</p>
                 <h3 className="font-serif text-lg mb-2">New Online Complaint System</h3>
                 <p className="text-neutral-600 dark:text-neutral-400 mb-4">
@@ -157,9 +157,9 @@ const BrowardIndex: React.FC = () => {
                 <Link to="/news" className="text-bc-blue dark:text-bc-teal font-medium hover:underline">
                   Read More
                 </Link>
-              </BrowardCard>
+              </BrandCard>
               
-              <BrowardCard>
+              <BrandCard>
                 <p className="text-sm text-bc-teal mb-2">May 5, 2025</p>
                 <h3 className="font-serif text-lg mb-2">Business License Renewal Deadline</h3>
                 <p className="text-neutral-600 dark:text-neutral-400 mb-4">
@@ -168,7 +168,7 @@ const BrowardIndex: React.FC = () => {
                 <Link to="/news" className="text-bc-blue dark:text-bc-teal font-medium hover:underline">
                   Read More
                 </Link>
-              </BrowardCard>
+              </BrandCard>
             </div>
           </div>
         </section>
@@ -183,40 +183,40 @@ const BrowardIndex: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <h3 className="font-serif text-4xl text-bc-blue mb-2">2,500+</h3>
               <p className="text-neutral-600 dark:text-neutral-400">
                 Consumer complaints resolved annually
               </p>
-            </BrowardCard>
+            </BrandCard>
             
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <h3 className="font-serif text-4xl text-bc-teal mb-2">$1.2M</h3>
               <p className="text-neutral-600 dark:text-neutral-400">
                 Recovered for consumers last year
               </p>
-            </BrowardCard>
+            </BrandCard>
             
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <h3 className="font-serif text-4xl text-bc-navy mb-2">15,000+</h3>
               <p className="text-neutral-600 dark:text-neutral-400">
                 Business licenses issued and renewed
               </p>
-            </BrowardCard>
+            </BrandCard>
             
-            <BrowardCard className="text-center">
+            <BrandCard className="text-center">
               <h3 className="font-serif text-4xl text-bc-gold mb-2">98%</h3>
               <p className="text-neutral-600 dark:text-neutral-400">
                 Customer satisfaction rating
               </p>
-            </BrowardCard>
+            </BrandCard>
           </div>
         </section>
       </main>
       
-      <BrowardFooter />
+      <SiteFooter />
     </div>
   );
 };
 
-export default BrowardIndex;
+export default DesignSystemIndexPage;

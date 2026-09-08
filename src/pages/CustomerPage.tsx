@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
 import SimpleAppointmentForm from '@/components/customer/SimpleAppointmentForm';
@@ -9,24 +10,18 @@ import { CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentFo
 
 const CustomerPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const { createAppointment, isSubmitting } = useCustomerAppointmentFlow();
 
-  console.log('CustomerPage - Component rendering');
-
-  const handleAppointmentSubmit = async (customerData: CustomerAppointmentData) => {
-    console.log('CustomerPage - Handling appointment submission:', customerData);
-    
-    try {
-      const result = await createAppointment(customerData);
-      console.log('CustomerPage - Appointment creation result:', result);
-      
-      if (result) {
-        setConfirmationCode(result);
-      }
-    } catch (error) {
-      console.error('CustomerPage - Error creating appointment:', error);
+  /** Returns true only when the booking was actually created. */
+  const handleAppointmentSubmit = async (customerData: CustomerAppointmentData): Promise<boolean> => {
+    const result = await createAppointment(customerData);
+    if (result) {
+      setConfirmationCode(result);
+      return true;
     }
+    return false;
   };
 
   const handleConfirmationClose = (open: boolean) => {
@@ -38,8 +33,8 @@ const CustomerPage = () => {
 
   return (
     <PageLayout 
-      headerTitle="Consumer Protection Division"
-      headerSubtitle="Schedule your appointment with Broward County services"
+      headerTitle={t('public.booking.pageTitle')}
+      headerSubtitle={t('public.booking.pageSubtitle')}
     >
       <div className="min-h-screen bg-pattern-bubbles bg-gradient-overlay-blue">
         <div className="container mx-auto px-4 py-8">

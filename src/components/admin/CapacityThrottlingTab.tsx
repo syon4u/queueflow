@@ -46,11 +46,20 @@ interface CapacityPrediction {
   adjustment_reason: string;
 }
 
+interface ThrottlingRuleFormValues {
+  dayOfWeek: string;
+  hourOfDay: string;
+  maxCapacity: string;
+  throttleThreshold: string;
+  waitlistEnabled: boolean;
+  dynamicAdjustment: boolean;
+}
+
 export const CapacityThrottlingTab: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [selectedService, setSelectedService] = useState<string>('');
   const [showRuleDialog, setShowRuleDialog] = useState(false);
-  const [editingRule, setEditingRule] = useState<any>(null);
+  const [editingRule, setEditingRule] = useState<ThrottlingRule | null>(null);
 
   // Get locations
   const { data: locations, isLoading: locationsLoading } = useQuery({
@@ -94,7 +103,7 @@ export const CapacityThrottlingTab: React.FC = () => {
     togglingThrottling
   } = useCapacityThrottling(selectedLocation, selectedService);
 
-  const handleCreateRule = (values: any) => {
+  const handleCreateRule = (values: ThrottlingRuleFormValues) => {
     createThrottlingRule({
       location_id: selectedLocation,
       service_id: selectedService || undefined,
@@ -130,7 +139,7 @@ export const CapacityThrottlingTab: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               {locationsLoading ? (
-                <SelectItem value="">Loading...</SelectItem>
+                <SelectItem value="__loading" disabled>Loading...</SelectItem>
               ) : locations?.map((location) => (
                 <SelectItem key={location.id} value={location.id}>
                   {location.name}
@@ -141,14 +150,14 @@ export const CapacityThrottlingTab: React.FC = () => {
         </div>
         <div>
           <Label htmlFor="service">Service (Optional)</Label>
-          <Select onValueChange={setSelectedService}>
+          <Select onValueChange={(value) => setSelectedService(value === 'all' ? '' : value)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a service (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Services</SelectItem>
+              <SelectItem value="all">All Services</SelectItem>
               {servicesLoading ? (
-                <SelectItem value="">Loading...</SelectItem>
+                <SelectItem value="__loading" disabled>Loading...</SelectItem>
               ) : services?.map((service) => (
                 <SelectItem key={service.id} value={service.id}>
                   {service.name}

@@ -4,7 +4,7 @@ import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
-import type { Appointment } from '@/hooks/use-appointments';
+import type { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 import { SendReminderDialog } from './staff/SendReminderDialog';
 import { CreateAppointmentDialog } from './staff/CreateAppointmentDialog';
 import { AppointmentTableHeader } from './staff/AppointmentTableHeader';
@@ -48,7 +48,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
     }
     
     // Handle other actions through the existing system
-    const statusMap: Record<string, string> = {
+    const statusMap: Record<string, AppointmentStatus> = {
       check_in: 'checked_in',
       start: 'in_progress',
       pause: 'checked_in',
@@ -57,7 +57,7 @@ const StaffAppointmentTable: React.FC<StaffAppointmentTableProps> = ({
     };
     
     if (statusMap[action]) {
-      updateAppointmentStatus(appointmentId, statusMap[action] as any);
+      updateAppointmentStatus(appointmentId, statusMap[action]);
     }
   };
 

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { getErrorMessage } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Customer } from '@/components/customer/CustomerSearchBox';
@@ -94,11 +95,11 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
       });
 
       onAppointmentScheduled(confirmationCode);
-    } catch (error: any) {
+    } catch (error) {
       console.error('useAppointmentSubmission - Error:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create appointment. Please try again.',
+        description: getErrorMessage(error) || 'Failed to create appointment. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -169,11 +170,11 @@ export const useAppointmentSubmission = (onAppointmentScheduled: (code: string) 
       });
 
       onAppointmentScheduled(confirmationCode);
-    } catch (error: any) {
+    } catch (error) {
       console.error('useAppointmentSubmission - Error:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create appointment. Please try again.',
+        description: getErrorMessage(error) || 'Failed to create appointment. Please try again.',
         variant: 'destructive',
       });
     } finally {

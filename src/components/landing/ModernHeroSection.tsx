@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CheckCircle, Clock, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ interface ModernHeroSectionProps {
 }
 
 const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) => {
+  const { t } = useTranslation();
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Video Background */}
@@ -30,7 +32,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
           {/* Using a tech-forward video more aligned with queue management systems */}
           <source src="https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_25fps.mp4" type="video/mp4" />
           <source src="https://videos.pexels.com/video-files/6963944/6963944-uhd_2560_1440_30fps.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
+          {t('public.hero.videoUnsupported')}
         </video>
         
         {/* Elegant Dark Overlay - Queue management theme */}
@@ -61,13 +63,13 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
         {/* Main Heading */}
         <div className="mb-8">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
-            Smart Queue Management
+            {t('public.hero.titleLine1')}
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
-              For Modern Business
+              {t('public.hero.titleLine2')}
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
-            Eliminate waiting rooms, reduce customer frustration, and boost efficiency with our AI-powered queue management system.
+            {t('public.hero.subtitle')}
           </p>
         </div>
 
@@ -75,15 +77,15 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2 text-white border border-white/10">
             <Clock className="h-4 w-4" />
-            <span className="text-sm font-medium">Real-time Updates</span>
+            <span className="text-sm font-medium">{t('public.hero.pillRealtime')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2 text-white border border-white/10">
             <Users className="h-4 w-4" />
-            <span className="text-sm font-medium">Smart Scheduling</span>
+            <span className="text-sm font-medium">{t('public.hero.pillScheduling')}</span>
           </div>
           <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2 text-white border border-white/10">
             <CheckCircle className="h-4 w-4" />
-            <span className="text-sm font-medium">No More Lines</span>
+            <span className="text-sm font-medium">{t('public.hero.pillNoLines')}</span>
           </div>
         </div>
 
@@ -95,7 +97,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
             asChild
           >
             <Link to="/customer">
-              Book Appointment
+              {t('public.hero.bookAppointment')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -106,7 +108,7 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
             className="w-full sm:w-auto bg-transparent border-2 border-white/80 text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300 min-h-[48px] touch-manipulation" 
             asChild
           >
-            <Link to="/status">Check Status</Link>
+            <Link to="/status">{t('public.hero.checkStatus')}</Link>
           </Button>
           
           <Button 
@@ -115,23 +117,23 @@ const ModernHeroSection: React.FC<ModernHeroSectionProps> = ({ onShowGuide }) =>
             className="w-full sm:w-auto text-white hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-md transition-all duration-300 min-h-[48px] touch-manipulation" 
             onClick={onShowGuide}
           >
-            Learn More
+            {t('public.hero.learnMore')}
           </Button>
         </div>
 
         {/* Stats Bar - Enhanced for queue management theme */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">85%</div>
-            <div className="text-blue-100">Time Saved</div>
+            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">{t('public.hero.statLive')}</div>
+            <div className="text-blue-100">{t('public.hero.statLiveDescription')}</div>
           </div>
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">10k+</div>
-            <div className="text-blue-100">Happy Customers</div>
+            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">{t('public.hero.statLanguages')}</div>
+            <div className="text-blue-100">{t('public.hero.statLanguagesDescription')}</div>
           </div>
           <div className="bg-white/15 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-lg">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">24/7</div>
-            <div className="text-blue-100">Available</div>
+            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">{t('public.hero.statPwa')}</div>
+            <div className="text-blue-100">{t('public.hero.statPwaDescription')}</div>
           </div>
         </div>
       </div>

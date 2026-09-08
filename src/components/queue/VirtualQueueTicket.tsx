@@ -1,13 +1,15 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { QrCode, MapPin, Clock, Users, Phone, CheckCircle } from 'lucide-react';
 import QRCode from 'qrcode';
 
-interface TicketData {
+export interface TicketData {
   id: string;
+  confirmationCode?: string | null;
   ticketId: string;
   qrCode: string;
   position: number;
@@ -35,6 +37,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
   ticketData, 
   onCheckIn 
 }) => {
+  const { t } = useTranslation();
   const [qrCodeUrl, setQrCodeUrl] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -56,7 +59,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
       <CardHeader className="text-center">
         <CardTitle className="flex items-center justify-center gap-2">
           <QrCode className="h-5 w-5" />
-          Your Queue Ticket
+          {t('public.virtualQueue.ticket.title')}
         </CardTitle>
         <div className="text-2xl font-bold text-blue-600">
           #{ticketData.ticketId}
@@ -69,7 +72,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
           {qrCodeUrl && (
             <img 
               src={qrCodeUrl} 
-              alt="Queue ticket QR code"
+              alt={t('public.virtualQueue.ticket.qrAlt')}
               className="w-32 h-32 border-2 border-gray-200 rounded-lg"
             />
           )}
@@ -81,7 +84,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
             variant={isCheckedIn ? 'default' : 'outline'}
             className={isCheckedIn ? 'bg-green-600 text-white' : 'bg-orange-100 text-orange-700'}
           >
-            {isCheckedIn ? 'Checked In' : 'Virtual Queue'}
+            {isCheckedIn ? t('public.virtualQueue.ticket.checkedIn') : t('public.virtualQueue.ticket.virtualQueue')}
           </Badge>
         </div>
 
@@ -91,7 +94,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
             <CardContent className="pt-4 text-center">
               <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
                 <Users className="h-4 w-4" />
-                <span className="text-sm font-medium">Position</span>
+                <span className="text-sm font-medium">{t('public.virtualQueue.ticket.position')}</span>
               </div>
               <div className="text-2xl font-bold text-blue-900">
                 #{ticketData.position}
@@ -103,7 +106,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
             <CardContent className="pt-4 text-center">
               <div className="flex items-center justify-center gap-1 text-orange-600 mb-1">
                 <Clock className="h-4 w-4" />
-                <span className="text-sm font-medium">Est. Wait</span>
+                <span className="text-sm font-medium">{t('public.virtualQueue.ticket.estimatedWait')}</span>
               </div>
               <div className="text-2xl font-bold text-orange-900">
                 {ticketData.estimatedWait}m
@@ -119,7 +122,7 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
             <span className="font-medium">{ticketData.locations.name}</span>
           </div>
           <div className="text-gray-600">
-            Service: {ticketData.services.name}
+            {t('public.virtualQueue.ticket.service', { name: ticketData.services.name })}
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Phone className="h-4 w-4" />
@@ -135,23 +138,23 @@ export const VirtualQueueTicket: React.FC<VirtualQueueTicketProps> = ({
             size="lg"
           >
             <CheckCircle className="h-5 w-5 mr-2" />
-            I'm Here - Check In
+            {t('public.virtualQueue.ticket.checkInButton')}
           </Button>
         )}
 
         {isCheckedIn && (
           <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
             <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-2" />
-            <p className="text-green-800 font-medium">You're checked in!</p>
-            <p className="text-green-600 text-sm">Please wait to be called for service</p>
+            <p className="text-green-800 font-medium">{t('public.virtualQueue.ticket.checkedInTitle')}</p>
+            <p className="text-green-600 text-sm">{t('public.virtualQueue.ticket.checkedInDescription')}</p>
           </div>
         )}
 
         {/* Instructions */}
         <div className="text-xs text-gray-500 space-y-1">
-          <div>• Keep this ticket handy for check-in</div>
-          <div>• You'll receive SMS updates on your position</div>
-          <div>• Scan QR code at kiosk or show to staff</div>
+          <div>{t('public.virtualQueue.ticket.tip1')}</div>
+          <div>{t('public.virtualQueue.ticket.tip2')}</div>
+          <div>{t('public.virtualQueue.ticket.tip3')}</div>
         </div>
       </CardContent>
     </Card>

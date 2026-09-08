@@ -95,9 +95,9 @@ export const AutomatedAppointmentReminders: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Select Appointment</label>
+              <label htmlFor="reminder-appointment" className="text-sm font-medium">Select Appointment</label>
               <Select value={selectedAppointment} onValueChange={setSelectedAppointment}>
-                <SelectTrigger>
+                <SelectTrigger id="reminder-appointment">
                   <SelectValue placeholder="Choose an upcoming appointment" />
                 </SelectTrigger>
                 <SelectContent>
@@ -111,7 +111,7 @@ export const AutomatedAppointmentReminders: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-medium">Reminder Preferences</label>
+              <span className="text-sm font-medium">Reminder Preferences</span>
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -153,14 +153,14 @@ export const AutomatedAppointmentReminders: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Initial Reminder Timing</label>
+                <label htmlFor="reminder-timing" className="text-sm font-medium">Initial Reminder Timing</label>
                 <Select 
                   value={reminderSettings.reminder_timing} 
-                  onValueChange={(value: any) => 
-                    setReminderSettings(prev => ({ ...prev, reminder_timing: value }))
+                  onValueChange={(value) => 
+                    setReminderSettings(prev => ({ ...prev, reminder_timing: value as typeof prev.reminder_timing }))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="reminder-timing">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

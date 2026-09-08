@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, AlertCircle } from 'lucide-react';
@@ -13,11 +14,13 @@ import VisitDetailsSection from './appointment-form/VisitDetailsSection';
 import { Spinner } from '@/components/ui/spinner';
 
 interface SimpleAppointmentFormProps {
-  onSubmit: (customerInfo: CustomerAppointmentData) => void;
+  /** Resolve false (or throw) when the booking was not created; the caller has already shown the reason. */
+  onSubmit: (customerInfo: CustomerAppointmentData) => Promise<boolean | void> | boolean | void;
 }
 
 const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   console.log('SimpleAppointmentForm - Component rendering');
@@ -54,7 +57,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     if (validationError) {
       console.log('SimpleAppointmentForm - Validation error:', validationError);
       toast({
-        title: 'Missing Information',
+        title: t('public.booking.toast.missingInfo'),
         description: validationError,
         variant: 'destructive',
       });
@@ -65,18 +68,21 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
     console.log('SimpleAppointmentForm - Calling onSubmit with:', formData);
     
     try {
-      await onSubmit(formData);
+      const created = await onSubmit(formData);
+      if (created === false) {
+        return;
+      }
       toast({
-        title: 'Request Submitted!',
-        description: 'We will contact you soon to confirm your appointment.',
+        title: t('public.booking.toast.booked'),
+        description: t('public.booking.toast.bookedDescription'),
       });
-      
+
       resetForm();
     } catch (error) {
       console.error('SimpleAppointmentForm - Submission error:', error);
       toast({
-        title: 'Error',
-        description: 'There was a problem submitting your request. Please try again.',
+        title: t('common.error'),
+        description: t('public.booking.toast.submitError'),
         variant: 'destructive',
       });
     } finally {
@@ -92,16 +98,16 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
         <CardHeader className="text-left">
           <CardTitle className="flex items-center gap-2 text-left">
             <User className="h-5 w-5" />
-            Request an Appointment
+            {t('public.booking.formTitle')}
           </CardTitle>
           <CardDescription className="text-left">
-            Loading appointment form...
+            {t('public.booking.loadingForm')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Spinner className="h-6 w-6" />
-            <span className="ml-2 text-muted-foreground">Loading locations...</span>
+            <span className="ml-2 text-muted-foreground">{t('public.booking.loadingLocations')}</span>
           </div>
         </CardContent>
       </Card>
@@ -116,17 +122,17 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
         <CardHeader className="text-left">
           <CardTitle className="flex items-center gap-2 text-left">
             <User className="h-5 w-5" />
-            Request an Appointment
+            {t('public.booking.formTitle')}
           </CardTitle>
           <CardDescription className="text-left">
-            Unable to load appointment form
+            {t('public.booking.loadFailed')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Failed to load locations: {locationsError}
+              {t('public.booking.loadLocationsError', { error: locationsError })}
               <br />
               <Button 
                 variant="outline" 
@@ -134,7 +140,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 className="mt-2"
                 onClick={() => window.location.reload()}
               >
-                Retry
+                {t('public.booking.retry')}
               </Button>
             </AlertDescription>
           </Alert>
@@ -151,18 +157,17 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
         <CardHeader className="text-left">
           <CardTitle className="flex items-center gap-2 text-left">
             <User className="h-5 w-5" />
-            Request an Appointment
+            {t('public.booking.formTitle')}
           </CardTitle>
           <CardDescription className="text-left">
-            No locations available
+            {t('public.booking.noLocations')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              There are currently no locations available for scheduling appointments. 
-              Please check back later or contact support.
+              {t('public.booking.noLocationsMessage')}
               <br />
               <Button 
                 variant="outline" 
@@ -170,7 +175,7 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
                 className="mt-2"
                 onClick={() => window.location.reload()}
               >
-                Refresh
+                {t('public.booking.refresh')}
               </Button>
             </AlertDescription>
           </Alert>
@@ -186,10 +191,10 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
       <CardHeader className="text-left">
         <CardTitle className="flex items-center gap-2 text-left">
           <User className="h-5 w-5" />
-          Request an Appointment
+          {t('public.booking.formTitle')}
         </CardTitle>
         <CardDescription className="text-left">
-          Fill out this form and we'll contact you to schedule your appointment
+          {t('public.booking.formDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -226,11 +231,11 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
             disabled={isSubmitting}
             size="lg"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Appointment Request'}
+            {isSubmitting ? t('public.booking.submitting') : t('public.booking.submit')}
           </Button>
           
           <p className="text-sm text-muted-foreground text-center">
-            * Required fields. We will contact you within 1 business day to confirm your appointment.
+            {t('public.booking.requiredNote')}
           </p>
         </form>
       </CardContent>

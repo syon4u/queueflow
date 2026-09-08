@@ -1,7 +1,7 @@
 
 import React from 'react';
-import BrowardHeader from './BrowardHeader';
-import BrowardFooter from './BrowardFooter';
+import SiteHeader from './SiteHeader';
+import SiteFooter from './SiteFooter';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   return (
     <div className={`min-h-screen w-full flex flex-col ${className}`}>
       {showHeader && (
-        <BrowardHeader 
+        <SiteHeader 
           title={headerTitle}
           subtitle={headerSubtitle}
         />
@@ -33,7 +33,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
         {children}
       </main>
       
-      {showFooter && <BrowardFooter />}
+      {showFooter && <SiteFooter />}
     </div>
   );
 };

@@ -1,56 +1,58 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, Shield, BarChart3, Calendar, Bell, MapPin, Smartphone } from 'lucide-react';
 
 const FeaturesShowcase: React.FC = () => {
+  const { t } = useTranslation();
   const features = [
     {
       icon: Clock,
-      title: 'Real-Time Updates',
-      description: 'Get live updates on wait times and queue position through SMS and web notifications.',
+      title: t('public.features.realtime.title'),
+      description: t('public.features.realtime.description'),
       color: 'from-blue-500 to-cyan-500'
     },
     {
       icon: Calendar,
-      title: 'Smart Scheduling',
-      description: 'Book appointments in advance and choose your preferred time slot to avoid waiting.',
+      title: t('public.features.scheduling.title'),
+      description: t('public.features.scheduling.description'),
       color: 'from-purple-500 to-pink-500'
     },
     {
       icon: Users,
-      title: 'Queue Management',
-      description: 'Join virtual queues from anywhere and track your position in real-time.',
+      title: t('public.features.queue.title'),
+      description: t('public.features.queue.description'),
       color: 'from-green-500 to-emerald-500'
     },
     {
       icon: Bell,
-      title: 'Instant Notifications',
-      description: 'Receive alerts when it\'s almost your turn, so you never miss your appointment.',
+      title: t('public.features.notifications.title'),
+      description: t('public.features.notifications.description'),
       color: 'from-orange-500 to-red-500'
     },
     {
       icon: Shield,
-      title: 'Secure & Private',
-      description: 'Your personal information is protected with enterprise-grade security measures.',
+      title: t('public.features.secure.title'),
+      description: t('public.features.secure.description'),
       color: 'from-indigo-500 to-blue-500'
     },
     {
       icon: BarChart3,
-      title: 'Analytics Dashboard',
-      description: 'Staff can track performance metrics and optimize service delivery.',
+      title: t('public.features.analytics.title'),
+      description: t('public.features.analytics.description'),
       color: 'from-pink-500 to-rose-500'
     },
     {
       icon: MapPin,
-      title: 'Multi-Location',
-      description: 'Manage appointments across multiple locations from a single platform.',
+      title: t('public.features.multiLocation.title'),
+      description: t('public.features.multiLocation.description'),
       color: 'from-teal-500 to-cyan-500'
     },
     {
       icon: Smartphone,
-      title: 'Mobile First',
-      description: 'Optimized mobile experience for customers and staff on any device.',
+      title: t('public.features.mobileFirst.title'),
+      description: t('public.features.mobileFirst.description'),
       color: 'from-violet-500 to-purple-500'
     }
   ];
@@ -66,11 +68,10 @@ const FeaturesShowcase: React.FC = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Powerful Features for Everyone
+            {t('public.features.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Our queue management system is designed to make your experience smoother, 
-            whether you're a customer or staff member.
+            {t('public.features.subtitle')}
           </p>
         </div>
         
@@ -102,23 +103,23 @@ const FeaturesShowcase: React.FC = () => {
         <div className="mt-20 text-center">
           <div className="max-w-4xl mx-auto bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-xl">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Everything You Need in One Platform
+              {t('public.features.highlightTitle')}
             </h3>
             <p className="text-lg text-gray-600 mb-6">
-              From appointment scheduling to real-time queue management, we've got you covered with cutting-edge technology and intuitive design.
+              {t('public.features.highlightDescription')}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
-                Cloud-Based
+                {t('public.features.badgeCloud')}
               </div>
               <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                99.9% Uptime
+                {t('public.features.badgeRls')}
               </div>
               <div className="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">
-                HIPAA Compliant
+                {t('public.features.badgeEncrypted')}
               </div>
               <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">
-                24/7 Support
+                {t('public.features.badgePwa')}
               </div>
             </div>
           </div>

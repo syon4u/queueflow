@@ -1,58 +1,63 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { QueueProvider } from '@/context/QueueContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ProtectedRoute, AdminRoute, StaffRoute, PowerUserRoute } from '@/components/ProtectedRoute';
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Public pages
 import Index from '@/pages/Index';
-import CustomerPage from '@/pages/CustomerPage';
-import AppointmentLookupPage from './pages/AppointmentLookupPage';
-import AuthPage from '@/pages/AuthPage';
-import Login from '@/pages/Login';
-import ResetPassword from '@/pages/ResetPassword';
-import CheckInPage from '@/pages/CheckInPage';
-import KioskPage from '@/pages/KioskPage';
-import DigitalSignagePage from '@/pages/DigitalSignagePage';
-import MobileQueuePage from '@/pages/MobileQueuePage';
-import VirtualQueuePage from '@/pages/VirtualQueuePage';
-import StatusPage from '@/pages/StatusPage';
-import PricingPage from '@/pages/PricingPage';
-import Unauthorized from '@/pages/Unauthorized';
-import NotFound from '@/pages/NotFound';
+const CustomerPage = React.lazy(() => import('@/pages/CustomerPage'));
+const AppointmentLookupPage = React.lazy(() => import('./pages/AppointmentLookupPage'));
+const AuthPage = React.lazy(() => import('@/pages/AuthPage'));
+const ResetPassword = React.lazy(() => import('@/pages/ResetPassword'));
+const CheckInPage = React.lazy(() => import('@/pages/CheckInPage'));
+const KioskPage = React.lazy(() => import('@/pages/KioskPage'));
+const DigitalSignagePage = React.lazy(() => import('@/pages/DigitalSignagePage'));
+const MobileQueuePage = React.lazy(() => import('@/pages/MobileQueuePage'));
+const VirtualQueuePage = React.lazy(() => import('@/pages/VirtualQueuePage'));
+const StatusPage = React.lazy(() => import('@/pages/StatusPage'));
+const PricingPage = React.lazy(() => import('@/pages/PricingPage'));
+const Unauthorized = React.lazy(() => import('@/pages/Unauthorized'));
+const NotFound = React.lazy(() => import('@/pages/NotFound'));
 
 // Protected pages
-import AdminPage from '@/pages/AdminPage';
-import StaffPage from '@/pages/StaffPage';
-import PowerUserPage from '@/pages/PowerUserPage';
-import ProfilePage from '@/pages/ProfilePage';
-import NewAppointmentPage from '@/pages/NewAppointmentPage';
-import PerformanceReportPage from '@/pages/PerformanceReportPage';
-import BackendHealthPage from '@/pages/BackendHealthPage';
+const AdminPage = React.lazy(() => import('@/pages/AdminPage'));
+const StaffPage = React.lazy(() => import('@/pages/StaffPage'));
+const PowerUserPage = React.lazy(() => import('@/pages/PowerUserPage'));
+const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
+const NewAppointmentPage = React.lazy(() => import('@/pages/NewAppointmentPage'));
+const PerformanceReportPage = React.lazy(() => import('@/pages/PerformanceReportPage'));
+const BackendHealthPage = React.lazy(() => import('@/pages/BackendHealthPage'));
 
 // Design system pages
-import BrowardDesignSystem from '@/pages/BrowardDesignSystem';
-import BrowardIndex from '@/pages/BrowardIndex';
+const DesignSystemPage = React.lazy(() => import('@/pages/DesignSystemPage'));
+const DesignSystemIndexPage = React.lazy(() => import('@/pages/DesignSystemIndexPage'));
 
 // Create a query client instance
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <div className="min-h-screen bg-background">
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             <QueueProvider>
+              <ErrorBoundary>
+              <Suspense fallback={<div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">Loading…</div>}>
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/customer" element={<CustomerPage />} />
                 <Route path="/appointment-lookup" element={<AppointmentLookupPage />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/login" element={<Login />} />
+                {/* /login was a second, divergent sign-in page; /auth is canonical. */}
+                <Route path="/login" element={<Navigate to="/auth" replace />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/check-in" element={<CheckInPage />} />
                 <Route path="/status" element={<StatusPage />} />
@@ -66,8 +71,8 @@ function App() {
                 <Route path="/virtual-queue" element={<VirtualQueuePage />} />
                 
                 {/* Design system routes */}
-                <Route path="/broward-design-system" element={<BrowardDesignSystem />} />
-                <Route path="/broward-index" element={<BrowardIndex />} />
+                <Route path="/design-system" element={<AdminRoute><DesignSystemPage /></AdminRoute>} />
+                <Route path="/design-system/index" element={<AdminRoute><DesignSystemIndexPage /></AdminRoute>} />
                 
                 {/* Protected routes - require authentication */}
                 <Route path="/profile" element={
@@ -118,6 +123,10 @@ function App() {
                 {/* Catch-all route for 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
+              </ErrorBoundary>
+              <Toaster />
+              <Sonner />
             </QueueProvider>
           </QueryClientProvider>
         </AuthProvider>

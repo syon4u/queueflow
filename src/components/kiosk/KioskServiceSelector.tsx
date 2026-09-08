@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Clock, FileText, ChevronRight, Zap } from 'lucide-react';
 
@@ -21,16 +22,17 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
   onServiceSelect,
   onBack,
 }) => {
+  const { t } = useTranslation();
   const formatDuration = (minutes: number) => {
     if (minutes < 60) {
-      return `${minutes} min`;
+      return t('public.kiosk.service.durationMinutes', { minutes });
     }
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     if (remainingMinutes === 0) {
-      return `${hours}h`;
+      return t('public.kiosk.service.durationHours', { hours });
     }
-    return `${hours}h ${remainingMinutes}m`;
+    return t('public.kiosk.service.durationHoursMinutes', { hours, minutes: remainingMinutes });
   };
 
   const serviceColors = [
@@ -53,14 +55,14 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
           className="flex items-center gap-3 px-8 py-4 text-xl border-3 border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 rounded-2xl shadow-lg"
         >
           <ArrowLeft className="h-6 w-6" />
-          Back
+          {t('public.kiosk.service.back')}
         </Button>
         <div>
           <h3 className="text-5xl font-bold text-gray-900 mb-3">
-            Select Service Type
+            {t('public.kiosk.service.title')}
           </h3>
           <p className="text-2xl text-gray-600">
-            Choose the service you need today
+            {t('public.kiosk.service.subtitle')}
           </p>
         </div>
       </div>
@@ -71,10 +73,10 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
             <FileText className="h-16 w-16 text-white" />
           </div>
           <h4 className="text-4xl font-bold text-gray-600 mb-6">
-            No Services Available
+            {t('public.kiosk.service.noneTitle')}
           </h4>
           <p className="text-2xl text-gray-500 max-w-md mx-auto">
-            No services are currently available at this location.
+            {t('public.kiosk.service.noneDescription')}
           </p>
         </div>
       ) : (
@@ -85,7 +87,15 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
               <div
                 key={service.id}
                 className={`relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer bg-gradient-to-br ${serviceColors[index % serviceColors.length]}`}
+                role="button"
+                tabIndex={0}
                 onClick={() => onServiceSelect(service.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onServiceSelect(service.id);
+                  }
+                }}
               >
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
                 <div className="relative p-8 text-white min-h-[280px] flex flex-col">
@@ -113,7 +123,7 @@ export const KioskServiceSelector: React.FC<KioskServiceSelectorProps> = ({
                   
                   <div className="flex items-center justify-between mt-auto">
                     <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
-                      <span className="text-sm font-medium">Select Service</span>
+                      <span className="text-sm font-medium">{t('public.kiosk.service.select')}</span>
                     </div>
                     <ChevronRight className="h-6 w-6 text-white/80" />
                   </div>

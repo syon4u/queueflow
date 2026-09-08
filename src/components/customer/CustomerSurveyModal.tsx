@@ -7,12 +7,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 interface SurveyQuestion {
   id: string;
   question_text: string;
   question_type: 'rating' | 'text' | 'multiple_choice';
-  options?: any;
+  options?: Json | null;
   is_required: boolean;
   order_index: number;
 }

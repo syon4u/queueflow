@@ -1,21 +1,28 @@
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { getErrorMessage } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useMinimalAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import type { Database, Json } from '@/integrations/supabase/types';
+
+type AppointmentUpdate = Database['public']['Tables']['appointments']['Update'];
 
 type AppointmentStatus = 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
 
 export const useStaffActions = () => {
-  const { user } = useMinimalAuth();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const logAction = async (
     actionType: string,
     resourceType: string,
     resourceId: string,
-    oldData?: any,
-    newData?: any
+    oldData?: Json | null,
+    newData?: Json | null,
+    options: { canUndo?: boolean } = {}
   ) => {
     if (!user?.id) {
       console.warn('No user ID available for logging action');
@@ -30,6 +37,7 @@ export const useStaffActions = () => {
         resource_id: resourceId,
         old_data: oldData,
         new_data: newData,
+        can_undo: options.canUndo ?? true,
       });
     } catch (error) {
       console.error('Failed to log staff action:', error);
@@ -39,7 +47,7 @@ export const useStaffActions = () => {
   const updateAppointmentStatus = async (
     appointmentId: string,
     newStatus: AppointmentStatus,
-    additionalData?: Record<string, any>
+    additionalData?: Partial<AppointmentUpdate>
   ) => {
     if (!user?.id) {
       toast({
@@ -60,7 +68,7 @@ export const useStaffActions = () => {
         .single();
 
       // Update appointment with proper typing
-      const updateData: Record<string, any> = {
+      const updateData: AppointmentUpdate = {
         status: newStatus,
         ...additionalData,
       };
@@ -87,11 +95,11 @@ export const useStaffActions = () => {
       });
 
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating appointment status:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to update appointment status',
+        description: getErrorMessage(error) || 'Failed to update appointment status',
         variant: 'destructive',
       });
       return false;
@@ -100,8 +108,12 @@ export const useStaffActions = () => {
     }
   };
 
-  const getRecentActions = async (limit: number = 10) => {
-    if (!user?.id) {
+  // Only actions that can still be undone: can_undo = true and not yet undone.
+  // Stable identity (useCallback) so UndoActionButton's effect does not re-run
+  // on every render.
+  const userId = user?.id;
+  const getRecentActions = useCallback(async (limit: number = 10) => {
+    if (!userId) {
       return [];
     }
 
@@ -109,7 +121,9 @@ export const useStaffActions = () => {
       const { data, error } = await supabase
         .from('staff_actions')
         .select('*')
-        .eq('staff_id', user.id)
+        .eq('staff_id', userId)
+        .eq('can_undo', true)
+        .is('undone_at', null)
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -119,7 +133,7 @@ export const useStaffActions = () => {
       console.error('Error fetching recent actions:', error);
       return [];
     }
-  };
+  }, [userId]);
 
   const undoAction = async (actionId: string) => {
     if (!user?.id) {
@@ -142,12 +156,20 @@ export const useStaffActions = () => {
 
       if (fetchError) throw fetchError;
 
+      if (action.undone_at || action.can_undo === false) {
+        toast({
+          title: 'Nothing to undo',
+          description: 'This action has already been undone',
+        });
+        return false;
+      }
+
       if (action.resource_type === 'appointment' && action.old_data) {
         // Type cast the JSON data to the expected appointment update format
-        const oldAppointmentData = action.old_data as Record<string, any>;
+        const oldAppointmentData = action.old_data as Record<string, Json | undefined>;
         
         // Extract only the fields we want to update (excluding id and other system fields)
-        const updateFields: Record<string, any> = {};
+        const updateFields: Record<string, Json | undefined> = {};
         const allowedFields = [
           'status', 'scheduled_time', 'check_in_time', 'start_time', 'end_time',
           'notes', 'reason_for_visit', 'staff_id', 'assigned_staff_id'
@@ -162,20 +184,32 @@ export const useStaffActions = () => {
         // Undo appointment changes
         const { error: undoError } = await supabase
           .from('appointments')
-          .update(updateFields)
+          .update(updateFields as AppointmentUpdate)
           .eq('id', action.resource_id);
 
         if (undoError) throw undoError;
       }
 
-      // Log the undo action
+      // Mark the original as undone so it is not offered again (F38).
+      const { error: markError } = await supabase
+        .from('staff_actions')
+        .update({ undone_at: new Date().toISOString(), can_undo: false })
+        .eq('id', actionId);
+
+      if (markError) throw markError;
+
+      // Log the undo itself as a non-undoable action.
       await logAction(
         'undo_action',
         action.resource_type,
         action.resource_id,
         action.new_data,
-        action.old_data
+        action.old_data,
+        { canUndo: false }
       );
+
+      // Refresh the queue dashboard now instead of waiting for the 30 s poll.
+      await queryClient.invalidateQueries({ queryKey: ['queue-appointments'] });
 
       toast({
         title: 'Success',
@@ -183,11 +217,11 @@ export const useStaffActions = () => {
       });
 
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error undoing action:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to undo action',
+        description: getErrorMessage(error) || 'Failed to undo action',
         variant: 'destructive',
       });
       return false;

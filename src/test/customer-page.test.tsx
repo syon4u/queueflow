@@ -1,21 +1,29 @@
+import React from 'react';
 
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
-import * as reactTesting from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from './test-utils';
 import CustomerPage from '../pages/CustomerPage';
 import { useAuth } from '../context/AuthContext';
 import { QueueProvider } from '../context/QueueContext';
 
 // Extract the needed utilities from the testing library
-const { screen, fireEvent, waitFor } = reactTesting as any;
 
 // Mock the auth context
-vi.mock('../context/AuthContext', () => ({
-  useAuth: vi.fn().mockReturnValue({
-    user: { id: 'mock-user-id' },
+vi.mock('../context/AuthContext', () => {
+  const auth = {
+    user: { id: 'mock-user-id', email: 'test@example.com' },
     role: 'customer',
-  }),
-}));
+    loading: false,
+    signIn: vi.fn(), signOut: vi.fn(), signUp: vi.fn(),
+  };
+  return {
+    // renderWithProviders wraps in AuthProvider; keep it a passthrough when mocked.
+    AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+    useAuth: () => auth,
+    useMinimalAuth: () => ({ user: auth.user, role: auth.role }),
+  };
+});
 
 // Mock the useAppointments hook
 vi.mock('../hooks/use-appointments', () => ({
@@ -30,23 +38,9 @@ vi.mock('../hooks/use-appointments', () => ({
 }));
 
 describe('CustomerPage', () => {
-  it('renders the CustomerPage component', () => {
-    render(
-      <QueueProvider>
-        <CustomerPage />
-      </QueueProvider>
-    );
-
-    expect(screen.getByText(/queue status/i)).toBeInTheDocument();
+  it('renders the appointment request form', async () => {
+    renderWithProviders(<CustomerPage />);
+    expect(await screen.findByText(/request an appointment/i)).toBeInTheDocument();
   });
 
-  it('displays the user role', () => {
-    render(
-      <QueueProvider>
-        <CustomerPage />
-      </QueueProvider>
-    );
-
-    expect(screen.getByText(/role: customer/i)).toBeInTheDocument();
-  });
 });

@@ -42,7 +42,7 @@ export const EmailVerificationBanner = () => {
           description: 'Please check your email for verification instructions.',
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
         description: 'Failed to resend verification email. Please try again.',

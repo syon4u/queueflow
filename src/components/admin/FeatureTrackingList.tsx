@@ -12,8 +12,10 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { CheckCircle2, Clock, XCircle, AlertCircle } from 'lucide-react';
 
+type FeatureFilter = 'all' | 'implemented' | 'inProgress' | 'notStarted';
+
 const FeatureTrackingList = () => {
-  const [filter, setFilter] = useState<'all' | 'implemented' | 'inProgress' | 'notStarted'>('all');
+  const [filter, setFilter] = useState<FeatureFilter>('all');
   const stats = getFeatureStats();
   
   const getFilteredFeatures = () => {
@@ -63,7 +65,7 @@ const FeatureTrackingList = () => {
       </CardHeader>
       
       <CardContent>
-        <Tabs defaultValue="all" onValueChange={(value) => setFilter(value as any)}>
+        <Tabs defaultValue="all" onValueChange={(value) => setFilter(value as FeatureFilter)}>
           <TabsList className="mb-4">
             <TabsTrigger value="all">All ({features.length})</TabsTrigger>
             <TabsTrigger value="implemented">Implemented ({stats.implemented})</TabsTrigger>

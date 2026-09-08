@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface BrowardCardProps {
+interface BrandCardProps {
   title?: string;
   subtitle?: string;
   children: React.ReactNode;
@@ -8,7 +8,7 @@ interface BrowardCardProps {
   elevation?: 'sm' | 'md' | 'lg';
 }
 
-const BrowardCard: React.FC<BrowardCardProps> = ({
+const BrandCard: React.FC<BrandCardProps> = ({
   title,
   subtitle,
   children,
@@ -34,4 +34,4 @@ const BrowardCard: React.FC<BrowardCardProps> = ({
   );
 };
 
-export default BrowardCard;
+export default BrandCard;

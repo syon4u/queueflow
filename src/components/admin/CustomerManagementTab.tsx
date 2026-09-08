@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getStringProp } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -109,10 +110,10 @@ const CustomerManagementTab = () => {
         const locationMap: Record<string, Record<string, number>> = {};
         const serviceMap: Record<string, Record<string, number>> = {};
 
-        (appointmentDetails || []).forEach((apt: any) => {
+        (appointmentDetails || []).forEach((apt) => {
           const customerId = apt.customer_id;
-          const locationName = apt.locations?.name;
-          const serviceName = apt.services?.name;
+          const locationName = getStringProp(apt.locations, 'name');
+          const serviceName = getStringProp(apt.services, 'name');
 
           if (locationName) {
             if (!locationMap[customerId]) locationMap[customerId] = {};
