@@ -12,50 +12,50 @@ const ServiceCardsGrid = () => {
   const services = [
     {
       icon: Calendar,
-      title: 'Schedule Appointment',
-      description: 'Book your visit in advance and skip the wait',
-      buttonText: 'Schedule Now',
+      title: t('public.serviceCards.schedule.title'),
+      description: t('public.serviceCards.schedule.description'),
+      buttonText: t('public.serviceCards.schedule.button'),
       link: '/customer',
       gradient: 'from-blue-500 to-blue-600',
       featured: true
     },
     {
       icon: Search,
-      title: 'Find My Appointment',
-      description: 'Look up, modify, or cancel your existing appointment',
-      buttonText: 'Find Appointment',
+      title: t('public.serviceCards.find.title'),
+      description: t('public.serviceCards.find.description'),
+      buttonText: t('public.serviceCards.find.button'),
       link: '/appointment-lookup',
       gradient: 'from-purple-500 to-purple-600'
     },
     {
       icon: Clock,
-      title: "I'm Here",
-      description: 'Check in for your appointment when you arrive',
-      buttonText: 'Check In',
+      title: t('public.serviceCards.checkIn.title'),
+      description: t('public.serviceCards.checkIn.description'),
+      buttonText: t('public.serviceCards.checkIn.button'),
       link: '/check-in',
       gradient: 'from-green-500 to-green-600'
     },
     {
       icon: MapPin,
-      title: 'Queue Status',
-      description: 'View current wait times and queue status',
-      buttonText: 'View Status',
+      title: t('public.serviceCards.status.title'),
+      description: t('public.serviceCards.status.description'),
+      buttonText: t('public.serviceCards.status.button'),
       link: '/status',
       gradient: 'from-orange-500 to-orange-600'
     },
     {
       icon: Smartphone,
-      title: 'Mobile Queue',
-      description: 'Join the virtual queue from your mobile device',
-      buttonText: 'Join Queue',
+      title: t('public.serviceCards.mobile.title'),
+      description: t('public.serviceCards.mobile.description'),
+      buttonText: t('public.serviceCards.mobile.button'),
       link: '/mobile-queue',
       gradient: 'from-pink-500 to-pink-600'
     },
     {
       icon: User,
-      title: 'Walk-In Kiosk',
-      description: 'Use our self-service kiosk for walk-in visits',
-      buttonText: 'Use Kiosk',
+      title: t('public.serviceCards.kiosk.title'),
+      description: t('public.serviceCards.kiosk.description'),
+      buttonText: t('public.serviceCards.kiosk.button'),
       link: '/kiosk',
       gradient: 'from-indigo-500 to-indigo-600'
     }
@@ -75,10 +75,10 @@ const ServiceCardsGrid = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            How Can We Help You Today?
+            {t('public.serviceCards.title')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Choose the option that works best for you and experience seamless service
+            {t('public.serviceCards.subtitle')}
           </p>
         </div>
 
@@ -127,12 +127,12 @@ const ServiceCardsGrid = () => {
           <div className="flex flex-wrap justify-center gap-6">
             <Link to="/virtual-queue">
               <Button variant="ghost" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-6 py-3">
-                Virtual Queue →
+                {t('public.serviceCards.virtualQueue')}
               </Button>
             </Link>
             <Link to="/digital-signage">
               <Button variant="ghost" className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 px-6 py-3">
-                Digital Signage →
+                {t('public.serviceCards.digitalSignage')}
               </Button>
             </Link>
           </div>

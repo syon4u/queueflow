@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Clock, Menu, X, User, Calendar, Search, BarChart3, Settings, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -14,6 +15,7 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffAccess }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, role, loading, signOut } = useAuth();
+  const { t } = useTranslation();
   // Role resolves a beat after the session; don't render '()' or pop links in later.
   const roleResolving = !!user && role === null && loading;
 
@@ -25,32 +27,32 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
     const links = [];
     
     if (user) {
-      links.push({ to: '/profile', icon: User, label: 'Profile' });
-      links.push({ to: '/new-appointment', icon: Calendar, label: 'New Appointment' });
+      links.push({ to: '/profile', icon: User, label: t('public.nav.profile') });
+      links.push({ to: '/new-appointment', icon: Calendar, label: t('public.nav.newAppointment') });
     }
     
     if (role === 'admin') {
-      links.push({ to: '/admin', icon: Settings, label: 'Admin Dashboard' });
-      links.push({ to: '/backend-health', icon: BarChart3, label: 'System Health' });
+      links.push({ to: '/admin', icon: Settings, label: t('public.nav.adminDashboard') });
+      links.push({ to: '/backend-health', icon: BarChart3, label: t('public.nav.systemHealth') });
     }
     
     if (role === 'power_user') {
-      links.push({ to: '/power-user', icon: BarChart3, label: 'Power User Dashboard' });
+      links.push({ to: '/power-user', icon: BarChart3, label: t('public.nav.powerUserDashboard') });
     }
     
     if (role === 'staff' || role === 'power_user' || role === 'admin') {
-      links.push({ to: '/staff', icon: User, label: 'Staff Dashboard' });
-      links.push({ to: '/performance-report', icon: BarChart3, label: 'Performance Report' });
+      links.push({ to: '/staff', icon: User, label: t('public.nav.staffDashboard') });
+      links.push({ to: '/performance-report', icon: BarChart3, label: t('public.nav.performanceReport') });
     }
     
     return links;
   };
 
   const publicLinks = [
-    { to: '/appointment-lookup', icon: Search, label: 'Find Appointment' },
-    { to: '/check-in', icon: Calendar, label: "I'm Here" },
-    { to: '/status', icon: Clock, label: 'Queue Status' },
-    { to: '/pricing', icon: Tag, label: 'Pricing' },
+    { to: '/appointment-lookup', icon: Search, label: t('public.nav.findAppointment') },
+    { to: '/check-in', icon: Calendar, label: t('public.nav.imHere') },
+    { to: '/status', icon: Clock, label: t('public.nav.queueStatus') },
+    { to: '/pricing', icon: Tag, label: t('public.nav.pricing') },
   ];
 
   return (
@@ -107,18 +109,18 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                     {user.email}{role ? ` (${role})` : ''}
                   </span>
                   <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    Sign Out
+                    {t('public.nav.signOut')}
                   </Button>
                 </div>
               ) : (
                 <>
                   <Link to="/auth">
                     <Button variant="outline" size="sm">
-                      Sign In
+                      {t('public.nav.signIn')}
                     </Button>
                   </Link>
                   <Button variant="outline" size="sm" onClick={onToggleStaffAccess}>
-                    Employee Login
+                    {t('public.nav.employeeLogin')}
                   </Button>
                 </>
               )}
@@ -131,7 +133,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
             size="icon"
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={mobileMenuOpen ? t('public.nav.closeMenu') : t('public.nav.openMenu')}
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -179,18 +181,18 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                       {user.email}{role ? ` (${role})` : ''}
                     </div>
                     <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
-                      Sign Out
+                      {t('public.nav.signOut')}
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full justify-start">
-                        Sign In
+                        {t('public.nav.signIn')}
                       </Button>
                     </Link>
                     <Button variant="outline" className="w-full justify-start" onClick={onToggleStaffAccess}>
-                      Employee Login
+                      {t('public.nav.employeeLogin')}
                     </Button>
                   </div>
                 )}
