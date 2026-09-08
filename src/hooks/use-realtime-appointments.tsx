@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAppData } from '@/hooks/useAppData';
 import { Appointment } from '@/hooks/use-appointments';
 
@@ -17,12 +17,13 @@ export const useRealtimeAppointments = (): RealtimeAppointmentsReturn => {
   const [userPosition, setUserPosition] = useState<number | null>(null);
   const [estimatedWaitTime, setEstimatedWaitTime] = useState<number | null>(null);
 
-  // Filter for today's active appointments
-  const todaysActiveAppointments = appointments.filter(appointment => {
+  // Filter for today's active appointments. Memoised so the effect below only
+  // re-runs when the data changes, not on every render.
+  const todaysActiveAppointments = useMemo(() => appointments.filter(appointment => {
     const today = new Date().toISOString().split('T')[0];
     const appointmentDate = new Date(appointment.scheduled_time).toISOString().split('T')[0];
     return appointmentDate === today && ['scheduled', 'checked_in', 'in_progress'].includes(appointment.status);
-  });
+  }), [appointments]);
 
   // Calculate queue positions when appointments change
   useEffect(() => {

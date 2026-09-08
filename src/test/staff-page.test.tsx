@@ -6,6 +6,7 @@ import { renderWithProviders } from './test-utils';
 import StaffPage from '../pages/StaffPage';
 import { useAuth } from '../context/AuthContext';
 import { QueueProvider } from '../context/QueueContext';
+import { supabase } from '@/integrations/supabase/client';
 
 // Extract the needed utilities from the testing library
 
@@ -51,5 +52,13 @@ describe('StaffPage', () => {
     const { container } = renderWithProviders(<StaffPage />);
     await screen.findByRole('heading', { name: 'Staff Dashboard' });
     expect(container.firstChild).not.toBeNull();
+  });
+
+  it('does not pull the full customers table on initial render', async () => {
+    vi.clearAllMocks();
+    renderWithProviders(<StaffPage />);
+    await screen.findByRole('heading', { name: 'Staff Dashboard' });
+    const tablesQueried = (vi.mocked(supabase.from).mock.calls as unknown as [string][]).map(([table]) => table);
+    expect(tablesQueried).not.toContain('customers');
   });
 });

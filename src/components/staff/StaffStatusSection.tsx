@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Activity, Clock, XCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -21,15 +21,17 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
   const [returnTime, setReturnTime] = useState<string | null>(null);
   const [showBreakDialog, setShowBreakDialog] = useState(false);
   
-  const fetchStatus = async () => {
-    if (!user) return;
+  const userId = user?.id;
+
+  const fetchStatus = useCallback(async () => {
+    if (!userId) return;
     
     try {
       // Use profiles table instead of staff table
       const { data, error } = await supabase
         .from('profiles')
         .select('status')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
       
       if (error) throw error;
@@ -45,11 +47,11 @@ const StaffStatusSection: React.FC<StaffStatusSectionProps> = ({ onStatusChange 
         description: t('staff.statusFetchError')
       });
     }
-  };
+  }, [userId, toast, t]);
   
   useEffect(() => {
     fetchStatus();
-  }, [user]);
+  }, [fetchStatus]);
   
   const handleStatusChange = async (newStatus: string) => {
     if (!user) return;

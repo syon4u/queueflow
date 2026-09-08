@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { populateDemoData, clearDemoData } from '@/utils/demo-data';
 import { Database, Trash2, Users, RefreshCw } from 'lucide-react';
-import { useAppData } from '@/hooks/useAppData';
+import { useRefetchAppData } from '@/hooks/useAppData';
 
 export const DemoDataControls: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { refetch } = useAppData();
+  const refetch = useRefetchAppData();
 
   const handlePopulateDemo = async () => {
     setIsLoading(true);

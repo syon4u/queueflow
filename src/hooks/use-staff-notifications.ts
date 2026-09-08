@@ -43,9 +43,11 @@ export const useStaffNotifications = () => {
     refetchInterval: 30000 // Refetch every 30 seconds
   });
 
-  // Set up real-time subscription for new notifications
+  // Set up real-time subscription for new notifications. Keyed on the user id
+  // so a refreshed session object does not tear the channel down and back up.
+  const userId = user?.id;
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
 
     const channel = supabase
       .channel('staff-notifications')
@@ -55,7 +57,7 @@ export const useStaffNotifications = () => {
           event: 'INSERT',
           schema: 'public',
           table: 'staff_notification_queue',
-          filter: `staff_id=eq.${user.id}`
+          filter: `staff_id=eq.${userId}`
         },
         (payload) => {
           const newNotification = payload.new as StaffNotification;
@@ -84,7 +86,7 @@ export const useStaffNotifications = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, toast, queryClient]);
+  }, [userId, toast, queryClient]);
 
   // Request browser notification permission. Only ever call this from a user
   // gesture (e.g. clicking the notifications bell): prompting automatically on
