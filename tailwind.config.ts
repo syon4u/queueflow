@@ -182,6 +182,7 @@ export default {
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],
 				serif: ['Merriweather', 'Georgia', 'serif'],
+				display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
 			},
 			boxShadow: {
 				'card': '0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 4px -1px rgba(0, 0, 0, 0.1)',

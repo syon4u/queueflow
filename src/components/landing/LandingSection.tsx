@@ -5,13 +5,16 @@ import { cn } from '@/lib/utils';
  * Shared rhythm for the public landing page: every section gets the same
  * vertical padding and the same container width, so cards in a row share
  * edges and the page reads as one system. Sections override only `tone`.
+ *
+ * Tones map to the landing palette: paper (white), mist (alternate), ink
+ * (navy ground for the hero, final CTA and footer).
  */
-type Tone = 'white' | 'muted' | 'brand';
+type Tone = 'paper' | 'mist' | 'ink';
 
 const toneClass: Record<Tone, string> = {
-  white: 'bg-white text-gray-900',
-  muted: 'bg-gray-50 text-gray-900',
-  brand: 'bg-blue-700 text-white',
+  paper: 'bg-[--paper] text-[--text-1]',
+  mist: 'bg-[--mist] text-[--text-1]',
+  ink: 'on-ink bg-[--ink] text-white',
 };
 
 interface LandingSectionProps extends React.HTMLAttributes<HTMLElement> {
@@ -21,7 +24,7 @@ interface LandingSectionProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 export const LandingSection: React.FC<LandingSectionProps> = ({
-  tone = 'white',
+  tone = 'paper',
   labelledBy,
   className,
   children,
@@ -29,10 +32,10 @@ export const LandingSection: React.FC<LandingSectionProps> = ({
 }) => (
   <section
     aria-labelledby={labelledBy}
-    className={cn('py-16 sm:py-24', toneClass[tone], className)}
+    className={cn('scroll-mt-16 py-16 sm:py-24', toneClass[tone], className)}
     {...rest}
   >
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">{children}</div>
+    <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">{children}</div>
   </section>
 );
 
@@ -42,7 +45,7 @@ interface SectionHeadingProps {
   title: string;
   description?: string;
   align?: 'left' | 'center';
-  onBrand?: boolean;
+  onInk?: boolean;
 }
 
 export const SectionHeading: React.FC<SectionHeadingProps> = ({
@@ -51,19 +54,27 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
   title,
   description,
   align = 'center',
-  onBrand = false,
+  onInk = false,
 }) => (
-  <div className={cn('mb-10 sm:mb-14', align === 'center' ? 'mx-auto text-center' : 'text-left', 'max-w-2xl')}>
-    {eyebrow && (
-      <p className={cn('mb-3 text-sm font-semibold uppercase tracking-wide', onBrand ? 'text-blue-100' : 'text-blue-700')}>
-        {eyebrow}
-      </p>
-    )}
-    <h2 id={id} className={cn('text-balance text-3xl font-bold tracking-tight sm:text-4xl', onBrand ? 'text-white' : 'text-gray-900')}>
+  <div className={cn('mb-10 max-w-2xl sm:mb-14', align === 'center' ? 'mx-auto text-center' : 'text-left')}>
+    {eyebrow && <p className="qf-eyebrow reveal mb-4">{eyebrow}</p>}
+    <h2
+      id={id}
+      className={cn(
+        'reveal font-display text-[30px] font-bold leading-[1.1] tracking-[-0.02em] sm:text-[40px]',
+        onInk ? 'text-white' : 'text-[--text-1]'
+      )}
+    >
       {title}
     </h2>
     {description && (
-      <p className={cn('mt-4 max-w-[65ch] text-lg leading-relaxed', align === 'center' && 'mx-auto', onBrand ? 'text-blue-100' : 'text-gray-600')}>
+      <p
+        className={cn(
+          'reveal mt-4 max-w-[60ch] text-base leading-relaxed sm:text-lg',
+          align === 'center' && 'mx-auto',
+          onInk ? 'text-[--on-ink-2]' : 'text-[--text-2]'
+        )}
+      >
         {description}
       </p>
     )}
