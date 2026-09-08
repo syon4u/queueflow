@@ -5,9 +5,10 @@ import * as reactTesting from '@testing-library/react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import type { AuthTokenResponsePassword, Session } from '@supabase/supabase-js';
 
 // Extract the needed utilities from the testing library
-const { screen, waitFor } = reactTesting as any;
+const { screen, waitFor } = reactTesting;
 
 // Mock component to test the hook
 const AuthConsumer = () => {
@@ -57,15 +58,18 @@ describe('AuthProvider', () => {
     const mockSession = { user: mockUser };
     
     vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-      data: { session: mockSession as any },
+      data: { session: mockSession as unknown as Session },
       error: null,
-    } as any);
+    });
     
     // Mock role response
     vi.mocked(supabase.rpc).mockResolvedValueOnce({
       data: 'customer',
       error: null,
-    } as any);
+      count: null,
+      status: 200,
+      statusText: 'OK',
+    });
 
     render(
       <BrowserRouter>
@@ -91,7 +95,7 @@ describe('AuthProvider', () => {
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
       data: {},
       error: null,
-    } as any);
+    } as unknown as AuthTokenResponsePassword);
 
     render(
       <BrowserRouter>

@@ -12,9 +12,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { createPublicAppointment, getQueueSnapshot } from '@/lib/publicQueue';
+import type { TicketData } from './VirtualQueueTicket';
 
 interface VirtualQueueJoinProps {
-  onJoinSuccess: (ticketData: any) => void;
+  onJoinSuccess: (ticketData: TicketData) => void;
 }
 
 export const VirtualQueueJoin: React.FC<VirtualQueueJoinProps> = ({ onJoinSuccess }) => {

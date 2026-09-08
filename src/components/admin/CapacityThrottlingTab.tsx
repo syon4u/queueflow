@@ -46,11 +46,20 @@ interface CapacityPrediction {
   adjustment_reason: string;
 }
 
+interface ThrottlingRuleFormValues {
+  dayOfWeek: string;
+  hourOfDay: string;
+  maxCapacity: string;
+  throttleThreshold: string;
+  waitlistEnabled: boolean;
+  dynamicAdjustment: boolean;
+}
+
 export const CapacityThrottlingTab: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [selectedService, setSelectedService] = useState<string>('');
   const [showRuleDialog, setShowRuleDialog] = useState(false);
-  const [editingRule, setEditingRule] = useState<any>(null);
+  const [editingRule, setEditingRule] = useState<ThrottlingRule | null>(null);
 
   // Get locations
   const { data: locations, isLoading: locationsLoading } = useQuery({
@@ -94,7 +103,7 @@ export const CapacityThrottlingTab: React.FC = () => {
     togglingThrottling
   } = useCapacityThrottling(selectedLocation, selectedService);
 
-  const handleCreateRule = (values: any) => {
+  const handleCreateRule = (values: ThrottlingRuleFormValues) => {
     createThrottlingRule({
       location_id: selectedLocation,
       service_id: selectedService || undefined,

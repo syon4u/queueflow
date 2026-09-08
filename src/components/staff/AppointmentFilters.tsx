@@ -9,6 +9,7 @@ import { Calendar, CalendarIcon, Filter, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
 
 interface AppointmentFiltersProps {
@@ -17,10 +18,7 @@ interface AppointmentFiltersProps {
 
 export interface AppointmentFilterOptions {
   status?: string;
-  dateRange?: {
-    from: Date;
-    to: Date;
-  };
+  dateRange?: DateRange;
   customerName?: string;
   service?: string;
 }
@@ -30,7 +28,7 @@ export const AppointmentFilters: React.FC<AppointmentFiltersProps> = ({ onFilter
   const [filters, setFilters] = useState<AppointmentFilterOptions>({});
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleFilterChange = (key: keyof AppointmentFilterOptions, value: any) => {
+  const handleFilterChange = <K extends keyof AppointmentFilterOptions>(key: K, value: AppointmentFilterOptions[K]) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFiltersChange(newFilters);

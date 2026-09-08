@@ -19,11 +19,11 @@ vi.mock('@/integrations/supabase/client', () => ({
     },
     rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     from: vi.fn(() => {
-      const q: any = {};
+      const q: Record<string, unknown> = {};
       for (const m of ['select','insert','update','delete','eq','neq','in','order','limit','gte','lte','ilike','single','maybeSingle','range']) {
         q[m] = vi.fn(() => q);
       }
-      q.then = (res: any) => Promise.resolve({ data: [], error: null }).then(res);
+      q.then = (res: (value: unknown) => unknown) => Promise.resolve({ data: [], error: null }).then(res);
       return q;
     }),
     channel: vi.fn(() => ({ on: vi.fn().mockReturnThis(), subscribe: vi.fn().mockReturnThis(), unsubscribe: vi.fn() })),

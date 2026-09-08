@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { validateAppointmentTime, formatBusinessHoursMessage } from '@/utils/businessHours';
 
 interface SimpleScheduleCardProps {
-  onAppointmentRequested: (data: any) => void;
+  onAppointmentRequested: (data: ReturnType<typeof useSimpleAppointmentForm>['formData']) => void;
 }
 
 const SimpleScheduleCard: React.FC<SimpleScheduleCardProps> = ({ onAppointmentRequested }) => {

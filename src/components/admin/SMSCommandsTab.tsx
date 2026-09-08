@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Phone, Clock, X } from 'lucide-react';
-import { useSMSCommands } from '@/hooks/use-sms-commands';
+import { useSMSCommands, type SMSCommandResponse } from '@/hooks/use-sms-commands';
 
 export const SMSCommandsTab: React.FC = () => {
   const [testPhone, setTestPhone] = useState('');
   const [testMessage, setTestMessage] = useState('');
-  const [testResult, setTestResult] = useState<any>(null);
+  const [testResult, setTestResult] = useState<SMSCommandResponse | null>(null);
   const { processSMSCommand, isProcessing } = useSMSCommands();
 
   const handleTestCommand = async () => {

@@ -8,12 +8,12 @@ import CustomerHistoryModal from './CustomerHistoryModal';
 import { CommunicationDialog } from './CommunicationDialog';
 import { CustomerNotesDialog } from './CustomerNotesDialog';
 import { toast } from '@/hooks/use-toast';
-import type { Appointment } from '@/hooks/use-appointments';
+import type { Appointment, AppointmentStatus } from '@/hooks/use-appointments';
 
 interface AppointmentActionButtonsProps {
   appointment: Appointment;
   isLoading: boolean;
-  onUpdateStatus: (id: string, status: any) => Promise<void>;
+  onUpdateStatus: (id: string, status: AppointmentStatus) => Promise<void>;
   onOpenReminderDialog: (appointment: Appointment) => void;
 }
 
@@ -28,7 +28,7 @@ export const AppointmentActionButtons: React.FC<AppointmentActionButtonsProps> =
   const [notesOpen, setNotesOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const handleStatusUpdate = async (newStatus: string, actionType: string) => {
+  const handleStatusUpdate = async (newStatus: AppointmentStatus, actionType: string) => {
     try {
       setActionLoading(actionType);
       await onUpdateStatus(appointment.id, newStatus);

@@ -156,8 +156,8 @@ export const AutomatedAppointmentReminders: React.FC = () => {
                 <label htmlFor="reminder-timing" className="text-sm font-medium">Initial Reminder Timing</label>
                 <Select 
                   value={reminderSettings.reminder_timing} 
-                  onValueChange={(value: any) => 
-                    setReminderSettings(prev => ({ ...prev, reminder_timing: value }))
+                  onValueChange={(value) => 
+                    setReminderSettings(prev => ({ ...prev, reminder_timing: value as typeof prev.reminder_timing }))
                   }
                 >
                   <SelectTrigger id="reminder-timing">

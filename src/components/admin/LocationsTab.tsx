@@ -150,7 +150,7 @@ export const LocationsTab: React.FC = () => {
     }
   });
 
-  const columns: Column[] = [
+  const columns: Column<Location>[] = [
     { key: 'name', header: 'Name' },
     { key: 'address', header: 'Address' },
     { key: 'phone', header: 'Phone' },

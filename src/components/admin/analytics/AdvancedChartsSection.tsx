@@ -57,7 +57,7 @@ const AdvancedChartsSection: React.FC<AdvancedChartsSectionProps> = ({ data }) =
       }
       
       return acc;
-    }, [] as any[])
+    }, [] as Array<{ date: string; appointments: number; completed: number; wait_time: number; satisfaction: number }>)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(-14); // Last 14 days
 
@@ -94,7 +94,7 @@ const AdvancedChartsSection: React.FC<AdvancedChartsSectionProps> = ({ data }) =
       }
       
       return acc;
-    }, [] as any[])
+    }, [] as Array<{ service: string; appointments: number; avg_wait_time: number; completion_rate: number }>)
     .sort((a, b) => b.appointments - a.appointments)
     .slice(0, 8);
 
