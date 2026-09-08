@@ -18,7 +18,7 @@ const AppointmentHelpSection: React.FC = () => {
             </div>
             <div className="flex items-center justify-center gap-2">
               <span className="font-medium">Email:</span>
-              <span>support@queueflow.com</span>
+              <span>info@garrickinternational.com</span>
             </div>
           </div>
         </CardContent>
