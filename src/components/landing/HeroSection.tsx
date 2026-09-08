@@ -97,12 +97,12 @@ const HeroSection: React.FC = () => {
             >
               {FACTS.map(({ key, icon: Icon }, i) => (
                 <li key={key} className="qf-stub-shadow flex">
-                  <div className="qf-stub qf-perf-top flex w-full flex-col rounded-xl px-3.5 pb-3.5 pt-4">
-                    <span className="flex items-center justify-between text-[--stamp]">
+                  <div className="qf-stub qf-perf-top flex w-full items-center gap-3 rounded-xl px-3.5 pb-3.5 pt-4 sm:flex-col sm:items-stretch sm:gap-2">
+                    <span className="flex items-center gap-2.5 text-[--stamp] sm:justify-between">
                       <span className="qf-stub-num text-[14px]">0{i + 1}</span>
                       <Icon aria-hidden="true" className="size-4" />
                     </span>
-                    <span className="mt-2 text-[14px] font-medium leading-snug text-[--text-1]">{t(`public.hero.facts.${key}`)}</span>
+                    <span className="text-[14px] font-medium leading-snug text-[--text-1]">{t(`public.hero.facts.${key}`)}</span>
                   </div>
                 </li>
               ))}

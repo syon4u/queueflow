@@ -336,3 +336,60 @@ lazy hero chunk (skip drei), fallback under reduced motion and on `webgl` failur
 static CSS ribbon of three stacked stubs. It is more spectacular but costs ~230 kB,
 needs a WebGL fallback path, and puts the signature in decoration rather than in the
 product; "NOW SERVING" puts it in the product, for a tenth of the bytes.
+
+---
+
+## As built (branch `feat/landing-showstopper`)
+
+Implemented section by section as specified above. Where the build differs from
+the brief, the reason is recorded here.
+
+**The Call.** `src/components/landing/useCallHeartbeat.ts` owns the single
+`head` state (tickets called since load). `HeroSection` calls it once and passes
+`head` to `LedBoard` (board digits + "up next"), to `ProductPreview` (queue rows,
+now-serving row, figcaption, phone ticket position/ETA/progress) and renders the
+polite live region. Timeline: A-041 at paint, first call at 900 ms, then every
+4 s; the mock's real `<button>` calls immediately and restarts the clock;
+`announcedHead` changes only on a press, so the live region never speaks for the
+interval. Under `prefers-reduced-motion` the clock never starts and the page opens
+on the settled state (A-042, "#2 in line"); a press still advances with instant
+digit swaps.
+
+**Phone ticket loop.** The customer's ticket walks 3 → 2 → 1 and is then reissued
+three places back, so the mock never shows a served ticket. The rolling digit sits
+inside the translated sentence via `useSplitTemplate`, which splits the active
+locale's string around the `{{position}}` slot.
+
+**Fonts.** Loaded in `src/index.css`:
+`https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..700&family=Instrument+Serif:ital@1&display=swap`.
+
+**Deviations.**
+
+- Bricolage is requested at `wght 600..700` instead of `200..800`: only 600 and
+  700 are used, and a narrower range is a smaller variable file.
+- No `<link rel="preconnect">`: `index.html` is outside the files this build was
+  allowed to touch; the `@import` in `src/index.css` is kept.
+- `FlickeringGrid` is not mounted under reduced motion at all (the `.qf-board`
+  CSS dot field is the static frame), so the lazy chunk is never fetched there.
+- `BorderBeam` gates itself on `useReducedMotion`: `offsetDistance` is not a
+  transform, so `MotionConfig reducedMotion="user"` alone would let it loop. Its
+  ring mask now uses two opaque layers (padding-box XOR border-box); the original
+  transparent first layer left the whole box unmasked.
+- The "Call next" accessible name is `Call next (Example)` with the hint sentence
+  on `aria-describedby`, so the button says it is a demo without reading the hint
+  twice.
+- CTA board line is stacked (label above, `A-047` + *Your turn.* below) and the
+  digits are 64–80 px rather than 34 px: under the 4 px dot mask, 34 px does not
+  read as a number.
+- Bento vignette numbers roll on `onMouseEnter`/`onFocus` of the tile; tiles are
+  not made focusable (no `tabIndex`), so the keyboard path only fires when a tile
+  gains a focusable child.
+- Section `h2`s use `CalledWords` for Capabilities and the CTA only; the others
+  keep the `.reveal` system, as §5 asks.
+
+**Measured.** Main chunk gzip 223,876 B → 263,582 B (+39.7 kB; the brief budgeted
+≤ 250 kB of new JS). `FlickeringGrid` chunk 1.25 kB gzip. `public.*` keys: 660 in
+each of EN/ES/PT/HT. Desktop 1280×800: page 6,305 px, hero 1,199 px, one `h1`,
+no horizontal overflow. Mobile 390×844: page 10,442 px, hero 1,962 px,
+`scrollWidth` 390. Reduced motion: board A-042 at 0.4 s and still A-042 at 4.9 s
+with zero running animations; marquee renders as a static wrapping row.
