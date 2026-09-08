@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/landing/Navigation';
 import CTASection from '@/components/landing/CTASection';
@@ -17,55 +18,6 @@ type Plan = {
   cta: string;
 };
 
-const PLANS: Plan[] = [
-  {
-    name: 'Starter',
-    tagline: 'Single location, walk-in and appointment queueing',
-    price: '$99',
-    cadence: '/ month',
-    features: [
-      'Up to 2 staff seats',
-      'Virtual queue + QR check-in',
-      'Customer status page & PWA',
-      'CSAT survey after each visit',
-      'Email support',
-    ],
-    cta: 'Talk to sales',
-  },
-  {
-    name: 'Growth',
-    tagline: 'Multi-location teams that need real analytics and control',
-    price: '$299',
-    cadence: '/ month',
-    highlighted: true,
-    features: [
-      'Up to 15 staff seats, multiple locations',
-      'Everything in Starter',
-      'Staff dashboard with RBAC (clerk/manager/admin)',
-      'Advanced analytics & AI-assisted scheduling (in progress)',
-      'Digital signage & kiosk mode',
-      'Language switcher: Spanish, Portuguese, Haitian Creole (partial coverage today)',
-      'Priority email + chat support',
-    ],
-    cta: 'Talk to sales',
-  },
-  {
-    name: 'Enterprise',
-    tagline: 'Large or regulated organizations with custom requirements',
-    price: 'Custom',
-    cadence: 'contact us',
-    features: [
-      'Unlimited staff seats & locations',
-      'Everything in Growth',
-      'SSO / SAML (roadmap) & custom RBAC policies',
-      'SLA-backed support & onboarding',
-      'Custom integrations (CRM/POS/signage)',
-      'Dedicated success manager',
-    ],
-    cta: 'Contact Sales',
-  },
-];
-
 /**
  * Static pricing page for demo / sale purposes. No billing integration —
  * a clean, on-brand plan comparison that gives a prospective buyer a sense
@@ -73,6 +25,36 @@ const PLANS: Plan[] = [
  * used across the rest of the app.
  */
 const PricingPage: React.FC = () => {
+  const { t } = useTranslation();
+  const featureList = (plan: string) => t(`public.pricing.${plan}.features`, { returnObjects: true }) as string[];
+  const plans: Plan[] = [
+    {
+      name: t('public.pricing.starter.name'),
+      tagline: t('public.pricing.starter.tagline'),
+      price: '$99',
+      cadence: t('public.pricing.perMonth'),
+      features: featureList('starter'),
+      cta: t('public.pricing.talkToSales'),
+    },
+    {
+      name: t('public.pricing.growth.name'),
+      tagline: t('public.pricing.growth.tagline'),
+      price: '$299',
+      cadence: t('public.pricing.perMonth'),
+      highlighted: true,
+      features: featureList('growth'),
+      cta: t('public.pricing.talkToSales'),
+    },
+    {
+      name: t('public.pricing.enterprise.name'),
+      tagline: t('public.pricing.enterprise.tagline'),
+      price: t('public.pricing.custom'),
+      cadence: t('public.pricing.contactUs'),
+      features: featureList('enterprise'),
+      cta: t('public.pricing.contactSales'),
+    },
+  ];
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Navigation showStaffAccess={false} onToggleStaffAccess={() => {}} />
@@ -80,18 +62,17 @@ const PricingPage: React.FC = () => {
       <div className="w-full">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <Badge variant="secondary" className="mb-4">Simple, transparent pricing</Badge>
+            <Badge variant="secondary" className="mb-4">{t('public.pricing.badge')}</Badge>
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              Plans that grow with your queue
+              {t('public.pricing.title')}
             </h1>
             <p className="mt-4 text-lg text-gray-600">
-              Whether you're running one front desk or a network of locations, QueueFlow scales with you.
-              No setup fees, cancel anytime.
+              {t('public.pricing.subtitle')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
-            {PLANS.map((plan) => (
+            {plans.map((plan) => (
               <Card
                 key={plan.name}
                 className={`flex flex-col ${
@@ -100,7 +81,7 @@ const PricingPage: React.FC = () => {
               >
                 {plan.highlighted && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 hover:bg-blue-600">
-                    Most Popular
+                    {t('public.pricing.mostPopular')}
                   </Badge>
                 )}
                 <CardHeader>
@@ -139,7 +120,7 @@ const PricingPage: React.FC = () => {
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-12">
-            Billed monthly. Volume and public-sector pricing available on request.
+            {t('public.pricing.footnote')}
           </p>
         </div>
       </div>

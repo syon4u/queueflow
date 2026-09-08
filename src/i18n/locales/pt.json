@@ -1,4 +1,3 @@
-
 {
   "common": {
     "loading": "Carregando...",
@@ -182,5 +181,666 @@
   "unauthorized": {
     "title": "Acesso Não Autorizado",
     "description": "Você não tem permissão para visualizar esta página"
+  },
+  "public": {
+    "layout": {
+      "menu": "Menu",
+      "staffDashboard": "Painel da Equipe",
+      "staffDashboardDescription": "Gerenciar agendamentos e fila",
+      "adminPortal": "Portal do Administrador",
+      "adminPortalDescription": "Administração do sistema",
+      "performanceReports": "Relatórios de Desempenho",
+      "performanceReportsDescription": "Análises e insights",
+      "footer": {
+        "tagline": "Sistema Inteligente de Gestão de Filas",
+        "description": "Agilizando o atendimento ao cliente com gestão inteligente de filas",
+        "quickLinks": "Links Rápidos",
+        "home": "Início",
+        "services": "Serviços",
+        "appointments": "Agendamentos",
+        "contact": "Fale Conosco",
+        "contactInfo": "Informações de Contato",
+        "email": "E-mail:",
+        "supportHours": "Horário de suporte: seg–sex, 9h–17h ET",
+        "rights": "© {{year}} Queue Flow. Todos os direitos reservados.",
+        "motto": "Revolucionando a gestão do atendimento ao cliente"
+      }
+    },
+    "nav": {
+      "findAppointment": "Encontrar Agendamento",
+      "imHere": "Cheguei",
+      "queueStatus": "Status da Fila",
+      "pricing": "Preços",
+      "profile": "Perfil",
+      "newAppointment": "Novo Agendamento",
+      "adminDashboard": "Painel do Administrador",
+      "systemHealth": "Saúde do Sistema",
+      "powerUserDashboard": "Painel de Usuário Avançado",
+      "staffDashboard": "Painel da Equipe",
+      "performanceReport": "Relatório de Desempenho",
+      "signOut": "Sair",
+      "signIn": "Entrar",
+      "employeeLogin": "Acesso para Funcionários",
+      "openMenu": "Abrir menu",
+      "closeMenu": "Fechar menu"
+    },
+    "hero": {
+      "titleLine1": "Gestão Inteligente de Filas",
+      "titleLine2": "Para Empresas Modernas",
+      "subtitle": "Elimine salas de espera, reduza a frustração dos clientes e aumente a eficiência com nosso sistema de gestão de filas com IA.",
+      "pillRealtime": "Atualizações em Tempo Real",
+      "pillScheduling": "Agendamento Inteligente",
+      "pillNoLines": "Chega de Filas",
+      "bookAppointment": "Agendar Atendimento",
+      "checkStatus": "Ver Status",
+      "learnMore": "Saiba Mais",
+      "statLive": "Ao vivo",
+      "statLiveDescription": "Posição na fila e estimativa de espera",
+      "statLanguages": "4",
+      "statLanguagesDescription": "Idiomas para os clientes",
+      "statPwa": "PWA",
+      "statPwaDescription": "Instalável, funciona em qualquer dispositivo",
+      "videoUnsupported": "Seu navegador não suporta a tag de vídeo."
+    },
+    "serviceCards": {
+      "title": "Como Podemos Ajudar Você Hoje?",
+      "subtitle": "Escolha a opção ideal para você e tenha um atendimento sem complicações",
+      "schedule": {
+        "title": "Agendar Atendimento",
+        "description": "Reserve sua visita com antecedência e evite a espera",
+        "button": "Agendar Agora"
+      },
+      "find": {
+        "title": "Encontrar Meu Agendamento",
+        "description": "Consulte, altere ou cancele seu agendamento existente",
+        "button": "Encontrar Agendamento"
+      },
+      "checkIn": {
+        "title": "Cheguei",
+        "description": "Faça o check-in do seu agendamento ao chegar",
+        "button": "Fazer Check-in"
+      },
+      "status": {
+        "title": "Status da Fila",
+        "description": "Veja os tempos de espera atuais e o status da fila",
+        "button": "Ver Status"
+      },
+      "mobile": {
+        "title": "Fila pelo Celular",
+        "description": "Entre na fila virtual pelo seu dispositivo móvel",
+        "button": "Entrar na Fila"
+      },
+      "kiosk": {
+        "title": "Quiosque sem Agendamento",
+        "description": "Use nosso quiosque de autoatendimento para visitas sem agendamento",
+        "button": "Usar Quiosque"
+      },
+      "virtualQueue": "Fila Virtual →",
+      "digitalSignage": "Painel Digital →"
+    },
+    "features": {
+      "title": "Recursos Poderosos para Todos",
+      "subtitle": "Nosso sistema de gestão de filas foi criado para tornar sua experiência mais tranquila, seja você cliente ou membro da equipe.",
+      "realtime": {
+        "title": "Atualizações em Tempo Real",
+        "description": "Receba atualizações ao vivo sobre tempos de espera e posição na fila por SMS e notificações web."
+      },
+      "scheduling": {
+        "title": "Agendamento Inteligente",
+        "description": "Agende com antecedência e escolha o horário de sua preferência para evitar esperas."
+      },
+      "queue": {
+        "title": "Gestão de Filas",
+        "description": "Entre em filas virtuais de qualquer lugar e acompanhe sua posição em tempo real."
+      },
+      "notifications": {
+        "title": "Notificações Instantâneas",
+        "description": "Receba alertas quando estiver quase na sua vez, para nunca perder seu atendimento."
+      },
+      "secure": {
+        "title": "Seguro e Privado",
+        "description": "Suas informações pessoais são protegidas com medidas de segurança de nível corporativo."
+      },
+      "analytics": {
+        "title": "Painel de Análises",
+        "description": "A equipe pode acompanhar métricas de desempenho e otimizar a prestação do serviço."
+      },
+      "multiLocation": {
+        "title": "Várias Unidades",
+        "description": "Gerencie agendamentos em várias unidades a partir de uma única plataforma."
+      },
+      "mobileFirst": {
+        "title": "Feito para o Celular",
+        "description": "Experiência móvel otimizada para clientes e equipe em qualquer dispositivo."
+      },
+      "highlightTitle": "Tudo o que Você Precisa em uma Só Plataforma",
+      "highlightDescription": "Do agendamento à gestão de filas em tempo real, cuidamos de tudo com tecnologia de ponta e um design intuitivo.",
+      "badgeCloud": "Na Nuvem",
+      "badgeRls": "Controle de acesso por linha",
+      "badgeEncrypted": "Criptografado em trânsito e em repouso",
+      "badgePwa": "PWA instalável"
+    },
+    "cta": {
+      "title": "Pronto para Ir Mais Rápido?",
+      "subtitle": "Ofereça aos seus clientes uma fila em que possam esperar de qualquer lugar",
+      "bookAppointment": "Agendar Atendimento",
+      "checkStatus": "Ver Status",
+      "checkInNow": "Fazer Check-in Agora"
+    },
+    "pricing": {
+      "badge": "Preços simples e transparentes",
+      "title": "Planos que crescem com a sua fila",
+      "subtitle": "Seja uma única recepção ou uma rede de unidades, o QueueFlow cresce com você. Sem taxas de configuração, cancele quando quiser.",
+      "mostPopular": "Mais Popular",
+      "perMonth": "/ mês",
+      "contactUs": "fale conosco",
+      "custom": "Sob consulta",
+      "talkToSales": "Falar com vendas",
+      "contactSales": "Contatar Vendas",
+      "footnote": "Cobrança mensal. Preços por volume e para o setor público disponíveis sob consulta.",
+      "starter": {
+        "name": "Starter",
+        "tagline": "Uma única unidade, filas para atendimento com e sem agendamento",
+        "features": [
+          "Até 2 contas de equipe",
+          "Fila virtual + check-in por QR",
+          "Página de status para clientes e PWA",
+          "Pesquisa de satisfação após cada visita",
+          "Suporte por e-mail"
+        ]
+      },
+      "growth": {
+        "name": "Growth",
+        "tagline": "Equipes com várias unidades que precisam de análises e controle reais",
+        "features": [
+          "Até 15 contas de equipe, várias unidades",
+          "Tudo do plano Starter",
+          "Painel da equipe com RBAC (atendente/gerente/administrador)",
+          "Análises avançadas e agendamento assistido por IA (em desenvolvimento)",
+          "Painel digital e modo quiosque",
+          "Espanhol, português e crioulo haitiano em todas as páginas para clientes (ferramentas da equipe em inglês)",
+          "Suporte prioritário por e-mail e chat"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "Organizações grandes ou reguladas com requisitos personalizados",
+        "features": [
+          "Contas de equipe e unidades ilimitadas",
+          "Tudo do plano Growth",
+          "SSO / SAML (no roadmap) e políticas RBAC personalizadas",
+          "Suporte e integração com SLA",
+          "Integrações personalizadas (CRM/PDV/painéis)",
+          "Gerente de sucesso dedicado"
+        ]
+      }
+    },
+    "statusLabels": {
+      "scheduled": "Agendado",
+      "checked_in": "Na Fila",
+      "in_progress": "Em Atendimento",
+      "completed": "Concluído",
+      "cancelled": "Cancelado",
+      "no_show": "Não Compareceu",
+      "unknown": "Desconhecido"
+    },
+    "booking": {
+      "pageTitle": "Agendar um Atendimento",
+      "pageSubtitle": "Escolha o serviço, a unidade e o horário que funcionam melhor para você",
+      "formTitle": "Solicitar um Agendamento",
+      "formDescription": "Preencha este formulário e entraremos em contato para agendar seu atendimento",
+      "loadingForm": "Carregando o formulário de agendamento...",
+      "loadingLocations": "Carregando unidades...",
+      "loadFailed": "Não foi possível carregar o formulário de agendamento",
+      "loadLocationsError": "Falha ao carregar as unidades: {{error}}",
+      "retry": "Tentar novamente",
+      "refresh": "Atualizar",
+      "noLocations": "Nenhuma unidade disponível",
+      "noLocationsMessage": "No momento não há unidades disponíveis para agendamento. Tente novamente mais tarde ou entre em contato com o suporte.",
+      "submit": "Enviar Solicitação de Agendamento",
+      "submitting": "Enviando...",
+      "requiredNote": "* Campos obrigatórios. Entraremos em contato em até 1 dia útil para confirmar seu agendamento.",
+      "toast": {
+        "missingInfo": "Informações Faltando",
+        "booked": "Agendamento realizado",
+        "bookedDescription": "Guarde seu código de confirmação para fazer o check-in quando chegar.",
+        "submitError": "Houve um problema ao enviar sua solicitação. Tente novamente.",
+        "bookingFailed": "Falha no agendamento",
+        "createFailed": "Não foi possível criar o agendamento. Tente novamente."
+      },
+      "validation": {
+        "firstNameRequired": "O nome é obrigatório",
+        "lastNameRequired": "O sobrenome é obrigatório",
+        "phoneRequired": "O número de telefone é obrigatório",
+        "locationRequired": "A unidade é obrigatória",
+        "serviceRequired": "O serviço é obrigatório",
+        "dateRequired": "A data preferida é obrigatória",
+        "timeRequired": "O horário preferido é obrigatório"
+      },
+      "personal": {
+        "title": "Informações Pessoais",
+        "firstName": "Nome *",
+        "firstNamePlaceholder": "Digite seu nome",
+        "lastName": "Sobrenome *",
+        "lastNamePlaceholder": "Digite seu sobrenome",
+        "phone": "Número de Telefone *",
+        "email": "Endereço de E-mail"
+      },
+      "serviceLocation": {
+        "title": "Serviço e Unidade",
+        "service": "Serviço *",
+        "servicesError": "Erro ao carregar os serviços: {{error}}",
+        "loadingServices": "Carregando serviços...",
+        "selectService": "Selecione um serviço",
+        "minutes": "{{count}} min",
+        "allLocations": "(Disponível em todas as unidades)",
+        "location": "Unidade *",
+        "locationsError": "Erro ao carregar as unidades: {{error}}",
+        "loadingLocations": "Carregando unidades...",
+        "selectServiceFirst": "Selecione um serviço primeiro",
+        "noLocationsAvailable": "Nenhuma unidade disponível",
+        "selectLocation": "Selecione uma unidade"
+      },
+      "preferences": {
+        "title": "Preferências do Agendamento",
+        "preferredDate": "Data Preferida *",
+        "preferredTime": "Horário Preferido *"
+      },
+      "visit": {
+        "title": "Detalhes da Visita",
+        "reason": "Motivo da Visita",
+        "reasonPlaceholder": "Descreva o motivo da sua visita...",
+        "notes": "Observações Adicionais",
+        "notesPlaceholder": "Qualquer informação adicional ou solicitação especial..."
+      },
+      "confirmation": {
+        "title": "Agendamento Confirmado!",
+        "description": "Seu atendimento foi agendado com sucesso. Guarde seu código de confirmação.",
+        "codeLabel": "Código de Confirmação",
+        "keepCode": "Guarde este código para o check-in e para consultar o status. Use-o para ver sua posição na fila.",
+        "gotIt": "Entendi"
+      }
+    },
+    "checkIn": {
+      "pageTitle": "Cheguei",
+      "helpLine1": "Já chegou para o seu atendimento?",
+      "helpLine2": "Digite seu código de confirmação para nos avisar que você chegou.",
+      "findTitle": "Encontre Seu Agendamento",
+      "findDescription": "Digite seu código de confirmação ou seus dados de contato",
+      "methodCode": "Nº de Confirmação",
+      "methodDetails": "Nome e Telefone",
+      "codeLabel": "Código de Confirmação",
+      "codeHint": "Use seu número de confirmação de cliente ou o código do agendamento",
+      "or": "– OU –",
+      "lastName": "Sobrenome",
+      "lastNamePlaceholder": "Digite seu sobrenome",
+      "phone": "Número de Telefone",
+      "searching": "Buscando...",
+      "findButton": "Encontrar Agendamento",
+      "confirmTitle": "Confirmar Check-in",
+      "confirmDescription": "Confira os detalhes do seu agendamento",
+      "service": "Serviço",
+      "location": "Unidade",
+      "scheduledTime": "Horário Agendado",
+      "back": "Voltar",
+      "checkingIn": "Fazendo Check-in...",
+      "checkMeIn": "Fazer Check-in",
+      "successTitle": "Check-in realizado!",
+      "successDescription": "Bem-vindo! Aqui estão as informações da sua fila",
+      "positionLabel": "Sua posição na fila",
+      "aheadOfYou": "à sua frente",
+      "estimatedWait": "espera estimada",
+      "waitShort": "≈ {{minutes}} min",
+      "refreshNote": "As informações são atualizadas a cada 30 segundos",
+      "done": "Concluir",
+      "fallbackService": "Serviço",
+      "fallbackLocation": "Unidade",
+      "errors": {
+        "enterCode": "Digite seu código de confirmação.",
+        "enterNameAndPhone": "Digite o sobrenome e o número de telefone.",
+        "notFound": "Nenhum agendamento encontrado com as informações fornecidas. Verifique seus dados e tente novamente.",
+        "alreadyCheckedIn": "Você já fez o check-in. Use \"Ver Status\" para acompanhar sua posição na fila.",
+        "alreadyCheckedInWithPosition": "Você já fez o check-in e está na posição nº {{position}} da fila. Use \"Ver Status\" para acompanhar sua posição na fila.",
+        "latestStatus": "Seu agendamento mais recente está {{status}}. Faça um novo agendamento ou fale com um membro da equipe.",
+        "notFoundTitle": "Agendamento Não Encontrado",
+        "notFoundFallback": "Não foi possível encontrar o agendamento. Verifique suas informações e tente novamente.",
+        "checkInFailed": "Falha no Check-in",
+        "checkInFallback": "Não foi possível fazer o check-in. Tente novamente."
+      },
+      "codePlaceholder": "CUST-XXXXXXXX ou APT-XXXXXXXX"
+    },
+    "status": {
+      "pageTitle": "Ver Status",
+      "findTitle": "Consultar Meu Status",
+      "methodCode": "Nº de Confirmação",
+      "methodDetails": "Nome e Telefone",
+      "codeLabel": "Número de Confirmação",
+      "codePlaceholder": "Digite CUST-XXXXXXXX ou APT-XXXXXXXX",
+      "codeHint": "Use seu número de confirmação de cliente (CUST-XXXXXXXX) ou o código do agendamento (APT-XXXXXXXX)",
+      "lastName": "Sobrenome",
+      "lastNamePlaceholder": "Digite seu sobrenome",
+      "phone": "Número de Telefone",
+      "searching": "Buscando...",
+      "findButton": "Consultar Meu Status",
+      "notFoundTitle": "Agendamento Não Encontrado",
+      "notFoundDescription": "Não encontramos um agendamento com as informações fornecidas. Verifique seu número de confirmação e tente novamente.",
+      "bookNew": "Fazer Novo Agendamento",
+      "resultsLabel": "Resultados do status da fila",
+      "serviceCompleted": "Atendimento Concluído",
+      "checkedIn": "Check-in Feito",
+      "notCheckedIn": "Sem Check-in",
+      "positionLabel": "Sua posição na fila",
+      "waitApprox": "≈ {{minutes}} min de espera",
+      "location": "Unidade",
+      "service": "Serviço",
+      "scheduledTime": "Horário Agendado",
+      "checkInNow": "Fazer Check-in Agora",
+      "ticketNumber": "Número da Senha",
+      "errors": {
+        "provideInfo": "Informe um número de confirmação ou o sobrenome e o número de telefone",
+        "notFound": "Nenhum agendamento encontrado com as informações fornecidas",
+        "fetchFailed": "Não foi possível obter o status da fila. Tente novamente.",
+        "unknownService": "Serviço Desconhecido",
+        "mainOffice": "Escritório Principal"
+      }
+    },
+    "lookup": {
+      "headerSubtitle": "Consulte e gerencie seus agendamentos",
+      "pageTitle": "Encontrar Meu Agendamento",
+      "searchTitle": "Busque Seu Agendamento",
+      "methodCode": "Número de Confirmação",
+      "methodDetails": "Nome e Telefone",
+      "codeLabel": "Número de Confirmação",
+      "codePlaceholder": "Digite seu número de confirmação",
+      "lastName": "Sobrenome",
+      "lastNamePlaceholder": "Digite seu sobrenome",
+      "phone": "Número de Telefone",
+      "searching": "Buscando...",
+      "findButton": "Encontrar Agendamento",
+      "cancelConfirm": "Tem certeza de que deseja cancelar este agendamento?",
+      "cancelledTitle": "Agendamento Cancelado",
+      "cancelledDescription": "Seu agendamento foi cancelado com sucesso.",
+      "qrCode": "Código QR",
+      "dateTime": "Data e Hora",
+      "dateAt": "{{date}} às {{time}}",
+      "location": "Unidade",
+      "service": "Serviço",
+      "confirmation": "Confirmação",
+      "phoneLabel": "Telefone",
+      "email": "E-mail",
+      "reason": "Motivo da Visita",
+      "cancelling": "Cancelando...",
+      "cancelAppointment": "Cancelar Agendamento",
+      "checkQueueStatus": "Ver Status da Fila",
+      "errors": {
+        "notFoundByCode": "Nenhum agendamento encontrado com este número de confirmação",
+        "notFoundByDetails": "Nenhum agendamento encontrado com este nome e número de telefone",
+        "lookupFailed": "Não foi possível encontrar o agendamento",
+        "cancelFailed": "Não foi possível cancelar o agendamento. Tente novamente."
+      }
+    },
+    "kiosk": {
+      "title": "Quiosque QueueFlow",
+      "subtitle": "Check-in por Autoatendimento",
+      "startOver": "Recomeçar",
+      "stepLabel": "Etapa {{number}}: {{title}}",
+      "stepOf": "{{current}} de {{total}}",
+      "steps": {
+        "location": "Selecionar Unidade",
+        "service": "Escolher Serviço",
+        "customer": "Informar Dados",
+        "ticket": "Sua Senha"
+      },
+      "toast": {
+        "missingInfo": "Faltam informações obrigatórias",
+        "success": "Sucesso",
+        "ticketGenerated": "Sua senha foi gerada!",
+        "createFailed": "Não foi possível criar o agendamento. Tente novamente."
+      },
+      "location": {
+        "noneTitle": "Nenhuma Unidade Disponível",
+        "noneDescription": "Todas as unidades de atendimento estão fechadas no momento. Tente novamente mais tarde.",
+        "title": "Escolha Sua Unidade de Atendimento",
+        "subtitle": "Selecione a unidade onde deseja ser atendido",
+        "select": "Selecionar Unidade"
+      },
+      "service": {
+        "back": "Voltar",
+        "title": "Selecione o Tipo de Serviço",
+        "subtitle": "Escolha o serviço de que você precisa hoje",
+        "noneTitle": "Nenhum Serviço Disponível",
+        "noneDescription": "Não há serviços disponíveis nesta unidade no momento.",
+        "select": "Selecionar Serviço",
+        "durationMinutes": "{{minutes}} min",
+        "durationHours": "{{hours}}h",
+        "durationHoursMinutes": "{{hours}}h {{minutes}}min"
+      },
+      "customer": {
+        "back": "Voltar",
+        "title": "Informe Seus Dados",
+        "subtitle": "Precisamos de alguns dados para gerar sua senha de atendimento",
+        "notice": "Informe seus dados de contato para gerar sua senha de atendimento.",
+        "firstName": "Nome *",
+        "firstNamePlaceholder": "Digite seu nome",
+        "lastName": "Sobrenome *",
+        "lastNamePlaceholder": "Digite seu sobrenome",
+        "phone": "Número de Telefone *",
+        "email": "Endereço de E-mail (Opcional)",
+        "generateTicket": "Gerar Senha",
+        "validation": {
+          "firstNameRequired": "O nome é obrigatório",
+          "lastNameRequired": "O sobrenome é obrigatório",
+          "phoneRequired": "O número de telefone é obrigatório",
+          "phoneInvalid": "Digite um número de telefone válido",
+          "emailInvalid": "Digite um endereço de e-mail válido"
+        }
+      },
+      "ticket": {
+        "successTitle": "Senha Gerada com Sucesso!",
+        "successDescription": "Você já está na fila. Aguarde a chamada do seu número.",
+        "header": "Senha de Atendimento QueueFlow",
+        "keep": "Guarde esta senha até ser atendido",
+        "customer": "Cliente",
+        "location": "Unidade",
+        "service": "Serviço",
+        "estimatedMinutes": "Aprox. {{minutes}} minutos",
+        "queuePosition": "Posição na Fila",
+        "inLine": "na fila",
+        "qrCode": "Código QR",
+        "qrAlt": "Código QR da senha",
+        "scanToCheck": "Escaneie para ver o status",
+        "checkInTime": "Horário do check-in: {{time}}",
+        "stayNote": "Permaneça na área de espera. Você será chamado quando for a sua vez.",
+        "print": "Imprimir Senha",
+        "newTicket": "Nova Senha ({{seconds}}s)"
+      }
+    },
+    "virtualQueue": {
+      "title": "Fila Virtual",
+      "subtitle": "Entre na fila de qualquer lugar e acompanhe sua posição em tempo real",
+      "checkedInTitle": "Check-in realizado",
+      "checkedInWithPosition": "Você está na posição nº {{position}} da fila. Espera estimada de cerca de {{minutes}} minutos.",
+      "checkedInNoPosition": "Um membro da equipe vai chamar você em breve.",
+      "checkInFailed": "Falha no check-in",
+      "checkInFallback": "Tente novamente ou fale com um membro da equipe.",
+      "features": {
+        "sms": {
+          "title": "Atualizações por SMS",
+          "description": "Receba atualizações em tempo real sobre sua posição na fila por SMS"
+        },
+        "location": {
+          "title": "Flexibilidade de Local",
+          "description": "Não precisa esperar no local. Entre na fila de onde estiver!"
+        },
+        "tracking": {
+          "title": "Acompanhamento em Tempo Real",
+          "description": "Acompanhe sua posição e o tempo de espera estimado em tempo real"
+        }
+      },
+      "join": {
+        "title": "Entrar na Fila Virtual",
+        "missingInfo": "Informações Faltando",
+        "fillRequired": "Preencha todos os campos obrigatórios",
+        "fullNameRequired": "Digite seu nome e sobrenome.",
+        "joinedTitle": "Você Entrou na Fila",
+        "joinedDescription": "Você deve ser o nº {{position}} da fila para {{service}}. Faça o check-in quando chegar.",
+        "joinFailed": "Não foi possível entrar na fila. Tente novamente.",
+        "selectLocation": "Selecionar Unidade",
+        "chooseLocation": "Escolha uma unidade",
+        "selectService": "Selecionar Serviço",
+        "chooseService": "Escolha um serviço",
+        "waiting": "{{count}} aguardando",
+        "waitApprox": "~{{minutes}} min de espera",
+        "fullName": "Nome Completo *",
+        "fullNamePlaceholder": "Digite seu nome completo",
+        "phone": "Número de Telefone *",
+        "joining": "Entrando na Fila...",
+        "joinButton": "Entrar na Fila Virtual",
+        "qrNote": "Você receberá um código QR para facilitar o check-in",
+        "smsNote": "• Atualizações por SMS sobre sua posição na fila",
+        "arriveNote": "• Faça o check-in quando chegar à unidade"
+      },
+      "ticket": {
+        "title": "Sua Senha da Fila",
+        "qrAlt": "Código QR da senha da fila",
+        "checkedIn": "Check-in Feito",
+        "virtualQueue": "Fila Virtual",
+        "position": "Posição",
+        "estimatedWait": "Espera Est.",
+        "service": "Serviço: {{name}}",
+        "checkInButton": "Cheguei - Fazer Check-in",
+        "checkedInTitle": "Check-in realizado!",
+        "checkedInDescription": "Aguarde ser chamado para o atendimento",
+        "tip1": "• Mantenha esta senha à mão para o check-in",
+        "tip2": "• Você receberá atualizações por SMS sobre sua posição",
+        "tip3": "• Escaneie o código QR no quiosque ou mostre à equipe"
+      },
+      "tracker": {
+        "title": "Posição na Fila",
+        "description": "Sua posição atual na fila",
+        "noActive": "Nenhum agendamento ativo encontrado",
+        "positionLabel": "Posição na fila",
+        "estimatedWait": "Espera estimada: {{time}}",
+        "inQueue": "Na Fila",
+        "leave": "Sair da Fila",
+        "waitMinutes": "{{minutes}} min",
+        "waitHoursMinutes": "{{hours}}h {{minutes}}min"
+      }
+    },
+    "mobileQueue": {
+      "noAppointmentTitle": "Agendamento Não Encontrado",
+      "noAppointmentToast": "Escaneie seu código QR ou verifique sua confirmação.",
+      "noAppointmentDescription": "Escaneie seu código QR ou verifique os dados da sua confirmação.",
+      "goHome": "Ir para o Início",
+      "preferencesUpdated": "Preferências Atualizadas",
+      "preferencesSaved": "Suas configurações de notificação foram salvas.",
+      "tabs": {
+        "position": "Posição",
+        "progress": "Progresso"
+      },
+      "tracker": {
+        "notFound": "Agendamento não encontrado",
+        "fallbackService": "Serviço",
+        "calledTitle": "Você Está Sendo Chamado! 🔔",
+        "calledDescription": "Dirija-se ao balcão de atendimento.",
+        "notificationsEnabled": "Notificações Ativadas",
+        "notificationsDisabled": "Notificações Desativadas",
+        "enabledDescription": "Você receberá atualizações sobre sua posição na fila",
+        "disabledDescription": "As notificações da fila foram desativadas",
+        "loading": "Carregando sua posição na fila...",
+        "loadFailed": "Não foi possível carregar as informações da fila",
+        "tryAgain": "Tentar Novamente",
+        "status": {
+          "scheduled": "Agendado – faça o check-in ao chegar",
+          "checked_in": "Na Fila",
+          "in_progress": "Sendo Chamado!",
+          "completed": "Concluído",
+          "unknown": "Desconhecido"
+        },
+        "title": "Posição na Fila",
+        "ticket": "Senha nº {{number}}",
+        "positionLabel": "Sua posição na fila",
+        "onePersonAhead": "1 pessoa à sua frente",
+        "peopleAhead": "{{count}} pessoas à sua frente",
+        "estimatedWait": "Espera estimada",
+        "currentWait": "Espera atual",
+        "serviceDetails": "Detalhes do Atendimento",
+        "customer": "Cliente: {{name}}",
+        "checkedInAt": "Check-in: {{time}}",
+        "beingCalled": "🔔 Você está sendo chamado!",
+        "proceed": "Dirija-se ao balcão de atendimento agora.",
+        "showQr": "Mostrar Código QR"
+      },
+      "progress": {
+        "title": "Progresso na Fila",
+        "joined": "Entrada",
+        "yourTurn": "Sua Vez",
+        "peopleAhead": "Pessoas à Frente",
+        "estimatedTime": "Tempo Est.",
+        "averageService": "Atend. Médio",
+        "visualization": "Visualização da Fila",
+        "you": "Você",
+        "more": "+{{count}} mais",
+        "breakdown": "Detalhamento do Tempo",
+        "peopleAheadLabel": "Pessoas à frente:",
+        "averageServiceLabel": "Tempo médio de atendimento:",
+        "estimatedWaitLabel": "Espera estimada:",
+        "minutes": "{{count}} min"
+      },
+      "notifications": {
+        "title": "Preferências de Notificação",
+        "methods": "Formas de Notificação",
+        "push": "Notificações Push",
+        "enable": "Ativar",
+        "sms": "Notificações por SMS",
+        "email": "Notificações por E-mail",
+        "types": "Sobre o que quero ser avisado",
+        "positionChanges": "Mudanças de posição na fila",
+        "beingCalled": "Quando eu estiver sendo chamado",
+        "reminder": "Lembrete 5 minutos antes da minha vez",
+        "unsupported": "Notificações push não são suportadas neste dispositivo. Você ainda pode receber notificações por SMS e e-mail.",
+        "notSupported": "Não Suportado",
+        "notSupportedDescription": "Notificações push não são suportadas neste dispositivo.",
+        "enabled": "Notificações Ativadas",
+        "enabledDescription": "Você receberá notificações push com as atualizações da fila.",
+        "denied": "Permissão Negada",
+        "deniedDescription": "As notificações push não foram ativadas.",
+        "enableFailed": "Não foi possível ativar as notificações push."
+      },
+      "scanner": {
+        "cameraDenied": "Acesso à Câmera Negado",
+        "cameraDeniedDescription": "Permita o acesso à câmera ou use a digitação manual.",
+        "found": "Posição na Fila Encontrada",
+        "loadingPosition": "Carregando sua posição atual...",
+        "title": "Escanear Senha da Fila",
+        "frameHint": "Posicione o código QR dentro da moldura",
+        "enterCode": "Digitar Código de Confirmação",
+        "codeLabel": "Código de Confirmação",
+        "codePlaceholder": "Digite seu código de confirmação",
+        "codeHint": "Você o encontra na confirmação do seu agendamento",
+        "findPosition": "Encontrar Minha Posição",
+        "scan": "Escanear Código QR",
+        "manual": "Digitação Manual",
+        "cancelScan": "Cancelar Leitura",
+        "useCamera": "Usar Câmera"
+      }
+    },
+    "errors": {
+      "locationNotFound": "Unidade não encontrada",
+      "createFailed": "Não foi possível criar o agendamento. Tente novamente.",
+      "checkInFailed": "Falha no check-in. Procure um membro da equipe.",
+      "cancelFailed": "Não foi possível cancelar o agendamento.",
+      "db": {
+        "nameRequired": "Nome e sobrenome são obrigatórios",
+        "phoneRequired": "É necessário um número de telefone válido",
+        "serviceLocationRequired": "Serviço e unidade são obrigatórios",
+        "unknownLocation": "Unidade desconhecida",
+        "unknownService": "Serviço desconhecido ou inativo",
+        "appointmentNotFound": "Agendamento não encontrado",
+        "codeMismatch": "O código de confirmação não corresponde a este agendamento",
+        "cannotCheckIn": "Este agendamento está {{status}} e não permite check-in",
+        "cannotCancel": "Este agendamento está {{status}} e não pode ser cancelado"
+      }
+    }
   }
 }

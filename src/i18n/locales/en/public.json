@@ -1,0 +1,661 @@
+{
+  "layout": {
+    "menu": "Menu",
+    "staffDashboard": "Staff Dashboard",
+    "staffDashboardDescription": "Manage appointments and queue",
+    "adminPortal": "Admin Portal",
+    "adminPortalDescription": "System administration",
+    "performanceReports": "Performance Reports",
+    "performanceReportsDescription": "Analytics and insights",
+    "footer": {
+      "tagline": "Smart Queue Management System",
+      "description": "Streamlining customer service through intelligent queue management",
+      "quickLinks": "Quick Links",
+      "home": "Home",
+      "services": "Services",
+      "appointments": "Appointments",
+      "contact": "Contact Us",
+      "contactInfo": "Contact Information",
+      "email": "Email:",
+      "supportHours": "Support hours: Mon–Fri, 9am–5pm ET",
+      "rights": "© {{year}} Queue Flow. All rights reserved.",
+      "motto": "Revolutionizing customer service management"
+    }
+  },
+  "nav": {
+    "findAppointment": "Find Appointment",
+    "imHere": "I'm Here",
+    "queueStatus": "Queue Status",
+    "pricing": "Pricing",
+    "profile": "Profile",
+    "newAppointment": "New Appointment",
+    "adminDashboard": "Admin Dashboard",
+    "systemHealth": "System Health",
+    "powerUserDashboard": "Power User Dashboard",
+    "staffDashboard": "Staff Dashboard",
+    "performanceReport": "Performance Report",
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "employeeLogin": "Employee Login",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "titleLine1": "Smart Queue Management",
+    "titleLine2": "For Modern Business",
+    "subtitle": "Eliminate waiting rooms, reduce customer frustration, and boost efficiency with our AI-powered queue management system.",
+    "pillRealtime": "Real-time Updates",
+    "pillScheduling": "Smart Scheduling",
+    "pillNoLines": "No More Lines",
+    "bookAppointment": "Book Appointment",
+    "checkStatus": "Check Status",
+    "learnMore": "Learn More",
+    "statLive": "Live",
+    "statLiveDescription": "Queue position & wait estimates",
+    "statLanguages": "4",
+    "statLanguagesDescription": "Languages for customers",
+    "statPwa": "PWA",
+    "statPwaDescription": "Installable, works on any device",
+    "videoUnsupported": "Your browser does not support the video tag."
+  },
+  "serviceCards": {
+    "title": "How Can We Help You Today?",
+    "subtitle": "Choose the option that works best for you and experience seamless service",
+    "schedule": {
+      "title": "Schedule Appointment",
+      "description": "Book your visit in advance and skip the wait",
+      "button": "Schedule Now"
+    },
+    "find": {
+      "title": "Find My Appointment",
+      "description": "Look up, modify, or cancel your existing appointment",
+      "button": "Find Appointment"
+    },
+    "checkIn": {
+      "title": "I'm Here",
+      "description": "Check in for your appointment when you arrive",
+      "button": "Check In"
+    },
+    "status": {
+      "title": "Queue Status",
+      "description": "View current wait times and queue status",
+      "button": "View Status"
+    },
+    "mobile": {
+      "title": "Mobile Queue",
+      "description": "Join the virtual queue from your mobile device",
+      "button": "Join Queue"
+    },
+    "kiosk": {
+      "title": "Walk-In Kiosk",
+      "description": "Use our self-service kiosk for walk-in visits",
+      "button": "Use Kiosk"
+    },
+    "virtualQueue": "Virtual Queue →",
+    "digitalSignage": "Digital Signage →"
+  },
+  "features": {
+    "title": "Powerful Features for Everyone",
+    "subtitle": "Our queue management system is designed to make your experience smoother, whether you're a customer or staff member.",
+    "realtime": {
+      "title": "Real-Time Updates",
+      "description": "Get live updates on wait times and queue position through SMS and web notifications."
+    },
+    "scheduling": {
+      "title": "Smart Scheduling",
+      "description": "Book appointments in advance and choose your preferred time slot to avoid waiting."
+    },
+    "queue": {
+      "title": "Queue Management",
+      "description": "Join virtual queues from anywhere and track your position in real-time."
+    },
+    "notifications": {
+      "title": "Instant Notifications",
+      "description": "Receive alerts when it's almost your turn, so you never miss your appointment."
+    },
+    "secure": {
+      "title": "Secure & Private",
+      "description": "Your personal information is protected with enterprise-grade security measures."
+    },
+    "analytics": {
+      "title": "Analytics Dashboard",
+      "description": "Staff can track performance metrics and optimize service delivery."
+    },
+    "multiLocation": {
+      "title": "Multi-Location",
+      "description": "Manage appointments across multiple locations from a single platform."
+    },
+    "mobileFirst": {
+      "title": "Mobile First",
+      "description": "Optimized mobile experience for customers and staff on any device."
+    },
+    "highlightTitle": "Everything You Need in One Platform",
+    "highlightDescription": "From appointment scheduling to real-time queue management, we've got you covered with cutting-edge technology and intuitive design.",
+    "badgeCloud": "Cloud-Based",
+    "badgeRls": "Row-level access control",
+    "badgeEncrypted": "Encrypted in transit & at rest",
+    "badgePwa": "Installable PWA"
+  },
+  "cta": {
+    "title": "Ready to Move Faster?",
+    "subtitle": "Give your customers a queue they can wait in from anywhere",
+    "bookAppointment": "Book Appointment",
+    "checkStatus": "Check Status",
+    "checkInNow": "Check In Now"
+  },
+  "pricing": {
+    "badge": "Simple, transparent pricing",
+    "title": "Plans that grow with your queue",
+    "subtitle": "Whether you're running one front desk or a network of locations, QueueFlow scales with you. No setup fees, cancel anytime.",
+    "mostPopular": "Most Popular",
+    "perMonth": "/ month",
+    "contactUs": "contact us",
+    "custom": "Custom",
+    "talkToSales": "Talk to sales",
+    "contactSales": "Contact Sales",
+    "footnote": "Billed monthly. Volume and public-sector pricing available on request.",
+    "starter": {
+      "name": "Starter",
+      "tagline": "Single location, walk-in and appointment queueing",
+      "features": [
+        "Up to 2 staff seats",
+        "Virtual queue + QR check-in",
+        "Customer status page & PWA",
+        "CSAT survey after each visit",
+        "Email support"
+      ]
+    },
+    "growth": {
+      "name": "Growth",
+      "tagline": "Multi-location teams that need real analytics and control",
+      "features": [
+        "Up to 15 staff seats, multiple locations",
+        "Everything in Starter",
+        "Staff dashboard with RBAC (clerk/manager/admin)",
+        "Advanced analytics & AI-assisted scheduling (in progress)",
+        "Digital signage & kiosk mode",
+        "Spanish, Portuguese and Haitian Creole on all customer-facing pages (staff tools in English)",
+        "Priority email + chat support"
+      ]
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "tagline": "Large or regulated organizations with custom requirements",
+      "features": [
+        "Unlimited staff seats & locations",
+        "Everything in Growth",
+        "SSO / SAML (roadmap) & custom RBAC policies",
+        "SLA-backed support & onboarding",
+        "Custom integrations (CRM/POS/signage)",
+        "Dedicated success manager"
+      ]
+    }
+  },
+  "statusLabels": {
+    "scheduled": "Scheduled",
+    "checked_in": "In Queue",
+    "in_progress": "Being Served",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "no_show": "No Show",
+    "unknown": "Unknown"
+  },
+  "booking": {
+    "pageTitle": "Book an Appointment",
+    "pageSubtitle": "Choose a service, location and time that works for you",
+    "formTitle": "Request an Appointment",
+    "formDescription": "Fill out this form and we'll contact you to schedule your appointment",
+    "loadingForm": "Loading appointment form...",
+    "loadingLocations": "Loading locations...",
+    "loadFailed": "Unable to load appointment form",
+    "loadLocationsError": "Failed to load locations: {{error}}",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "noLocations": "No locations available",
+    "noLocationsMessage": "There are currently no locations available for scheduling appointments. Please check back later or contact support.",
+    "submit": "Submit Appointment Request",
+    "submitting": "Submitting...",
+    "requiredNote": "* Required fields. We will contact you within 1 business day to confirm your appointment.",
+    "toast": {
+      "missingInfo": "Missing Information",
+      "booked": "Appointment booked",
+      "bookedDescription": "Keep your confirmation code to check in when you arrive.",
+      "submitError": "There was a problem submitting your request. Please try again.",
+      "bookingFailed": "Booking failed",
+      "createFailed": "Failed to create appointment. Please try again."
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "phoneRequired": "Phone number is required",
+      "locationRequired": "Location is required",
+      "serviceRequired": "Service is required",
+      "dateRequired": "Preferred date is required",
+      "timeRequired": "Preferred time is required"
+    },
+    "personal": {
+      "title": "Personal Information",
+      "firstName": "First Name *",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name *",
+      "lastNamePlaceholder": "Enter your last name",
+      "phone": "Phone Number *",
+      "email": "Email Address"
+    },
+    "serviceLocation": {
+      "title": "Service and Location",
+      "service": "Service *",
+      "servicesError": "Error loading services: {{error}}",
+      "loadingServices": "Loading services...",
+      "selectService": "Select a service",
+      "minutes": "{{count}} min",
+      "allLocations": "(Available at all locations)",
+      "location": "Location *",
+      "locationsError": "Error loading locations: {{error}}",
+      "loadingLocations": "Loading locations...",
+      "selectServiceFirst": "Select a service first",
+      "noLocationsAvailable": "No locations available",
+      "selectLocation": "Select a location"
+    },
+    "preferences": {
+      "title": "Appointment Preferences",
+      "preferredDate": "Preferred Date *",
+      "preferredTime": "Preferred Time *"
+    },
+    "visit": {
+      "title": "Visit Details",
+      "reason": "Reason for Visit",
+      "reasonPlaceholder": "Please describe the nature of your visit...",
+      "notes": "Additional Notes",
+      "notesPlaceholder": "Any additional information or special requests..."
+    },
+    "confirmation": {
+      "title": "Appointment Confirmed!",
+      "description": "Your appointment has been successfully scheduled. Please save your confirmation code.",
+      "codeLabel": "Confirmation Code",
+      "keepCode": "Keep this code for check-in and status updates. Use it to check your queue position.",
+      "gotIt": "Got It"
+    }
+  },
+  "checkIn": {
+    "pageTitle": "I'm Here",
+    "helpLine1": "Already here for your appointment?",
+    "helpLine2": "Enter your confirmation code to let us know you've arrived.",
+    "findTitle": "Find Your Appointment",
+    "findDescription": "Enter your confirmation code or contact details",
+    "methodCode": "Confirmation #",
+    "methodDetails": "Name & Phone",
+    "codeLabel": "Confirmation Code",
+    "codeHint": "Use your customer confirmation number or appointment code",
+    "or": "– OR –",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "phone": "Phone Number",
+    "searching": "Searching...",
+    "findButton": "Find Appointment",
+    "confirmTitle": "Confirm Check-In",
+    "confirmDescription": "Please review your appointment details",
+    "service": "Service",
+    "location": "Location",
+    "scheduledTime": "Scheduled Time",
+    "back": "Back",
+    "checkingIn": "Checking In...",
+    "checkMeIn": "Check Me In",
+    "successTitle": "You're checked in!",
+    "successDescription": "Welcome! Here's your queue information",
+    "positionLabel": "Your position in line",
+    "aheadOfYou": "ahead of you",
+    "estimatedWait": "estimated wait",
+    "waitShort": "≈ {{minutes}}m",
+    "refreshNote": "Updates refresh every 30 seconds",
+    "done": "Done",
+    "fallbackService": "Service",
+    "fallbackLocation": "Location",
+    "errors": {
+      "enterCode": "Please enter your confirmation code.",
+      "enterNameAndPhone": "Please enter both last name and phone number.",
+      "notFound": "No appointment found with the provided information. Please check your details and try again.",
+      "alreadyCheckedIn": "You are already checked in. Use \"Check Status\" to follow your place in the queue.",
+      "alreadyCheckedInWithPosition": "You are already checked in and #{{position}} in line. Use \"Check Status\" to follow your place in the queue.",
+      "latestStatus": "Your most recent appointment is {{status}}. Please book a new appointment or see a staff member.",
+      "notFoundTitle": "Appointment Not Found",
+      "notFoundFallback": "Unable to find appointment. Please verify your information and try again.",
+      "checkInFailed": "Check-in Failed",
+      "checkInFallback": "Unable to check in. Please try again."
+    },
+    "codePlaceholder": "CUST-XXXXXXXX or APT-XXXXXXXX"
+  },
+  "status": {
+    "pageTitle": "Check Status",
+    "findTitle": "Find My Status",
+    "methodCode": "Confirmation #",
+    "methodDetails": "Name & Phone",
+    "codeLabel": "Confirmation Number",
+    "codePlaceholder": "Enter CUST-XXXXXXXX or APT-XXXXXXXX",
+    "codeHint": "Use your customer confirmation number (CUST-XXXXXXXX) or appointment code (APT-XXXXXXXX)",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "phone": "Phone Number",
+    "searching": "Searching...",
+    "findButton": "Find My Status",
+    "notFoundTitle": "Appointment Not Found",
+    "notFoundDescription": "We couldn't find an appointment with the information provided. Please check your confirmation number and try again.",
+    "bookNew": "Book New Appointment",
+    "resultsLabel": "Queue status results",
+    "serviceCompleted": "Service Completed",
+    "checkedIn": "Checked In",
+    "notCheckedIn": "Not Checked In",
+    "positionLabel": "Your position in line",
+    "waitApprox": "≈ {{minutes}} min wait",
+    "location": "Location",
+    "service": "Service",
+    "scheduledTime": "Scheduled Time",
+    "checkInNow": "Check In Now",
+    "ticketNumber": "Ticket Number",
+    "errors": {
+      "provideInfo": "Please provide either a confirmation number or both last name and phone number",
+      "notFound": "No appointment found with the provided information",
+      "fetchFailed": "Unable to retrieve queue status. Please try again.",
+      "unknownService": "Unknown Service",
+      "mainOffice": "Main Office"
+    }
+  },
+  "lookup": {
+    "headerSubtitle": "View and manage your appointments",
+    "pageTitle": "Find My Appointment",
+    "searchTitle": "Search for Your Appointment",
+    "methodCode": "Confirmation Number",
+    "methodDetails": "Name & Phone",
+    "codeLabel": "Confirmation Number",
+    "codePlaceholder": "Enter your confirmation number",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "phone": "Phone Number",
+    "searching": "Searching...",
+    "findButton": "Find Appointment",
+    "cancelConfirm": "Are you sure you want to cancel this appointment?",
+    "cancelledTitle": "Appointment Cancelled",
+    "cancelledDescription": "Your appointment has been successfully cancelled.",
+    "qrCode": "QR Code",
+    "dateTime": "Date & Time",
+    "dateAt": "{{date}} at {{time}}",
+    "location": "Location",
+    "service": "Service",
+    "confirmation": "Confirmation",
+    "phoneLabel": "Phone",
+    "email": "Email",
+    "reason": "Reason for Visit",
+    "cancelling": "Cancelling...",
+    "cancelAppointment": "Cancel Appointment",
+    "checkQueueStatus": "Check Queue Status",
+    "errors": {
+      "notFoundByCode": "Appointment not found with this confirmation number",
+      "notFoundByDetails": "No appointments found with this name and phone number",
+      "lookupFailed": "Failed to find appointment",
+      "cancelFailed": "Failed to cancel appointment. Please try again."
+    }
+  },
+  "kiosk": {
+    "title": "QueueFlow Kiosk",
+    "subtitle": "Self-Service Check-in",
+    "startOver": "Start Over",
+    "stepLabel": "Step {{number}}: {{title}}",
+    "stepOf": "{{current}} of {{total}}",
+    "steps": {
+      "location": "Select Location",
+      "service": "Choose Service",
+      "customer": "Enter Information",
+      "ticket": "Your Ticket"
+    },
+    "toast": {
+      "missingInfo": "Missing required information",
+      "success": "Success",
+      "ticketGenerated": "Your ticket has been generated!",
+      "createFailed": "Failed to create appointment. Please try again."
+    },
+    "location": {
+      "noneTitle": "No Locations Available",
+      "noneDescription": "All service locations are currently closed. Please try again later.",
+      "title": "Choose Your Service Location",
+      "subtitle": "Select the location where you'd like to receive service",
+      "select": "Select Location"
+    },
+    "service": {
+      "back": "Back",
+      "title": "Select Service Type",
+      "subtitle": "Choose the service you need today",
+      "noneTitle": "No Services Available",
+      "noneDescription": "No services are currently available at this location.",
+      "select": "Select Service",
+      "durationMinutes": "{{minutes}} min",
+      "durationHours": "{{hours}}h",
+      "durationHoursMinutes": "{{hours}}h {{minutes}}m"
+    },
+    "customer": {
+      "back": "Back",
+      "title": "Enter Your Information",
+      "subtitle": "We need a few details to generate your service ticket",
+      "notice": "Please provide your contact information to generate your service ticket.",
+      "firstName": "First Name *",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name *",
+      "lastNamePlaceholder": "Enter your last name",
+      "phone": "Phone Number *",
+      "email": "Email Address (Optional)",
+      "generateTicket": "Generate Ticket",
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "phoneRequired": "Phone number is required",
+        "phoneInvalid": "Please enter a valid phone number",
+        "emailInvalid": "Please enter a valid email address"
+      }
+    },
+    "ticket": {
+      "successTitle": "Ticket Generated Successfully!",
+      "successDescription": "You're now in the queue. Please wait for your number to be called.",
+      "header": "QueueFlow Service Ticket",
+      "keep": "Keep this ticket until you are served",
+      "customer": "Customer",
+      "location": "Location",
+      "service": "Service",
+      "estimatedMinutes": "Est. {{minutes}} minutes",
+      "queuePosition": "Queue Position",
+      "inLine": "in line",
+      "qrCode": "QR Code",
+      "qrAlt": "Ticket QR Code",
+      "scanToCheck": "Scan to check status",
+      "checkInTime": "Check-in time: {{time}}",
+      "stayNote": "Please stay in the waiting area. You will be called when it's your turn.",
+      "print": "Print Ticket",
+      "newTicket": "New Ticket ({{seconds}}s)"
+    }
+  },
+  "virtualQueue": {
+    "title": "Virtual Queue",
+    "subtitle": "Join the queue from anywhere and track your position in real-time",
+    "checkedInTitle": "You're checked in",
+    "checkedInWithPosition": "You are #{{position}} in line. Estimated wait about {{minutes}} minutes.",
+    "checkedInNoPosition": "A staff member will call you shortly.",
+    "checkInFailed": "Check-in failed",
+    "checkInFallback": "Please try again or see a staff member.",
+    "features": {
+      "sms": {
+        "title": "SMS Updates",
+        "description": "Receive real-time updates about your queue position via SMS"
+      },
+      "location": {
+        "title": "Location Flexibility",
+        "description": "No need to wait in the physical location. Join from anywhere!"
+      },
+      "tracking": {
+        "title": "Real-time Tracking",
+        "description": "Track your position and estimated wait time in real-time"
+      }
+    },
+    "join": {
+      "title": "Join Virtual Queue",
+      "missingInfo": "Missing Information",
+      "fillRequired": "Please fill in all required fields",
+      "fullNameRequired": "Please enter your first and last name.",
+      "joinedTitle": "Successfully Joined Queue",
+      "joinedDescription": "You're expected to be #{{position}} in line for {{service}}. Check in when you arrive.",
+      "joinFailed": "Failed to join queue. Please try again.",
+      "selectLocation": "Select Location",
+      "chooseLocation": "Choose a location",
+      "selectService": "Select Service",
+      "chooseService": "Choose a service",
+      "waiting": "{{count}} waiting",
+      "waitApprox": "~{{minutes}} min wait",
+      "fullName": "Full Name *",
+      "fullNamePlaceholder": "Enter your full name",
+      "phone": "Phone Number *",
+      "joining": "Joining Queue...",
+      "joinButton": "Join Virtual Queue",
+      "qrNote": "You'll receive a QR code for easy check-in",
+      "smsNote": "• SMS updates on your queue position",
+      "arriveNote": "• Check in when you arrive at the location"
+    },
+    "ticket": {
+      "title": "Your Queue Ticket",
+      "qrAlt": "Queue ticket QR code",
+      "checkedIn": "Checked In",
+      "virtualQueue": "Virtual Queue",
+      "position": "Position",
+      "estimatedWait": "Est. Wait",
+      "service": "Service: {{name}}",
+      "checkInButton": "I'm Here - Check In",
+      "checkedInTitle": "You're checked in!",
+      "checkedInDescription": "Please wait to be called for service",
+      "tip1": "• Keep this ticket handy for check-in",
+      "tip2": "• You'll receive SMS updates on your position",
+      "tip3": "• Scan QR code at kiosk or show to staff"
+    },
+    "tracker": {
+      "title": "Queue Position",
+      "description": "Your current position in the queue",
+      "noActive": "No active appointment found",
+      "positionLabel": "Position in queue",
+      "estimatedWait": "Estimated wait: {{time}}",
+      "inQueue": "In Queue",
+      "leave": "Leave Queue",
+      "waitMinutes": "{{minutes}} min",
+      "waitHoursMinutes": "{{hours}}h {{minutes}}m"
+    }
+  },
+  "mobileQueue": {
+    "noAppointmentTitle": "No Appointment Found",
+    "noAppointmentToast": "Please scan your QR code or check your confirmation.",
+    "noAppointmentDescription": "Please scan your QR code or check your confirmation details.",
+    "goHome": "Go Home",
+    "preferencesUpdated": "Preferences Updated",
+    "preferencesSaved": "Your notification settings have been saved.",
+    "tabs": {
+      "position": "Position",
+      "progress": "Progress"
+    },
+    "tracker": {
+      "notFound": "Appointment not found",
+      "fallbackService": "Service",
+      "calledTitle": "You're Being Called! 🔔",
+      "calledDescription": "Please proceed to the service counter.",
+      "notificationsEnabled": "Notifications Enabled",
+      "notificationsDisabled": "Notifications Disabled",
+      "enabledDescription": "You'll receive updates about your queue position",
+      "disabledDescription": "Queue notifications have been turned off",
+      "loading": "Loading your queue position...",
+      "loadFailed": "Unable to load queue information",
+      "tryAgain": "Try Again",
+      "status": {
+        "scheduled": "Booked – check in on arrival",
+        "checked_in": "In Queue",
+        "in_progress": "Being Called!",
+        "completed": "Completed",
+        "unknown": "Unknown"
+      },
+      "title": "Queue Position",
+      "ticket": "Ticket #{{number}}",
+      "positionLabel": "Your position in line",
+      "onePersonAhead": "1 person ahead of you",
+      "peopleAhead": "{{count}} people ahead of you",
+      "estimatedWait": "Est. wait time",
+      "currentWait": "Current wait",
+      "serviceDetails": "Service Details",
+      "customer": "Customer: {{name}}",
+      "checkedInAt": "Checked in: {{time}}",
+      "beingCalled": "🔔 You're being called!",
+      "proceed": "Please proceed to the service counter now.",
+      "showQr": "Show QR Code"
+    },
+    "progress": {
+      "title": "Queue Progress",
+      "joined": "Joined",
+      "yourTurn": "Your Turn",
+      "peopleAhead": "People Ahead",
+      "estimatedTime": "Est. Time",
+      "averageService": "Avg Service",
+      "visualization": "Queue Visualization",
+      "you": "You",
+      "more": "+{{count}} more",
+      "breakdown": "Time Breakdown",
+      "peopleAheadLabel": "People ahead:",
+      "averageServiceLabel": "Avg service time:",
+      "estimatedWaitLabel": "Estimated wait:",
+      "minutes": "{{count}} min"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "methods": "Notification Methods",
+      "push": "Push Notifications",
+      "enable": "Enable",
+      "sms": "SMS Notifications",
+      "email": "Email Notifications",
+      "types": "What to notify me about",
+      "positionChanges": "Position changes in queue",
+      "beingCalled": "When I'm being called",
+      "reminder": "Reminder 5 minutes before my turn",
+      "unsupported": "Push notifications are not supported on this device. You can still receive SMS and email notifications.",
+      "notSupported": "Not Supported",
+      "notSupportedDescription": "Push notifications are not supported on this device.",
+      "enabled": "Notifications Enabled",
+      "enabledDescription": "You'll receive push notifications for queue updates.",
+      "denied": "Permission Denied",
+      "deniedDescription": "Push notifications were not enabled.",
+      "enableFailed": "Failed to enable push notifications."
+    },
+    "scanner": {
+      "cameraDenied": "Camera Access Denied",
+      "cameraDeniedDescription": "Please enable camera access or use manual entry.",
+      "found": "Queue Position Found",
+      "loadingPosition": "Loading your current position...",
+      "title": "Scan Queue Ticket",
+      "frameHint": "Position QR code within the frame",
+      "enterCode": "Enter Confirmation Code",
+      "codeLabel": "Confirmation Code",
+      "codePlaceholder": "Enter your confirmation code",
+      "codeHint": "Find this on your appointment confirmation",
+      "findPosition": "Find My Position",
+      "scan": "Scan QR Code",
+      "manual": "Manual Entry",
+      "cancelScan": "Cancel Scan",
+      "useCamera": "Use Camera"
+    }
+  },
+  "errors": {
+    "locationNotFound": "Location not found",
+    "createFailed": "The appointment could not be created. Please try again.",
+    "checkInFailed": "Check-in failed. Please see a staff member.",
+    "cancelFailed": "The appointment could not be cancelled.",
+    "db": {
+      "nameRequired": "First and last name are required",
+      "phoneRequired": "A valid phone number is required",
+      "serviceLocationRequired": "Service and location are required",
+      "unknownLocation": "Unknown location",
+      "unknownService": "Unknown or inactive service",
+      "appointmentNotFound": "Appointment not found",
+      "codeMismatch": "Confirmation code does not match this appointment",
+      "cannotCheckIn": "This appointment is {{status}} and cannot be checked in",
+      "cannotCancel": "This appointment is {{status}} and cannot be cancelled"
+    }
+  }
+}

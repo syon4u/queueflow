@@ -44,12 +44,12 @@ describe('StaffPage', () => {
   it('renders the staff dashboard heading', async () => {
     renderWithProviders(<StaffPage />);
     // i18n is mocked to echo keys in setup.ts
-    expect(await screen.findByRole('heading', { name: 'staff.dashboard' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Staff Dashboard' })).toBeInTheDocument();
   });
 
   it('mounts without throwing when the queue hook returns appointments', async () => {
     const { container } = renderWithProviders(<StaffPage />);
-    await screen.findByRole('heading', { name: 'staff.dashboard' });
+    await screen.findByRole('heading', { name: 'Staff Dashboard' });
     expect(container.firstChild).not.toBeNull();
   });
 });

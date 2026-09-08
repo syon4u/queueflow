@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/use-toast';
 import { createPublicAppointment } from '@/lib/publicQueue';
 import { getNextBusinessDay } from '@/utils/businessHours';
@@ -7,6 +8,7 @@ import { CustomerAppointmentData } from './useSimpleAppointmentForm';
 
 export const useCustomerAppointmentFlow = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   /** Books the appointment and returns its confirmation code, or null on failure (after toasting). */
   const createAppointment = async (customerData: CustomerAppointmentData): Promise<string | null> => {
@@ -32,10 +34,10 @@ export const useCustomerAppointmentFlow = () => {
 
       return appointment.confirmation_code;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to create appointment. Please try again.';
+      const message = error instanceof Error ? error.message : t('public.booking.toast.createFailed');
       console.error('Appointment creation failed:', error);
       toast({
-        title: 'Booking failed',
+        title: t('public.booking.toast.bookingFailed'),
         description: message,
         variant: 'destructive',
       });

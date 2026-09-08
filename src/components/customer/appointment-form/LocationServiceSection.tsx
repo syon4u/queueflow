@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Loader2, Globe } from 'lucide-react';
@@ -40,6 +41,7 @@ const LocationServiceSection = ({
   servicesLoading,
   servicesError
 }: LocationServiceSectionProps) => {
+  const { t } = useTranslation();
   const [availableLocationIds, setAvailableLocationIds] = useState<string[]>([]);
 
   // Services are stored one row per location. Group by name so the customer
@@ -112,13 +114,13 @@ const LocationServiceSection = ({
     <div className="space-y-4">
       <h3 className="text-lg font-medium flex items-center gap-2">
         <MapPin className="h-5 w-5" />
-        Service and Location
+        {t('public.booking.serviceLocation.title')}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="service">Service *</Label>
+          <Label htmlFor="service">{t('public.booking.serviceLocation.service')}</Label>
           {servicesError && (
-            <p className="text-sm text-red-600">Error loading services: {servicesError}</p>
+            <p className="text-sm text-red-600">{t('public.booking.serviceLocation.servicesError', { error: servicesError })}</p>
           )}
           <Select 
             value={formData.serviceId} 
@@ -127,9 +129,9 @@ const LocationServiceSection = ({
           >
             <SelectTrigger>
               <SelectValue placeholder={
-                servicesLoading 
-                  ? "Loading services..." 
-                  : "Select a service"
+                servicesLoading
+                  ? t('public.booking.serviceLocation.loadingServices')
+                  : t('public.booking.serviceLocation.selectService')
               } />
               {servicesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             </SelectTrigger>
@@ -144,9 +146,9 @@ const LocationServiceSection = ({
                       )}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      {service.duration} min
+                      {t('public.booking.serviceLocation.minutes', { count: service.duration })}
                       {!service.location_id && (
-                        <span className="ml-2 text-blue-600">(Available at all locations)</span>
+                        <span className="ml-2 text-blue-600">{t('public.booking.serviceLocation.allLocations')}</span>
                       )}
                     </span>
                   </div>
@@ -157,9 +159,9 @@ const LocationServiceSection = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="location">Location *</Label>
+          <Label htmlFor="location">{t('public.booking.serviceLocation.location')}</Label>
           {locationsError && (
-            <p className="text-sm text-red-600">Error loading locations: {locationsError}</p>
+            <p className="text-sm text-red-600">{t('public.booking.serviceLocation.locationsError', { error: locationsError })}</p>
           )}
           <Select 
             value={formData.locationId} 
@@ -168,13 +170,13 @@ const LocationServiceSection = ({
           >
             <SelectTrigger>
               <SelectValue placeholder={
-                locationsLoading 
-                  ? "Loading locations..."
-                  : !formData.serviceId 
-                    ? "Select a service first"
+                locationsLoading
+                  ? t('public.booking.serviceLocation.loadingLocations')
+                  : !formData.serviceId
+                    ? t('public.booking.serviceLocation.selectServiceFirst')
                     : filteredLocations.length === 0
-                      ? "No locations available"
-                      : "Select a location"
+                      ? t('public.booking.serviceLocation.noLocationsAvailable')
+                      : t('public.booking.serviceLocation.selectLocation')
               } />
               {locationsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             </SelectTrigger>

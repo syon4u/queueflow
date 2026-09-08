@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { customerName, findPublicAppointment, isInQueue, PublicAppointmentStatus } from '@/lib/publicQueue';
 
 interface QueueStatusData {
@@ -35,10 +36,11 @@ export const useQueueStatus = (
   const [data, setData] = useState<QueueStatusData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const refetch = async () => {
     if (!confirmationNumber && (!lastName || !phone)) {
-      setError('Please provide either a confirmation number or both last name and phone number');
+      setError(t('public.status.errors.provideInfo'));
       return;
     }
 
@@ -52,7 +54,7 @@ export const useQueueStatus = (
       );
 
       if (!appointment) {
-        setError('No appointment found with the provided information');
+        setError(t('public.status.errors.notFound'));
         return;
       }
 
@@ -68,8 +70,8 @@ export const useQueueStatus = (
         estimated_wait_time_minutes: appointment.estimated_wait_minutes,
         current_wait_time_minutes: Math.max(0, currentWaitTime),
         customer_name: customerName(appointment),
-        service_name: appointment.service_name || 'Unknown Service',
-        location_name: appointment.location_name || 'Main Office',
+        service_name: appointment.service_name || t('public.status.errors.unknownService'),
+        location_name: appointment.location_name || t('public.status.errors.mainOffice'),
         scheduled_at: appointment.scheduled_time,
         check_in_time: appointment.check_in_time || undefined,
         ticket_number: appointment.ticket_number,
@@ -80,7 +82,7 @@ export const useQueueStatus = (
 
     } catch (err) {
       console.error('Error fetching queue status:', err);
-      setError('Unable to retrieve queue status. Please try again.');
+      setError(t('public.status.errors.fetchFailed'));
     } finally {
       setIsLoading(false);
     }

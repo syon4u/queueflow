@@ -45,12 +45,28 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock react-i18next
-vi.mock('react-i18next', async () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: vi.fn(),
-    },
-  }),
-}));
+// Mock react-i18next. `t` resolves against the English resources (with
+// {{interpolation}}) so components render the same copy users see, and tests
+// can keep asserting on English text.
+vi.mock('react-i18next', async () => {
+  const { default: en } = await import('@/i18n/locales/en');
+  const lookup = (key: string) =>
+    key.split('.').reduce<unknown>((node, part) => (node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined), en);
+  const t = (key: string, options?: string | Record<string, unknown>) => {
+    const opts = typeof options === 'object' && options ? options : {};
+    const defaultValue = typeof options === 'string' ? options : (opts.defaultValue as string | undefined);
+    const value = lookup(key);
+    if (Array.isArray(value)) return value;
+    if (typeof value !== 'string') return defaultValue ?? key;
+    return value.replace(/\{\{(\w+)\}\}/g, (_, name: string) => String(opts[name] ?? ''));
+  };
+  return {
+    useTranslation: () => ({
+      t,
+      i18n: {
+        language: 'en',
+        changeLanguage: vi.fn(),
+      },
+    }),
+  };
+});

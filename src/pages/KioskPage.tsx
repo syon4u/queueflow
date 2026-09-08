@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KioskHeader } from '@/components/kiosk/KioskHeader';
 import { KioskServiceSelector } from '@/components/kiosk/KioskServiceSelector';
 import { KioskLocationSelector } from '@/components/kiosk/KioskLocationSelector';
@@ -26,6 +27,7 @@ interface KioskState {
 
 const KioskPage = () => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { locations, services, isLoading } = useAppData();
   const [kioskState, setKioskState] = useState<KioskState>({
     step: 'location',
@@ -81,8 +83,8 @@ const KioskPage = () => {
   const handleCustomerSubmit = async (customerData: KioskState['customerData']) => {
     if (!customerData || !kioskState.selectedLocation || !kioskState.selectedService) {
       toast({
-        title: 'Error',
-        description: 'Missing required information',
+        title: t('common.error'),
+        description: t('public.kiosk.toast.missingInfo'),
         variant: 'destructive',
       });
       return;
@@ -109,15 +111,15 @@ const KioskPage = () => {
       }));
 
       toast({
-        title: 'Success',
-        description: 'Your ticket has been generated!',
+        title: t('public.kiosk.toast.success'),
+        description: t('public.kiosk.toast.ticketGenerated'),
       });
 
     } catch (error) {
       console.error('Error creating appointment:', error);
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create appointment. Please try again.',
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('public.kiosk.toast.createFailed'),
         variant: 'destructive',
       });
     }

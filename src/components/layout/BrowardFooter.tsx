@@ -1,9 +1,11 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ShieldIcon, HandshakeIcon, DocumentIcon } from '@/components/ui/broward-icons';
 
 const BrowardFooter: React.FC = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   
   return (
@@ -72,10 +74,10 @@ const BrowardFooter: React.FC = () => {
           <div>
             <h3 className="text-xl font-serif mb-4 text-white font-bold drop-shadow-lg">Queue Flow</h3>
             <p className="text-white/95 mb-4 font-medium drop-shadow">
-              Smart Queue Management System
+              {t('public.layout.footer.tagline')}
             </p>
             <p className="text-white/90 text-sm mb-4 drop-shadow">
-              Streamlining customer service through intelligent queue management
+              {t('public.layout.footer.description')}
             </p>
             <div className="flex gap-4">
               <ShieldIcon className="text-white hover:text-white/80 transition-colors drop-shadow" />
@@ -85,44 +87,44 @@ const BrowardFooter: React.FC = () => {
           </div>
           
           <div>
-            <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">Quick Links</h4>
+            <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">{t('public.layout.footer.quickLinks')}</h4>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-white/95 hover:text-white transition-colors font-medium drop-shadow hover:drop-shadow-lg">
-                  Home
+                  {t('public.layout.footer.home')}
                 </Link>
               </li>
               <li>
                 <Link to="/services" className="text-white/95 hover:text-white transition-colors font-medium drop-shadow hover:drop-shadow-lg">
-                  Services
+                  {t('public.layout.footer.services')}
                 </Link>
               </li>
               <li>
                 <Link to="/appointments" className="text-white/95 hover:text-white transition-colors font-medium drop-shadow hover:drop-shadow-lg">
-                  Appointments
+                  {t('public.layout.footer.appointments')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-white/95 hover:text-white transition-colors font-medium drop-shadow hover:drop-shadow-lg">
-                  Contact Us
+                  {t('public.layout.footer.contact')}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div>
-            <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">Contact Information</h4>
+            <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">{t('public.layout.footer.contactInfo')}</h4>
             <address className="not-italic text-white/95">
               
-              <p className="font-medium drop-shadow">Email: <span className="text-white font-bold">support@queueflow.com</span></p>
-              <p className="mt-2 font-medium drop-shadow">Support hours: Mon–Fri, 9am–5pm ET</p>
+              <p className="font-medium drop-shadow">{t('public.layout.footer.email')} <span className="text-white font-bold">support@queueflow.com</span></p>
+              <p className="mt-2 font-medium drop-shadow">{t('public.layout.footer.supportHours')}</p>
             </address>
           </div>
         </div>
         
         <div className="border-t border-white/30 mt-8 pt-6 text-center text-sm text-white/95">
-          <p className="font-medium drop-shadow">&copy; {currentYear} Queue Flow. All rights reserved.</p>
-          <p className="mt-1 text-white/90 drop-shadow">Revolutionizing customer service management</p>
+          <p className="font-medium drop-shadow">{t('public.layout.footer.rights', { year: currentYear })}</p>
+          <p className="mt-1 text-white/90 drop-shadow">{t('public.layout.footer.motto')}</p>
         </div>
       </div>
     </footer>
