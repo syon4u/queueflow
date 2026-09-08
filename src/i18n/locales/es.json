@@ -222,7 +222,12 @@
       "signIn": "Iniciar Sesión",
       "employeeLogin": "Acceso para Empleados",
       "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú"
+      "closeMenu": "Cerrar menú",
+      "landingLabel": "Página principal",
+      "landingHowItWorks": "Cómo funciona",
+      "landingCapabilities": "Funciones",
+      "landingPricing": "Precios",
+      "landingVisitors": "Para visitantes"
     },
     "hero": {
       "titleLine1": "Gestión Inteligente de Filas",
@@ -249,7 +254,12 @@
       "customerPrompt": "¿Vienes a una cita?",
       "customerBook": "Reservar",
       "customerCheckIn": "Registrarte",
-      "customerStatus": "Ver estado"
+      "customerStatus": "Ver estado",
+      "facts": {
+        "oneLine": "Sin cita y con cita, en una sola fila",
+        "livePosition": "Posición en vivo desde cualquier teléfono",
+        "languages": "EN · ES · PT · HT"
+      }
     },
     "serviceCards": {
       "title": "¿Cómo Podemos Ayudarte Hoy?",
@@ -336,7 +346,8 @@
       "checkStatus": "Ver Estado",
       "checkInNow": "Registrarme Ahora",
       "talkToUs": "Habla con nosotros",
-      "tryDemo": "Probar la demo en vivo"
+      "tryDemo": "Probar la demo en vivo",
+      "headline": "¿Listo para un vestíbulo más tranquilo?"
     },
     "pricing": {
       "badge": "Precios simples y transparentes",
@@ -941,6 +952,37 @@
         "analytics": {
           "title": "Analítica y varias sedes",
           "description": "Tiempos de espera, volúmenes y mezcla de servicios por sede, con varias sedes administradas desde una sola cuenta."
+        },
+        "signage": {
+          "title": "Pantalla del vestíbulo",
+          "description": "Una pantalla en la pared muestra a quién se atiende y quién sigue, así nadie tiene que preguntar."
+        }
+      },
+      "vignettes": {
+        "tracker": {
+          "label": "Tu lugar"
+        },
+        "kiosk": {
+          "ticket": "Turno",
+          "takeTicket": "Tomar turno",
+          "bookOnline": "Reservar en línea"
+        },
+        "checkIn": {
+          "label": "Código de confirmación",
+          "button": "Registrarme"
+        },
+        "staff": {
+          "served": "Atendido",
+          "noShow": "No se presentó"
+        },
+        "virtual": {
+          "joined": "Se unió desde casa",
+          "arrive": "Regístrate al llegar"
+        },
+        "analytics": {
+          "label": "Espera media, últimos 7 días",
+          "locations": "{{n}} sedes",
+          "dayLabels": "L,M,X,J,V,S,D"
         }
       }
     },
@@ -964,6 +1006,43 @@
       "company": "Producto",
       "pricing": "Precios",
       "staffSignIn": "Acceso del personal"
+    },
+    "preview": {
+      "ariaLabel": "Panel de personal de ejemplo con las cifras de hoy, la fila y el turno que se atiende ahora",
+      "timestamp": "Martes 10:24",
+      "stats": {
+        "waiting": "En espera",
+        "beingServed": "Atendiendo",
+        "avgWait": "Espera media",
+        "servedToday": "Atendidos hoy"
+      },
+      "queue": "Fila",
+      "wait": "Espera",
+      "services": {
+        "account": "Apertura de cuenta",
+        "renewal": "Renovación de documento",
+        "enquiry": "Consulta general",
+        "payment": "Pago",
+        "consultation": "Asesoría"
+      },
+      "nextUp": "Siguiente {{ticket}}",
+      "callNext": "Llamar siguiente",
+      "caption": "Atendiendo ahora {{ticket}}",
+      "ticketAria": "Turno de cliente de ejemplo con la posición en la fila y la espera estimada",
+      "yourTicket": "Tu turno · {{ticket}}",
+      "position": "Eres el #{{position}} en la fila",
+      "eta": "Faltan unos {{minutes}} min",
+      "progressLabel": "Avance en la fila",
+      "ahead": "{{n}} personas delante de ti"
+    },
+    "fit": {
+      "eyebrow": "Hecho para mostradores con mucho movimiento",
+      "clinics": "Clínicas",
+      "government": "Oficinas públicas",
+      "banks": "Bancos y cooperativas",
+      "serviceCentres": "Centros de servicio",
+      "campuses": "Campus",
+      "repairShops": "Talleres"
     }
   }
 }

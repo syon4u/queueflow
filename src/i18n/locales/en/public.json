@@ -38,7 +38,12 @@
     "signIn": "Sign In",
     "employeeLogin": "Employee Login",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "landingLabel": "Landing page",
+    "landingHowItWorks": "How it works",
+    "landingCapabilities": "Capabilities",
+    "landingPricing": "Pricing",
+    "landingVisitors": "For visitors"
   },
   "hero": {
     "titleLine1": "Smart Queue Management",
@@ -65,7 +70,12 @@
     "customerPrompt": "Here for an appointment?",
     "customerBook": "Book",
     "customerCheckIn": "Check in",
-    "customerStatus": "Check status"
+    "customerStatus": "Check status",
+    "facts": {
+      "oneLine": "Walk-ins and bookings in one line",
+      "livePosition": "Live position on any phone",
+      "languages": "EN · ES · PT · HT"
+    }
   },
   "serviceCards": {
     "title": "How Can We Help You Today?",
@@ -152,7 +162,8 @@
     "checkStatus": "Check Status",
     "checkInNow": "Check In Now",
     "talkToUs": "Talk to us",
-    "tryDemo": "Try the live demo"
+    "tryDemo": "Try the live demo",
+    "headline": "Ready to run a calmer lobby?"
   },
   "pricing": {
     "badge": "Simple, transparent pricing",
@@ -757,6 +768,37 @@
       "analytics": {
         "title": "Admin analytics and multi-location",
         "description": "Wait times, volumes and service mix per location, with several sites managed from one account."
+      },
+      "signage": {
+        "title": "Lobby signage",
+        "description": "A wall screen shows who is being served and who is next, so nobody has to ask."
+      }
+    },
+    "vignettes": {
+      "tracker": {
+        "label": "Your place"
+      },
+      "kiosk": {
+        "ticket": "Ticket",
+        "takeTicket": "Take a ticket",
+        "bookOnline": "Book online"
+      },
+      "checkIn": {
+        "label": "Confirmation code",
+        "button": "Check in"
+      },
+      "staff": {
+        "served": "Served",
+        "noShow": "No-show"
+      },
+      "virtual": {
+        "joined": "Joined from home",
+        "arrive": "Check in when you arrive"
+      },
+      "analytics": {
+        "label": "Avg wait, last 7 days",
+        "locations": "{{n}} locations",
+        "dayLabels": "M,T,W,T,F,S,S"
       }
     }
   },
@@ -780,5 +822,42 @@
     "company": "Product",
     "pricing": "Pricing",
     "staffSignIn": "Staff sign in"
+  },
+  "preview": {
+    "ariaLabel": "Example staff dashboard showing today's numbers, the queue and the ticket now being served",
+    "timestamp": "Tuesday 10:24",
+    "stats": {
+      "waiting": "Waiting",
+      "beingServed": "Being served",
+      "avgWait": "Avg wait",
+      "servedToday": "Served today"
+    },
+    "queue": "Queue",
+    "wait": "Wait",
+    "services": {
+      "account": "Account opening",
+      "renewal": "Document renewal",
+      "enquiry": "General enquiry",
+      "payment": "Payment",
+      "consultation": "Consultation"
+    },
+    "nextUp": "Next up {{ticket}}",
+    "callNext": "Call next",
+    "caption": "Now serving {{ticket}}",
+    "ticketAria": "Example customer ticket showing position in line and estimated wait",
+    "yourTicket": "Your ticket · {{ticket}}",
+    "position": "You're #{{position}} in line",
+    "eta": "About {{minutes}} min to go",
+    "progressLabel": "Progress in line",
+    "ahead": "{{n}} people ahead of you"
+  },
+  "fit": {
+    "eyebrow": "Built for busy front desks",
+    "clinics": "Clinics",
+    "government": "Government offices",
+    "banks": "Banks & credit unions",
+    "serviceCentres": "Service centres",
+    "campuses": "Campuses",
+    "repairShops": "Repair shops"
   }
 }

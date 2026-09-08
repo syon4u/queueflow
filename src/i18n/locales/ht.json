@@ -222,7 +222,12 @@
       "signIn": "Konekte",
       "employeeLogin": "Aksè pou Anplwaye",
       "openMenu": "Ouvri meni an",
-      "closeMenu": "Fèmen meni an"
+      "closeMenu": "Fèmen meni an",
+      "landingLabel": "Paj dakèy",
+      "landingHowItWorks": "Kijan li mache",
+      "landingCapabilities": "Fonksyon yo",
+      "landingPricing": "Pri",
+      "landingVisitors": "Pou vizitè yo"
     },
     "hero": {
       "titleLine1": "Jesyon Liy Entèlijan",
@@ -249,7 +254,12 @@
       "customerPrompt": "Ou vin pou yon randevou?",
       "customerBook": "Pran randevou",
       "customerCheckIn": "Fè check-in",
-      "customerStatus": "Verifye eta"
+      "customerStatus": "Verifye eta",
+      "facts": {
+        "oneLine": "Moun san randevou ak moun ak randevou, nan yon sèl liy",
+        "livePosition": "Pozisyon an dirèk sou nenpòt telefòn",
+        "languages": "EN · ES · PT · HT"
+      }
     },
     "serviceCards": {
       "title": "Kijan Nou Ka Ede Ou Jodi a?",
@@ -336,7 +346,8 @@
       "checkStatus": "Verifye Eta",
       "checkInNow": "Anrejistre Kounye a",
       "talkToUs": "Pale ak nou",
-      "tryDemo": "Eseye demo an dirèk la"
+      "tryDemo": "Eseye demo an dirèk la",
+      "headline": "Ou pare pou yon sal datant pi kalm?"
     },
     "pricing": {
       "badge": "Pri senp e klè",
@@ -941,6 +952,37 @@
         "analytics": {
           "title": "Analiz pou administratè ak plizyè kote",
           "description": "Tan datant, kantite moun ak melanj sèvis pou chak kote, ak plizyè kote ou jere nan yon sèl kont."
+        },
+        "signage": {
+          "title": "Ekran sal datant",
+          "description": "Yon ekran sou mi an montre ki moun y ap sèvi ak ki moun ki vin apre, konsa pèsonn pa bezwen mande."
+        }
+      },
+      "vignettes": {
+        "tracker": {
+          "label": "Plas ou"
+        },
+        "kiosk": {
+          "ticket": "Tikè",
+          "takeTicket": "Pran yon tikè",
+          "bookOnline": "Pran randevou sou entènèt"
+        },
+        "checkIn": {
+          "label": "Kòd konfimasyon",
+          "button": "Fè check-in"
+        },
+        "staff": {
+          "served": "Sèvi",
+          "noShow": "Pa vini"
+        },
+        "virtual": {
+          "joined": "Antre depi lakay",
+          "arrive": "Fè check-in lè ou rive"
+        },
+        "analytics": {
+          "label": "Tan datant mwayen, 7 dènye jou yo",
+          "locations": "{{n}} kote",
+          "dayLabels": "L,M,M,J,V,S,D"
         }
       }
     },
@@ -964,6 +1006,43 @@
       "company": "Pwodui",
       "pricing": "Pri",
       "staffSignIn": "Koneksyon anplwaye"
+    },
+    "preview": {
+      "ariaLabel": "Egzanp tablo anplwaye ki montre chif jodi a, liy lan ak tikè y ap sèvi kounye a",
+      "timestamp": "Madi 10:24",
+      "stats": {
+        "waiting": "K ap tann",
+        "beingServed": "Y ap sèvi",
+        "avgWait": "Tan datant mwayen",
+        "servedToday": "Sèvi jodi a"
+      },
+      "queue": "Liy",
+      "wait": "Datant",
+      "services": {
+        "account": "Louvri kont",
+        "renewal": "Renouvle dokiman",
+        "enquiry": "Kesyon jeneral",
+        "payment": "Peman",
+        "consultation": "Konsiltasyon"
+      },
+      "nextUp": "Pwochen {{ticket}}",
+      "callNext": "Rele pwochen an",
+      "caption": "N ap sèvi {{ticket}} kounye a",
+      "ticketAria": "Egzanp tikè kliyan ki montre pozisyon nan liy lan ak tan datant estime a",
+      "yourTicket": "Tikè ou · {{ticket}}",
+      "position": "Ou se #{{position}} nan liy lan",
+      "eta": "Rete apeprè {{minutes}} min",
+      "progressLabel": "Pwogrè nan liy lan",
+      "ahead": "{{n}} moun devan ou"
+    },
+    "fit": {
+      "eyebrow": "Fèt pou biwo resepsyon ki gen anpil mouvman",
+      "clinics": "Klinik",
+      "government": "Biwo leta",
+      "banks": "Bank ak kès popilè",
+      "serviceCentres": "Sant sèvis",
+      "campuses": "Kanpis",
+      "repairShops": "Atelye reparasyon"
     }
   }
 }

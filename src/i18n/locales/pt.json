@@ -222,7 +222,12 @@
       "signIn": "Entrar",
       "employeeLogin": "Acesso para Funcionários",
       "openMenu": "Abrir menu",
-      "closeMenu": "Fechar menu"
+      "closeMenu": "Fechar menu",
+      "landingLabel": "Página inicial",
+      "landingHowItWorks": "Como funciona",
+      "landingCapabilities": "Recursos",
+      "landingPricing": "Preços",
+      "landingVisitors": "Para visitantes"
     },
     "hero": {
       "titleLine1": "Gestão Inteligente de Filas",
@@ -249,7 +254,12 @@
       "customerPrompt": "Veio para um atendimento?",
       "customerBook": "Agendar",
       "customerCheckIn": "Fazer check-in",
-      "customerStatus": "Ver status"
+      "customerStatus": "Ver status",
+      "facts": {
+        "oneLine": "Sem agendamento e com agendamento, numa só fila",
+        "livePosition": "Posição ao vivo em qualquer celular",
+        "languages": "EN · ES · PT · HT"
+      }
     },
     "serviceCards": {
       "title": "Como Podemos Ajudar Você Hoje?",
@@ -336,7 +346,8 @@
       "checkStatus": "Ver Status",
       "checkInNow": "Fazer Check-in Agora",
       "talkToUs": "Fale conosco",
-      "tryDemo": "Testar a demo ao vivo"
+      "tryDemo": "Testar a demo ao vivo",
+      "headline": "Pronto para um saguão mais tranquilo?"
     },
     "pricing": {
       "badge": "Preços simples e transparentes",
@@ -941,6 +952,37 @@
         "analytics": {
           "title": "Análises e várias unidades",
           "description": "Tempos de espera, volumes e mix de serviços por unidade, com várias unidades gerenciadas em uma só conta."
+        },
+        "signage": {
+          "title": "Painel do saguão",
+          "description": "Uma tela na parede mostra quem está sendo atendido e quem é o próximo, e ninguém precisa perguntar."
+        }
+      },
+      "vignettes": {
+        "tracker": {
+          "label": "Sua posição"
+        },
+        "kiosk": {
+          "ticket": "Senha",
+          "takeTicket": "Retirar senha",
+          "bookOnline": "Agendar on-line"
+        },
+        "checkIn": {
+          "label": "Código de confirmação",
+          "button": "Fazer check-in"
+        },
+        "staff": {
+          "served": "Atendido",
+          "noShow": "Não compareceu"
+        },
+        "virtual": {
+          "joined": "Entrou de casa",
+          "arrive": "Faça check-in ao chegar"
+        },
+        "analytics": {
+          "label": "Espera média, últimos 7 dias",
+          "locations": "{{n}} unidades",
+          "dayLabels": "S,T,Q,Q,S,S,D"
         }
       }
     },
@@ -964,6 +1006,43 @@
       "company": "Produto",
       "pricing": "Preços",
       "staffSignIn": "Acesso da equipe"
+    },
+    "preview": {
+      "ariaLabel": "Painel da equipe de exemplo com os números de hoje, a fila e a senha em atendimento",
+      "timestamp": "Terça-feira 10:24",
+      "stats": {
+        "waiting": "Aguardando",
+        "beingServed": "Em atendimento",
+        "avgWait": "Espera média",
+        "servedToday": "Atendidos hoje"
+      },
+      "queue": "Fila",
+      "wait": "Espera",
+      "services": {
+        "account": "Abertura de conta",
+        "renewal": "Renovação de documento",
+        "enquiry": "Consulta geral",
+        "payment": "Pagamento",
+        "consultation": "Consultoria"
+      },
+      "nextUp": "Próximo {{ticket}}",
+      "callNext": "Chamar próximo",
+      "caption": "Atendendo agora {{ticket}}",
+      "ticketAria": "Senha de cliente de exemplo com a posição na fila e a espera estimada",
+      "yourTicket": "Sua senha · {{ticket}}",
+      "position": "Você é o #{{position}} da fila",
+      "eta": "Faltam cerca de {{minutes}} min",
+      "progressLabel": "Progresso na fila",
+      "ahead": "{{n}} pessoas à sua frente"
+    },
+    "fit": {
+      "eyebrow": "Feito para balcões movimentados",
+      "clinics": "Clínicas",
+      "government": "Órgãos públicos",
+      "banks": "Bancos e cooperativas",
+      "serviceCentres": "Centros de atendimento",
+      "campuses": "Campi",
+      "repairShops": "Oficinas"
     }
   }
 }
