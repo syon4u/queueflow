@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Languages, Lock, MonitorDown, ShieldCheck } from 'lucide-react';
 
-/** Four short, true platform facts in one hairline-divided row. */
+/** Four short, true platform facts in one perforated ticket row. */
 const FACTS = [
   { key: 'rls', icon: ShieldCheck },
   { key: 'encrypted', icon: Lock },
@@ -19,16 +19,22 @@ const TrustStrip: React.FC = () => {
         <h2 id="landing-trust-title" className="sr-only">
           {t('public.trust.title')}
         </h2>
-        <ul className="grid overflow-hidden rounded-2xl border border-[--hairline] sm:grid-cols-2 lg:grid-cols-4">
-          {FACTS.map(({ key, icon: Icon }) => (
+        <ul className="qf-stub qf-perf-y grid rounded-2xl sm:grid-cols-2 lg:grid-cols-4">
+          {FACTS.map(({ key, icon: Icon }, i) => (
             <li
               key={key}
-              className="reveal flex items-center gap-3 border-[--hairline] px-5 py-5 text-[15px] font-medium text-[--text-1] [&:not(:first-child)]:border-t sm:[&:nth-child(2)]:border-t-0 sm:[&:nth-child(even)]:border-l lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-t-0"
+              className="reveal flex flex-col gap-3 border-[--hairline] px-5 pb-6 pt-7 text-[15px] font-medium text-[--text-1] [&:not(:first-child)]:border-t sm:[&:nth-child(2)]:border-t-0 sm:[&:nth-child(even)]:border-l lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-t-0"
             >
-              <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-[rgba(37,99,235,0.08)] text-[--brand]">
-                <Icon aria-hidden="true" className="size-[18px]" />
+              <span aria-hidden="true" className="qf-eyebrow flex items-center gap-3">
+                0{i + 1}
+                <span className="h-px flex-1 bg-[--hairline]" />
               </span>
-              <span className="text-balance">{t(`public.trust.${key}`)}</span>
+              <span className="flex items-center gap-3">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-white text-[--stamp] shadow-[var(--shadow-card)]">
+                  <Icon aria-hidden="true" className="size-[18px]" />
+                </span>
+                <span className="text-balance">{t(`public.trust.${key}`)}</span>
+              </span>
             </li>
           ))}
         </ul>

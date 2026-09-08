@@ -38,7 +38,7 @@ const LandingFooter: React.FC = () => {
           <div>
             <Link to="/" className="inline-flex min-h-11 items-center gap-2.5 rounded-lg">
               <img src={logoTile} alt="" width={32} height={32} className="size-8 rounded-lg" />
-              <span className="font-display text-[19px] font-bold tracking-[-0.02em] text-white">QueueFlow</span>
+              <span className="qf-wordmark text-[19px] text-white">QueueFlow</span>
             </Link>
             <p className="mt-3 max-w-[36ch] text-[15px] leading-relaxed text-[--on-ink-2]">{t('public.footer.tagline')}</p>
           </div>

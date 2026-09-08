@@ -50,7 +50,7 @@ const LandingNav: React.FC = () => {
       <nav aria-label={t('public.nav.landingLabel')} className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-6">
         <Link to="/" className="flex min-h-11 items-center gap-2.5 rounded-lg">
           <img src={logoTile} alt="" width={32} height={32} className="size-8 rounded-lg" />
-          <span className="font-display text-[19px] font-bold tracking-[-0.02em] text-[--text-1]">QueueFlow</span>
+          <span className="qf-wordmark text-[19px] text-[--text-1]">QueueFlow</span>
         </Link>
 
         <ul className="hidden items-center gap-1 lg:flex">

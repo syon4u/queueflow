@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useInView, useReducedMotion } from 'motion/react';
 import { LandingSection, SectionHeading } from '@/components/landing/LandingSection';
+import { TicketNumber } from '@/components/landing/fx';
 
 const STEPS = ['book', 'call', 'see'] as const;
+
+/** Square ticket stub whose number rolls 00 → 0n as the step enters view. */
+const StepStub: React.FC<{ number: number }> = ({ number }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.8 });
+  const reduced = useReducedMotion();
+  return (
+    <span ref={ref} aria-hidden="true" className="qf-stub-shadow relative z-10 flex shrink-0 md:mb-6">
+      <span className="qf-stub qf-perf-top flex size-14 items-center justify-center rounded-xl pt-1">
+        <TicketNumber value={reduced || inView ? number : 0} prefix="" digits={2} className="qf-stub-num text-[24px] text-[--stamp]" />
+      </span>
+    </span>
+  );
+};
 
 const HowItWorksSection: React.FC = () => {
   const { t } = useTranslation();
@@ -16,21 +32,16 @@ const HowItWorksSection: React.FC = () => {
         description={t('public.howItWorks.subtitle')}
       />
       <ol className="relative grid gap-10 md:grid-cols-3 md:gap-8">
-        {/* Connector between the numbered circles (desktop only) */}
+        {/* Tear line between the stubs (desktop only) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-5 right-[calc(33.33%-41px)] top-5 hidden h-px bg-[--hairline] md:block"
+          className="qf-tear pointer-events-none absolute left-7 right-[calc(33.33%-56px)] top-7 hidden h-px md:block"
         />
         {STEPS.map((step, index) => (
           <li key={step} className="reveal relative flex gap-4 md:block">
-            <span
-              aria-hidden="true"
-              className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full bg-[--brand] font-display text-[15px] font-bold tabular-nums text-white shadow-[var(--shadow-card)] md:mb-6"
-            >
-              {index + 1}
-            </span>
+            <StepStub number={index + 1} />
             <div>
-              <h3 className="text-[20px] font-bold leading-snug text-[--text-1]">
+              <h3 className="qf-h3 text-[--text-1]">
                 <span className="sr-only">{t('public.howItWorks.stepLabel', { number: index + 1 })} </span>
                 {t(`public.howItWorks.steps.${step}.title`)}
               </h3>
