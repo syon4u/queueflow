@@ -1,0 +1,15 @@
+/* Reduced-motion fallbacks for the CSS-driven fx primitives. Motion-driven
+   ones (BorderBeam) are handled by <MotionConfig reducedMotion="user">. */
+@media (prefers-reduced-motion: reduce) {
+  .qf-marquee .animate-marquee,
+  .qf-marquee .animate-marquee-vertical {
+    animation: none;
+  }
+  /* Show only the first copy so the strip becomes a static, wrapping row. */
+  .qf-marquee {
+    flex-wrap: wrap;
+  }
+  .qf-marquee > [aria-hidden='true'] {
+    display: none;
+  }
+}
