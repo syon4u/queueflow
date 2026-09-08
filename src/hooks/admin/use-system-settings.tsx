@@ -73,7 +73,7 @@ export const useSystemSettings = () => {
   });
 
   // Update system settings
-  const updateSettings = async (newSettings: Record<string, any>, section: string) => {
+  const updateSettings = async (newSettings: Record<string, unknown>, section: string) => {
     setIsUpdating(true);
     
     try {

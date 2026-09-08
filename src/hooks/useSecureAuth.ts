@@ -7,12 +7,12 @@ interface SecureAuthRequest {
   action: 'signin' | 'signup' | 'password_reset';
   email: string;
   password?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface SecureAuthResult {
   success: boolean;
-  data?: any;
+  data?: unknown;
   error?: string;
   retryAfter?: number;
 }
@@ -45,7 +45,7 @@ export const useSecureAuth = () => {
         // Handle validation errors
         if (error.context?.details) {
           const validationErrors = error.context.details;
-          const errorMessage = validationErrors.map((err: any) => err.message).join(', ');
+          const errorMessage = validationErrors.map((err: { message: string }) => err.message).join(', ');
           toast({
             title: 'Validation Error',
             description: errorMessage,
@@ -62,7 +62,7 @@ export const useSecureAuth = () => {
       }
 
       return { success: true, data: data.data };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Secure auth request failed:', error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
@@ -78,7 +78,7 @@ export const useSecureAuth = () => {
     });
   };
 
-  const secureSignUp = async (email: string, password: string, metadata?: Record<string, any>) => {
+  const secureSignUp = async (email: string, password: string, metadata?: Record<string, unknown>) => {
     return makeSecureAuthRequest({
       action: 'signup',
       email,

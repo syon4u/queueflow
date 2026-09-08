@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
+import type { Json } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 
@@ -54,7 +55,7 @@ export interface Location {
   max_capacity: number;
   current_capacity: number;
   capacity_buffer: number;
-  operating_hours: any;
+  operating_hours: Json | null;
   created_at: string;
   updated_at: string;
 }

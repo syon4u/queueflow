@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface SMSCommandResponse {
+export interface SMSCommandResponse {
   command: string;
   response: string;
-  appointment?: any;
+  appointment?: { id: string };
 }
 
 export const useSMSCommands = () => {

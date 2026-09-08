@@ -1,9 +1,13 @@
 
 import { useCallback, useState } from 'react';
+import { getErrorMessage } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import type { Database, Json } from '@/integrations/supabase/types';
+
+type AppointmentUpdate = Database['public']['Tables']['appointments']['Update'];
 
 type AppointmentStatus = 'scheduled' | 'checked_in' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
 
@@ -16,8 +20,8 @@ export const useStaffActions = () => {
     actionType: string,
     resourceType: string,
     resourceId: string,
-    oldData?: any,
-    newData?: any,
+    oldData?: Json | null,
+    newData?: Json | null,
     options: { canUndo?: boolean } = {}
   ) => {
     if (!user?.id) {
@@ -43,7 +47,7 @@ export const useStaffActions = () => {
   const updateAppointmentStatus = async (
     appointmentId: string,
     newStatus: AppointmentStatus,
-    additionalData?: Record<string, any>
+    additionalData?: Partial<AppointmentUpdate>
   ) => {
     if (!user?.id) {
       toast({
@@ -64,7 +68,7 @@ export const useStaffActions = () => {
         .single();
 
       // Update appointment with proper typing
-      const updateData: Record<string, any> = {
+      const updateData: AppointmentUpdate = {
         status: newStatus,
         ...additionalData,
       };
@@ -91,11 +95,11 @@ export const useStaffActions = () => {
       });
 
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating appointment status:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to update appointment status',
+        description: getErrorMessage(error) || 'Failed to update appointment status',
         variant: 'destructive',
       });
       return false;
@@ -162,10 +166,10 @@ export const useStaffActions = () => {
 
       if (action.resource_type === 'appointment' && action.old_data) {
         // Type cast the JSON data to the expected appointment update format
-        const oldAppointmentData = action.old_data as Record<string, any>;
+        const oldAppointmentData = action.old_data as Record<string, Json | undefined>;
         
         // Extract only the fields we want to update (excluding id and other system fields)
-        const updateFields: Record<string, any> = {};
+        const updateFields: Record<string, Json | undefined> = {};
         const allowedFields = [
           'status', 'scheduled_time', 'check_in_time', 'start_time', 'end_time',
           'notes', 'reason_for_visit', 'staff_id', 'assigned_staff_id'
@@ -180,7 +184,7 @@ export const useStaffActions = () => {
         // Undo appointment changes
         const { error: undoError } = await supabase
           .from('appointments')
-          .update(updateFields)
+          .update(updateFields as AppointmentUpdate)
           .eq('id', action.resource_id);
 
         if (undoError) throw undoError;
@@ -213,11 +217,11 @@ export const useStaffActions = () => {
       });
 
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error undoing action:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to undo action',
+        description: getErrorMessage(error) || 'Failed to undo action',
         variant: 'destructive',
       });
       return false;

@@ -12,6 +12,23 @@ export interface AutoSchedulingConfig {
   };
 }
 
+export interface DailyScheduleSlot {
+  hour: number;
+  predicted_demand: number;
+  recommended_staff: number;
+  recommended_capacity: number;
+  confidence: number;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface DailySchedule {
+  date: string;
+  location_id: string;
+  schedule: DailyScheduleSlot[];
+  total_predicted_demand: number;
+  peak_hour: DailyScheduleSlot;
+}
+
 export interface AutoSchedulingResult {
   applied: number;
   skipped: number;
@@ -74,7 +91,7 @@ export class AutoScheduler {
     }
   }
 
-  private async applyRecommendation(recommendation: any): Promise<void> {
+  private async applyRecommendation(recommendation: Pick<SchedulingRecommendation, 'id' | 'recommended_capacity'>): Promise<void> {
     // Mock implementation - in a real scenario, this would update the scheduling system
     console.log(`Auto-applied recommendation: ${recommendation.id} for ${recommendation.recommended_capacity} capacity`);
     
@@ -82,7 +99,7 @@ export class AutoScheduler {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  async generateDailySchedule(locationId: string, targetDate: string): Promise<any> {
+  async generateDailySchedule(locationId: string, targetDate: string): Promise<DailySchedule> {
     try {
       // Try to get real predictions from the database
       const { data: predictions, error } = await supabase
@@ -104,7 +121,7 @@ export class AutoScheduler {
         return this.generateMockSchedule(locationId, targetDate);
       }
 
-      const schedule = [];
+      const schedule: DailyScheduleSlot[] = [];
       
       for (const prediction of predictions) {
         const staffNeeded = Math.ceil(prediction.predicted_demand / 8); // 8 appointments per staff
@@ -135,7 +152,7 @@ export class AutoScheduler {
 
   private generateMockSchedule(locationId: string, targetDate: string) {
     // Generate mock schedule data for demonstration
-    const mockSchedule = [];
+    const mockSchedule: DailyScheduleSlot[] = [];
     
     for (let hour = this.config.workingHours.start; hour <= this.config.workingHours.end; hour++) {
       const baseLoad = Math.random() * 15 + 5; // 5-20 base appointments

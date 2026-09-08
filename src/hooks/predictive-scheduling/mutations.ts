@@ -81,7 +81,7 @@ export function usePredictiveSchedulingMutations() {
   const applyRecommendation = async (recommendationId: string) => {
     try {
       const { error } = await supabase
-        .from('scheduling_recommendations' as any)
+        .from('scheduling_recommendations')
         .update({
           status: 'applied',
           applied_at: new Date().toISOString()
@@ -110,7 +110,7 @@ export function usePredictiveSchedulingMutations() {
   const rejectRecommendation = async (recommendationId: string) => {
     try {
       const { error } = await supabase
-        .from('scheduling_recommendations' as any)
+        .from('scheduling_recommendations')
         .update({
           status: 'rejected'
         })

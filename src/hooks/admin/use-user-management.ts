@@ -85,7 +85,7 @@ export const useUserManagement = () => {
         description: `User role has been updated to ${data.role}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('Error updating role:', error);
       toast({
         title: 'Error',
@@ -109,7 +109,7 @@ export const useUserManagement = () => {
         description: 'Mock profile data has been created for testing',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('Error adding temporary data:', error);
       toast({
         title: 'Error',

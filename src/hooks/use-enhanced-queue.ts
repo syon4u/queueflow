@@ -4,6 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
+
+type AppointmentRow = Database['public']['Tables']['appointments']['Row'];
 
 export interface EnhancedCustomer {
   id: string;
@@ -70,7 +74,7 @@ export const useEnhancedQueue = (locationId?: string) => {
           table: 'appointments',
           filter: `location_id=eq.${locationId}`
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<AppointmentRow>) => {
           console.log('Queue update received:', payload);
           handleRealtimeUpdate(payload);
         }
@@ -97,25 +101,25 @@ export const useEnhancedQueue = (locationId?: string) => {
     };
   }, [settings.autoCallEnabled, settings.autoCallInterval, currentCustomer]);
 
-  const handleRealtimeUpdate = useCallback((payload: any) => {
-    const { eventType, new: newRecord, old: oldRecord } = payload;
-    
-    switch (eventType) {
+  const handleRealtimeUpdate = useCallback((payload: RealtimePostgresChangesPayload<AppointmentRow>) => {
+    switch (payload.eventType) {
       case 'INSERT':
-        if (newRecord.status === 'checked_in') {
-          addCustomerToQueue(newRecord);
+        if (payload.new.status === 'checked_in') {
+          addCustomerToQueue(payload.new);
         }
         break;
       case 'UPDATE':
-        updateCustomerInQueue(newRecord, oldRecord);
+        updateCustomerInQueue(payload.new, payload.old);
         break;
       case 'DELETE':
-        removeCustomerFromQueue(oldRecord.id);
+        if (payload.old.id) {
+          removeCustomerFromQueue(payload.old.id);
+        }
         break;
     }
   }, []);
 
-  const addCustomerToQueue = useCallback((appointmentData: any) => {
+  const addCustomerToQueue = useCallback((appointmentData: AppointmentRow) => {
     const newCustomer: EnhancedCustomer = {
       id: appointmentData.id,
       name: appointmentData.customer_id, // This would need proper customer name resolution
@@ -137,7 +141,7 @@ export const useEnhancedQueue = (locationId?: string) => {
     });
   }, [settings.estimatedWaitPerCustomer, t, toast]);
 
-  const updateCustomerInQueue = useCallback((newData: any, oldData: any) => {
+  const updateCustomerInQueue = useCallback((newData: AppointmentRow, oldData: Partial<AppointmentRow>) => {
     setCustomers(prev => 
       prev.map(customer => 
         customer.id === newData.id 

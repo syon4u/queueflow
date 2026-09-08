@@ -10,7 +10,7 @@ export const useNotifications = () => {
   const sendConfirmationNotifications = async (
     customerId: string, 
     confirmationCode: string, 
-    customerData: any
+    customerData: { email?: string | null; phone?: string | null }
   ) => {
     try {
       // Send email notification if customer has email
