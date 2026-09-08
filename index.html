@@ -13,6 +13,13 @@
     <meta property="og:type" content="website" />
 
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Explicit icon links: without them browsers probe /favicon.ico and
+         /apple-touch-icon.png at the origin root, which 404s on a sub-path deploy. -->
+    <link rel="icon" href="/favicon.ico" sizes="16x16" />
+    <link rel="icon" type="image/png" href="/pwa-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/pwa-192.png" />
+    <meta name="theme-color" content="#2563eb" />
   </head>
 
   <body>

@@ -91,6 +91,46 @@ describe('AuthProvider', () => {
     });
   });
 
+  it('resolves the role once per session even though Supabase emits several auth events', async () => {
+    const mockUser = { id: 'once-user-id', email: 'once@example.com' };
+    const mockSession = { user: mockUser } as unknown as Session;
+
+    type AuthCallback = (event: string, session: Session | null) => void;
+    let emit: AuthCallback | undefined;
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: mockSession },
+      error: null,
+    });
+    vi.mocked(supabase.auth.onAuthStateChange).mockImplementationOnce(((cb: AuthCallback) => {
+      emit = cb;
+      return { data: { subscription: { unsubscribe: vi.fn() } } };
+    }) as unknown as typeof supabase.auth.onAuthStateChange);
+
+    render(
+      <BrowserRouter>
+        <AuthProvider>
+          <AuthConsumer />
+        </AuthProvider>
+      </BrowserRouter>
+    );
+
+    // A cold load fires the initial-session check plus a burst of listener events.
+    reactTesting.act(() => {
+      emit?.('INITIAL_SESSION', mockSession);
+      emit?.('SIGNED_IN', mockSession);
+      emit?.('TOKEN_REFRESHED', mockSession);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('loading').textContent).toBe('false');
+      expect(screen.getByTestId('role').textContent).toBe('customer');
+    });
+
+    const tablesQueried = (vi.mocked(supabase.from).mock.calls as unknown as [string][]).map(([table]) => table);
+    const roleLookups = tablesQueried.filter((table) => table === 'user_roles');
+    expect(roleLookups).toHaveLength(1);
+  });
+
   it('should call signInWithPassword when signIn is called', async () => {
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
       data: {},

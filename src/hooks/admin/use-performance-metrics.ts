@@ -3,15 +3,19 @@ import { useQuery } from '@tanstack/react-query';
 import { getStringProp } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays } from 'date-fns';
-import { isNoShowToday, isServedToday, isWithinRange, localDayRange } from '@/lib/dateRanges';
+import { isWithinRange, localDayRange } from '@/lib/dateRanges';
+import {
+  STAFF_METRICS_COLUMNS,
+  STAFF_METRICS_HAS_STAFF_FILTER,
+  aggregateStaffMetrics,
+  staffIdFor,
+  staffMetricsOrFilter,
+  type StaffAppointmentRow,
+  type StaffMetric,
+  type StaffProfileRow,
+} from '@/lib/staffMetrics';
 
-export interface StaffMetric {
-  staff_id: string;
-  staff_name: string;
-  appointments_served: number;
-  average_service_time: number;
-  no_shows: number;
-}
+export type { StaffMetric } from '@/lib/staffMetrics';
 
 export interface ServiceMetric {
   service_id: string;
@@ -31,28 +35,50 @@ export interface DailyMetric {
   no_shows: number;
 }
 
-// Hook for fetching staff performance metrics
+// Hook for fetching staff performance metrics.
+// Computed in the browser from `appointments` (see src/lib/staffMetrics.ts)
+// instead of the `staff-metrics` edge function, which grouped by `staff_id`
+// only; the queue dashboard sets `assigned_staff_id`, so it reported 0 served.
 export const useStaffMetrics = (timeRange: string, locationId?: string) => {
   return useQuery({
     queryKey: ['staff-metrics', timeRange, locationId],
     queryFn: async () => {
       const { startDate, endDate } = getDateRange(timeRange);
-      
-      // Call the staff-metrics edge function
-      const { data, error } = await supabase.functions.invoke('staff-metrics', {
-        body: {
-          start_date: startDate,
-          end_date: endDate,
-          location_id: locationId
-        }
-      });
+      const range = { start: new Date(startDate), end: new Date(endDate) };
+
+      let query = supabase
+        .from('appointments')
+        .select(STAFF_METRICS_COLUMNS)
+        .or(staffMetricsOrFilter({ start: startDate, end: endDate }))
+        .or(STAFF_METRICS_HAS_STAFF_FILTER);
+
+      if (locationId) {
+        query = query.eq('location_id', locationId);
+      }
+
+      const { data: rows, error } = await query;
 
       if (error) {
         console.error('Error fetching staff metrics:', error);
         throw error;
       }
 
-      return data as StaffMetric[];
+      const appointments = (rows ?? []) as StaffAppointmentRow[];
+      const staffIds = Array.from(new Set(appointments.map(staffIdFor).filter((id): id is string => !!id)));
+      if (staffIds.length === 0) return [] as StaffMetric[];
+
+      // Names are subject to `profiles` RLS (staff see only their own row,
+      // admin/power_user see all) - the same visibility the edge function had.
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', staffIds);
+
+      if (profilesError) {
+        console.error('Error fetching staff names:', profilesError);
+      }
+
+      return aggregateStaffMetrics(appointments, range, (profiles ?? []) as StaffProfileRow[]);
     }
   });
 };

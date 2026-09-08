@@ -19,11 +19,13 @@ export const QueueStatsCards: React.FC<QueueStatsCardsProps> = ({ variant = 'sta
   // Metric definitions live in src/lib/dateRanges.ts (shared with /admin and /power-user).
   const statsConfig = [
     {
-      title: variant === 'admin' ? 'Total Customers' : 'Queue Length',
+      // stats.totalCustomers is the size of today's queue (useQueueData scopes
+      // rows with todayMetricsOrFilter), not an all-time customer count.
+      title: variant === 'admin' ? "In Today's Queue" : 'Queue Length',
       value: variant === 'admin' ? stats.totalCustomers : stats.waitingCustomers,
       icon: Users,
       color: 'blue',
-      description: variant === 'admin' ? 'In queue or resolved today' : 'Checked in, last 24 h'
+      description: variant === 'admin' ? 'Arrived or resolved today' : 'Checked in, last 24 h'
     },
     {
       title: 'Currently Waiting',

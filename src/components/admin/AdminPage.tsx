@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,13 +12,24 @@ import { CommunicationTemplatesTab } from './CommunicationTemplatesTab';
 import SystemSettingsTab from './SystemSettingsTab';
 import SecurityMetricsTab from './SecurityMetricsTab';
 import { SMSCommandsTab } from './SMSCommandsTab';
-import { AdvancedAnalyticsTab } from './AdvancedAnalyticsTab';
 import { CapacityManagementTab } from './CapacityManagementTab';
 import { CapacityThrottlingTab } from './CapacityThrottlingTab';
 import { QueueFlow2Tab } from './QueueFlow2Tab';
 import { AdminDashboardHeader } from './AdminDashboardHeader';
 import { AdminTopNavigation } from './AdminTopNavigation';
 import BackendHealthCheck from './BackendHealthCheck';
+
+// The analytics tab owns every recharts-based dashboard on this page; load it
+// (and recharts) only when the tab is opened rather than with the admin shell.
+const AdvancedAnalyticsTab = React.lazy(() =>
+  import('./AdvancedAnalyticsTab').then((m) => ({ default: m.AdvancedAnalyticsTab }))
+);
+
+const TabFallback = () => (
+  <div className="flex justify-center items-center h-64">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -122,7 +133,9 @@ export const AdminPage: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="advanced-analytics">
-            <AdvancedAnalyticsTab />
+            <Suspense fallback={<TabFallback />}>
+              <AdvancedAnalyticsTab />
+            </Suspense>
           </TabsContent>
           
           <TabsContent value="capacity-management">
