@@ -44,8 +44,7 @@ const StaffPerformanceReport: React.FC = () => {
       (serviceMetrics.reduce((sum, service) => sum + service.average_wait_time, 0) / serviceMetrics.length) : stats.averageWaitTime;
     
     // Completed = end_time within the period (src/lib/dateRanges.ts), from the
-    // direct appointments query rather than the staff-metrics edge function
-    // (which only sees rows with staff_id set).
+    // direct appointments query (same definition as the per-staff metrics).
     const completedAppointments = Array.isArray(dailyMetrics) && dailyMetrics.length > 0 ? 
       dailyMetrics.reduce((sum, day) => sum + day.completed, 0) : stats.servedCustomers;
     

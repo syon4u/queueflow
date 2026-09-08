@@ -14,9 +14,8 @@ const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMe
     (serviceMetrics.reduce((sum, service) => sum + service.average_wait_time, 0) / serviceMetrics.length).toFixed(1) : "0";
   
   // Completed / no-shows come from the direct appointments query (useDailyMetrics)
-  // using the shared definitions in src/lib/dateRanges.ts. The staff-metrics edge
-  // function only counts rows with `staff_id`, which the queue dashboard never sets
-  // (it uses assigned_staff_id), so it reported "Completed 0" after a real serve.
+  // using the shared definitions in src/lib/dateRanges.ts, so the totals here
+  // agree with the per-staff numbers (src/lib/staffMetrics.ts) on the Staff tab.
   const completedAppointments = Array.isArray(dailyMetrics) ?
     dailyMetrics.reduce((sum, day) => sum + (day.completed ?? 0), 0) : 0;
 
