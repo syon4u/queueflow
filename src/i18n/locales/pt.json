@@ -259,7 +259,8 @@
         "oneLine": "Sem agendamento e com agendamento, numa só fila",
         "livePosition": "Posição ao vivo em qualquer celular",
         "languages": "EN · ES · PT · HT"
-      }
+      },
+      "headlineAccent": "calmas"
     },
     "serviceCards": {
       "title": "Como Podemos Ajudar Você Hoje?",
@@ -347,7 +348,8 @@
       "checkInNow": "Fazer Check-in Agora",
       "talkToUs": "Fale conosco",
       "tryDemo": "Testar a demo ao vivo",
-      "headline": "Pronto para um saguão mais tranquilo?"
+      "headline": "Pronto para um saguão mais tranquilo?",
+      "yourTurn": "Sua vez."
     },
     "pricing": {
       "badge": "Preços simples e transparentes",
@@ -893,7 +895,8 @@
       "counter": "Guichê {{number}}",
       "upNext": "Próximos",
       "averageWait": "Espera média",
-      "waitMinutes": "{{minutes}} min"
+      "waitMinutes": "{{minutes}} min",
+      "ariaLive": "Atendendo {{ticket}} no guichê {{number}}"
     },
     "quickActions": {
       "eyebrow": "Para visitantes",
@@ -1033,7 +1036,8 @@
       "position": "Você é o #{{position}} da fila",
       "eta": "Faltam cerca de {{minutes}} min",
       "progressLabel": "Progresso na fila",
-      "ahead": "{{n}} pessoas à sua frente"
+      "ahead": "{{n}} pessoas à sua frente",
+      "callNextHint": "Apenas um exemplo — avança o painel de demonstração"
     },
     "fit": {
       "eyebrow": "Feito para balcões movimentados",
@@ -1042,7 +1046,8 @@
       "banks": "Bancos e cooperativas",
       "serviceCentres": "Centros de atendimento",
       "campuses": "Campi",
-      "repairShops": "Oficinas"
+      "repairShops": "Oficinas",
+      "marqueeLabel": "Tipos de balcão para os quais o QueueFlow foi feito"
     }
   }
 }

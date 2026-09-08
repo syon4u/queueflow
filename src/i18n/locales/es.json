@@ -259,7 +259,8 @@
         "oneLine": "Sin cita y con cita, en una sola fila",
         "livePosition": "Posición en vivo desde cualquier teléfono",
         "languages": "EN · ES · PT · HT"
-      }
+      },
+      "headlineAccent": "tranquilas"
     },
     "serviceCards": {
       "title": "¿Cómo Podemos Ayudarte Hoy?",
@@ -347,7 +348,8 @@
       "checkInNow": "Registrarme Ahora",
       "talkToUs": "Habla con nosotros",
       "tryDemo": "Probar la demo en vivo",
-      "headline": "¿Listo para un vestíbulo más tranquilo?"
+      "headline": "¿Listo para un vestíbulo más tranquilo?",
+      "yourTurn": "Tu turno."
     },
     "pricing": {
       "badge": "Precios simples y transparentes",
@@ -893,7 +895,8 @@
       "counter": "Ventanilla {{number}}",
       "upNext": "Siguientes",
       "averageWait": "Espera promedio",
-      "waitMinutes": "{{minutes}} min"
+      "waitMinutes": "{{minutes}} min",
+      "ariaLive": "Atendiendo {{ticket}} en la ventanilla {{number}}"
     },
     "quickActions": {
       "eyebrow": "Para visitantes",
@@ -1033,7 +1036,8 @@
       "position": "Eres el #{{position}} en la fila",
       "eta": "Faltan unos {{minutes}} min",
       "progressLabel": "Avance en la fila",
-      "ahead": "{{n}} personas delante de ti"
+      "ahead": "{{n}} personas delante de ti",
+      "callNextHint": "Solo es un ejemplo: avanza el tablero de demostración"
     },
     "fit": {
       "eyebrow": "Hecho para mostradores con mucho movimiento",
@@ -1042,7 +1046,8 @@
       "banks": "Bancos y cooperativas",
       "serviceCentres": "Centros de servicio",
       "campuses": "Campus",
-      "repairShops": "Talleres"
+      "repairShops": "Talleres",
+      "marqueeLabel": "Tipos de mostrador para los que está hecho QueueFlow"
     }
   }
 }

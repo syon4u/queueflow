@@ -259,7 +259,8 @@
         "oneLine": "Moun san randevou ak moun ak randevou, nan yon sèl liy",
         "livePosition": "Pozisyon an dirèk sou nenpòt telefòn",
         "languages": "EN · ES · PT · HT"
-      }
+      },
+      "headlineAccent": "kalm"
     },
     "serviceCards": {
       "title": "Kijan Nou Ka Ede Ou Jodi a?",
@@ -347,7 +348,8 @@
       "checkInNow": "Anrejistre Kounye a",
       "talkToUs": "Pale ak nou",
       "tryDemo": "Eseye demo an dirèk la",
-      "headline": "Ou pare pou yon sal datant pi kalm?"
+      "headline": "Ou pare pou yon sal datant pi kalm?",
+      "yourTurn": "Se tou pa w."
     },
     "pricing": {
       "badge": "Pri senp e klè",
@@ -893,7 +895,8 @@
       "counter": "Gichè {{number}}",
       "upNext": "Pwochen yo",
       "averageWait": "Tan datant mwayen",
-      "waitMinutes": "{{minutes}} min"
+      "waitMinutes": "{{minutes}} min",
+      "ariaLive": "N ap sèvi {{ticket}} nan gichè {{number}}"
     },
     "quickActions": {
       "eyebrow": "Pou vizitè yo",
@@ -1033,7 +1036,8 @@
       "position": "Ou se #{{position}} nan liy lan",
       "eta": "Rete apeprè {{minutes}} min",
       "progressLabel": "Pwogrè nan liy lan",
-      "ahead": "{{n}} moun devan ou"
+      "ahead": "{{n}} moun devan ou",
+      "callNextHint": "Se yon egzanp sèlman — li fè tablo demo a avanse"
     },
     "fit": {
       "eyebrow": "Fèt pou biwo resepsyon ki gen anpil mouvman",
@@ -1042,7 +1046,8 @@
       "banks": "Bank ak kès popilè",
       "serviceCentres": "Sant sèvis",
       "campuses": "Kanpis",
-      "repairShops": "Atelye reparasyon"
+      "repairShops": "Atelye reparasyon",
+      "marqueeLabel": "Kalite biwo resepsyon QueueFlow fèt pou yo"
     }
   }
 }

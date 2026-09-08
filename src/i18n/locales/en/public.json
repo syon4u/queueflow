@@ -75,7 +75,8 @@
       "oneLine": "Walk-ins and bookings in one line",
       "livePosition": "Live position on any phone",
       "languages": "EN · ES · PT · HT"
-    }
+    },
+    "headlineAccent": "Calmer"
   },
   "serviceCards": {
     "title": "How Can We Help You Today?",
@@ -163,7 +164,8 @@
     "checkInNow": "Check In Now",
     "talkToUs": "Talk to us",
     "tryDemo": "Try the live demo",
-    "headline": "Ready to run a calmer lobby?"
+    "headline": "Ready to run a calmer lobby?",
+    "yourTurn": "Your turn."
   },
   "pricing": {
     "badge": "Simple, transparent pricing",
@@ -709,7 +711,8 @@
     "counter": "Counter {{number}}",
     "upNext": "Up next",
     "averageWait": "Average wait",
-    "waitMinutes": "{{minutes}} min"
+    "waitMinutes": "{{minutes}} min",
+    "ariaLive": "Now serving {{ticket}} at counter {{number}}"
   },
   "quickActions": {
     "eyebrow": "For visitors",
@@ -849,7 +852,8 @@
     "position": "You're #{{position}} in line",
     "eta": "About {{minutes}} min to go",
     "progressLabel": "Progress in line",
-    "ahead": "{{n}} people ahead of you"
+    "ahead": "{{n}} people ahead of you",
+    "callNextHint": "Example only — advances the demo board"
   },
   "fit": {
     "eyebrow": "Built for busy front desks",
@@ -858,6 +862,7 @@
     "banks": "Banks & credit unions",
     "serviceCentres": "Service centres",
     "campuses": "Campuses",
-    "repairShops": "Repair shops"
+    "repairShops": "Repair shops",
+    "marqueeLabel": "Kinds of front desk QueueFlow is built for"
   }
 }
