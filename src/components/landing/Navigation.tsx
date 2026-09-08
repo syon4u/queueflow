@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Clock, Menu, X, User, Calendar, Search, BarChart3, Settings, Tag } from 'lucide-react';
+import logoTile from '@/assets/logo-tile.svg';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -61,9 +62,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Clock className="h-5 w-5 text-white" />
-            </div>
+            <img src={logoTile} alt="" width={32} height={32} className="w-8 h-8 rounded-lg" />
             <span className="text-xl font-bold text-gray-900">Queue Flow</span>
           </Link>
 

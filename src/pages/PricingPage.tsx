@@ -104,7 +104,7 @@ const PricingPage: React.FC = () => {
                 </CardContent>
                 <CardFooter>
                   <a
-                    href={`mailto:sales@queueflow.app?subject=${encodeURIComponent(`QueueFlow ${plan.name} plan`)}`}
+                    href={`mailto:info@garrickinternational.com?subject=${encodeURIComponent(`QueueFlow ${plan.name} plan`)}`}
                     className="w-full"
                   >
                     <Button

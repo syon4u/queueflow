@@ -116,7 +116,7 @@ const SiteFooter: React.FC = () => {
             <h4 className="text-lg font-serif mb-4 text-white font-semibold drop-shadow-lg">{t('public.layout.footer.contactInfo')}</h4>
             <address className="not-italic text-white/95">
               
-              <p className="font-medium drop-shadow">{t('public.layout.footer.email')} <span className="text-white font-bold">support@queueflow.com</span></p>
+              <p className="font-medium drop-shadow">{t('public.layout.footer.email')} <span className="text-white font-bold">info@garrickinternational.com</span></p>
               <p className="mt-2 font-medium drop-shadow">{t('public.layout.footer.supportHours')}</p>
             </address>
           </div>
