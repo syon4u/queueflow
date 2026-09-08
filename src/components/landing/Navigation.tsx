@@ -61,9 +61,9 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex min-h-11 items-center space-x-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
             <img src={logoTile} alt="" width={32} height={32} className="w-8 h-8 rounded-lg" />
-            <span className="text-xl font-bold text-gray-900">Queue Flow</span>
+            <span className="text-xl font-bold text-gray-900">QueueFlow</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -73,7 +73,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               <Link
                 key={link.to}
                 to={link.to}
-                className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex min-h-11 items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 <link.icon className="h-4 w-4" />
                 <span>{link.label}</span>
@@ -92,7 +92,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
               <Link
                 key={link.to}
                 to={link.to}
-                className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex min-h-11 items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 <link.icon className="h-4 w-4" />
                 <span>{link.label}</span>
@@ -113,8 +113,8 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                 </div>
               ) : (
                 <>
-                  <Link to="/auth">
-                    <Button variant="outline" size="sm">
+                  <Link to="/auth" className="inline-flex">
+                    <Button variant="outline" size="sm" tabIndex={-1}>
                       {t('public.nav.signIn')}
                     </Button>
                   </Link>
@@ -130,7 +130,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
           <Button 
             variant="ghost" 
             size="icon"
-            className="md:hidden"
+            className="size-11 md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? t('public.nav.closeMenu') : t('public.nav.openMenu')}
             aria-expanded={mobileMenuOpen}
@@ -148,7 +148,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                  className="flex min-h-11 items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <link.icon className="h-4 w-4" />
@@ -161,7 +161,7 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+                  className="flex min-h-11 items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <link.icon className="h-4 w-4" />
@@ -179,18 +179,18 @@ const Navigation: React.FC<NavigationProps> = ({ showStaffAccess, onToggleStaffA
                     <div className="text-sm text-gray-600">
                       {user.email}{role ? ` (${role})` : ''}
                     </div>
-                    <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
+                    <Button variant="outline" className="min-h-11 w-full justify-start" onClick={handleSignOut}>
                       {t('public.nav.signOut')}
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full justify-start">
+                    <Link to="/auth" className="block" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="min-h-11 w-full justify-start" tabIndex={-1}>
                         {t('public.nav.signIn')}
                       </Button>
                     </Link>
-                    <Button variant="outline" className="w-full justify-start" onClick={onToggleStaffAccess}>
+                    <Button variant="outline" className="min-h-11 w-full justify-start" onClick={onToggleStaffAccess}>
                       {t('public.nav.employeeLogin')}
                     </Button>
                   </div>
