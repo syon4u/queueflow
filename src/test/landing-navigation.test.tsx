@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import CTASection from '@/components/landing/CTASection';
 import Navigation from '@/components/landing/Navigation';
+import LandingNav from '@/components/landing/LandingNav';
 import { renderWithProviders } from './test-utils';
 import StatusPage from '@/pages/StatusPage';
 
@@ -102,6 +103,32 @@ describe('Landing Page Navigation', () => {
       // Mobile menu duplicates the public links
       const statusLinks = getAllByRole('link').filter((a) => a.getAttribute('href') === '/status');
       expect(statusLinks.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe('LandingNav', () => {
+    it('links to the page sections, pricing and sign-in', () => {
+      const { getAllByRole } = renderWithRouter(<LandingNav />);
+      const hrefs = getAllByRole('link').map((a) => a.getAttribute('href'));
+      expect(hrefs).toContain('#how-it-works');
+      expect(hrefs).toContain('#capabilities');
+      expect(hrefs).toContain('#visitors');
+      expect(hrefs).toContain('/pricing');
+      expect(hrefs).toContain('/auth');
+    });
+
+    it('toggles the mobile menu with an accessible button', async () => {
+      const user = userEvent.setup();
+      const { getByRole, getAllByRole } = renderWithRouter(<LandingNav />);
+
+      const menuButton = getByRole('button', { name: /open menu/i });
+      expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+      await user.click(menuButton);
+      expect(getByRole('button', { name: /close menu/i })).toHaveAttribute('aria-expanded', 'true');
+
+      // The sheet duplicates the section links
+      const capLinks = getAllByRole('link').filter((a) => a.getAttribute('href') === '#capabilities');
+      expect(capLinks.length).toBeGreaterThanOrEqual(2);
     });
   });
 

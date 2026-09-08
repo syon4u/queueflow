@@ -23,28 +23,29 @@ const COMPANY_LINKS = [
 ] as const;
 
 const linkClass =
-  'inline-flex min-h-11 items-center rounded-sm text-sm text-gray-600 hover:text-blue-700 hover:underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2';
+  'inline-flex min-h-11 items-center rounded-md text-[15px] text-[--on-ink-2] transition-colors hover:text-white';
+const headingClass = 'text-[13px] font-semibold uppercase tracking-[0.1em] text-white';
 
-/** Lighter footer for the public landing page: only routes that exist. */
+/** Landing footer on the ink ground: only routes that exist. */
 const LandingFooter: React.FC = () => {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-gray-200 bg-white py-12">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="on-ink border-t border-white/10 bg-[--ink] py-14 text-white">
+      <div className="mx-auto w-full max-w-6xl px-5 sm:px-6">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
-            <Link to="/" className="inline-flex min-h-11 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+            <Link to="/" className="inline-flex min-h-11 items-center gap-2.5 rounded-lg">
               <img src={logoTile} alt="" width={32} height={32} className="size-8 rounded-lg" />
-              <span className="text-lg font-bold text-gray-900">QueueFlow</span>
+              <span className="font-display text-[19px] font-bold tracking-[-0.02em] text-white">QueueFlow</span>
             </Link>
-            <p className="mt-3 max-w-[40ch] text-sm leading-relaxed text-gray-600">{t('public.footer.tagline')}</p>
+            <p className="mt-3 max-w-[36ch] text-[15px] leading-relaxed text-[--on-ink-2]">{t('public.footer.tagline')}</p>
           </div>
 
           <nav aria-label={t('public.footer.forCustomers')}>
-            <h2 className="font-sans text-sm font-semibold tracking-normal text-gray-900">{t('public.footer.forCustomers')}</h2>
-            <ul className="mt-2 flex flex-col">
+            <h2 className={headingClass}>{t('public.footer.forCustomers')}</h2>
+            <ul className="mt-3 flex flex-col">
               {CUSTOMER_LINKS.map(({ key, to }) => (
                 <li key={key}>
                   <Link to={to} className={linkClass}>
@@ -56,8 +57,8 @@ const LandingFooter: React.FC = () => {
           </nav>
 
           <nav aria-label={t('public.footer.forLobbies')}>
-            <h2 className="font-sans text-sm font-semibold tracking-normal text-gray-900">{t('public.footer.forLobbies')}</h2>
-            <ul className="mt-2 flex flex-col">
+            <h2 className={headingClass}>{t('public.footer.forLobbies')}</h2>
+            <ul className="mt-3 flex flex-col">
               {LOBBY_LINKS.map(({ key, to }) => (
                 <li key={key}>
                   <Link to={to} className={linkClass}>
@@ -69,8 +70,8 @@ const LandingFooter: React.FC = () => {
           </nav>
 
           <div>
-            <h2 className="font-sans text-sm font-semibold tracking-normal text-gray-900">{t('public.footer.company')}</h2>
-            <ul className="mt-2 flex flex-col">
+            <h2 className={headingClass}>{t('public.footer.company')}</h2>
+            <ul className="mt-3 flex flex-col">
               {COMPANY_LINKS.map(({ key, to }) => (
                 <li key={key}>
                   <Link to={to} className={linkClass}>
@@ -84,11 +85,11 @@ const LandingFooter: React.FC = () => {
                 </a>
               </li>
             </ul>
-            <p className="mt-2 text-sm text-gray-600">{t('public.layout.footer.supportHours')}</p>
+            <p className="mt-2 text-[14px] text-[--on-ink-2]">{t('public.layout.footer.supportHours')}</p>
           </div>
         </div>
 
-        <p className="mt-10 border-t border-gray-200 pt-6 text-sm text-gray-600">
+        <p className="mt-12 border-t border-white/10 pt-6 text-[14px] text-[--on-ink-2]">
           {t('public.layout.footer.rights', { year })}
         </p>
       </div>
