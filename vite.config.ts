@@ -1,8 +1,33 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin, type ResolvedConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { copyFile } from "fs/promises";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
+
+/**
+ * GitHub Pages SPA fallback.
+ *
+ * Pages serves `404.html` for any path it has no file for, so a deep link such
+ * as `/queueflow-demo/check-in` must load the app. Copying the built
+ * `index.html` (asset URLs already carry `base`) does that without a redirect
+ * and without guessing the base from the URL, so it works for a sub-path deploy
+ * and for a domain-root deploy alike. Runs in `writeBundle`, i.e. before
+ * vite-plugin-pwa's `closeBundle`, so the copy is precached with its real hash.
+ */
+function spaFallback(): Plugin {
+  let outDir = "dist";
+  return {
+    name: "queueflow:spa-fallback",
+    apply: "build",
+    configResolved(config: ResolvedConfig) {
+      outDir = path.resolve(config.root, config.build.outDir);
+    },
+    async writeBundle() {
+      await copyFile(path.join(outDir, "index.html"), path.join(outDir, "404.html"));
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -14,6 +39,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
+    spaFallback(),
     VitePWA({
       // Update strategy: a new deploy takes effect on the next navigation.
       // src/main.tsx registers the worker (virtual:pwa-register) and reloads
