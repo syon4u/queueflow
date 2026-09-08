@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,12 +35,13 @@ const StepCheckInCard = () => {
   const [appointmentInfo, setAppointmentInfo] = useState<AppointmentInfo | null>(null);
   const [queueInfo, setQueueInfo] = useState<QueueInfo | null>(null);
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const findAppointment = async () => {
     if (lookupMethod === 'confirmation' && !confirmationCode.trim()) {
       toast({
-        title: 'Error',
-        description: 'Please enter your confirmation code.',
+        title: t('common.error'),
+        description: t('public.checkIn.errors.enterCode'),
         variant: 'destructive',
       });
       return;
@@ -47,8 +49,8 @@ const StepCheckInCard = () => {
 
     if (lookupMethod === 'details' && (!lastName.trim() || !phone.trim())) {
       toast({
-        title: 'Error',
-        description: 'Please enter both last name and phone number.',
+        title: t('common.error'),
+        description: t('public.checkIn.errors.enterNameAndPhone'),
         variant: 'destructive',
       });
       return;
@@ -64,24 +66,32 @@ const StepCheckInCard = () => {
       );
 
       if (matches.length === 0) {
-        throw new Error('No appointment found with the provided information. Please check your details and try again.');
+        throw new Error(t('public.checkIn.errors.notFound'));
       }
 
       const appointment = matches.find(apt => apt.status === 'scheduled');
       if (!appointment) {
         const latest = matches[0];
         if (latest.status === 'checked_in' || latest.status === 'in_progress') {
-          throw new Error(`You are already checked in${latest.position ? ` and #${latest.position} in line` : ''}. Use "Check Status" to follow your place in the queue.`);
+          throw new Error(
+            latest.position
+              ? t('public.checkIn.errors.alreadyCheckedInWithPosition', { position: latest.position })
+              : t('public.checkIn.errors.alreadyCheckedIn')
+          );
         }
-        throw new Error(`Your most recent appointment is ${latest.status.replace('_', ' ')}. Please book a new appointment or see a staff member.`);
+        throw new Error(
+          t('public.checkIn.errors.latestStatus', {
+            status: t(`public.statusLabels.${latest.status}`, latest.status.replace('_', ' ')).toLowerCase(),
+          })
+        );
       }
 
       setAppointmentInfo({
         id: appointment.appointment_id,
         code: appointment.confirmation_code,
         customer_name: customerName(appointment),
-        service_name: appointment.service_name || 'Service',
-        location_name: appointment.location_name || 'Location',
+        service_name: appointment.service_name || t('public.checkIn.fallbackService'),
+        location_name: appointment.location_name || t('public.checkIn.fallbackLocation'),
         location_id: appointment.location_id || '',
         scheduled_time: appointment.scheduled_time
       });
@@ -91,8 +101,8 @@ const StepCheckInCard = () => {
     } catch (error) {
       console.error('Error finding appointment:', error);
       toast({
-        title: 'Appointment Not Found',
-        description: error instanceof Error ? error.message : 'Unable to find appointment. Please verify your information and try again.',
+        title: t('public.checkIn.errors.notFoundTitle'),
+        description: error instanceof Error ? error.message : t('public.checkIn.errors.notFoundFallback'),
         variant: 'destructive',
       });
     } finally {
@@ -116,8 +126,8 @@ const StepCheckInCard = () => {
     } catch (error) {
       console.error('Check-in error:', error);
       toast({
-        title: 'Check-in Failed',
-        description: error instanceof Error ? error.message : 'Unable to check in. Please try again.',
+        title: t('public.checkIn.errors.checkInFailed'),
+        description: error instanceof Error ? error.message : t('public.checkIn.errors.checkInFallback'),
         variant: 'destructive',
       });
     } finally {
@@ -152,10 +162,10 @@ const StepCheckInCard = () => {
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <QrCode className="h-5 w-5" />
-                Find Your Appointment
+                {t('public.checkIn.findTitle')}
               </CardTitle>
               <CardDescription>
-                Enter your confirmation code or contact details
+                {t('public.checkIn.findDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -168,7 +178,7 @@ const StepCheckInCard = () => {
                   onClick={() => setLookupMethod('confirmation')}
                   className="flex-1"
                 >
-                  Confirmation #
+                  {t('public.checkIn.methodCode')}
                 </Button>
                 <Button
                   type="button"
@@ -177,16 +187,16 @@ const StepCheckInCard = () => {
                   onClick={() => setLookupMethod('details')}
                   className="flex-1"
                 >
-                  Name & Phone
+                  {t('public.checkIn.methodDetails')}
                 </Button>
               </div>
 
               {lookupMethod === 'confirmation' ? (
                 <div className="space-y-2">
-                  <Label htmlFor="confirmation-code">Confirmation Code</Label>
+                  <Label htmlFor="confirmation-code">{t('public.checkIn.codeLabel')}</Label>
                   <Input
                     id="confirmation-code"
-                    placeholder="CUST-XXXXXXXX or APT-XXXXXXXX"
+                    placeholder={t('public.checkIn.codePlaceholder')}
                     className="text-center font-mono"
                     value={confirmationCode}
                     onChange={(e) => setConfirmationCode(e.target.value)}
@@ -195,20 +205,20 @@ const StepCheckInCard = () => {
                     autoFocus
                   />
                   <p className="text-xs text-gray-500">
-                    Use your customer confirmation number or appointment code
+                    {t('public.checkIn.codeHint')}
                   </p>
                 </div>
               ) : (
                 <>
                   <div className="text-center text-sm text-gray-500 py-2">
-                    – OR –
+                    {t('public.checkIn.or')}
                   </div>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name</Label>
+                      <Label htmlFor="last-name">{t('public.checkIn.lastName')}</Label>
                       <Input
                         id="last-name"
-                        placeholder="Enter your last name"
+                        placeholder={t('public.checkIn.lastNamePlaceholder')}
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         onKeyPress={handleKeyPress}
@@ -217,7 +227,7 @@ const StepCheckInCard = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone">{t('public.checkIn.phone')}</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -240,10 +250,10 @@ const StepCheckInCard = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Searching...
+                    {t('public.checkIn.searching')}
                   </>
                 ) : (
-                  'Find Appointment'
+                  t('public.checkIn.findButton')
                 )}
               </Button>
             </CardContent>
@@ -253,9 +263,9 @@ const StepCheckInCard = () => {
         {step === 'confirm' && appointmentInfo && (
           <>
             <CardHeader className="text-center">
-              <CardTitle>Confirm Check-In</CardTitle>
+              <CardTitle>{t('public.checkIn.confirmTitle')}</CardTitle>
               <CardDescription>
-                Please review your appointment details
+                {t('public.checkIn.confirmDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -271,7 +281,7 @@ const StepCheckInCard = () => {
                 <div className="flex items-start">
                   <MapPin className="h-4 w-4 mt-0.5 mr-3 text-gray-500" />
                   <div>
-                    <p className="font-medium text-gray-900">Service</p>
+                    <p className="font-medium text-gray-900">{t('public.checkIn.service')}</p>
                     <p className="text-sm text-gray-600">{appointmentInfo.service_name}</p>
                   </div>
                 </div>
@@ -279,7 +289,7 @@ const StepCheckInCard = () => {
                 <div className="flex items-start">
                   <MapPin className="h-4 w-4 mt-0.5 mr-3 text-gray-500" />
                   <div>
-                    <p className="font-medium text-gray-900">Location</p>
+                    <p className="font-medium text-gray-900">{t('public.checkIn.location')}</p>
                     <p className="text-sm text-gray-600">{appointmentInfo.location_name}</p>
                   </div>
                 </div>
@@ -287,9 +297,9 @@ const StepCheckInCard = () => {
                 <div className="flex items-start">
                   <Calendar className="h-4 w-4 mt-0.5 mr-3 text-gray-500" />
                   <div>
-                    <p className="font-medium text-gray-900">Scheduled Time</p>
+                    <p className="font-medium text-gray-900">{t('public.checkIn.scheduledTime')}</p>
                     <p className="text-sm text-gray-600">
-                      {new Date(appointmentInfo.scheduled_time).toLocaleString([], { 
+                      {new Date(appointmentInfo.scheduled_time).toLocaleString(i18n.language, { 
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
@@ -308,7 +318,7 @@ const StepCheckInCard = () => {
                   disabled={isLoading}
                   className="flex-1"
                 >
-                  Back
+                  {t('public.checkIn.back')}
                 </Button>
                 <Button 
                   onClick={performCheckIn}
@@ -318,12 +328,12 @@ const StepCheckInCard = () => {
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Checking In...
+                      {t('public.checkIn.checkingIn')}
                     </>
                   ) : (
                     <>
                       <CheckCircle className="h-4 w-4 mr-2" />
-                      Check Me In
+                      {t('public.checkIn.checkMeIn')}
                     </>
                   )}
                 </Button>
@@ -338,9 +348,9 @@ const StepCheckInCard = () => {
               <div className="flex justify-center mb-4">
                 <CheckCircle className="h-16 w-16 text-green-500" />
               </div>
-              <CardTitle className="text-green-600">You're checked in!</CardTitle>
+              <CardTitle className="text-green-600">{t('public.checkIn.successTitle')}</CardTitle>
               <CardDescription>
-                Welcome! Here's your queue information
+                {t('public.checkIn.successDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -349,32 +359,32 @@ const StepCheckInCard = () => {
                 <div className="text-4xl font-bold text-blue-600 mb-2">
                   #{queueInfo.position}
                 </div>
-                <p className="text-gray-600 mb-4">Your position in line</p>
+                <p className="text-gray-600 mb-4">{t('public.checkIn.positionLabel')}</p>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <Users className="h-5 w-5 mx-auto mb-1 text-gray-500" />
                     <p className="text-lg font-semibold">{Math.max(0, queueInfo.position - 1)}</p>
-                    <p className="text-xs text-gray-600">ahead of you</p>
+                    <p className="text-xs text-gray-600">{t('public.checkIn.aheadOfYou')}</p>
                   </div>
                   
                   <div className="text-center">
                     <Clock className="h-5 w-5 mx-auto mb-1 text-gray-500" />
-                    <p className="text-lg font-semibold">≈ {queueInfo.estimatedWaitTime}m</p>
-                    <p className="text-xs text-gray-600">estimated wait</p>
+                    <p className="text-lg font-semibold">{t('public.checkIn.waitShort', { minutes: queueInfo.estimatedWaitTime })}</p>
+                    <p className="text-xs text-gray-600">{t('public.checkIn.estimatedWait')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="text-center text-xs text-gray-500">
-                <p>Updates refresh every 30 seconds</p>
+                <p>{t('public.checkIn.refreshNote')}</p>
               </div>
 
               <Button 
                 className="w-full" 
                 onClick={() => navigate('/')}
               >
-                Done
+                {t('public.checkIn.done')}
               </Button>
             </CardContent>
           </>

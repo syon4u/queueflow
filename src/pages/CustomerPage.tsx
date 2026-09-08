@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
 import SimpleAppointmentForm from '@/components/customer/SimpleAppointmentForm';
@@ -9,6 +10,7 @@ import { CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentFo
 
 const CustomerPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const { createAppointment, isSubmitting } = useCustomerAppointmentFlow();
 
@@ -31,8 +33,8 @@ const CustomerPage = () => {
 
   return (
     <PageLayout 
-      headerTitle="Book an Appointment"
-      headerSubtitle="Choose a service, location and time that works for you"
+      headerTitle={t('public.booking.pageTitle')}
+      headerSubtitle={t('public.booking.pageSubtitle')}
     >
       <div className="min-h-screen bg-pattern-bubbles bg-gradient-overlay-blue">
         <div className="container mx-auto px-4 py-8">

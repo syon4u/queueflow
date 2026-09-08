@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CustomerAppointmentData } from '@/hooks/customer/useSimpleAppointmentForm';
@@ -10,27 +11,28 @@ interface PersonalInfoSectionProps {
 }
 
 const PersonalInfoSection = ({ formData, updateField }: PersonalInfoSectionProps) => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">Personal Information</h3>
+      <h3 className="text-lg font-medium">{t('public.booking.personal.title')}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="firstName">First Name *</Label>
+          <Label htmlFor="firstName">{t('public.booking.personal.firstName')}</Label>
           <Input
             id="firstName"
             value={formData.firstName}
             onChange={(e) => updateField('firstName', e.target.value)}
-            placeholder="Enter your first name"
+            placeholder={t('public.booking.personal.firstNamePlaceholder')}
             required
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name *</Label>
+          <Label htmlFor="lastName">{t('public.booking.personal.lastName')}</Label>
           <Input
             id="lastName"
             value={formData.lastName}
             onChange={(e) => updateField('lastName', e.target.value)}
-            placeholder="Enter your last name"
+            placeholder={t('public.booking.personal.lastNamePlaceholder')}
             required
           />
         </div>
@@ -38,7 +40,7 @@ const PersonalInfoSection = ({ formData, updateField }: PersonalInfoSectionProps
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number *</Label>
+          <Label htmlFor="phone">{t('public.booking.personal.phone')}</Label>
           <Input
             id="phone"
             type="tel"
@@ -49,7 +51,7 @@ const PersonalInfoSection = ({ formData, updateField }: PersonalInfoSectionProps
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">{t('public.booking.personal.email')}</Label>
           <Input
             id="email"
             type="email"

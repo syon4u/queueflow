@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocations } from '@/hooks/appointment-form/useLocations';
 import { useServices } from '@/hooks/appointment-form/useServices';
 
@@ -17,6 +18,7 @@ export interface CustomerAppointmentData {
 }
 
 export const useSimpleAppointmentForm = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<CustomerAppointmentData>({
     firstName: '',
     lastName: '',
@@ -67,31 +69,31 @@ export const useSimpleAppointmentForm = () => {
 
   const validateForm = (): string | null => {
     if (!formData.firstName.trim()) {
-      return 'First name is required';
+      return t('public.booking.validation.firstNameRequired');
     }
 
     if (!formData.lastName.trim()) {
-      return 'Last name is required';
+      return t('public.booking.validation.lastNameRequired');
     }
 
     if (!formData.phone.trim()) {
-      return 'Phone number is required';
+      return t('public.booking.validation.phoneRequired');
     }
 
     if (!formData.locationId) {
-      return 'Location is required';
+      return t('public.booking.validation.locationRequired');
     }
 
     if (!formData.serviceId) {
-      return 'Service is required';
+      return t('public.booking.validation.serviceRequired');
     }
 
     if (!formData.preferredDate) {
-      return 'Preferred date is required';
+      return t('public.booking.validation.dateRequired');
     }
 
     if (!formData.preferredTime) {
-      return 'Preferred time is required';
+      return t('public.booking.validation.timeRequired');
     }
 
     return null;
