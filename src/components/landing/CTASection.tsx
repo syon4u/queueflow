@@ -1,38 +1,51 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
+export const CONTACT_EMAIL = 'info@garrickinternational.com';
+export const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('QueueFlow')}`;
+
+/** Final buyer call to action. Also rendered at the foot of the pricing page. */
 const CTASection: React.FC = () => {
   const { t } = useTranslation();
+
   return (
-    <section className="py-16 bg-blue-600">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold text-white mb-4">{t('public.cta.title')}</h2>
-        <p className="text-xl text-blue-100 mb-8">{t('public.cta.subtitle')}</p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 px-8" asChild>
-            <Link to="/customer">
-              {t('public.cta.bookAppointment')}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+    <section aria-labelledby="landing-cta-title" className="bg-blue-700 py-16 text-white sm:py-24">
+      <div className="mx-auto w-full max-w-6xl px-4 text-center sm:px-6">
+        <h2 id="landing-cta-title" className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          {t('public.cta.title')}
+        </h2>
+        <p className="mx-auto mt-4 max-w-[60ch] text-lg leading-relaxed text-blue-100">{t('public.cta.subtitle')}</p>
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Button
+            asChild
+            size="lg"
+            className="h-12 w-full bg-white px-6 text-base font-semibold text-blue-800 hover:bg-blue-50 hover:text-blue-900 focus-visible:ring-white focus-visible:ring-offset-blue-700 sm:w-auto"
+          >
+            <a href={CONTACT_MAILTO}>
+              <Mail aria-hidden="true" className="mr-1 h-5 w-5" />
+              {t('public.cta.talkToUs')}
+            </a>
           </Button>
-          <Link 
-            to="/status"
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white text-white hover:bg-white hover:text-blue-600 hover:translate-y-[-1px] h-11 px-8 w-full sm:w-auto"
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-12 w-full border-white/60 bg-transparent px-6 text-base font-semibold text-white hover:bg-white/10 hover:text-white focus-visible:ring-white focus-visible:ring-offset-blue-700 sm:w-auto"
           >
-            {t('public.cta.checkStatus')}
-          </Link>
-          <Link 
-            to="/check-in" 
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-blue-700 hover:translate-y-[-1px] h-11 px-8 w-full sm:w-auto text-white"
-          >
-            {t('public.cta.checkInNow')}
-          </Link>
+            <Link to="/customer">{t('public.cta.tryDemo')}</Link>
+          </Button>
         </div>
+        <p className="mt-6 text-sm text-blue-100">
+          <a
+            href={CONTACT_MAILTO}
+            className="inline-flex min-h-11 items-center rounded-sm underline decoration-white/50 underline-offset-4 hover:decoration-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700"
+          >
+            {CONTACT_EMAIL}
+          </a>
+        </p>
       </div>
     </section>
   );

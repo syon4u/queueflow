@@ -49,28 +49,27 @@ describe('Landing Page Navigation', () => {
   });
 
   describe('CTASection', () => {
-    it('renders Check Status button with correct link', () => {
+    it('renders the Talk to us button as a mailto link with the QueueFlow subject', () => {
       const { getByRole } = renderWithRouter(<CTASection />);
-      
-      const checkStatusButton = getByRole('link', { name: /check status/i });
-      expect(checkStatusButton).toBeInTheDocument();
-      expect(checkStatusButton).toHaveAttribute('href', '/status');
+
+      const talkButton = getByRole('link', { name: /talk to us/i });
+      expect(talkButton).toBeInTheDocument();
+      expect(talkButton).toHaveAttribute('href', 'mailto:info@garrickinternational.com?subject=QueueFlow');
     });
 
-    it('renders Check In Now button with correct link', () => {
+    it('renders the live demo button pointing at the booking flow', () => {
       const { getByRole } = renderWithRouter(<CTASection />);
-      
-      const checkInButton = getByRole('link', { name: /check in now/i });
-      expect(checkInButton).toBeInTheDocument();
-      expect(checkInButton).toHaveAttribute('href', '/check-in');
+
+      const demoButton = getByRole('link', { name: /try the live demo/i });
+      expect(demoButton).toBeInTheDocument();
+      expect(demoButton).toHaveAttribute('href', '/customer');
     });
 
-    it('renders Book Appointment button with correct link', () => {
-      const { getByRole } = renderWithRouter(<CTASection />);
-      
-      const bookButton = getByRole('link', { name: /book appointment/i });
-      expect(bookButton).toBeInTheDocument();
-      expect(bookButton).toHaveAttribute('href', '/customer');
+    it('does not offer customer tasks (check in / status) in the buyer CTA', () => {
+      const { queryByRole } = renderWithRouter(<CTASection />);
+
+      expect(queryByRole('link', { name: /check in now/i })).not.toBeInTheDocument();
+      expect(queryByRole('link', { name: /check status/i })).not.toBeInTheDocument();
     });
   });
 
