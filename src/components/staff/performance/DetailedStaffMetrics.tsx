@@ -24,9 +24,11 @@ const DetailedStaffMetrics: React.FC<DetailedStaffMetricsProps> = ({ staffMetric
         case 'service_time':
           return a.average_service_time - b.average_service_time;
         case 'efficiency':
+        {
           const efficiencyA = a.appointments_served / (a.average_service_time || 1);
           const efficiencyB = b.appointments_served / (b.average_service_time || 1);
           return efficiencyB - efficiencyA;
+        }
         default:
           return 0;
       }

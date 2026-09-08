@@ -52,7 +52,7 @@ export const useAppointmentTableLogic = () => {
     };
 
     appointments.forEach(apt => {
-      if (counts.hasOwnProperty(apt.status)) {
+      if (Object.prototype.hasOwnProperty.call(counts, apt.status)) {
         counts[apt.status as keyof typeof counts]++;
       }
     });

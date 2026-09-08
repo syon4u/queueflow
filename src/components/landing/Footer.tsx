@@ -20,9 +20,9 @@ const Footer: React.FC<FooterProps> = ({ onShowStaffAccess }) => {
           </div>
           
           <div className="flex flex-wrap gap-6 text-sm">
-            <a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-blue-400 transition-colors">Contact Support</a>
+            <button type="button" className="hover:text-blue-400 transition-colors">Privacy Policy</button>
+            <button type="button" className="hover:text-blue-400 transition-colors">Terms of Service</button>
+            <button type="button" className="hover:text-blue-400 transition-colors">Contact Support</button>
             <Button variant="ghost" size="sm" onClick={onShowStaffAccess} className="text-white hover:text-blue-400">
               Employee Login
             </Button>

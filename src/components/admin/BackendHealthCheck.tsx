@@ -126,7 +126,7 @@ const BackendHealthCheck: React.FC = () => {
       const { data: services } = await supabase.from('services').select('id, location_id');
       const { data: profiles } = await supabase.from('profiles').select('id');
       
-      let issues = [];
+      const issues = [];
       if (locations?.length === 0) issues.push('No locations found');
       if (services?.length === 0) issues.push('No services found');
       if (profiles?.length === 0) issues.push('No user profiles found');

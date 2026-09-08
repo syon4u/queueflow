@@ -134,7 +134,15 @@ export const AppointmentsList: React.FC<AppointmentsListProps> = ({
                 className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                   index === appointments.length - 1 ? 'border-b-0' : ''
                 } ${selectedAppointment === appointment.id ? 'bg-blue-50 border-blue-200' : ''}`}
+                role="button"
+                tabIndex={0}
                 onClick={() => onAppointmentSelect(appointment.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onAppointmentSelect(appointment.id);
+                  }
+                }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">

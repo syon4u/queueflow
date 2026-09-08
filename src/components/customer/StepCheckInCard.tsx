@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,18 @@ const StepCheckInCard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [appointmentInfo, setAppointmentInfo] = useState<AppointmentInfo | null>(null);
   const [queueInfo, setQueueInfo] = useState<QueueInfo | null>(null);
+  const codeInputRef = useRef<HTMLInputElement>(null);
+  const lastNameInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus the first field of the active lookup method when it appears (replaces autoFocus).
+  useEffect(() => {
+    if (step !== 'lookup') return;
+    if (lookupMethod === 'confirmation') {
+      codeInputRef.current?.focus();
+    } else {
+      lastNameInputRef.current?.focus();
+    }
+  }, [step, lookupMethod]);
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
@@ -196,13 +208,13 @@ const StepCheckInCard = () => {
                   <Label htmlFor="confirmation-code">{t('public.checkIn.codeLabel')}</Label>
                   <Input
                     id="confirmation-code"
+                    ref={codeInputRef}
                     placeholder={t('public.checkIn.codePlaceholder')}
                     className="text-center font-mono"
                     value={confirmationCode}
                     onChange={(e) => setConfirmationCode(e.target.value)}
                     onKeyPress={handleKeyPress}
                     disabled={isLoading}
-                    autoFocus
                   />
                   <p className="text-xs text-gray-500">
                     {t('public.checkIn.codeHint')}
@@ -218,12 +230,12 @@ const StepCheckInCard = () => {
                       <Label htmlFor="last-name">{t('public.checkIn.lastName')}</Label>
                       <Input
                         id="last-name"
+                        ref={lastNameInputRef}
                         placeholder={t('public.checkIn.lastNamePlaceholder')}
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         onKeyPress={handleKeyPress}
                         disabled={isLoading}
-                        autoFocus
                       />
                     </div>
                     <div className="space-y-2">

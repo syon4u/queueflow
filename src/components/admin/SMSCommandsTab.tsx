@@ -90,8 +90,9 @@ export const SMSCommandsTab: React.FC = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Phone Number</label>
+              <label htmlFor="sms-test-phone" className="block text-sm font-medium mb-2">Phone Number</label>
               <Input
+                id="sms-test-phone"
                 value={testPhone}
                 onChange={(e) => setTestPhone(e.target.value)}
                 placeholder="Enter phone number..."
@@ -99,9 +100,10 @@ export const SMSCommandsTab: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">SMS Message</label>
+              <label htmlFor="sms-test-message" className="block text-sm font-medium mb-2">SMS Message</label>
               <div className="flex gap-2">
                 <Input
+                  id="sms-test-message"
                   value={testMessage}
                   onChange={(e) => setTestMessage(e.target.value)}
                   placeholder="Enter command (R, LATE 10, CANCEL)..."

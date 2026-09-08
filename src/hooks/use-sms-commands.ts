@@ -58,12 +58,14 @@ export const useSMSCommands = () => {
       // Process commands
       switch (command) {
         case 'R': // Status request
+        {
           const scheduledTime = new Date(appointment.scheduled_time);
           return {
             command,
             response: `Your ${appointment.services.name} appointment at ${appointment.locations.name} is scheduled for ${scheduledTime.toLocaleDateString()} at ${scheduledTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Status: ${appointment.status}`,
             appointment
           };
+        }
 
         case 'LATE': // Report delay
         case 'LATE 5':
@@ -71,6 +73,7 @@ export const useSMSCommands = () => {
         case 'LATE 15':
         case 'LATE 20':
         case 'LATE 30':
+        {
           const delayMatch = command.match(/LATE\s+(\d+)/);
           const delayMinutes = delayMatch ? parseInt(delayMatch[1]) : 5; // Default 5 minutes
           
@@ -87,6 +90,7 @@ export const useSMSCommands = () => {
             response: `Thank you for letting us know. We've noted you'll be ${delayMinutes} minutes late. Please arrive as soon as possible.`,
             appointment
           };
+        }
 
         case 'CANCEL': // Cancel appointment
           await supabase

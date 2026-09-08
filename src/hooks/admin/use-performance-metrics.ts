@@ -252,8 +252,10 @@ function getDateRange(timeRange: string) {
       break;
     default:
       // Try to parse as number of days
+    {
       const days = parseInt(timeRange) || 7;
       startDate = subDays(today, days).toISOString();
+    }
   }
 
   return { startDate, endDate };

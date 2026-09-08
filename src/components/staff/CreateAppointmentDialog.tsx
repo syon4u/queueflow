@@ -170,22 +170,33 @@ export const CreateAppointmentDialog: React.FC<CreateAppointmentDialogProps> = (
             />
             {customers && customers.length > 0 && (
               <div className="border rounded-md max-h-32 overflow-y-auto">
-                {customers.map((customer) => (
-                  <div
-                    key={customer.id}
-                    className={cn(
-                      "p-2 cursor-pointer hover:bg-muted",
-                      formData.customerId === customer.id && "bg-muted"
-                    )}
-                    onClick={() => {
-                      setFormData(prev => ({ ...prev, customerId: customer.id }));
-                      setCustomerSearch(`${customer.first_name} ${customer.last_name}`);
-                    }}
-                  >
-                    <div className="font-medium">{customer.first_name} {customer.last_name}</div>
-                    <div className="text-sm text-muted-foreground">{customer.email}</div>
-                  </div>
-                ))}
+                {customers.map((customer) => {
+                  const selectCustomer = () => {
+                    setFormData(prev => ({ ...prev, customerId: customer.id }));
+                    setCustomerSearch(`${customer.first_name} ${customer.last_name}`);
+                  };
+                  return (
+                    <div
+                      key={customer.id}
+                      role="button"
+                      tabIndex={0}
+                      className={cn(
+                        "p-2 cursor-pointer hover:bg-muted",
+                        formData.customerId === customer.id && "bg-muted"
+                      )}
+                      onClick={selectCustomer}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          selectCustomer();
+                        }
+                      }}
+                    >
+                      <div className="font-medium">{customer.first_name} {customer.last_name}</div>
+                      <div className="text-sm text-muted-foreground">{customer.email}</div>
+                    </div>
+                  );
+                })}
               </div>
             )}
             {selectedCustomer && (
