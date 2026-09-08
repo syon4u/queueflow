@@ -2,7 +2,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ShieldCheckmarkAnimation } from '@/components/ui/broward-icons';
+import { ShieldCheckmarkAnimation } from '@/components/ui/brand-icons';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,13 @@ import {
 import { Menu, User, Settings, BarChart3, Cpu } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-interface BrowardHeaderProps {
+interface SiteHeaderProps {
   title?: string;
   subtitle?: string;
 }
 
 // `title` / `subtitle` are accepted for PageLayout compatibility; the header only renders the brand mark.
-const BrowardHeader: React.FC<BrowardHeaderProps> = () => {
+const SiteHeader: React.FC<SiteHeaderProps> = () => {
   const { user, role } = useAuth();
   const { t } = useTranslation();
 
@@ -168,4 +168,4 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = () => {
   );
 };
 
-export default BrowardHeader;
+export default SiteHeader;

@@ -31,7 +31,7 @@ const AppointmentPageHeader: React.FC<AppointmentPageHeaderProps> = ({ onBackNav
       <Button
         variant="ghost"
         onClick={onBackNavigation}
-        className="flex items-center gap-2 text-broward-navy hover:text-broward-teal"
+        className="flex items-center gap-2 text-brand-navy hover:text-brand-teal"
       >
         <ArrowLeft size={20} />
         Back to Dashboard

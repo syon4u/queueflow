@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { CheckIcon, DocumentIcon } from '@/components/ui/broward-icons';
+import { CheckIcon, DocumentIcon } from '@/components/ui/brand-icons';
 import { Location, Service } from '@/hooks/useAppointmentForm';
 
 interface ConfirmationStepProps {
@@ -42,11 +42,11 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
   return (
     <div className="space-y-6">
       {/* Appointment Summary */}
-      <Card className="border-broward-teal/30 bg-broward-sand/10">
+      <Card className="border-brand-teal/30 bg-brand-sand/10">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CheckIcon size={20} className="text-broward-teal" />
-            <CardTitle className="text-broward-navy">Appointment Summary</CardTitle>
+            <CheckIcon size={20} className="text-brand-teal" />
+            <CardTitle className="text-brand-navy">Appointment Summary</CardTitle>
           </div>
           <CardDescription>
             Please review your appointment details below
@@ -55,29 +55,29 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="font-medium text-broward-navy">Location</Label>
-              <p className="text-broward-navy/80 bg-white p-3 rounded-md border">
+              <Label className="font-medium text-brand-navy">Location</Label>
+              <p className="text-brand-navy/80 bg-white p-3 rounded-md border">
                 {selectedLocation?.name || 'Not selected'}
               </p>
             </div>
             
             <div className="space-y-2">
-              <Label className="font-medium text-broward-navy">Service</Label>
-              <p className="text-broward-navy/80 bg-white p-3 rounded-md border">
+              <Label className="font-medium text-brand-navy">Service</Label>
+              <p className="text-brand-navy/80 bg-white p-3 rounded-md border">
                 {selectedService?.name || 'Not selected'}
               </p>
             </div>
             
             <div className="space-y-2">
-              <Label className="font-medium text-broward-navy">Date</Label>
-              <p className="text-broward-navy/80 bg-white p-3 rounded-md border">
+              <Label className="font-medium text-brand-navy">Date</Label>
+              <p className="text-brand-navy/80 bg-white p-3 rounded-md border">
                 {selectedDate ? format(selectedDate, 'EEEE, MMMM do, yyyy') : 'Not selected'}
               </p>
             </div>
             
             <div className="space-y-2">
-              <Label className="font-medium text-broward-navy">Time</Label>
-              <p className="text-broward-navy/80 bg-white p-3 rounded-md border">
+              <Label className="font-medium text-brand-navy">Time</Label>
+              <p className="text-brand-navy/80 bg-white p-3 rounded-md border">
                 {selectedTime || 'Not selected'}
               </p>
             </div>
@@ -85,8 +85,8 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
           
           {selectedService?.duration && (
             <div className="space-y-2">
-              <Label className="font-medium text-broward-navy">Estimated Duration</Label>
-              <p className="text-broward-navy/80 bg-white p-3 rounded-md border">
+              <Label className="font-medium text-brand-navy">Estimated Duration</Label>
+              <p className="text-brand-navy/80 bg-white p-3 rounded-md border">
                 {selectedService.duration} minutes
               </p>
             </div>
@@ -95,11 +95,11 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
       </Card>
 
       {/* Additional Information */}
-      <Card className="border-broward-teal/30">
+      <Card className="border-brand-teal/30">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <DocumentIcon size={20} className="text-broward-teal" />
-            <CardTitle className="text-broward-navy">Additional Information</CardTitle>
+            <DocumentIcon size={20} className="text-brand-teal" />
+            <CardTitle className="text-brand-navy">Additional Information</CardTitle>
           </div>
           <CardDescription>
             Please provide any additional details about your visit
@@ -107,7 +107,7 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="reason" className="font-medium text-broward-navy">
+            <Label htmlFor="reason" className="font-medium text-brand-navy">
               {t('appointments.reasonForVisit')}
             </Label>
             <Input
@@ -115,12 +115,12 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
               placeholder={t('appointments.reasonPlaceholder')}
               value={reasonForVisit}
               onChange={(e) => onReasonForVisitChange(e.target.value)}
-              className="border-broward-teal/30 focus:border-broward-teal"
+              className="border-brand-teal/30 focus:border-brand-teal"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="notes" className="font-medium text-broward-navy">
+            <Label htmlFor="notes" className="font-medium text-brand-navy">
               {t('appointments.notes')}
             </Label>
             <Textarea
@@ -129,20 +129,20 @@ const ConfirmationStep: React.FC<ConfirmationStepProps> = ({
               value={notes}
               onChange={(e) => onNotesChange(e.target.value)}
               rows={4}
-              className="border-broward-teal/30 focus:border-broward-teal"
+              className="border-brand-teal/30 focus:border-brand-teal"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Important Notice */}
-      <Card className="border-broward-coral/30 bg-broward-coral/5">
+      <Card className="border-brand-coral/30 bg-brand-coral/5">
         <CardContent className="p-6">
           <div className="flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-broward-coral mt-2 flex-shrink-0"></div>
+            <div className="w-2 h-2 rounded-full bg-brand-coral mt-2 flex-shrink-0"></div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-broward-navy">Important Notice</h4>
-              <ul className="text-sm text-broward-navy/80 space-y-1">
+              <h4 className="font-semibold text-brand-navy">Important Notice</h4>
+              <ul className="text-sm text-brand-navy/80 space-y-1">
                 <li>• Please arrive 15 minutes before your scheduled appointment</li>
                 <li>• Bring a valid photo ID and any required documentation</li>
                 <li>• You will receive a confirmation email with your appointment details</li>

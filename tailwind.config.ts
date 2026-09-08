@@ -63,7 +63,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Broward County Colors
+				// Brand Colors
 				'bc-blue': '#005A9C',
 				'bc-navy': '#003366',
 				'bc-teal': '#00859B',

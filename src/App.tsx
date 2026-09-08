@@ -35,8 +35,8 @@ const PerformanceReportPage = React.lazy(() => import('@/pages/PerformanceReport
 const BackendHealthPage = React.lazy(() => import('@/pages/BackendHealthPage'));
 
 // Design system pages
-const BrowardDesignSystem = React.lazy(() => import('@/pages/BrowardDesignSystem'));
-const BrowardIndex = React.lazy(() => import('@/pages/BrowardIndex'));
+const DesignSystemPage = React.lazy(() => import('@/pages/DesignSystemPage'));
+const DesignSystemIndexPage = React.lazy(() => import('@/pages/DesignSystemIndexPage'));
 
 // Create a query client instance
 const queryClient = new QueryClient();
@@ -71,8 +71,8 @@ function App() {
                 <Route path="/virtual-queue" element={<VirtualQueuePage />} />
                 
                 {/* Design system routes */}
-                <Route path="/broward-design-system" element={<AdminRoute><BrowardDesignSystem /></AdminRoute>} />
-                <Route path="/broward-index" element={<AdminRoute><BrowardIndex /></AdminRoute>} />
+                <Route path="/design-system" element={<AdminRoute><DesignSystemPage /></AdminRoute>} />
+                <Route path="/design-system/index" element={<AdminRoute><DesignSystemIndexPage /></AdminRoute>} />
                 
                 {/* Protected routes - require authentication */}
                 <Route path="/profile" element={

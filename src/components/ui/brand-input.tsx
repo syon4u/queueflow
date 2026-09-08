@@ -1,13 +1,13 @@
 import React from 'react';
 
-interface BrowardInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface BrandInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
   floating?: boolean;
   className?: string;
 }
 
-const BrowardInput: React.FC<BrowardInputProps> = ({
+const BrandInput: React.FC<BrandInputProps> = ({
   label,
   error,
   floating = true,
@@ -47,4 +47,4 @@ const BrowardInput: React.FC<BrowardInputProps> = ({
   );
 };
 
-export default BrowardInput;
+export default BrandInput;

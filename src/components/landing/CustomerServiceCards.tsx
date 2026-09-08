@@ -112,7 +112,7 @@ const CustomerServiceCards = () => {
                 Digital Signage →
               </Button>
             </Link>
-            <Link to="/broward-design-system">
+            <Link to="/design-system">
               <Button variant="ghost" className="text-blue-600 hover:text-blue-800">
                 Design System →
               </Button>
