@@ -16,34 +16,35 @@ interface QueueStatsCardsProps {
 export const QueueStatsCards: React.FC<QueueStatsCardsProps> = ({ variant = 'staff' }) => {
   const { stats } = useQueue();
 
+  // Metric definitions live in src/lib/dateRanges.ts (shared with /admin and /power-user).
   const statsConfig = [
     {
       title: variant === 'admin' ? 'Total Customers' : 'Queue Length',
       value: variant === 'admin' ? stats.totalCustomers : stats.waitingCustomers,
       icon: Users,
       color: 'blue',
-      description: variant === 'admin' ? 'All-time entries' : 'Currently waiting'
+      description: variant === 'admin' ? 'In queue or resolved today' : 'Checked in, last 24 h'
     },
     {
       title: 'Currently Waiting',
       value: stats.waitingCustomers,
       icon: Clock,
       color: 'orange',
-      description: 'In queue now'
+      description: 'Checked in, last 24 h'
     },
     {
       title: 'Served Today',
       value: stats.servedCustomers,
       icon: CheckCircle,
       color: 'green',
-      description: 'Successfully completed'
+      description: 'Completed today (local day)'
     },
     {
       title: 'No-Shows',
       value: stats.noShowCustomers,
       icon: XCircle,
       color: 'red',
-      description: 'Missed appointments'
+      description: 'Marked no-show today'
     }
   ];
 

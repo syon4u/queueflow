@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Users, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { SummaryMetricsProps } from './types';
 
-const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMetrics, staffMetrics }) => {
+const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMetrics }) => {
   // Calculate total appointments
   const totalAppointments = Array.isArray(dailyMetrics) ? 
     dailyMetrics.reduce((sum, day) => sum + day.appointments, 0) : 0;
@@ -13,13 +13,15 @@ const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMe
   const averageWaitTime = Array.isArray(serviceMetrics) && serviceMetrics.length > 0 ?
     (serviceMetrics.reduce((sum, service) => sum + service.average_wait_time, 0) / serviceMetrics.length).toFixed(1) : "0";
   
-  // Calculate completed appointments
-  const completedAppointments = Array.isArray(staffMetrics) ? 
-    staffMetrics.reduce((sum, staff) => sum + staff.appointments_served, 0) : 0;
-  
-  // Calculate no-shows
-  const noShows = Array.isArray(staffMetrics) ? 
-    staffMetrics.reduce((sum, staff) => sum + staff.no_shows, 0) : 0;
+  // Completed / no-shows come from the direct appointments query (useDailyMetrics)
+  // using the shared definitions in src/lib/dateRanges.ts. The staff-metrics edge
+  // function only counts rows with `staff_id`, which the queue dashboard never sets
+  // (it uses assigned_staff_id), so it reported "Completed 0" after a real serve.
+  const completedAppointments = Array.isArray(dailyMetrics) ?
+    dailyMetrics.reduce((sum, day) => sum + (day.completed ?? 0), 0) : 0;
+
+  const noShows = Array.isArray(dailyMetrics) ?
+    dailyMetrics.reduce((sum, day) => sum + (day.no_shows ?? 0), 0) : 0;
   
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -32,6 +34,7 @@ const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMe
           <div className="text-3xl font-bold">
             {totalAppointments}
           </div>
+          <p className="text-xs text-muted-foreground mt-1">Scheduled in period, any status</p>
         </CardContent>
       </Card>
       
@@ -56,6 +59,7 @@ const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMe
           <div className="text-3xl font-bold">
             {completedAppointments}
           </div>
+          <p className="text-xs text-muted-foreground mt-1">Completed in period (by end time)</p>
         </CardContent>
       </Card>
       
@@ -68,6 +72,7 @@ const SummaryMetrics: React.FC<SummaryMetricsProps> = ({ dailyMetrics, serviceMe
           <div className="text-3xl font-bold">
             {noShows}
           </div>
+          <p className="text-xs text-muted-foreground mt-1">Marked no-show in period</p>
         </CardContent>
       </Card>
     </div>

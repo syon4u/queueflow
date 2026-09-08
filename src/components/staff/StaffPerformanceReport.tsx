@@ -43,8 +43,11 @@ const StaffPerformanceReport: React.FC = () => {
     const averageWaitTime = Array.isArray(serviceMetrics) && serviceMetrics.length > 0 ?
       (serviceMetrics.reduce((sum, service) => sum + service.average_wait_time, 0) / serviceMetrics.length) : stats.averageWaitTime;
     
-    const completedAppointments = Array.isArray(staffMetrics) && staffMetrics.length > 0 ? 
-      staffMetrics.reduce((sum, staff) => sum + staff.appointments_served, 0) : stats.servedCustomers;
+    // Completed = end_time within the period (src/lib/dateRanges.ts), from the
+    // direct appointments query rather than the staff-metrics edge function
+    // (which only sees rows with staff_id set).
+    const completedAppointments = Array.isArray(dailyMetrics) && dailyMetrics.length > 0 ? 
+      dailyMetrics.reduce((sum, day) => sum + day.completed, 0) : stats.servedCustomers;
     
     // Calculate trends based on comparison with previous period (simplified)
     const previousPeriodTotal = Math.round(totalAppointments * 0.9); // Simulate 10% growth
@@ -83,7 +86,7 @@ const StaffPerformanceReport: React.FC = () => {
         icon: <TrendingUp className="h-6 w-6" />
       }
     ];
-  }, [dailyMetrics, serviceMetrics, staffMetrics, stats]);
+  }, [dailyMetrics, serviceMetrics, stats]);
 
   // Download report as CSV including real Supabase data
   const downloadReportCSV = () => {

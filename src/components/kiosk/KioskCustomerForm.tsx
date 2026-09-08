@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +22,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
   onSubmit,
   onBack,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<CustomerData>({
     firstName: '',
     lastName: '',
@@ -34,21 +36,21 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
     const newErrors: Partial<CustomerData> = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = t('public.kiosk.customer.validation.firstNameRequired');
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+      newErrors.lastName = t('public.kiosk.customer.validation.lastNameRequired');
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = t('public.kiosk.customer.validation.phoneRequired');
     } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = t('public.kiosk.customer.validation.phoneInvalid');
     }
 
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('public.kiosk.customer.validation.emailInvalid');
     }
 
     setErrors(newErrors);
@@ -78,14 +80,14 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
           className="flex items-center gap-3 px-6 py-3 text-lg border-2 border-gray-300 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 rounded-xl"
         >
           <ArrowLeft className="h-5 w-5" />
-          Back
+          {t('public.kiosk.customer.back')}
         </Button>
         <div>
           <h3 className="text-4xl font-bold text-gray-900 mb-2">
-            Enter Your Information
+            {t('public.kiosk.customer.title')}
           </h3>
           <p className="text-xl text-gray-600">
-            We need a few details to generate your service ticket
+            {t('public.kiosk.customer.subtitle')}
           </p>
         </div>
       </div>
@@ -95,7 +97,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
           <UserCheck className="h-6 w-6 text-blue-600" />
         </div>
         <p className="text-xl text-blue-800 font-medium">
-          Please provide your contact information to generate your service ticket.
+          {t('public.kiosk.customer.notice')}
         </p>
       </div>
 
@@ -104,7 +106,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
           <div className="space-y-3">
             <Label htmlFor="firstName" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
               <User className="h-5 w-5" />
-              First Name *
+              {t('public.kiosk.customer.firstName')}
             </Label>
             <Input
               id="firstName"
@@ -116,7 +118,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
                   ? 'border-red-500 bg-red-50' 
                   : 'border-gray-300 hover:border-blue-300 focus:border-blue-500'
               }`}
-              placeholder="Enter your first name"
+              placeholder={t('public.kiosk.customer.firstNamePlaceholder')}
             />
             {errors.firstName && (
               <p className="text-red-500 text-lg font-medium">{errors.firstName}</p>
@@ -126,7 +128,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
           <div className="space-y-3">
             <Label htmlFor="lastName" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
               <User className="h-5 w-5" />
-              Last Name *
+              {t('public.kiosk.customer.lastName')}
             </Label>
             <Input
               id="lastName"
@@ -138,7 +140,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
                   ? 'border-red-500 bg-red-50' 
                   : 'border-gray-300 hover:border-blue-300 focus:border-blue-500'
               }`}
-              placeholder="Enter your last name"
+              placeholder={t('public.kiosk.customer.lastNamePlaceholder')}
             />
             {errors.lastName && (
               <p className="text-red-500 text-lg font-medium">{errors.lastName}</p>
@@ -149,7 +151,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
         <div className="space-y-3">
           <Label htmlFor="phone" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
             <Phone className="h-5 w-5" />
-            Phone Number *
+            {t('public.kiosk.customer.phone')}
           </Label>
           <Input
             id="phone"
@@ -171,7 +173,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
         <div className="space-y-3">
           <Label htmlFor="email" className="text-xl font-semibold text-gray-700 flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Email Address (Optional)
+            {t('public.kiosk.customer.email')}
           </Label>
           <Input
             id="email"
@@ -195,7 +197,7 @@ export const KioskCustomerForm: React.FC<KioskCustomerFormProps> = ({
             type="submit" 
             className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-xl"
           >
-            Generate Ticket
+            {t('public.kiosk.customer.generateTicket')}
           </Button>
         </div>
       </form>

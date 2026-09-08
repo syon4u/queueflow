@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, Printer, QrCode, Home, MapPin, Clock, User } from 'lucide-react';
@@ -27,6 +28,7 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
   serviceId,
   onStartOver,
 }) => {
+  const { t, i18n } = useTranslation();
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [countdown, setCountdown] = useState(30);
 
@@ -98,10 +100,10 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
           </div>
           <div>
             <h3 className="text-3xl font-bold text-green-800 mb-2">
-              Ticket Generated Successfully!
+              {t('public.kiosk.ticket.successTitle')}
             </h3>
             <p className="text-xl text-green-700">
-              You're now in the queue. Please wait for your number to be called.
+              {t('public.kiosk.ticket.successDescription')}
             </p>
           </div>
         </div>
@@ -113,13 +115,13 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 text-center">
             <h2 className="text-4xl font-bold mb-4">
-              QueueFlow Service Ticket
+              {t('public.kiosk.ticket.header')}
             </h2>
             <div className="text-7xl font-mono font-bold mb-4">
               #{ticketId}
             </div>
             <p className="text-xl opacity-90">
-              Keep this ticket until you are served
+              {t('public.kiosk.ticket.keep')}
             </p>
           </div>
 
@@ -132,7 +134,7 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
                     <User className="h-6 w-6 text-white" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-800">Customer</h4>
+                  <h4 className="text-xl font-bold text-gray-800">{t('public.kiosk.ticket.customer')}</h4>
                 </div>
                 <p className="text-2xl font-bold text-gray-900 mb-2">
                   {customerData.firstName} {customerData.lastName}
@@ -146,7 +148,7 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl flex items-center justify-center">
                     <MapPin className="h-6 w-6 text-white" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-800">Location</h4>
+                  <h4 className="text-xl font-bold text-gray-800">{t('public.kiosk.ticket.location')}</h4>
                 </div>
                 <p className="text-xl font-bold text-gray-900">
                   {appointmentDetails?.locations?.name}
@@ -159,24 +161,24 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center">
                     <Clock className="h-6 w-6 text-white" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-800">Service</h4>
+                  <h4 className="text-xl font-bold text-gray-800">{t('public.kiosk.ticket.service')}</h4>
                 </div>
                 <p className="text-xl font-bold text-gray-900 mb-2">
                   {appointmentDetails?.services?.name}
                 </p>
                 <p className="text-lg text-gray-700">
-                  Est. {appointmentDetails?.services?.duration} minutes
+                  {t('public.kiosk.ticket.estimatedMinutes', { minutes: appointmentDetails?.services?.duration ?? '' })}
                 </p>
               </div>
 
               {/* Queue Position Tile */}
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 border-2 border-orange-200">
-                <h4 className="text-xl font-bold text-gray-800 mb-4 text-center">Queue Position</h4>
+                <h4 className="text-xl font-bold text-gray-800 mb-4 text-center">{t('public.kiosk.ticket.queuePosition')}</h4>
                 <div className="text-center">
                   <div className="text-6xl font-bold text-orange-600 mb-2">
                     #{queuePosition || 1}
                   </div>
-                  <p className="text-lg text-gray-700">in line</p>
+                  <p className="text-lg text-gray-700">{t('public.kiosk.ticket.inLine')}</p>
                 </div>
               </div>
             </div>
@@ -185,26 +187,26 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
             {qrCodeUrl && (
               <div className="text-center mb-8">
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200 inline-block">
-                  <h4 className="text-xl font-bold text-gray-800 mb-4">QR Code</h4>
+                  <h4 className="text-xl font-bold text-gray-800 mb-4">{t('public.kiosk.ticket.qrCode')}</h4>
                   <img 
                     src={qrCodeUrl} 
-                    alt="Ticket QR Code" 
+                    alt={t('public.kiosk.ticket.qrAlt')} 
                     className="mx-auto border-2 border-gray-300 rounded-lg"
                   />
                   <p className="text-sm text-gray-600 mt-3">
-                    Scan to check status
+                    {t('public.kiosk.ticket.scanToCheck')}
                   </p>
                 </div>
               </div>
             )}
 
             <div className="text-center text-lg text-gray-600 mb-6 bg-gray-50 rounded-xl p-4">
-              <p>Check-in time: {new Date().toLocaleString()}</p>
+              <p>{t('public.kiosk.ticket.checkInTime', { time: new Date().toLocaleString(i18n.language) })}</p>
             </div>
 
             <div className="border-t-2 border-gray-200 pt-6 text-center">
               <p className="text-lg text-gray-700 mb-2 font-medium">
-                Please stay in the waiting area. You will be called when it's your turn.
+                {t('public.kiosk.ticket.stayNote')}
               </p>
             </div>
           </div>
@@ -219,7 +221,7 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
           className="flex items-center gap-3 px-8 py-4 text-xl border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50 rounded-2xl shadow-lg"
         >
           <Printer className="h-6 w-6" />
-          Print Ticket
+          {t('public.kiosk.ticket.print')}
         </Button>
         
         <Button 
@@ -227,7 +229,7 @@ export const KioskTicketGeneration: React.FC<KioskTicketGenerationProps> = ({
           className="flex items-center gap-3 px-8 py-4 text-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-2xl shadow-lg"
         >
           <Home className="h-6 w-6" />
-          New Ticket ({countdown}s)
+          {t('public.kiosk.ticket.newTicket', { seconds: countdown })}
         </Button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { cancelPublicAppointment, listPublicAppointments, PublicAppointment } from '@/lib/publicQueue';
 
@@ -56,6 +57,7 @@ export const useAppointmentLookup = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const lookupAppointment = async (params: LookupParams) => {
     setIsLoading(true);
@@ -72,8 +74,8 @@ export const useAppointmentLookup = () => {
       if (matches.length === 0) {
         throw new Error(
           params.confirmationNumber
-            ? 'Appointment not found with this confirmation number'
-            : 'No appointments found with this name and phone number'
+            ? t('public.lookup.errors.notFoundByCode')
+            : t('public.lookup.errors.notFoundByDetails')
         );
       }
 
@@ -81,7 +83,7 @@ export const useAppointmentLookup = () => {
       setAppointment(toDetails(matches[0]));
     } catch (err) {
       console.error('Error looking up appointment:', err);
-      setError(err instanceof Error ? err.message : 'Failed to find appointment');
+      setError(err instanceof Error ? err.message : t('public.lookup.errors.lookupFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -97,8 +99,8 @@ export const useAppointmentLookup = () => {
     } catch (err) {
       console.error('Error cancelling appointment:', err);
       toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to cancel appointment. Please try again.',
+        title: t('common.error'),
+        description: err instanceof Error ? err.message : t('public.lookup.errors.cancelFailed'),
         variant: 'destructive',
       });
       return false;

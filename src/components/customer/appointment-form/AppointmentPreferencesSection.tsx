@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar } from 'lucide-react';
@@ -11,15 +12,16 @@ interface AppointmentPreferencesSectionProps {
 }
 
 const AppointmentPreferencesSection = ({ formData, updateField }: AppointmentPreferencesSectionProps) => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium flex items-center gap-2">
         <Calendar className="h-5 w-5" />
-        Appointment Preferences
+        {t('public.booking.preferences.title')}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="preferredDate">Preferred Date *</Label>
+          <Label htmlFor="preferredDate">{t('public.booking.preferences.preferredDate')}</Label>
           <Input
             id="preferredDate"
             type="date"
@@ -30,7 +32,7 @@ const AppointmentPreferencesSection = ({ formData, updateField }: AppointmentPre
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="preferredTime">Preferred Time *</Label>
+          <Label htmlFor="preferredTime">{t('public.booking.preferences.preferredTime')}</Label>
           <Input
             id="preferredTime"
             type="time"

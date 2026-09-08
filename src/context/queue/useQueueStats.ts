@@ -2,6 +2,9 @@
 import React from 'react';
 import { Customer, QueueStats } from './types';
 
+// `customers` is already scoped by useQueueData to the shared "today" definitions
+// (src/lib/dateRanges.ts): waiting = checked in within 24 h, served = completed
+// today, no_show = marked today. The counts below just tally those buckets.
 export const useQueueStats = (customers: Customer[]): QueueStats => {
   return React.useMemo(() => {
     const totalCustomers = customers.length;

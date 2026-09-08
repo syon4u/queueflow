@@ -1,4 +1,3 @@
-
 {
   "common": {
     "loading": "Cargando...",
@@ -182,5 +181,666 @@
   "unauthorized": {
     "title": "Acceso No Autorizado",
     "description": "No tienes permisos para ver esta página"
+  },
+  "public": {
+    "layout": {
+      "menu": "Menú",
+      "staffDashboard": "Panel del Personal",
+      "staffDashboardDescription": "Gestionar citas y la fila",
+      "adminPortal": "Portal de Administración",
+      "adminPortalDescription": "Administración del sistema",
+      "performanceReports": "Informes de Rendimiento",
+      "performanceReportsDescription": "Análisis e información",
+      "footer": {
+        "tagline": "Sistema Inteligente de Gestión de Filas",
+        "description": "Agilizamos la atención al cliente con una gestión inteligente de filas",
+        "quickLinks": "Enlaces Rápidos",
+        "home": "Inicio",
+        "services": "Servicios",
+        "appointments": "Citas",
+        "contact": "Contáctenos",
+        "contactInfo": "Información de Contacto",
+        "email": "Correo electrónico:",
+        "supportHours": "Horario de soporte: lun–vie, 9am–5pm ET",
+        "rights": "© {{year}} Queue Flow. Todos los derechos reservados.",
+        "motto": "Revolucionando la gestión de la atención al cliente"
+      }
+    },
+    "nav": {
+      "findAppointment": "Buscar Cita",
+      "imHere": "Ya Llegué",
+      "queueStatus": "Estado de la Fila",
+      "pricing": "Precios",
+      "profile": "Perfil",
+      "newAppointment": "Nueva Cita",
+      "adminDashboard": "Panel de Administración",
+      "systemHealth": "Estado del Sistema",
+      "powerUserDashboard": "Panel de Usuario Avanzado",
+      "staffDashboard": "Panel del Personal",
+      "performanceReport": "Informe de Rendimiento",
+      "signOut": "Cerrar Sesión",
+      "signIn": "Iniciar Sesión",
+      "employeeLogin": "Acceso para Empleados",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú"
+    },
+    "hero": {
+      "titleLine1": "Gestión Inteligente de Filas",
+      "titleLine2": "Para Empresas Modernas",
+      "subtitle": "Elimina las salas de espera, reduce la frustración de tus clientes y aumenta la eficiencia con nuestro sistema de gestión de filas impulsado por IA.",
+      "pillRealtime": "Actualizaciones en Tiempo Real",
+      "pillScheduling": "Programación Inteligente",
+      "pillNoLines": "Sin Más Filas",
+      "bookAppointment": "Reservar Cita",
+      "checkStatus": "Ver Estado",
+      "learnMore": "Más Información",
+      "statLive": "En vivo",
+      "statLiveDescription": "Posición en la fila y tiempo de espera estimado",
+      "statLanguages": "4",
+      "statLanguagesDescription": "Idiomas para los clientes",
+      "statPwa": "PWA",
+      "statPwaDescription": "Instalable, funciona en cualquier dispositivo",
+      "videoUnsupported": "Tu navegador no admite la etiqueta de video."
+    },
+    "serviceCards": {
+      "title": "¿Cómo Podemos Ayudarte Hoy?",
+      "subtitle": "Elige la opción que mejor se adapte a ti y disfruta de un servicio sin complicaciones",
+      "schedule": {
+        "title": "Programar Cita",
+        "description": "Reserva tu visita con anticipación y evita la espera",
+        "button": "Programar Ahora"
+      },
+      "find": {
+        "title": "Buscar Mi Cita",
+        "description": "Consulta, modifica o cancela tu cita existente",
+        "button": "Buscar Cita"
+      },
+      "checkIn": {
+        "title": "Ya Llegué",
+        "description": "Regístrate para tu cita cuando llegues",
+        "button": "Registrarme"
+      },
+      "status": {
+        "title": "Estado de la Fila",
+        "description": "Consulta los tiempos de espera actuales y el estado de la fila",
+        "button": "Ver Estado"
+      },
+      "mobile": {
+        "title": "Fila Móvil",
+        "description": "Únete a la fila virtual desde tu dispositivo móvil",
+        "button": "Unirse a la Fila"
+      },
+      "kiosk": {
+        "title": "Quiosco Sin Cita",
+        "description": "Usa nuestro quiosco de autoservicio para visitas sin cita",
+        "button": "Usar Quiosco"
+      },
+      "virtualQueue": "Fila Virtual →",
+      "digitalSignage": "Pantalla Digital →"
+    },
+    "features": {
+      "title": "Funciones Potentes para Todos",
+      "subtitle": "Nuestro sistema de gestión de filas está diseñado para que tu experiencia sea más fluida, ya seas cliente o miembro del personal.",
+      "realtime": {
+        "title": "Actualizaciones en Tiempo Real",
+        "description": "Recibe actualizaciones en vivo sobre tiempos de espera y posición en la fila por SMS y notificaciones web."
+      },
+      "scheduling": {
+        "title": "Programación Inteligente",
+        "description": "Reserva citas con anticipación y elige tu horario preferido para evitar esperas."
+      },
+      "queue": {
+        "title": "Gestión de Filas",
+        "description": "Únete a filas virtuales desde cualquier lugar y sigue tu posición en tiempo real."
+      },
+      "notifications": {
+        "title": "Notificaciones Instantáneas",
+        "description": "Recibe alertas cuando casi sea tu turno, para que nunca pierdas tu cita."
+      },
+      "secure": {
+        "title": "Seguro y Privado",
+        "description": "Tu información personal está protegida con medidas de seguridad de nivel empresarial."
+      },
+      "analytics": {
+        "title": "Panel de Análisis",
+        "description": "El personal puede seguir métricas de rendimiento y optimizar la prestación del servicio."
+      },
+      "multiLocation": {
+        "title": "Múltiples Ubicaciones",
+        "description": "Gestiona citas en varias ubicaciones desde una sola plataforma."
+      },
+      "mobileFirst": {
+        "title": "Diseñado para Móvil",
+        "description": "Experiencia móvil optimizada para clientes y personal en cualquier dispositivo."
+      },
+      "highlightTitle": "Todo lo que Necesitas en una Sola Plataforma",
+      "highlightDescription": "Desde la programación de citas hasta la gestión de filas en tiempo real, te cubrimos con tecnología de vanguardia y un diseño intuitivo.",
+      "badgeCloud": "En la Nube",
+      "badgeRls": "Control de acceso a nivel de fila",
+      "badgeEncrypted": "Cifrado en tránsito y en reposo",
+      "badgePwa": "PWA instalable"
+    },
+    "cta": {
+      "title": "¿Listo para Avanzar Más Rápido?",
+      "subtitle": "Ofrece a tus clientes una fila en la que puedan esperar desde cualquier lugar",
+      "bookAppointment": "Reservar Cita",
+      "checkStatus": "Ver Estado",
+      "checkInNow": "Registrarme Ahora"
+    },
+    "pricing": {
+      "badge": "Precios simples y transparentes",
+      "title": "Planes que crecen con tu fila",
+      "subtitle": "Ya sea que administres una recepción o una red de ubicaciones, QueueFlow crece contigo. Sin costos de configuración, cancela cuando quieras.",
+      "mostPopular": "Más Popular",
+      "perMonth": "/ mes",
+      "contactUs": "contáctanos",
+      "custom": "A medida",
+      "talkToSales": "Hablar con ventas",
+      "contactSales": "Contactar a Ventas",
+      "footnote": "Facturación mensual. Precios por volumen y para el sector público disponibles a solicitud.",
+      "starter": {
+        "name": "Starter",
+        "tagline": "Una sola ubicación, filas para visitas sin cita y con cita",
+        "features": [
+          "Hasta 2 cuentas de personal",
+          "Fila virtual + registro con código QR",
+          "Página de estado para clientes y PWA",
+          "Encuesta de satisfacción después de cada visita",
+          "Soporte por correo electrónico"
+        ]
+      },
+      "growth": {
+        "name": "Growth",
+        "tagline": "Equipos con varias ubicaciones que necesitan análisis y control reales",
+        "features": [
+          "Hasta 15 cuentas de personal, múltiples ubicaciones",
+          "Todo lo incluido en Starter",
+          "Panel del personal con RBAC (empleado/gerente/administrador)",
+          "Análisis avanzado y programación asistida por IA (en desarrollo)",
+          "Pantalla digital y modo quiosco",
+          "Español, portugués y criollo haitiano en todas las páginas para clientes (herramientas del personal en inglés)",
+          "Soporte prioritario por correo y chat"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "Organizaciones grandes o reguladas con requisitos personalizados",
+        "features": [
+          "Cuentas de personal y ubicaciones ilimitadas",
+          "Todo lo incluido en Growth",
+          "SSO / SAML (en la hoja de ruta) y políticas RBAC personalizadas",
+          "Soporte e incorporación respaldados por SLA",
+          "Integraciones personalizadas (CRM/POS/pantallas)",
+          "Gerente de éxito dedicado"
+        ]
+      }
+    },
+    "statusLabels": {
+      "scheduled": "Programada",
+      "checked_in": "En la Fila",
+      "in_progress": "En Atención",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "no_show": "No se Presentó",
+      "unknown": "Desconocido"
+    },
+    "booking": {
+      "pageTitle": "Reservar una Cita",
+      "pageSubtitle": "Elige el servicio, la ubicación y el horario que más te convengan",
+      "formTitle": "Solicitar una Cita",
+      "formDescription": "Completa este formulario y te contactaremos para programar tu cita",
+      "loadingForm": "Cargando el formulario de cita...",
+      "loadingLocations": "Cargando ubicaciones...",
+      "loadFailed": "No se pudo cargar el formulario de cita",
+      "loadLocationsError": "Error al cargar las ubicaciones: {{error}}",
+      "retry": "Reintentar",
+      "refresh": "Actualizar",
+      "noLocations": "No hay ubicaciones disponibles",
+      "noLocationsMessage": "Actualmente no hay ubicaciones disponibles para programar citas. Vuelve a intentarlo más tarde o contacta con soporte.",
+      "submit": "Enviar Solicitud de Cita",
+      "submitting": "Enviando...",
+      "requiredNote": "* Campos obligatorios. Te contactaremos en 1 día hábil para confirmar tu cita.",
+      "toast": {
+        "missingInfo": "Falta Información",
+        "booked": "Cita reservada",
+        "bookedDescription": "Guarda tu código de confirmación para registrarte cuando llegues.",
+        "submitError": "Hubo un problema al enviar tu solicitud. Inténtalo de nuevo.",
+        "bookingFailed": "No se pudo reservar",
+        "createFailed": "No se pudo crear la cita. Inténtalo de nuevo."
+      },
+      "validation": {
+        "firstNameRequired": "El nombre es obligatorio",
+        "lastNameRequired": "El apellido es obligatorio",
+        "phoneRequired": "El número de teléfono es obligatorio",
+        "locationRequired": "La ubicación es obligatoria",
+        "serviceRequired": "El servicio es obligatorio",
+        "dateRequired": "La fecha preferida es obligatoria",
+        "timeRequired": "La hora preferida es obligatoria"
+      },
+      "personal": {
+        "title": "Información Personal",
+        "firstName": "Nombre *",
+        "firstNamePlaceholder": "Escribe tu nombre",
+        "lastName": "Apellido *",
+        "lastNamePlaceholder": "Escribe tu apellido",
+        "phone": "Número de Teléfono *",
+        "email": "Correo Electrónico"
+      },
+      "serviceLocation": {
+        "title": "Servicio y Ubicación",
+        "service": "Servicio *",
+        "servicesError": "Error al cargar los servicios: {{error}}",
+        "loadingServices": "Cargando servicios...",
+        "selectService": "Selecciona un servicio",
+        "minutes": "{{count}} min",
+        "allLocations": "(Disponible en todas las ubicaciones)",
+        "location": "Ubicación *",
+        "locationsError": "Error al cargar las ubicaciones: {{error}}",
+        "loadingLocations": "Cargando ubicaciones...",
+        "selectServiceFirst": "Primero selecciona un servicio",
+        "noLocationsAvailable": "No hay ubicaciones disponibles",
+        "selectLocation": "Selecciona una ubicación"
+      },
+      "preferences": {
+        "title": "Preferencias de la Cita",
+        "preferredDate": "Fecha Preferida *",
+        "preferredTime": "Hora Preferida *"
+      },
+      "visit": {
+        "title": "Detalles de la Visita",
+        "reason": "Motivo de la Visita",
+        "reasonPlaceholder": "Describe el motivo de tu visita...",
+        "notes": "Notas Adicionales",
+        "notesPlaceholder": "Cualquier información adicional o solicitud especial..."
+      },
+      "confirmation": {
+        "title": "¡Cita Confirmada!",
+        "description": "Tu cita se programó correctamente. Guarda tu código de confirmación.",
+        "codeLabel": "Código de Confirmación",
+        "keepCode": "Conserva este código para registrarte y consultar tu estado. Úsalo para ver tu posición en la fila.",
+        "gotIt": "Entendido"
+      }
+    },
+    "checkIn": {
+      "pageTitle": "Ya Llegué",
+      "helpLine1": "¿Ya llegaste a tu cita?",
+      "helpLine2": "Ingresa tu código de confirmación para avisarnos que has llegado.",
+      "findTitle": "Encuentra Tu Cita",
+      "findDescription": "Ingresa tu código de confirmación o tus datos de contacto",
+      "methodCode": "N.º de Confirmación",
+      "methodDetails": "Nombre y Teléfono",
+      "codeLabel": "Código de Confirmación",
+      "codeHint": "Usa tu número de confirmación de cliente o el código de la cita",
+      "or": "– O –",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Escribe tu apellido",
+      "phone": "Número de Teléfono",
+      "searching": "Buscando...",
+      "findButton": "Buscar Cita",
+      "confirmTitle": "Confirmar Registro",
+      "confirmDescription": "Revisa los detalles de tu cita",
+      "service": "Servicio",
+      "location": "Ubicación",
+      "scheduledTime": "Hora Programada",
+      "back": "Volver",
+      "checkingIn": "Registrando...",
+      "checkMeIn": "Registrarme",
+      "successTitle": "¡Ya estás registrado!",
+      "successDescription": "¡Bienvenido! Aquí tienes la información de tu fila",
+      "positionLabel": "Tu posición en la fila",
+      "aheadOfYou": "delante de ti",
+      "estimatedWait": "espera estimada",
+      "waitShort": "≈ {{minutes}} min",
+      "refreshNote": "Los datos se actualizan cada 30 segundos",
+      "done": "Listo",
+      "fallbackService": "Servicio",
+      "fallbackLocation": "Ubicación",
+      "errors": {
+        "enterCode": "Ingresa tu código de confirmación.",
+        "enterNameAndPhone": "Ingresa tanto el apellido como el número de teléfono.",
+        "notFound": "No se encontró ninguna cita con la información proporcionada. Verifica tus datos e inténtalo de nuevo.",
+        "alreadyCheckedIn": "Ya estás registrado. Usa \"Ver Estado\" para seguir tu lugar en la fila.",
+        "alreadyCheckedInWithPosition": "Ya estás registrado y eres el n.º {{position}} en la fila. Usa \"Ver Estado\" para seguir tu lugar en la fila.",
+        "latestStatus": "Tu cita más reciente está {{status}}. Reserva una nueva cita o habla con un miembro del personal.",
+        "notFoundTitle": "Cita No Encontrada",
+        "notFoundFallback": "No se pudo encontrar la cita. Verifica tu información e inténtalo de nuevo.",
+        "checkInFailed": "Error al Registrarse",
+        "checkInFallback": "No se pudo completar el registro. Inténtalo de nuevo."
+      },
+      "codePlaceholder": "CUST-XXXXXXXX o APT-XXXXXXXX"
+    },
+    "status": {
+      "pageTitle": "Ver Estado",
+      "findTitle": "Buscar Mi Estado",
+      "methodCode": "N.º de Confirmación",
+      "methodDetails": "Nombre y Teléfono",
+      "codeLabel": "Número de Confirmación",
+      "codePlaceholder": "Ingresa CUST-XXXXXXXX o APT-XXXXXXXX",
+      "codeHint": "Usa tu número de confirmación de cliente (CUST-XXXXXXXX) o el código de la cita (APT-XXXXXXXX)",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Escribe tu apellido",
+      "phone": "Número de Teléfono",
+      "searching": "Buscando...",
+      "findButton": "Buscar Mi Estado",
+      "notFoundTitle": "Cita No Encontrada",
+      "notFoundDescription": "No pudimos encontrar una cita con la información proporcionada. Verifica tu número de confirmación e inténtalo de nuevo.",
+      "bookNew": "Reservar Nueva Cita",
+      "resultsLabel": "Resultados del estado de la fila",
+      "serviceCompleted": "Servicio Completado",
+      "checkedIn": "Registrado",
+      "notCheckedIn": "No Registrado",
+      "positionLabel": "Tu posición en la fila",
+      "waitApprox": "≈ {{minutes}} min de espera",
+      "location": "Ubicación",
+      "service": "Servicio",
+      "scheduledTime": "Hora Programada",
+      "checkInNow": "Registrarme Ahora",
+      "ticketNumber": "Número de Ticket",
+      "errors": {
+        "provideInfo": "Proporciona un número de confirmación o bien el apellido y el número de teléfono",
+        "notFound": "No se encontró ninguna cita con la información proporcionada",
+        "fetchFailed": "No se pudo obtener el estado de la fila. Inténtalo de nuevo.",
+        "unknownService": "Servicio Desconocido",
+        "mainOffice": "Oficina Principal"
+      }
+    },
+    "lookup": {
+      "headerSubtitle": "Consulta y gestiona tus citas",
+      "pageTitle": "Buscar Mi Cita",
+      "searchTitle": "Busca Tu Cita",
+      "methodCode": "Número de Confirmación",
+      "methodDetails": "Nombre y Teléfono",
+      "codeLabel": "Número de Confirmación",
+      "codePlaceholder": "Ingresa tu número de confirmación",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "Escribe tu apellido",
+      "phone": "Número de Teléfono",
+      "searching": "Buscando...",
+      "findButton": "Buscar Cita",
+      "cancelConfirm": "¿Seguro que quieres cancelar esta cita?",
+      "cancelledTitle": "Cita Cancelada",
+      "cancelledDescription": "Tu cita se canceló correctamente.",
+      "qrCode": "Código QR",
+      "dateTime": "Fecha y Hora",
+      "dateAt": "{{date}} a las {{time}}",
+      "location": "Ubicación",
+      "service": "Servicio",
+      "confirmation": "Confirmación",
+      "phoneLabel": "Teléfono",
+      "email": "Correo Electrónico",
+      "reason": "Motivo de la Visita",
+      "cancelling": "Cancelando...",
+      "cancelAppointment": "Cancelar Cita",
+      "checkQueueStatus": "Ver Estado de la Fila",
+      "errors": {
+        "notFoundByCode": "No se encontró ninguna cita con este número de confirmación",
+        "notFoundByDetails": "No se encontraron citas con este nombre y número de teléfono",
+        "lookupFailed": "No se pudo encontrar la cita",
+        "cancelFailed": "No se pudo cancelar la cita. Inténtalo de nuevo."
+      }
+    },
+    "kiosk": {
+      "title": "Quiosco QueueFlow",
+      "subtitle": "Registro de Autoservicio",
+      "startOver": "Empezar de Nuevo",
+      "stepLabel": "Paso {{number}}: {{title}}",
+      "stepOf": "{{current}} de {{total}}",
+      "steps": {
+        "location": "Seleccionar Ubicación",
+        "service": "Elegir Servicio",
+        "customer": "Ingresar Información",
+        "ticket": "Tu Ticket"
+      },
+      "toast": {
+        "missingInfo": "Falta información obligatoria",
+        "success": "Éxito",
+        "ticketGenerated": "¡Tu ticket ha sido generado!",
+        "createFailed": "No se pudo crear la cita. Inténtalo de nuevo."
+      },
+      "location": {
+        "noneTitle": "No Hay Ubicaciones Disponibles",
+        "noneDescription": "Todas las ubicaciones de servicio están cerradas en este momento. Inténtalo más tarde.",
+        "title": "Elige Tu Ubicación de Servicio",
+        "subtitle": "Selecciona la ubicación donde deseas recibir el servicio",
+        "select": "Seleccionar Ubicación"
+      },
+      "service": {
+        "back": "Volver",
+        "title": "Selecciona el Tipo de Servicio",
+        "subtitle": "Elige el servicio que necesitas hoy",
+        "noneTitle": "No Hay Servicios Disponibles",
+        "noneDescription": "No hay servicios disponibles en esta ubicación en este momento.",
+        "select": "Seleccionar Servicio",
+        "durationMinutes": "{{minutes}} min",
+        "durationHours": "{{hours}} h",
+        "durationHoursMinutes": "{{hours}} h {{minutes}} min"
+      },
+      "customer": {
+        "back": "Volver",
+        "title": "Ingresa Tu Información",
+        "subtitle": "Necesitamos algunos datos para generar tu ticket de servicio",
+        "notice": "Proporciona tu información de contacto para generar tu ticket de servicio.",
+        "firstName": "Nombre *",
+        "firstNamePlaceholder": "Escribe tu nombre",
+        "lastName": "Apellido *",
+        "lastNamePlaceholder": "Escribe tu apellido",
+        "phone": "Número de Teléfono *",
+        "email": "Correo Electrónico (Opcional)",
+        "generateTicket": "Generar Ticket",
+        "validation": {
+          "firstNameRequired": "El nombre es obligatorio",
+          "lastNameRequired": "El apellido es obligatorio",
+          "phoneRequired": "El número de teléfono es obligatorio",
+          "phoneInvalid": "Ingresa un número de teléfono válido",
+          "emailInvalid": "Ingresa una dirección de correo electrónico válida"
+        }
+      },
+      "ticket": {
+        "successTitle": "¡Ticket Generado Correctamente!",
+        "successDescription": "Ya estás en la fila. Espera a que llamen tu número.",
+        "header": "Ticket de Servicio QueueFlow",
+        "keep": "Conserva este ticket hasta que te atiendan",
+        "customer": "Cliente",
+        "location": "Ubicación",
+        "service": "Servicio",
+        "estimatedMinutes": "Aprox. {{minutes}} minutos",
+        "queuePosition": "Posición en la Fila",
+        "inLine": "en la fila",
+        "qrCode": "Código QR",
+        "qrAlt": "Código QR del ticket",
+        "scanToCheck": "Escanea para ver el estado",
+        "checkInTime": "Hora de registro: {{time}}",
+        "stayNote": "Permanece en la sala de espera. Te llamaremos cuando sea tu turno.",
+        "print": "Imprimir Ticket",
+        "newTicket": "Nuevo Ticket ({{seconds}}s)"
+      }
+    },
+    "virtualQueue": {
+      "title": "Fila Virtual",
+      "subtitle": "Únete a la fila desde cualquier lugar y sigue tu posición en tiempo real",
+      "checkedInTitle": "Ya estás registrado",
+      "checkedInWithPosition": "Eres el n.º {{position}} en la fila. Espera estimada de unos {{minutes}} minutos.",
+      "checkedInNoPosition": "Un miembro del personal te llamará en breve.",
+      "checkInFailed": "Error al registrarse",
+      "checkInFallback": "Inténtalo de nuevo o habla con un miembro del personal.",
+      "features": {
+        "sms": {
+          "title": "Actualizaciones por SMS",
+          "description": "Recibe actualizaciones en tiempo real sobre tu posición en la fila por SMS"
+        },
+        "location": {
+          "title": "Flexibilidad de Ubicación",
+          "description": "No necesitas esperar en el lugar. ¡Únete desde cualquier parte!"
+        },
+        "tracking": {
+          "title": "Seguimiento en Tiempo Real",
+          "description": "Sigue tu posición y el tiempo de espera estimado en tiempo real"
+        }
+      },
+      "join": {
+        "title": "Unirse a la Fila Virtual",
+        "missingInfo": "Falta Información",
+        "fillRequired": "Completa todos los campos obligatorios",
+        "fullNameRequired": "Ingresa tu nombre y apellido.",
+        "joinedTitle": "Te Uniste a la Fila",
+        "joinedDescription": "Se espera que seas el n.º {{position}} en la fila para {{service}}. Regístrate cuando llegues.",
+        "joinFailed": "No se pudo unir a la fila. Inténtalo de nuevo.",
+        "selectLocation": "Seleccionar Ubicación",
+        "chooseLocation": "Elige una ubicación",
+        "selectService": "Seleccionar Servicio",
+        "chooseService": "Elige un servicio",
+        "waiting": "{{count}} en espera",
+        "waitApprox": "~{{minutes}} min de espera",
+        "fullName": "Nombre Completo *",
+        "fullNamePlaceholder": "Escribe tu nombre completo",
+        "phone": "Número de Teléfono *",
+        "joining": "Uniéndote a la Fila...",
+        "joinButton": "Unirse a la Fila Virtual",
+        "qrNote": "Recibirás un código QR para registrarte fácilmente",
+        "smsNote": "• Actualizaciones por SMS sobre tu posición en la fila",
+        "arriveNote": "• Regístrate cuando llegues a la ubicación"
+      },
+      "ticket": {
+        "title": "Tu Ticket de Fila",
+        "qrAlt": "Código QR del ticket de fila",
+        "checkedIn": "Registrado",
+        "virtualQueue": "Fila Virtual",
+        "position": "Posición",
+        "estimatedWait": "Espera Est.",
+        "service": "Servicio: {{name}}",
+        "checkInButton": "Ya Llegué - Registrarme",
+        "checkedInTitle": "¡Ya estás registrado!",
+        "checkedInDescription": "Espera a que te llamen para el servicio",
+        "tip1": "• Ten este ticket a mano para registrarte",
+        "tip2": "• Recibirás actualizaciones por SMS sobre tu posición",
+        "tip3": "• Escanea el código QR en el quiosco o muéstralo al personal"
+      },
+      "tracker": {
+        "title": "Posición en la Fila",
+        "description": "Tu posición actual en la fila",
+        "noActive": "No se encontró ninguna cita activa",
+        "positionLabel": "Posición en la fila",
+        "estimatedWait": "Espera estimada: {{time}}",
+        "inQueue": "En la Fila",
+        "leave": "Salir de la Fila",
+        "waitMinutes": "{{minutes}} min",
+        "waitHoursMinutes": "{{hours}} h {{minutes}} min"
+      }
+    },
+    "mobileQueue": {
+      "noAppointmentTitle": "Cita No Encontrada",
+      "noAppointmentToast": "Escanea tu código QR o revisa tu confirmación.",
+      "noAppointmentDescription": "Escanea tu código QR o revisa los datos de tu confirmación.",
+      "goHome": "Ir al Inicio",
+      "preferencesUpdated": "Preferencias Actualizadas",
+      "preferencesSaved": "Tu configuración de notificaciones se ha guardado.",
+      "tabs": {
+        "position": "Posición",
+        "progress": "Progreso"
+      },
+      "tracker": {
+        "notFound": "Cita no encontrada",
+        "fallbackService": "Servicio",
+        "calledTitle": "¡Te Están Llamando! 🔔",
+        "calledDescription": "Dirígete al mostrador de atención.",
+        "notificationsEnabled": "Notificaciones Activadas",
+        "notificationsDisabled": "Notificaciones Desactivadas",
+        "enabledDescription": "Recibirás actualizaciones sobre tu posición en la fila",
+        "disabledDescription": "Las notificaciones de la fila se han desactivado",
+        "loading": "Cargando tu posición en la fila...",
+        "loadFailed": "No se pudo cargar la información de la fila",
+        "tryAgain": "Intentar de Nuevo",
+        "status": {
+          "scheduled": "Reservada – regístrate al llegar",
+          "checked_in": "En la Fila",
+          "in_progress": "¡Te Están Llamando!",
+          "completed": "Completada",
+          "unknown": "Desconocido"
+        },
+        "title": "Posición en la Fila",
+        "ticket": "Ticket n.º {{number}}",
+        "positionLabel": "Tu posición en la fila",
+        "onePersonAhead": "1 persona delante de ti",
+        "peopleAhead": "{{count}} personas delante de ti",
+        "estimatedWait": "Espera estimada",
+        "currentWait": "Espera actual",
+        "serviceDetails": "Detalles del Servicio",
+        "customer": "Cliente: {{name}}",
+        "checkedInAt": "Registrado: {{time}}",
+        "beingCalled": "🔔 ¡Te están llamando!",
+        "proceed": "Dirígete al mostrador de atención ahora.",
+        "showQr": "Mostrar Código QR"
+      },
+      "progress": {
+        "title": "Progreso en la Fila",
+        "joined": "Ingreso",
+        "yourTurn": "Tu Turno",
+        "peopleAhead": "Personas Delante",
+        "estimatedTime": "Tiempo Est.",
+        "averageService": "Servicio Prom.",
+        "visualization": "Visualización de la Fila",
+        "you": "Tú",
+        "more": "+{{count}} más",
+        "breakdown": "Desglose del Tiempo",
+        "peopleAheadLabel": "Personas delante:",
+        "averageServiceLabel": "Tiempo promedio de servicio:",
+        "estimatedWaitLabel": "Espera estimada:",
+        "minutes": "{{count}} min"
+      },
+      "notifications": {
+        "title": "Preferencias de Notificación",
+        "methods": "Métodos de Notificación",
+        "push": "Notificaciones Push",
+        "enable": "Activar",
+        "sms": "Notificaciones por SMS",
+        "email": "Notificaciones por Correo",
+        "types": "Sobre qué quiero recibir avisos",
+        "positionChanges": "Cambios de posición en la fila",
+        "beingCalled": "Cuando me estén llamando",
+        "reminder": "Recordatorio 5 minutos antes de mi turno",
+        "unsupported": "Las notificaciones push no son compatibles con este dispositivo. Aún puedes recibir notificaciones por SMS y correo electrónico.",
+        "notSupported": "No Compatible",
+        "notSupportedDescription": "Las notificaciones push no son compatibles con este dispositivo.",
+        "enabled": "Notificaciones Activadas",
+        "enabledDescription": "Recibirás notificaciones push con las novedades de la fila.",
+        "denied": "Permiso Denegado",
+        "deniedDescription": "Las notificaciones push no se activaron.",
+        "enableFailed": "No se pudieron activar las notificaciones push."
+      },
+      "scanner": {
+        "cameraDenied": "Acceso a la Cámara Denegado",
+        "cameraDeniedDescription": "Permite el acceso a la cámara o usa la entrada manual.",
+        "found": "Posición en la Fila Encontrada",
+        "loadingPosition": "Cargando tu posición actual...",
+        "title": "Escanear Ticket de Fila",
+        "frameHint": "Coloca el código QR dentro del marco",
+        "enterCode": "Ingresar Código de Confirmación",
+        "codeLabel": "Código de Confirmación",
+        "codePlaceholder": "Ingresa tu código de confirmación",
+        "codeHint": "Lo encontrarás en la confirmación de tu cita",
+        "findPosition": "Buscar Mi Posición",
+        "scan": "Escanear Código QR",
+        "manual": "Entrada Manual",
+        "cancelScan": "Cancelar Escaneo",
+        "useCamera": "Usar Cámara"
+      }
+    },
+    "errors": {
+      "locationNotFound": "Ubicación no encontrada",
+      "createFailed": "No se pudo crear la cita. Inténtalo de nuevo.",
+      "checkInFailed": "El registro falló. Habla con un miembro del personal.",
+      "cancelFailed": "No se pudo cancelar la cita.",
+      "db": {
+        "nameRequired": "El nombre y el apellido son obligatorios",
+        "phoneRequired": "Se requiere un número de teléfono válido",
+        "serviceLocationRequired": "El servicio y la ubicación son obligatorios",
+        "unknownLocation": "Ubicación desconocida",
+        "unknownService": "Servicio desconocido o inactivo",
+        "appointmentNotFound": "Cita no encontrada",
+        "codeMismatch": "El código de confirmación no coincide con esta cita",
+        "cannotCheckIn": "Esta cita está {{status}} y no se puede registrar",
+        "cannotCancel": "Esta cita está {{status}} y no se puede cancelar"
+      }
+    }
   }
 }

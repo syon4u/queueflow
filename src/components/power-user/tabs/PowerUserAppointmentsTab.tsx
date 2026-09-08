@@ -11,6 +11,7 @@ import { useAppData } from '@/hooks/useAppData';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AppointmentMetricsCards } from '../appointments/AppointmentMetricsCards';
+import { isAppointmentToday, isServedToday, isWaitingNow } from '@/lib/dateRanges';
 export const PowerUserAppointmentsTab: React.FC = () => {
   const {
     appointments,
@@ -24,9 +25,9 @@ export const PowerUserAppointmentsTab: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Filter for today's appointments
-  const today = new Date().toDateString();
-  const todaysAppointments = appointments.filter(apt => new Date(apt.scheduled_time).toDateString() === today);
+  // Shared "today" definitions (src/lib/dateRanges.ts): local calendar day.
+  const now = new Date();
+  const todaysAppointments = appointments.filter(apt => isAppointmentToday(apt, now));
 
   // Apply filters
   const filteredAppointments = todaysAppointments.filter(apt => {
@@ -35,11 +36,13 @@ export const PowerUserAppointmentsTab: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Calculate queue status
+  // Queue status: waiting = checked in within the last 24 h (matches
+  // public_queue_snapshot and /staff); completed = served today by end_time.
+  // Previously these counted every checked_in / completed row ever.
   const queueStats = {
-    waiting: appointments.filter(apt => apt.status === 'checked_in').length,
+    waiting: appointments.filter(apt => isWaitingNow(apt, now)).length,
     inProgress: appointments.filter(apt => apt.status === 'in_progress').length,
-    completed: appointments.filter(apt => apt.status === 'completed').length
+    completed: appointments.filter(apt => isServedToday(apt, now)).length
   };
 
   // Calculate performance metrics

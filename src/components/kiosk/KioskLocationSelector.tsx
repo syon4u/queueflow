@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { MapPin, Clock, ChevronRight } from 'lucide-react';
 
@@ -18,6 +19,7 @@ export const KioskLocationSelector: React.FC<KioskLocationSelectorProps> = ({
   locations,
   onLocationSelect,
 }) => {
+  const { t } = useTranslation();
   if (!locations.length) {
     return (
       <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl shadow-2xl p-12 text-center border-2 border-orange-200">
@@ -25,10 +27,10 @@ export const KioskLocationSelector: React.FC<KioskLocationSelectorProps> = ({
           <Clock className="h-14 w-14 text-white" />
         </div>
         <h3 className="text-4xl font-bold text-gray-800 mb-6">
-          No Locations Available
+          {t('public.kiosk.location.noneTitle')}
         </h3>
         <p className="text-2xl text-gray-600 max-w-md mx-auto">
-          All service locations are currently closed. Please try again later.
+          {t('public.kiosk.location.noneDescription')}
         </p>
       </div>
     );
@@ -50,10 +52,10 @@ export const KioskLocationSelector: React.FC<KioskLocationSelectorProps> = ({
           <MapPin className="h-12 w-12 text-white" />
         </div>
         <h3 className="text-5xl font-bold text-gray-900 mb-4">
-          Choose Your Service Location
+          {t('public.kiosk.location.title')}
         </h3>
         <p className="text-2xl text-gray-600">
-          Select the location where you'd like to receive service
+          {t('public.kiosk.location.subtitle')}
         </p>
       </div>
       
@@ -85,7 +87,7 @@ export const KioskLocationSelector: React.FC<KioskLocationSelectorProps> = ({
               
               <div className="mt-6">
                 <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm">
-                  <span className="text-sm font-medium">Select Location</span>
+                  <span className="text-sm font-medium">{t('public.kiosk.location.select')}</span>
                 </div>
               </div>
             </div>

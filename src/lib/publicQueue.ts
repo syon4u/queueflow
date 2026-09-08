@@ -1,3 +1,4 @@
+import i18next from 'i18next';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -85,9 +86,38 @@ interface RpcResponse<T> {
 const rpc = <T>(fn: string, args: Record<string, unknown>) =>
   (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => PromiseLike<RpcResponse<T>>)(fn, args);
 
-const friendly = (message: string) =>
+/** Customer-facing copy; falls back to the English default when i18n is not initialised (e.g. unit tests). */
+const msg = (key: string, defaultValue: string, values: Record<string, unknown> = {}) =>
+  i18next.t(key, { defaultValue, ...values }) || defaultValue;
+
+const statusLabel = (dbStatus: string) => {
+  const key = dbStatus.trim().replace(/\s+/g, '_');
+  return msg(`public.statusLabels.${key}`, dbStatus);
+};
+
+// The RAISE EXCEPTION messages from supabase/migrations/20260906190000_public_queue_rpcs.sql,
+// mapped to translation keys so the customer sees them in their language.
+const DB_MESSAGES: Array<[RegExp, string, (m: RegExpMatchArray) => Record<string, unknown>]> = [
+  [/^First and last name are required$/, 'public.errors.db.nameRequired', () => ({})],
+  [/^A valid phone number is required$/, 'public.errors.db.phoneRequired', () => ({})],
+  [/^Service and location are required$/, 'public.errors.db.serviceLocationRequired', () => ({})],
+  [/^Unknown location$/, 'public.errors.db.unknownLocation', () => ({})],
+  [/^Unknown or inactive service$/, 'public.errors.db.unknownService', () => ({})],
+  [/^Appointment not found$/, 'public.errors.db.appointmentNotFound', () => ({})],
+  [/^Confirmation code does not match this appointment$/, 'public.errors.db.codeMismatch', () => ({})],
+  [/^This appointment is (.+) and cannot be checked in$/, 'public.errors.db.cannotCheckIn', (m) => ({ status: statusLabel(m[1]) })],
+  [/^This appointment is (.+) and cannot be cancelled$/, 'public.errors.db.cannotCancel', (m) => ({ status: statusLabel(m[1]) })],
+];
+
+const friendly = (message: string) => {
   // Postgres RAISE messages are already customer-readable; strip the PostgREST noise.
-  message.replace(/^.*?:\s*/, '').replace(/\s*\(SQLSTATE.*$/, '');
+  const cleaned = message.replace(/^.*?:\s*/, '').replace(/\s*\(SQLSTATE.*$/, '');
+  for (const [pattern, key, values] of DB_MESSAGES) {
+    const match = cleaned.match(pattern);
+    if (match) return msg(key, cleaned, values(match));
+  }
+  return cleaned;
+};
 
 export const customerName = (a: Pick<PublicAppointment, 'first_name' | 'last_name'>) =>
   `${a.first_name ?? ''} ${a.last_name ?? ''}`.trim();
@@ -136,7 +166,7 @@ export interface SignageBoard {
 export async function getSignageBoard(locationId: string): Promise<SignageBoard> {
   const { data, error } = await rpc<SignageBoard | null>('public_signage_board', { p_location_id: locationId });
   if (error) throw new Error(friendly(error.message));
-  if (!data) throw new Error('Location not found');
+  if (!data) throw new Error(msg('public.errors.locationNotFound', 'Location not found'));
   return data;
 }
 
@@ -160,7 +190,7 @@ export async function createPublicAppointment(input: CreatePublicAppointmentInpu
     p_check_in: input.checkIn ?? false,
   });
   if (error) throw new Error(friendly(error.message));
-  if (!data) throw new Error('The appointment could not be created. Please try again.');
+  if (!data) throw new Error(msg('public.errors.createFailed', 'The appointment could not be created. Please try again.'));
   return data;
 }
 
@@ -170,7 +200,7 @@ export async function checkInPublicAppointment(appointmentId: string, code?: str
     p_code: code ?? null,
   });
   if (error) throw new Error(friendly(error.message));
-  if (!data) throw new Error('Check-in failed. Please see a staff member.');
+  if (!data) throw new Error(msg('public.errors.checkInFailed', 'Check-in failed. Please see a staff member.'));
   return data;
 }
 
@@ -180,6 +210,6 @@ export async function cancelPublicAppointment(appointmentId: string, code?: stri
     p_code: code ?? null,
   });
   if (error) throw new Error(friendly(error.message));
-  if (!data) throw new Error('The appointment could not be cancelled.');
+  if (!data) throw new Error(msg('public.errors.cancelFailed', 'The appointment could not be cancelled.'));
   return data;
 }

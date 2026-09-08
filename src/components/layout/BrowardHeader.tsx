@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ShieldCheckmarkAnimation } from '@/components/ui/broward-icons';
 import ThemeToggle from '@/components/ui/theme-toggle';
@@ -20,11 +21,10 @@ interface BrowardHeaderProps {
   subtitle?: string;
 }
 
-const BrowardHeader: React.FC<BrowardHeaderProps> = ({
-  title = "QueueFlow",
-  subtitle = "Smart queue and appointment management for service businesses"
-}) => {
+// `title` / `subtitle` are accepted for PageLayout compatibility; the header only renders the brand mark.
+const BrowardHeader: React.FC<BrowardHeaderProps> = () => {
   const { user, role } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <header className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 border-b border-white/20 shadow-lg overflow-hidden">
@@ -120,7 +120,7 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                 </SheetTrigger>
                 <SheetContent side="right" className="w-80">
                   <SheetHeader>
-                    <SheetTitle>Menu</SheetTitle>
+                    <SheetTitle>{t('public.layout.menu')}</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6 space-y-4">
                     {/* Staff Dashboard - Always visible */}
@@ -130,8 +130,8 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                     >
                       <User className="h-5 w-5" />
                       <div>
-                        <p className="font-medium">Staff Dashboard</p>
-                        <p className="text-sm text-muted-foreground">Manage appointments and queue</p>
+                        <p className="font-medium">{t('public.layout.staffDashboard')}</p>
+                        <p className="text-sm text-muted-foreground">{t('public.layout.staffDashboardDescription')}</p>
                       </div>
                     </Link>
                     
@@ -142,8 +142,8 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                     >
                       <Settings className="h-5 w-5" />
                       <div>
-                        <p className="font-medium">Admin Portal</p>
-                        <p className="text-sm text-muted-foreground">System administration</p>
+                        <p className="font-medium">{t('public.layout.adminPortal')}</p>
+                        <p className="text-sm text-muted-foreground">{t('public.layout.adminPortalDescription')}</p>
                       </div>
                     </Link>
                     
@@ -153,8 +153,8 @@ const BrowardHeader: React.FC<BrowardHeaderProps> = ({
                     >
                       <BarChart3 className="h-5 w-5" />
                       <div>
-                        <p className="font-medium">Performance Reports</p>
-                        <p className="text-sm text-muted-foreground">Analytics and insights</p>
+                        <p className="font-medium">{t('public.layout.performanceReports')}</p>
+                        <p className="text-sm text-muted-foreground">{t('public.layout.performanceReportsDescription')}</p>
                       </div>
                     </Link>
                   </div>

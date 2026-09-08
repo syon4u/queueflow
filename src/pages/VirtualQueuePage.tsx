@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,7 @@ import { checkInPublicAppointment } from '@/lib/publicQueue';
 import { toast } from '@/components/ui/use-toast';
 
 const VirtualQueuePage = () => {
+  const { t } = useTranslation();
   const [hasJoinedQueue, setHasJoinedQueue] = useState(false);
   const [queuePosition, setQueuePosition] = useState(0);
   const [estimatedWait, setEstimatedWait] = useState(0);
@@ -38,15 +40,15 @@ const VirtualQueuePage = () => {
       setQueuePosition(checkedIn.position ?? 0);
       setEstimatedWait(checkedIn.estimated_wait_minutes ?? 0);
       toast({
-        title: "You're checked in",
+        title: t('public.virtualQueue.checkedInTitle'),
         description: checkedIn.position
-          ? `You are #${checkedIn.position} in line. Estimated wait about ${checkedIn.estimated_wait_minutes} minutes.`
-          : 'A staff member will call you shortly.',
+          ? t('public.virtualQueue.checkedInWithPosition', { position: checkedIn.position, minutes: checkedIn.estimated_wait_minutes })
+          : t('public.virtualQueue.checkedInNoPosition'),
       });
     } catch (error) {
       toast({
-        title: 'Check-in failed',
-        description: error instanceof Error ? error.message : 'Please try again or see a staff member.',
+        title: t('public.virtualQueue.checkInFailed'),
+        description: error instanceof Error ? error.message : t('public.virtualQueue.checkInFallback'),
         variant: 'destructive',
       });
     }
@@ -57,8 +59,8 @@ const VirtualQueuePage = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900">Virtual Queue</h1>
-          <p className="text-gray-600">Join the queue from anywhere and track your position in real-time</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('public.virtualQueue.title')}</h1>
+          <p className="text-gray-600">{t('public.virtualQueue.subtitle')}</p>
         </div>
 
         {!hasJoinedQueue ? (
@@ -84,11 +86,11 @@ const VirtualQueuePage = () => {
           <Card>
             <CardHeader className="text-center">
               <Phone className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <CardTitle className="text-lg">SMS Updates</CardTitle>
+              <CardTitle className="text-lg">{t('public.virtualQueue.features.sms.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 text-center">
-                Receive real-time updates about your queue position via SMS
+                {t('public.virtualQueue.features.sms.description')}
               </p>
             </CardContent>
           </Card>
@@ -96,11 +98,11 @@ const VirtualQueuePage = () => {
           <Card>
             <CardHeader className="text-center">
               <MapPin className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <CardTitle className="text-lg">Location Flexibility</CardTitle>
+              <CardTitle className="text-lg">{t('public.virtualQueue.features.location.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 text-center">
-                No need to wait in the physical location. Join from anywhere!
+                {t('public.virtualQueue.features.location.description')}
               </p>
             </CardContent>
           </Card>
@@ -108,11 +110,11 @@ const VirtualQueuePage = () => {
           <Card>
             <CardHeader className="text-center">
               <Clock className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <CardTitle className="text-lg">Real-time Tracking</CardTitle>
+              <CardTitle className="text-lg">{t('public.virtualQueue.features.tracking.title')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 text-center">
-                Track your position and estimated wait time in real-time
+                {t('public.virtualQueue.features.tracking.description')}
               </p>
             </CardContent>
           </Card>

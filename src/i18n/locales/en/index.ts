@@ -14,6 +14,7 @@ import queue from './queue.json';
 import unauthorized from './unauthorized.json';
 import landing from './landing.json';
 import services from './services.json';
+import publicPages from './public.json';
 
 export default {
   auth,
@@ -30,5 +31,6 @@ export default {
   queue,
   unauthorized,
   landing,
-  services
+  services,
+  public: publicPages
 };

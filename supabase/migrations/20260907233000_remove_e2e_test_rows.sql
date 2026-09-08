@@ -26,3 +26,15 @@ DELETE FROM public.customers
 DELETE FROM public.customers c
  WHERE c.first_name = 'E2E'
    AND NOT EXISTS (SELECT 1 FROM public.appointments a WHERE a.customer_id = c.id);
+
+-- Rows created through the UI flows (kiosk, virtual queue, booking) carry the
+-- flow's own notes rather than the seed tag; they belong to the same test
+-- customers, so remove them as well.
+DELETE FROM public.staff_actions
+ WHERE resource_type = 'appointment'
+   AND resource_id IN (SELECT a.id FROM public.appointments a JOIN public.customers c ON c.id = a.customer_id WHERE c.first_name = 'E2E');
+DELETE FROM public.appointments
+ WHERE customer_id IN (SELECT id FROM public.customers WHERE first_name = 'E2E');
+DELETE FROM public.customers c
+ WHERE c.first_name = 'E2E'
+   AND NOT EXISTS (SELECT 1 FROM public.appointments a WHERE a.customer_id = c.id);

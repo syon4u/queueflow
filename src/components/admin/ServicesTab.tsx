@@ -84,9 +84,10 @@ export const ServicesTab: React.FC = () => {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Close first so a second click cannot resubmit while the list refetches (F36).
+      closeDialog();
       queryClient.invalidateQueries({ queryKey: ['services'] });
       toast({ title: "Success", description: "Service created successfully" });
-      closeDialog();
     },
     onError: (error) => {
       toast({ 
@@ -113,9 +114,10 @@ export const ServicesTab: React.FC = () => {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Close first so a second click cannot resubmit while the list refetches (F36).
+      closeDialog();
       queryClient.invalidateQueries({ queryKey: ['services'] });
       toast({ title: "Success", description: "Service updated successfully" });
-      closeDialog();
     },
     onError: (error) => {
       toast({ 
@@ -191,13 +193,17 @@ export const ServicesTab: React.FC = () => {
   };
 
   const handleDeleteClick = (service: Service) => {
+    if (deleteMutation.isPending) return;
     if (window.confirm(`Are you sure you want to delete ${service.name}?`)) {
       deleteMutation.mutate(service.id);
     }
   };
 
+  const isSaving = createMutation.isPending || updateMutation.isPending;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     if (isEditing) {
       updateMutation.mutate(formData);
     } else {
@@ -294,11 +300,11 @@ export const ServicesTab: React.FC = () => {
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={closeDialog}>
+              <Button type="button" variant="outline" onClick={closeDialog} disabled={isSaving}>
                 Cancel
               </Button>
-              <Button type="submit">
-                {isEditing ? 'Update' : 'Create'}
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? 'Saving…' : isEditing ? 'Update' : 'Create'}
               </Button>
             </DialogFooter>
           </form>

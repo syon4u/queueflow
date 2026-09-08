@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (scanning && videoRef.current) {
@@ -44,8 +46,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast({
-        title: 'Camera Access Denied',
-        description: 'Please enable camera access or use manual entry.',
+        title: t('public.mobileQueue.scanner.cameraDenied'),
+        description: t('public.mobileQueue.scanner.cameraDeniedDescription'),
         variant: 'destructive',
       });
       setScanning(false);
@@ -71,8 +73,8 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     onScan?.(appointmentId);
     navigate(`/mobile-queue?appointment=${appointmentId}`);
     toast({
-      title: 'Queue Position Found',
-      description: 'Loading your current position...',
+      title: t('public.mobileQueue.scanner.found'),
+      description: t('public.mobileQueue.scanner.loadingPosition'),
     });
   };
 
@@ -81,7 +83,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-20 bg-black/50 backdrop-blur-sm">
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-white font-semibold">Scan Queue Ticket</h1>
+          <h1 className="text-white font-semibold">{t('public.mobileQueue.scanner.title')}</h1>
           {onClose && (
             <Button variant="ghost" size="sm" onClick={onClose} className="text-white">
               <X className="h-5 w-5" />
@@ -110,7 +112,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                 <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500 rounded-br-lg"></div>
               </div>
               <p className="text-white text-center mt-4">
-                Position QR code within the frame
+                {t('public.mobileQueue.scanner.frameHint')}
               </p>
             </div>
           </div>
@@ -125,29 +127,29 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Keyboard className="h-5 w-5" />
-                  Enter Confirmation Code
+                  {t('public.mobileQueue.scanner.enterCode')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleManualSubmit} className="space-y-4">
                   <div>
                     <Label htmlFor="confirmation-code">
-                      Confirmation Code
+                      {t('public.mobileQueue.scanner.codeLabel')}
                     </Label>
                     <Input
                       id="confirmation-code"
                       type="text"
-                      placeholder="Enter your confirmation code"
+                      placeholder={t('public.mobileQueue.scanner.codePlaceholder')}
                       value={confirmationCode}
                       onChange={(e) => setConfirmationCode(e.target.value)}
                       className="mt-1"
                     />
                     <p className="text-sm text-gray-500 mt-1">
-                      Find this on your appointment confirmation
+                      {t('public.mobileQueue.scanner.codeHint')}
                     </p>
                   </div>
                   <Button type="submit" className="w-full">
-                    Find My Position
+                    {t('public.mobileQueue.scanner.findPosition')}
                   </Button>
                 </form>
               </CardContent>
@@ -166,7 +168,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Camera className="h-5 w-5 mr-2" />
-                Scan QR Code
+                {t('public.mobileQueue.scanner.scan')}
               </Button>
               <Button
                 onClick={() => setManualEntry(true)}
@@ -174,7 +176,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                 className="bg-white/20 border-white/30 text-white hover:bg-white/30"
               >
                 <Keyboard className="h-5 w-5 mr-2" />
-                Manual Entry
+                {t('public.mobileQueue.scanner.manual')}
               </Button>
             </>
           )}
@@ -185,7 +187,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
               variant="outline"
               className="bg-white/20 border-white/30 text-white hover:bg-white/30"
             >
-              Cancel Scan
+              {t('public.mobileQueue.scanner.cancelScan')}
             </Button>
           )}
 
@@ -195,7 +197,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
               variant="outline"
               className="bg-white/20 border-white/30 text-white hover:bg-white/30"
             >
-              Use Camera
+              {t('public.mobileQueue.scanner.useCamera')}
             </Button>
           )}
         </div>
