@@ -202,7 +202,7 @@
         "contactInfo": "Informações de Contato",
         "email": "E-mail:",
         "supportHours": "Horário de suporte: seg–sex, 8h–18h ET",
-        "rights": "© {{year}} Queue Flow. Todos os direitos reservados.",
+        "rights": "© {{year}} QueueFlow. Todos os direitos reservados.",
         "motto": "Revolucionando a gestão do atendimento ao cliente"
       }
     },
@@ -240,7 +240,16 @@
       "statLanguagesDescription": "Idiomas para os clientes",
       "statPwa": "PWA",
       "statPwaDescription": "Instalável, funciona em qualquer dispositivo",
-      "videoUnsupported": "Seu navegador não suporta a tag de vídeo."
+      "videoUnsupported": "Seu navegador não suporta a tag de vídeo.",
+      "eyebrow": "Gestão de filas e agendamentos",
+      "headline": "Filas mais curtas. Recepções mais calmas.",
+      "subline": "Com o QueueFlow, os clientes agendam online ou retiram uma senha no quiosque, fazem check-in com um código e acompanham sua posição na fila pelo celular ou pela tela da recepção, enquanto sua equipe chama o próximo a partir de um único painel.",
+      "seePricing": "Ver preços",
+      "tryDemo": "Testar a demo ao vivo",
+      "customerPrompt": "Veio para um atendimento?",
+      "customerBook": "Agendar",
+      "customerCheckIn": "Fazer check-in",
+      "customerStatus": "Ver status"
     },
     "serviceCards": {
       "title": "Como Podemos Ajudar Você Hoje?",
@@ -325,7 +334,9 @@
       "subtitle": "Ofereça aos seus clientes uma fila em que possam esperar de qualquer lugar",
       "bookAppointment": "Agendar Atendimento",
       "checkStatus": "Ver Status",
-      "checkInNow": "Fazer Check-in Agora"
+      "checkInNow": "Fazer Check-in Agora",
+      "talkToUs": "Fale conosco",
+      "tryDemo": "Testar a demo ao vivo"
     },
     "pricing": {
       "badge": "Preços simples e transparentes",
@@ -841,6 +852,118 @@
         "cannotCheckIn": "Este agendamento está {{status}} e não permite check-in",
         "cannotCancel": "Este agendamento está {{status}} e não pode ser cancelado"
       }
+    },
+    "howItWorks": {
+      "eyebrow": "Como funciona",
+      "title": "Uma fila, três passos",
+      "subtitle": "Agendamentos e atendimentos sem hora marcada entram na mesma fila, e ninguém é atendido fora da vez.",
+      "stepLabel": "Passo {{number}}:",
+      "steps": {
+        "book": {
+          "title": "Os clientes agendam online ou vão até o quiosque",
+          "description": "Agendamentos online recebem um código de confirmação. Quem chega sem hora marcada retira uma senha impressa ou na tela, com QR code, no quiosque de autoatendimento."
+        },
+        "call": {
+          "title": "A equipe chama o próximo a partir de um único painel",
+          "description": "Chamar o próximo, marcar como atendido ou ausente e desfazer um engano: cada ação atualiza a fila para todos na hora."
+        },
+        "see": {
+          "title": "Todos veem sua posição na fila",
+          "description": "Os clientes acompanham a posição e a espera estimada pelo celular; a tela da recepção mostra quem está sendo atendido e quem é o próximo."
+        }
+      }
+    },
+    "board": {
+      "ariaLabel": "Exemplo de painel de recepção com a senha em atendimento, as três próximas e a espera média",
+      "location": "Unidade Rua Principal",
+      "caption": "Painel da recepção",
+      "example": "Exemplo",
+      "nowServing": "Atendendo",
+      "counter": "Guichê {{number}}",
+      "upNext": "Próximos",
+      "averageWait": "Espera média",
+      "waitMinutes": "{{minutes}} min"
+    },
+    "quickActions": {
+      "eyebrow": "Para visitantes",
+      "title": "Veio para o seu atendimento?",
+      "subtitle": "Escolha o que precisa. Não é preciso fazer login.",
+      "book": {
+        "title": "Agendar um atendimento",
+        "description": "Escolha o serviço, a unidade e o horário que funcionam para você.",
+        "action": "Agendar agora"
+      },
+      "checkIn": {
+        "title": "Fazer check-in",
+        "description": "Já chegou? Digite seu código de confirmação para entrar na fila.",
+        "action": "Cheguei"
+      },
+      "status": {
+        "title": "Ver status",
+        "description": "Veja sua posição na fila e a espera estimada.",
+        "action": "Ver status"
+      },
+      "find": {
+        "title": "Encontrar meu agendamento",
+        "description": "Consulte ou cancele um agendamento existente.",
+        "action": "Encontrar agendamento"
+      },
+      "lobbiesLabel": "Para recepções:",
+      "kiosk": "Quiosque",
+      "signage": "Painel",
+      "virtualQueue": "Fila virtual"
+    },
+    "capabilities": {
+      "eyebrow": "Recursos",
+      "title": "Tudo o que uma recepção precisa para controlar a fila",
+      "subtitle": "Feito para balcões movimentados — clínicas, órgãos públicos, centrais de atendimento — que recebem agendamentos e atendimentos sem hora marcada.",
+      "items": {
+        "kiosk": {
+          "title": "Quiosque para atendimento sem hora marcada e agendamento online",
+          "description": "Os clientes agendam de qualquer dispositivo ou retiram uma senha no quiosque de autoatendimento. Os dois entram na mesma fila."
+        },
+        "checkIn": {
+          "title": "Check-in por código",
+          "description": "Ao chegar, o cliente faz check-in com o código de confirmação, ou com nome e telefone, e recebe sua posição na fila na hora."
+        },
+        "live": {
+          "title": "Posição ao vivo e espera estimada",
+          "description": "Cada senha mostra sua posição e uma espera estimada, atualizadas conforme a fila anda, no rastreador móvel e no painel da recepção."
+        },
+        "virtual": {
+          "title": "Fila virtual",
+          "description": "Os clientes entram na fila antes de chegar e fazem check-in quando chegam, para que a sala de espera fique tranquila."
+        },
+        "staff": {
+          "title": "Painel da equipe",
+          "description": "Chamar o próximo, marcar como atendido ou ausente e desfazer um engano em uma única tela, com perfis separados para equipe e administradores."
+        },
+        "analytics": {
+          "title": "Análises e várias unidades",
+          "description": "Tempos de espera, volumes e mix de serviços por unidade, com várias unidades gerenciadas em uma só conta."
+        }
+      }
+    },
+    "trust": {
+      "title": "Fatos da plataforma",
+      "rls": "Segurança em nível de linha no Postgres",
+      "encrypted": "Criptografado em trânsito e em repouso",
+      "pwa": "PWA instalável: funciona em qualquer dispositivo",
+      "languages": "Quatro idiomas para clientes: EN, ES, PT, HT"
+    },
+    "pricingTeaser": {
+      "eyebrow": "Preços",
+      "title": "Planos para um balcão ou vários",
+      "subtitle": "Comece com uma única unidade e cresça para análises multiunidade e requisitos sob medida.",
+      "link": "Ver preços"
+    },
+    "footer": {
+      "tagline": "Gestão de filas e agendamentos para recepções movimentadas.",
+      "forCustomers": "Para clientes",
+      "forLobbies": "Para recepções",
+      "company": "Produto",
+      "pricing": "Preços",
+      "staffSignIn": "Acesso da equipe"
     }
   }
 }

@@ -202,7 +202,7 @@
         "contactInfo": "Enfòmasyon pou Kontakte Nou",
         "email": "Imèl:",
         "supportHours": "Lè sipò: lendi–vandredi, 8am–6pm ET",
-        "rights": "© {{year}} Queue Flow. Tout dwa rezève.",
+        "rights": "© {{year}} QueueFlow. Tout dwa rezève.",
         "motto": "N ap revolisyone jesyon sèvis kliyan"
       }
     },
@@ -240,7 +240,16 @@
       "statLanguagesDescription": "Lang pou kliyan yo",
       "statPwa": "PWA",
       "statPwaDescription": "Ou ka enstale l, li mache sou nenpòt aparèy",
-      "videoUnsupported": "Navigatè ou a pa sipòte videyo."
+      "videoUnsupported": "Navigatè ou a pa sipòte videyo.",
+      "eyebrow": "Jesyon liy ak randevou",
+      "headline": "Liy pi kout. Sal datant pi kalm.",
+      "subline": "Ak QueueFlow, kliyan yo ka pran randevou sou entènèt oswa pran yon tikè nan kyòs la, fè check-in ak yon kòd, epi swiv plas yo nan liy lan sou telefòn yo oswa sou ekran sal datant lan — pandan anplwaye ou yo ap rele pwochen moun nan sou yon sèl tablo.",
+      "seePricing": "Gade pri yo",
+      "tryDemo": "Eseye demo an dirèk la",
+      "customerPrompt": "Ou vin pou yon randevou?",
+      "customerBook": "Pran randevou",
+      "customerCheckIn": "Fè check-in",
+      "customerStatus": "Verifye eta"
     },
     "serviceCards": {
       "title": "Kijan Nou Ka Ede Ou Jodi a?",
@@ -325,7 +334,9 @@
       "subtitle": "Bay kliyan ou yo yon liy yo ka tann ladan l kote yo ye a",
       "bookAppointment": "Pran Randevou",
       "checkStatus": "Verifye Eta",
-      "checkInNow": "Anrejistre Kounye a"
+      "checkInNow": "Anrejistre Kounye a",
+      "talkToUs": "Pale ak nou",
+      "tryDemo": "Eseye demo an dirèk la"
     },
     "pricing": {
       "badge": "Pri senp e klè",
@@ -841,6 +852,118 @@
         "cannotCheckIn": "Randevou sa a {{status}} epi li pa ka anrejistre",
         "cannotCancel": "Randevou sa a {{status}} epi li pa ka anile"
       }
+    },
+    "howItWorks": {
+      "eyebrow": "Kijan sa mache",
+      "title": "Yon sèl liy, twa etap",
+      "subtitle": "Randevou yo ak moun ki vini san randevou antre nan menm liy lan, konsa pèsonn pa pase anvan tou li.",
+      "stepLabel": "Etap {{number}}:",
+      "steps": {
+        "book": {
+          "title": "Kliyan yo pran randevou sou entènèt oswa vin nan kyòs la",
+          "description": "Randevou sou entènèt yo resevwa yon kòd konfimasyon. Moun ki vini san randevou pran yon tikè enprime oswa sou ekran, ak yon kòd QR, nan kyòs oto-sèvis la."
+        },
+        "call": {
+          "title": "Anplwaye yo rele pwochen moun nan sou yon sèl tablo",
+          "description": "Rele pwochen an, make moun nan kòm sèvi oswa absan, epi defèt yon erè: chak aksyon mete liy lan ajou pou tout moun menm lè a."
+        },
+        "see": {
+          "title": "Tout moun wè plas yo nan liy lan",
+          "description": "Kliyan yo swiv pozisyon yo ak tan datant estime a sou telefòn yo; ekran sal datant lan montre kiyès y ap sèvi ak kiyès ki vin apre."
+        }
+      }
+    },
+    "board": {
+      "ariaLabel": "Egzanp yon ekran sal datant ki montre tikè y ap sèvi kounye a, twa pwochen tikè yo ak tan datant mwayen an",
+      "location": "Biwo Gran Ri",
+      "caption": "Ekran sal datant",
+      "example": "Egzanp",
+      "nowServing": "N ap sèvi",
+      "counter": "Gichè {{number}}",
+      "upNext": "Pwochen yo",
+      "averageWait": "Tan datant mwayen",
+      "waitMinutes": "{{minutes}} min"
+    },
+    "quickActions": {
+      "eyebrow": "Pou vizitè yo",
+      "title": "Ou vin pou randevou ou?",
+      "subtitle": "Chwazi sa ou bezwen. Ou pa bezwen konekte.",
+      "book": {
+        "title": "Pran yon randevou",
+        "description": "Chwazi sèvis la, kote a ak lè ki bon pou ou.",
+        "action": "Pran randevou kounye a"
+      },
+      "checkIn": {
+        "title": "Fè check-in",
+        "description": "Ou rive deja? Antre kòd konfimasyon ou pou antre nan liy lan.",
+        "action": "Mwen la"
+      },
+      "status": {
+        "title": "Verifye eta",
+        "description": "Gade pozisyon ou nan liy lan ak tan datant estime a.",
+        "action": "Gade eta"
+      },
+      "find": {
+        "title": "Jwenn randevou mwen",
+        "description": "Chèche oswa anile yon randevou ki egziste deja.",
+        "action": "Jwenn randevou"
+      },
+      "lobbiesLabel": "Pou sal datant yo:",
+      "kiosk": "Kyòs",
+      "signage": "Ekran",
+      "virtualQueue": "Liy vityèl"
+    },
+    "capabilities": {
+      "eyebrow": "Fonksyon yo",
+      "title": "Tout sa yon biwo resepsyon bezwen pou jere liy lan",
+      "subtitle": "Fèt pou biwo ki gen anpil mouvman — klinik, ajans piblik, sant sèvis — ki resevwa ni randevou ni moun ki vini san randevou.",
+      "items": {
+        "kiosk": {
+          "title": "Kyòs pou moun san randevou ak randevou sou entènèt",
+          "description": "Kliyan yo pran randevou davans sou nenpòt aparèy oswa pran yon tikè nan kyòs oto-sèvis la. Tou de antre nan menm liy lan."
+        },
+        "checkIn": {
+          "title": "Check-in ak kòd",
+          "description": "Lè yo rive, kliyan yo fè check-in ak kòd konfimasyon yo, oswa ak non ak nimewo telefòn, epi yo jwenn plas yo nan liy lan tousuit."
+        },
+        "live": {
+          "title": "Pozisyon an dirèk ak tan datant estime",
+          "description": "Chak tikè montre pozisyon li ak yon tan datant estime ki mete ajou pandan liy lan ap avanse — sou aplikasyon mobil la ak sou ekran sal datant lan."
+        },
+        "virtual": {
+          "title": "Liy vityèl",
+          "description": "Kliyan yo antre nan liy lan anvan yo rive epi yo fè check-in lè yo rive, konsa sal datant lan rete kalm."
+        },
+        "staff": {
+          "title": "Tablo anplwaye yo",
+          "description": "Rele pwochen an, make moun nan kòm sèvi oswa absan, epi defèt yon erè sou yon sèl ekran, ak wòl separe pou anplwaye ak administratè."
+        },
+        "analytics": {
+          "title": "Analiz pou administratè ak plizyè kote",
+          "description": "Tan datant, kantite moun ak melanj sèvis pou chak kote, ak plizyè kote ou jere nan yon sèl kont."
+        }
+      }
+    },
+    "trust": {
+      "title": "Enfòmasyon sou platfòm nan",
+      "rls": "Sekirite nivo ranje nan Postgres",
+      "encrypted": "Chifre pandan transpò ak nan depo",
+      "pwa": "PWA ou ka enstale: li mache sou nenpòt aparèy",
+      "languages": "Kat lang pou kliyan yo: EN, ES, PT, HT"
+    },
+    "pricingTeaser": {
+      "eyebrow": "Pri",
+      "title": "Plan pou yon sèl biwo oswa plizyè",
+      "subtitle": "Kòmanse ak yon sèl kote epi grandi pou rive nan analiz plizyè kote ak bezwen espesyal.",
+      "link": "Gade pri yo"
+    },
+    "footer": {
+      "tagline": "Jesyon liy ak randevou pou biwo resepsyon ki gen anpil mouvman.",
+      "forCustomers": "Pou kliyan yo",
+      "forLobbies": "Pou sal datant yo",
+      "company": "Pwodui",
+      "pricing": "Pri",
+      "staffSignIn": "Koneksyon anplwaye"
     }
   }
 }
