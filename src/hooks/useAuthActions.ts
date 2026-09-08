@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { getErrorMessage } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { handleAuthError, handleAuthSuccess } from '@/utils/auth-helpers';
 import { UseAuthActionsReturn } from '@/types/auth';
@@ -18,14 +19,14 @@ export const useAuthActions = (): UseAuthActionsReturn => {
       const { error } = await signIn(email, password);
       
       if (error) {
-        handleAuthError(error, 'login');
+        handleAuthError({ message: getErrorMessage(error) || '' }, 'login');
       } else {
         handleAuthSuccess('login');
         // Session will be initialized by SessionContext
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign in error:', error);
-      handleAuthError({ message: error.message || 'An unexpected error occurred' }, 'login');
+      handleAuthError({ message: getErrorMessage(error) || 'An unexpected error occurred' }, 'login');
     } finally {
       setIsLoading(false);
     }
@@ -37,13 +38,13 @@ export const useAuthActions = (): UseAuthActionsReturn => {
       const { error } = await signUp(email, password);
       
       if (error) {
-        handleAuthError(error, 'register');
+        handleAuthError({ message: getErrorMessage(error) || '' }, 'register');
       } else {
         handleAuthSuccess('register');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign up error:', error);
-      handleAuthError({ message: error.message || 'An unexpected error occurred' }, 'register');
+      handleAuthError({ message: getErrorMessage(error) || 'An unexpected error occurred' }, 'register');
     } finally {
       setIsLoading(false);
     }
@@ -55,13 +56,13 @@ export const useAuthActions = (): UseAuthActionsReturn => {
       const { error } = await signInWithGoogle();
       
       if (error) {
-        handleAuthError(error, 'google');
+        handleAuthError({ message: getErrorMessage(error) || '' }, 'google');
         setIsLoading(false);
       }
       // Don't set loading to false here as the redirect will handle it
-    } catch (error: any) {
+    } catch (error) {
       console.error('Google sign in error:', error);
-      handleAuthError({ message: error.message || 'An unexpected error occurred' }, 'google');
+      handleAuthError({ message: getErrorMessage(error) || 'An unexpected error occurred' }, 'google');
       setIsLoading(false);
     }
   };
@@ -70,7 +71,7 @@ export const useAuthActions = (): UseAuthActionsReturn => {
     setIsLoading(true);
     try {
       await sessionManager.invalidateCurrentSession();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign out error:', error);
     } finally {
       setIsLoading(false);

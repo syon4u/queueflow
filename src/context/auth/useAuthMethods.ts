@@ -1,5 +1,6 @@
 
 import { useNavigate } from 'react-router-dom';
+import { getErrorMessage } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
@@ -37,11 +38,11 @@ export const useAuthMethods = () => {
       });
       
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error signing in with email:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to sign in",
+        description: getErrorMessage(error) || "Failed to sign in",
         variant: "destructive",
       });
       throw error;
@@ -66,11 +67,11 @@ export const useAuthMethods = () => {
       });
       
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error signing up with email:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to create account",
+        description: getErrorMessage(error) || "Failed to create account",
         variant: "destructive",
       });
       throw error;
@@ -88,11 +89,11 @@ export const useAuthMethods = () => {
       });
       
       navigate('/login');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error signing out:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to sign out",
+        description: getErrorMessage(error) || "Failed to sign out",
         variant: "destructive",
       });
       throw error;

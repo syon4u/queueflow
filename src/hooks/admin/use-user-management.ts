@@ -20,28 +20,28 @@ export const useUserManagement = () => {
   const mockUsers: UserData[] = [
     {
       id: 'mock-admin-user-id',
-      email: 'admin@broward.gov',
+      email: 'admin@example.gov',
       role: 'admin',
       created_at: new Date().toISOString(),
       last_sign_in_at: new Date().toISOString()
     },
     {
       id: 'mock-power-user-id',
-      email: 'poweruser@broward.gov',
+      email: 'poweruser@example.gov',
       role: 'power_user',
       created_at: new Date().toISOString(),
       last_sign_in_at: new Date().toISOString()
     },
     {
       id: 'mock-staff-user-1',
-      email: 'staff1@broward.gov',
+      email: 'staff1@example.gov',
       role: 'staff',
       created_at: new Date().toISOString(),
       last_sign_in_at: new Date().toISOString()
     },
     {
       id: 'mock-staff-user-2',
-      email: 'staff2@broward.gov',
+      email: 'staff2@example.gov',
       role: 'staff',
       created_at: new Date().toISOString(),
       last_sign_in_at: new Date().toISOString()
@@ -85,7 +85,7 @@ export const useUserManagement = () => {
         description: `User role has been updated to ${data.role}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('Error updating role:', error);
       toast({
         title: 'Error',
@@ -109,7 +109,7 @@ export const useUserManagement = () => {
         description: 'Mock profile data has been created for testing',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error('Error adding temporary data:', error);
       toast({
         title: 'Error',

@@ -11,29 +11,29 @@ import {
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Plus } from 'lucide-react';
 
-export interface Column {
+export interface Column<T extends object = Record<string, unknown>> {
   key: string;
   header: string;
-  cell?: (row: any) => React.ReactNode;
+  cell?: (row: T) => React.ReactNode;
 }
 
-interface DataTableProps {
-  data: any[];
-  columns: Column[];
+interface DataTableProps<T extends object> {
+  data: T[];
+  columns: Column<T>[];
   onAddClick?: () => void;
-  onEditClick?: (row: any) => void;
-  onDeleteClick?: (row: any) => void;
+  onEditClick?: (row: T) => void;
+  onDeleteClick?: (row: T) => void;
   isLoading?: boolean;
 }
 
-export const DataTable: React.FC<DataTableProps> = ({
+export const DataTable = <T extends object>({
   data,
   columns,
   onAddClick,
   onEditClick,
   onDeleteClick,
   isLoading = false
-}) => {
+}: DataTableProps<T>) => {
   return (
     <div>
       {/* Header with add button */}
@@ -72,11 +72,13 @@ export const DataTable: React.FC<DataTableProps> = ({
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((row, index) => (
-                <TableRow key={row.id || index}>
+              data.map((row, index) => {
+                const rowId = (row as { id?: React.Key }).id;
+                return (
+                <TableRow key={rowId || index}>
                   {columns.map((column) => (
-                    <TableCell key={`${row.id}-${column.key}`}>
-                      {column.cell ? column.cell(row) : row[column.key]}
+                    <TableCell key={`${rowId}-${column.key}`}>
+                      {column.cell ? column.cell(row) : ((row as Record<string, unknown>)[column.key] as React.ReactNode)}
                     </TableCell>
                   ))}
                   {(onEditClick || onDeleteClick) && (
@@ -96,7 +98,8 @@ export const DataTable: React.FC<DataTableProps> = ({
                     </TableCell>
                   )}
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>

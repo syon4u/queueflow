@@ -2,12 +2,13 @@
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import type { Json } from '@/integrations/supabase/types';
 
 interface AuditLogEntry {
   action: string;
   resource_type: string;
   resource_id?: string;
-  details?: Record<string, any>;
+  details?: { [key: string]: Json | undefined; old_values?: Json; new_values?: Json };
 }
 
 export const useAuditLog = () => {

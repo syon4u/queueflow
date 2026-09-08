@@ -1,6 +1,4 @@
 
-/// <reference types="@testing-library/jest-dom" />
-
 // Type definitions for testing-library__jest-dom
 import '@testing-library/jest-dom';
 

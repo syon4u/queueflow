@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
+import { getStringProp } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays } from 'date-fns';
 import { isNoShowToday, isServedToday, isWithinRange, localDayRange } from '@/lib/dateRanges';
@@ -90,9 +91,9 @@ export const useServiceMetrics = (timeRange: string, locationId?: string) => {
       // Process appointments to calculate service metrics
       const serviceMap = new Map();
       
-      appointments?.forEach((appointment: any) => {
+      appointments?.forEach((appointment) => {
         const serviceId = appointment.service_id;
-        const serviceName = appointment.services?.name || 'Unknown Service';
+        const serviceName = getStringProp(appointment.services, 'name') || 'Unknown Service';
         
         if (!serviceMap.has(serviceId)) {
           serviceMap.set(serviceId, {
@@ -182,7 +183,7 @@ export const useDailyMetrics = (timeRange: string, locationId?: string) => {
         return dailyMap.get(date);
       };
 
-      appointments?.forEach((appointment: any) => {
+      appointments?.forEach((appointment) => {
         // Appointments = scheduled that day, any status.
         if (isWithinRange(appointment.scheduled_time, range)) {
           const daily = bucket(appointment.scheduled_time);
@@ -252,8 +253,10 @@ function getDateRange(timeRange: string) {
       break;
     default:
       // Try to parse as number of days
+    {
       const days = parseInt(timeRange) || 7;
       startDate = subDays(today, days).toISOString();
+    }
   }
 
   return { startDate, endDate };

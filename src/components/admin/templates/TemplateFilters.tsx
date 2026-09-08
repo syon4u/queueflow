@@ -43,10 +43,11 @@ export const TemplateFilters: React.FC<TemplateFiltersProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Search</label>
+          <label htmlFor="template-search" className="text-sm font-medium">Search</label>
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
+              id="template-search"
               placeholder="Search templates..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
@@ -56,9 +57,9 @@ export const TemplateFilters: React.FC<TemplateFiltersProps> = ({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Type</label>
+          <label htmlFor="template-type-filter" className="text-sm font-medium">Type</label>
           <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger id="template-type-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -70,9 +71,9 @@ export const TemplateFilters: React.FC<TemplateFiltersProps> = ({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Status</label>
+          <label htmlFor="template-status-filter" className="text-sm font-medium">Status</label>
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger id="template-status-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Phone, Clock, X } from 'lucide-react';
-import { useSMSCommands } from '@/hooks/use-sms-commands';
+import { useSMSCommands, type SMSCommandResponse } from '@/hooks/use-sms-commands';
 
 export const SMSCommandsTab: React.FC = () => {
   const [testPhone, setTestPhone] = useState('');
   const [testMessage, setTestMessage] = useState('');
-  const [testResult, setTestResult] = useState<any>(null);
+  const [testResult, setTestResult] = useState<SMSCommandResponse | null>(null);
   const { processSMSCommand, isProcessing } = useSMSCommands();
 
   const handleTestCommand = async () => {
@@ -90,8 +90,9 @@ export const SMSCommandsTab: React.FC = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Phone Number</label>
+              <label htmlFor="sms-test-phone" className="block text-sm font-medium mb-2">Phone Number</label>
               <Input
+                id="sms-test-phone"
                 value={testPhone}
                 onChange={(e) => setTestPhone(e.target.value)}
                 placeholder="Enter phone number..."
@@ -99,9 +100,10 @@ export const SMSCommandsTab: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">SMS Message</label>
+              <label htmlFor="sms-test-message" className="block text-sm font-medium mb-2">SMS Message</label>
               <div className="flex gap-2">
                 <Input
+                  id="sms-test-message"
                   value={testMessage}
                   onChange={(e) => setTestMessage(e.target.value)}
                   placeholder="Enter command (R, LATE 10, CANCEL)..."

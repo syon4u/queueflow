@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Bell, Smartphone, Mail, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface NotificationPreferences {
+export interface NotificationPreferences {
   push: boolean;
   sms: boolean;
   email: boolean;

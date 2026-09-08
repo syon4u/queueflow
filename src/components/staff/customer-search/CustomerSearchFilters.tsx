@@ -59,12 +59,12 @@ export const CustomerSearchFilters: React.FC<CustomerSearchFiltersProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Location Filter */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label htmlFor="customer-search-location" className="text-sm font-medium flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 Location
               </label>
               <Select value={selectedLocation} onValueChange={onLocationChange}>
-                <SelectTrigger className="bg-white">
+                <SelectTrigger id="customer-search-location" className="bg-white">
                   <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border shadow-md z-50">
@@ -80,12 +80,12 @@ export const CustomerSearchFilters: React.FC<CustomerSearchFiltersProps> = ({
 
             {/* Service Filter */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label htmlFor="customer-search-service" className="text-sm font-medium flex items-center gap-2">
                 <Settings className="h-4 w-4 text-muted-foreground" />
                 Service
               </label>
               <Select value={selectedService} onValueChange={onServiceChange}>
-                <SelectTrigger className="bg-white">
+                <SelectTrigger id="customer-search-service" className="bg-white">
                   <SelectValue placeholder="All Services" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border shadow-md z-50">
@@ -101,7 +101,7 @@ export const CustomerSearchFilters: React.FC<CustomerSearchFiltersProps> = ({
 
             {/* Clear Filters */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-transparent">Clear</label>
+              <span className="text-sm font-medium text-transparent">Clear</span>
               {hasActiveFilters && (
                 <Button
                   variant="outline"

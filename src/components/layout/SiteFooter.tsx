@@ -2,9 +2,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ShieldIcon, HandshakeIcon, DocumentIcon } from '@/components/ui/broward-icons';
+import { ShieldIcon, HandshakeIcon, DocumentIcon } from '@/components/ui/brand-icons';
 
-const BrowardFooter: React.FC = () => {
+const SiteFooter: React.FC = () => {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   
@@ -131,4 +131,4 @@ const BrowardFooter: React.FC = () => {
   );
 };
 
-export default BrowardFooter;
+export default SiteFooter;

@@ -1,7 +1,15 @@
 
 import { Column } from '../DataTable';
 
-export const useEmployeeTableColumns = (): Column[] => {
+interface EmployeeRow {
+  first_name: string;
+  last_name: string;
+  role?: string | null;
+  status?: string | null;
+  locations?: { name: string } | null;
+}
+
+export const useEmployeeTableColumns = (): Column<EmployeeRow>[] => {
   return [
     { 
       key: 'name', 

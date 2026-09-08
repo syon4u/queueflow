@@ -99,6 +99,7 @@ export const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
             ref={videoRef}
             autoPlay
             playsInline
+            muted
             className="w-full h-full object-cover"
           />
           

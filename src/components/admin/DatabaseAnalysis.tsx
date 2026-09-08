@@ -10,13 +10,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface DatabaseAnalysis {
-  tables: any[];
-  views: any[];
-  functions: any[];
-  triggers: any[];
-  policies: any[];
-  indexes: any[];
-  constraints: any[];
+  tables: Array<{ table_name: string; table_type: string }>;
+  views: Array<{ table_name: string; table_schema: string }>;
+  functions: Array<{ function_name: string; is_security_definer?: boolean; arguments?: string }>;
+  triggers: unknown[];
+  policies: Array<{ policyname: string; cmd: string; tablename: string; permissive: string }>;
+  indexes: Array<{ index_name: string; table_name: string; index_definition: string }>;
+  constraints: Array<{ constraint_name: string; constraint_type: string; table_name: string }>;
   duplicateIssues: string[];
   recommendations: string[];
 }

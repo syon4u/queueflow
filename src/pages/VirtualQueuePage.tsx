@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, MapPin, Phone, CheckCircle } from 'lucide-react';
 import { VirtualQueueJoin } from '@/components/queue/VirtualQueueJoin';
-import { VirtualQueueTicket } from '@/components/queue/VirtualQueueTicket';
+import { VirtualQueueTicket, type TicketData } from '@/components/queue/VirtualQueueTicket';
 import QueuePositionTracker from '@/components/customer/QueuePositionTracker';
 import { checkInPublicAppointment } from '@/lib/publicQueue';
 import { toast } from '@/components/ui/use-toast';
@@ -16,9 +16,9 @@ const VirtualQueuePage = () => {
   const [hasJoinedQueue, setHasJoinedQueue] = useState(false);
   const [queuePosition, setQueuePosition] = useState(0);
   const [estimatedWait, setEstimatedWait] = useState(0);
-  const [ticketData, setTicketData] = useState<any>(null);
+  const [ticketData, setTicketData] = useState<TicketData | null>(null);
 
-  const handleJoinQueue = (ticketInfo: any) => {
+  const handleJoinQueue = (ticketInfo: TicketData) => {
     setHasJoinedQueue(true);
     setQueuePosition(ticketInfo?.position ?? 0);
     setEstimatedWait(ticketInfo?.estimatedWait ?? 0);

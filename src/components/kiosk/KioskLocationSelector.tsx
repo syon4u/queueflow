@@ -64,7 +64,15 @@ export const KioskLocationSelector: React.FC<KioskLocationSelectorProps> = ({
           <div
             key={location.id}
             className={`relative overflow-hidden rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer bg-gradient-to-br ${tileColors[index % tileColors.length]}`}
+            role="button"
+            tabIndex={0}
             onClick={() => onLocationSelect(location.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onLocationSelect(location.id);
+              }
+            }}
           >
             <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
             <div className="relative p-8 text-white">

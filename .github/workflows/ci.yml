@@ -17,9 +17,8 @@ jobs:
       - run: npm ci
       - name: Typecheck
         run: npx tsc -p tsconfig.app.json --noEmit
-      - name: Lint (advisory — 255 pre-existing findings, mostly no-explicit-any)
+      - name: Lint
         run: npm run lint
-        continue-on-error: true
       - name: Test
         run: npx vitest run
       - name: Build

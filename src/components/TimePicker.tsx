@@ -26,6 +26,7 @@ const minuteOptions = ['00', '15', '30', '45'];
 const amPmOptions = ['AM', 'PM'];
 
 const TimePicker = ({ date, onDateChange, time, onTimeChange }: TimePickerProps) => {
+  const timeFieldId = React.useId();
   const [hour, minute, amPm] = time ? time.split(/[:\s]/) : ['', '', ''];
 
   const handleHourChange = (value: string) => {
@@ -101,9 +102,9 @@ const TimePicker = ({ date, onDateChange, time, onTimeChange }: TimePickerProps)
             <div className="grid grid-cols-3 gap-3">
               {/* Hour Selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-600">Hour</label>
+                <label htmlFor={`${timeFieldId}-hour`} className="text-sm font-medium text-gray-600">Hour</label>
                 <Select value={hour} onValueChange={handleHourChange}>
-                  <SelectTrigger className="h-12 border-2 hover:border-green-300 transition-colors">
+                  <SelectTrigger id={`${timeFieldId}-hour`} className="h-12 border-2 hover:border-green-300 transition-colors">
                     <SelectValue placeholder="Hour" />
                   </SelectTrigger>
                   <SelectContent>
@@ -118,9 +119,9 @@ const TimePicker = ({ date, onDateChange, time, onTimeChange }: TimePickerProps)
               
               {/* Minute Selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-600">Minute</label>
+                <label htmlFor={`${timeFieldId}-minute`} className="text-sm font-medium text-gray-600">Minute</label>
                 <Select value={minute} onValueChange={handleMinuteChange}>
-                  <SelectTrigger className="h-12 border-2 hover:border-green-300 transition-colors">
+                  <SelectTrigger id={`${timeFieldId}-minute`} className="h-12 border-2 hover:border-green-300 transition-colors">
                     <SelectValue placeholder="Min" />
                   </SelectTrigger>
                   <SelectContent>
@@ -135,9 +136,9 @@ const TimePicker = ({ date, onDateChange, time, onTimeChange }: TimePickerProps)
               
               {/* AM/PM Selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-600">Period</label>
+                <label htmlFor={`${timeFieldId}-period`} className="text-sm font-medium text-gray-600">Period</label>
                 <Select value={amPm} onValueChange={handleAmPmChange}>
-                  <SelectTrigger className="h-12 border-2 hover:border-green-300 transition-colors">
+                  <SelectTrigger id={`${timeFieldId}-period`} className="h-12 border-2 hover:border-green-300 transition-colors">
                     <SelectValue placeholder="AM/PM" />
                   </SelectTrigger>
                   <SelectContent>

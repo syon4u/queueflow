@@ -1,7 +1,8 @@
 
 import { Column } from '../DataTable';
+import type { Profile } from '@/hooks/admin/use-profile-management';
 
-export const useStaffTableColumns = (): Column[] => {
+export const useStaffTableColumns = (): Column<Profile>[] => {
   return [
     { 
       key: 'name', 

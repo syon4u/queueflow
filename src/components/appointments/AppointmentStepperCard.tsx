@@ -9,7 +9,7 @@ interface AppointmentStepperCardProps {
 
 const AppointmentStepperCard: React.FC<AppointmentStepperCardProps> = ({ currentStep }) => {
   return (
-    <Card className="bg-white/95 backdrop-blur-sm border-broward-teal/20 shadow-lg">
+    <Card className="bg-white/95 backdrop-blur-sm border-brand-teal/20 shadow-lg">
       <CardContent className="p-6">
         <AppointmentStepper currentStep={currentStep} />
       </CardContent>

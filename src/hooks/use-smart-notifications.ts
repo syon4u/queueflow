@@ -34,7 +34,12 @@ interface SmartNotificationTrigger {
   appointmentId: string;
   customerId: string;
   triggerType: string;
-  triggerData: any;
+  triggerData: {
+    scheduledTime?: string | number | Date;
+    newStatus?: string;
+    queuePosition?: number;
+    waitTimeMinutes?: number;
+  };
 }
 
 export function useSmartNotifications() {

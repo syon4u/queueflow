@@ -1,6 +1,13 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { getNumberProp, getStringProp } from '@/lib/utils';
 import type { QueueOptimizationRule, OptimizationRecommendation, QueueMetrics } from './types';
+
+interface QueueEntry {
+  id: string;
+  priority_level?: number | null;
+  services?: unknown;
+}
 
 export class QueueOptimizer {
   private rules: QueueOptimizationRule[] = [];
@@ -134,18 +141,19 @@ export class QueueOptimizer {
     };
   }
 
-  private optimizeByPriority(queue: any[]): OptimizationRecommendation[] {
+  private optimizeByPriority(queue: QueueEntry[]): OptimizationRecommendation[] {
     const recommendations: OptimizationRecommendation[] = [];
     
     // Look for urgent appointments that should be moved up
     queue.forEach((appointment, index) => {
-      if (appointment.priority_level > 0 && index > 2) {
-        const newPosition = Math.max(0, index - appointment.priority_level);
+      const priorityLevel = appointment.priority_level ?? 0;
+      if (priorityLevel > 0 && index > 2) {
+        const newPosition = Math.max(0, index - priorityLevel);
         recommendations.push({
           appointmentId: appointment.id,
           currentPosition: index,
           recommendedPosition: newPosition,
-          reason: `High priority customer (level ${appointment.priority_level}) should be expedited`,
+          reason: `High priority customer (level ${priorityLevel}) should be expedited`,
           impact: 'high',
           estimatedSavings: {
             timeMinutes: (index - newPosition) * 15,
@@ -158,20 +166,24 @@ export class QueueOptimizer {
     return recommendations;
   }
 
-  private optimizeByServiceTime(queue: any[]): OptimizationRecommendation[] {
+  private optimizeByServiceTime(queue: QueueEntry[]): OptimizationRecommendation[] {
     const recommendations: OptimizationRecommendation[] = [];
     
     // Group by service duration and suggest reordering
     queue.forEach((appointment, index) => {
-      if (appointment.services?.duration <= 15) {
-        const longServicesAhead = queue.slice(0, index).filter(a => a.services?.duration > 30).length;
+      const duration = getNumberProp(appointment.services, 'duration');
+      if (duration !== undefined && duration <= 15) {
+        const longServicesAhead = queue.slice(0, index).filter(a => {
+          const aheadDuration = getNumberProp(a.services, 'duration');
+          return aheadDuration !== undefined && aheadDuration > 30;
+        }).length;
         
         if (longServicesAhead > 0) {
           recommendations.push({
             appointmentId: appointment.id,
             currentPosition: index,
             recommendedPosition: Math.max(0, index - longServicesAhead),
-            reason: `Quick service (${appointment.services.duration}min) can be processed faster`,
+            reason: `Quick service (${duration}min) can be processed faster`,
             impact: 'medium',
             estimatedSavings: {
               timeMinutes: longServicesAhead * 10,
@@ -185,12 +197,12 @@ export class QueueOptimizer {
     return recommendations;
   }
 
-  private async optimizeByStaffEfficiency(queue: any[], locationId: string): Promise<OptimizationRecommendation[]> {
+  private async optimizeByStaffEfficiency(queue: QueueEntry[], locationId: string): Promise<OptimizationRecommendation[]> {
     const recommendations: OptimizationRecommendation[] = [];
     
     // Simplified staff efficiency optimization
     queue.forEach((appointment, index) => {
-      if (appointment.services?.name?.includes('Express') && index > 5) {
+      if (getStringProp(appointment.services, 'name')?.includes('Express') && index > 5) {
         recommendations.push({
           appointmentId: appointment.id,
           currentPosition: index,

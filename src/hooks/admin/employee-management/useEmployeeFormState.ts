@@ -2,6 +2,15 @@
 import { useState, useCallback } from 'react';
 import { EmployeeFormData } from './types';
 
+interface EmployeeRecord {
+  id: string;
+  first_name: string;
+  last_name: string;
+  phone?: string | null;
+  role?: string | null;
+  location_id?: string | null;
+}
+
 export const useEmployeeFormState = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,13 +38,13 @@ export const useEmployeeFormState = () => {
     setIsDialogOpen(true);
   }, []);
 
-  const handleEditClick = useCallback((member: any) => {
+  const handleEditClick = useCallback((member: EmployeeRecord) => {
     setFormData({
       id: member.id,
       first_name: member.first_name,
       last_name: member.last_name,
       phone: member.phone || '',
-      role: member.role || 'staff',
+      role: (member.role as EmployeeFormData['role'] | null | undefined) || 'staff',
       location_id: member.location_id || '',
     });
     setIsEditing(true);

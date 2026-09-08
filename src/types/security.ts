@@ -1,4 +1,6 @@
 
+import type { Json } from '@/integrations/supabase/types';
+
 export interface SecurityAuditLog {
   id: string;
   event_type: string;
@@ -47,7 +49,7 @@ export interface SecurityAuditLogRecord {
   event_type: string;
   client_identifier: string;
   success: boolean;
-  details: any;
+  details: Json | null;
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;
