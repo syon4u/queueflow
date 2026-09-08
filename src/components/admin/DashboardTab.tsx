@@ -78,6 +78,8 @@ export const DashboardTab: React.FC = () => {
   });
 
   // Live metrics (replaces the previous hardcoded demo numbers)
+  // Open Locations = rows in `locations` with queue_status = 'open'. Nothing
+  // else (capacity, hours, staff on shift) feeds this number.
   const { data: activeQueues = 0 } = useQuery({
     queryKey: ['dashboard-active-queues'],
     queryFn: async () => {
@@ -244,7 +246,7 @@ export const DashboardTab: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-900">{systemMetrics.activeQueues}</div>
-            <p className="text-xs text-green-600 mt-1">Locations currently accepting walk-ins</p>
+            <p className="text-xs text-green-600 mt-1">Locations with queue_status = &apos;open&apos;</p>
           </CardContent>
         </Card>
         

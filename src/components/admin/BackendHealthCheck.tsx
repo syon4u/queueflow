@@ -81,7 +81,8 @@ const BackendHealthCheck: React.FC = () => {
     }
 
     // 4. Test Edge Functions
-    const functions = ['admin-stats', 'appointments', 'customer-history', 'daily-metrics', 'staff-metrics', 'service-metrics'];
+    // staff-metrics is not probed: the app computes per-staff metrics client-side (src/lib/staffMetrics.ts).
+    const functions = ['admin-stats', 'appointments', 'customer-history', 'daily-metrics', 'service-metrics'];
     
     for (const func of functions) {
       updateResult(`Function: ${func}`, 'loading', 'Testing function...');
