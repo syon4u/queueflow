@@ -854,6 +854,7 @@
       "createFailed": "Nou pa t kapab kreye randevou a. Tanpri eseye ankò.",
       "checkInFailed": "Anrejistreman an pa pase. Tanpri wè yon manm pèsonèl la.",
       "cancelFailed": "Nou pa t kapab anile randevou a.",
+      "rateLimited": "Twòp tantativ. Tanpri tann kèk minit epi eseye ankò.",
       "db": {
         "nameRequired": "Prenon ak siyati obligatwa",
         "phoneRequired": "Yon nimewo telefòn valab obligatwa",

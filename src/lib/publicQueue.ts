@@ -98,6 +98,8 @@ const statusLabel = (dbStatus: string) => {
 // The RAISE EXCEPTION messages from supabase/migrations/20260906190000_public_queue_rpcs.sql,
 // mapped to translation keys so the customer sees them in their language.
 const DB_MESSAGES: Array<[RegExp, string, (m: RegExpMatchArray) => Record<string, unknown>]> = [
+  // Bare token from the per-IP / per-phone limits in 20260909120000_public_rate_limits.sql.
+  [/^RATE_LIMITED$/, 'public.errors.rateLimited', () => ({})],
   [/^First and last name are required$/, 'public.errors.db.nameRequired', () => ({})],
   [/^A valid phone number is required$/, 'public.errors.db.phoneRequired', () => ({})],
   [/^Service and location are required$/, 'public.errors.db.serviceLocationRequired', () => ({})],
@@ -109,12 +111,15 @@ const DB_MESSAGES: Array<[RegExp, string, (m: RegExpMatchArray) => Record<string
   [/^This appointment is (.+) and cannot be cancelled$/, 'public.errors.db.cannotCancel', (m) => ({ status: statusLabel(m[1]) })],
 ];
 
+const RATE_LIMITED_DEFAULT = 'Too many attempts. Please wait a few minutes and try again.';
+
 const friendly = (message: string) => {
   // Postgres RAISE messages are already customer-readable; strip the PostgREST noise.
   const cleaned = message.replace(/^.*?:\s*/, '').replace(/\s*\(SQLSTATE.*$/, '');
   for (const [pattern, key, values] of DB_MESSAGES) {
     const match = cleaned.match(pattern);
-    if (match) return msg(key, cleaned, values(match));
+    // RATE_LIMITED is a token, not prose, so it needs an English fallback of its own.
+    if (match) return msg(key, cleaned === 'RATE_LIMITED' ? RATE_LIMITED_DEFAULT : cleaned, values(match));
   }
   return cleaned;
 };

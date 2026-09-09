@@ -854,6 +854,7 @@
       "createFailed": "No se pudo crear la cita. Inténtalo de nuevo.",
       "checkInFailed": "El registro falló. Habla con un miembro del personal.",
       "cancelFailed": "No se pudo cancelar la cita.",
+      "rateLimited": "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.",
       "db": {
         "nameRequired": "El nombre y el apellido son obligatorios",
         "phoneRequired": "Se requiere un número de teléfono válido",

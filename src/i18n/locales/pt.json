@@ -854,6 +854,7 @@
       "createFailed": "Não foi possível criar o agendamento. Tente novamente.",
       "checkInFailed": "Falha no check-in. Procure um membro da equipe.",
       "cancelFailed": "Não foi possível cancelar o agendamento.",
+      "rateLimited": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
       "db": {
         "nameRequired": "Nome e sobrenome são obrigatórios",
         "phoneRequired": "É necessário um número de telefone válido",

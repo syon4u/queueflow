@@ -670,6 +670,7 @@
     "createFailed": "The appointment could not be created. Please try again.",
     "checkInFailed": "Check-in failed. Please see a staff member.",
     "cancelFailed": "The appointment could not be cancelled.",
+    "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
     "db": {
       "nameRequired": "First and last name are required",
       "phoneRequired": "A valid phone number is required",
