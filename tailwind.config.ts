@@ -1,24 +1,20 @@
-
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
+// The single Tailwind config. A minimal tailwind.config.js used to sit beside
+// this file and, because Tailwind resolves the .js first, silently replaced it —
+// none of the tokens below (bc-* colours, shadow-card, text-body-*, animate-*)
+// were ever generated. Everything the .js had is folded in here.
+//
+// Deliberately NOT enabled, to keep the rendered CSS byte-for-byte compatible
+// with what the app shipped with (each is a visible change to review on its own):
+//   darkMode: ["class"]        – `dark:` utilities currently follow the OS, not the toggle
+//   container: { center, padding: '2rem', screens: { '2xl': '1400px' } }
+//   fontFamily.serif: Merriweather   – `font-serif` currently resolves to the browser default
+//   colors.sidebar.*           – would restyle the mounted shadcn sidebar
 export default {
-	darkMode: ["class"],
-	content: [
-		"./pages/**/*.{ts,tsx}",
-		"./components/**/*.{ts,tsx}",
-		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
-	],
-	prefix: "",
+	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
-		container: {
-			center: true,
-			padding: '2rem',
-			screens: {
-				'2xl': '1400px'
-			}
-		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',
@@ -53,16 +49,6 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
-				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
 				},
 				// Brand Colors
 				'bc-blue': '#005A9C',
@@ -169,7 +155,16 @@ export default {
 				'wave': {
 					'0%': { backgroundPositionX: '0' },
 					'100%': { backgroundPositionX: '1200px' },
-				}
+				},
+				// Landing fx (src/components/landing/fx/Marquee.tsx)
+				marquee: {
+					from: { transform: 'translateX(0)' },
+					to: { transform: 'translateX(calc(-100% - var(--gap)))' },
+				},
+				'marquee-vertical': {
+					from: { transform: 'translateY(0)' },
+					to: { transform: 'translateY(calc(-100% - var(--gap)))' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -178,10 +173,11 @@ export default {
 				'fade-in-up': 'fade-in-up 0.5s ease-out',
 				'float': 'float 3s ease-in-out infinite',
 				'wave': 'wave 10s linear infinite',
+				marquee: 'marquee var(--duration) infinite linear',
+				'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],
-				serif: ['Merriweather', 'Georgia', 'serif'],
 				display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
 				// Landing page (src/styles/landing.css): signage display face + serif accent word
 				signage: ['"Bricolage Grotesque"', 'Inter', 'system-ui', 'sans-serif'],
@@ -194,4 +190,4 @@ export default {
 		}
 	},
 	plugins: [tailwindcssAnimate],
-}
+} satisfies Config;

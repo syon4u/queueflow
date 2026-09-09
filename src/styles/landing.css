@@ -62,10 +62,8 @@
   margin: 0;
 }
 
-/* Display face for numerals and the wordmark. Defined here as well as in
-   tailwind.config.js because the repo's tailwind.config.js shadows the .ts
-   config; keeping the class name means no markup churn. */
-.landing .font-display,
+/* Display face for numerals and the wordmark (Tailwind's `font-signage`
+   utility resolves to the same stack). */
 .landing .qf-signage {
   font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
 }
