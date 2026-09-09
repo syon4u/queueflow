@@ -202,7 +202,7 @@
         "contactInfo": "Información de Contacto",
         "email": "Correo electrónico:",
         "supportHours": "Horario de soporte: lun–vie, 8am–6pm ET",
-        "rights": "© {{year}} Queue Flow. Todos los derechos reservados.",
+        "rights": "© {{year}} QueueFlow. Todos los derechos reservados.",
         "motto": "Revolucionando la gestión de la atención al cliente"
       }
     },
@@ -222,7 +222,12 @@
       "signIn": "Iniciar Sesión",
       "employeeLogin": "Acceso para Empleados",
       "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú"
+      "closeMenu": "Cerrar menú",
+      "landingLabel": "Página principal",
+      "landingHowItWorks": "Cómo funciona",
+      "landingCapabilities": "Funciones",
+      "landingPricing": "Precios",
+      "landingVisitors": "Para visitantes"
     },
     "hero": {
       "titleLine1": "Gestión Inteligente de Filas",
@@ -240,7 +245,22 @@
       "statLanguagesDescription": "Idiomas para los clientes",
       "statPwa": "PWA",
       "statPwaDescription": "Instalable, funciona en cualquier dispositivo",
-      "videoUnsupported": "Tu navegador no admite la etiqueta de video."
+      "videoUnsupported": "Tu navegador no admite la etiqueta de video.",
+      "eyebrow": "Gestión de filas y citas",
+      "headline": "Filas más cortas. Salas más tranquilas.",
+      "subline": "QueueFlow permite a tus clientes reservar en línea o tomar un turno en el quiosco, registrarse con un código y seguir su lugar en la fila desde el teléfono o la pantalla del vestíbulo, mientras tu personal llama al siguiente desde un solo panel.",
+      "seePricing": "Ver precios",
+      "tryDemo": "Probar la demo en vivo",
+      "customerPrompt": "¿Vienes a una cita?",
+      "customerBook": "Reservar",
+      "customerCheckIn": "Registrarte",
+      "customerStatus": "Ver estado",
+      "facts": {
+        "oneLine": "Sin cita y con cita, en una sola fila",
+        "livePosition": "Posición en vivo desde cualquier teléfono",
+        "languages": "EN · ES · PT · HT"
+      },
+      "headlineAccent": "tranquilas"
     },
     "serviceCards": {
       "title": "¿Cómo Podemos Ayudarte Hoy?",
@@ -325,7 +345,11 @@
       "subtitle": "Ofrece a tus clientes una fila en la que puedan esperar desde cualquier lugar",
       "bookAppointment": "Reservar Cita",
       "checkStatus": "Ver Estado",
-      "checkInNow": "Registrarme Ahora"
+      "checkInNow": "Registrarme Ahora",
+      "talkToUs": "Habla con nosotros",
+      "tryDemo": "Probar la demo en vivo",
+      "headline": "¿Listo para un vestíbulo más tranquilo?",
+      "yourTurn": "Tu turno."
     },
     "pricing": {
       "badge": "Precios simples y transparentes",
@@ -841,6 +865,189 @@
         "cannotCheckIn": "Esta cita está {{status}} y no se puede registrar",
         "cannotCancel": "Esta cita está {{status}} y no se puede cancelar"
       }
+    },
+    "howItWorks": {
+      "eyebrow": "Cómo funciona",
+      "title": "Una fila, tres pasos",
+      "subtitle": "Las citas y las visitas sin cita entran en la misma fila, así nadie se atiende fuera de turno.",
+      "stepLabel": "Paso {{number}}:",
+      "steps": {
+        "book": {
+          "title": "Los clientes reservan en línea o se acercan al quiosco",
+          "description": "Las reservas en línea reciben un código de confirmación. Quien llega sin cita toma un turno impreso o en pantalla, con código QR, en el quiosco de autoservicio."
+        },
+        "call": {
+          "title": "El personal llama al siguiente desde un solo panel",
+          "description": "Llamar al siguiente, marcar como atendido o ausente y deshacer un error: cada acción actualiza la fila para todos al instante."
+        },
+        "see": {
+          "title": "Todos ven su lugar en la fila",
+          "description": "Los clientes siguen su posición y el tiempo de espera estimado en el teléfono; la pantalla del vestíbulo muestra a quién se atiende y quién sigue."
+        }
+      }
+    },
+    "board": {
+      "ariaLabel": "Ejemplo de pantalla de vestíbulo con el turno que se atiende, los tres siguientes y la espera promedio",
+      "location": "Sucursal Calle Principal",
+      "caption": "Pantalla del vestíbulo",
+      "example": "Ejemplo",
+      "nowServing": "Atendiendo",
+      "counter": "Ventanilla {{number}}",
+      "upNext": "Siguientes",
+      "averageWait": "Espera promedio",
+      "waitMinutes": "{{minutes}} min",
+      "ariaLive": "Atendiendo {{ticket}} en la ventanilla {{number}}"
+    },
+    "quickActions": {
+      "eyebrow": "Para visitantes",
+      "title": "¿Vienes a tu cita?",
+      "subtitle": "Elige lo que necesitas. No hace falta iniciar sesión.",
+      "book": {
+        "title": "Reservar una cita",
+        "description": "Elige el servicio, la sede y la hora que te convengan.",
+        "action": "Reservar ahora"
+      },
+      "checkIn": {
+        "title": "Registrarte",
+        "description": "¿Ya llegaste? Ingresa tu código de confirmación para entrar en la fila.",
+        "action": "Ya estoy aquí"
+      },
+      "status": {
+        "title": "Ver estado",
+        "description": "Consulta tu posición en la fila y el tiempo de espera estimado.",
+        "action": "Ver estado"
+      },
+      "find": {
+        "title": "Buscar mi cita",
+        "description": "Consulta o cancela una reserva existente.",
+        "action": "Buscar cita"
+      },
+      "lobbiesLabel": "Para vestíbulos:",
+      "kiosk": "Quiosco",
+      "signage": "Pantalla",
+      "virtualQueue": "Fila virtual"
+    },
+    "capabilities": {
+      "eyebrow": "Funciones",
+      "title": "Todo lo que un mostrador necesita para manejar la fila",
+      "subtitle": "Pensado para mostradores con mucho movimiento —clínicas, oficinas públicas, centros de servicio— que atienden citas y visitas sin cita.",
+      "items": {
+        "kiosk": {
+          "title": "Quiosco para visitas sin cita y reservas en línea",
+          "description": "Los clientes reservan desde cualquier dispositivo o toman un turno en el quiosco de autoservicio. Ambos entran en la misma fila."
+        },
+        "checkIn": {
+          "title": "Registro con código",
+          "description": "Al llegar, el cliente se registra con su código de confirmación, o con nombre y teléfono, y recibe su lugar en la fila de inmediato."
+        },
+        "live": {
+          "title": "Posición en vivo y espera estimada",
+          "description": "Cada turno muestra su posición y una espera estimada que se actualiza a medida que avanza la fila, en el rastreador móvil y en la pantalla del vestíbulo."
+        },
+        "virtual": {
+          "title": "Fila virtual",
+          "description": "Los clientes entran en la fila antes de llegar y se registran al llegar, así la sala de espera se mantiene tranquila."
+        },
+        "staff": {
+          "title": "Panel del personal",
+          "description": "Llamar al siguiente, marcar como atendido o ausente y deshacer un error desde una sola pantalla, con roles separados para personal y administradores."
+        },
+        "analytics": {
+          "title": "Analítica y varias sedes",
+          "description": "Tiempos de espera, volúmenes y mezcla de servicios por sede, con varias sedes administradas desde una sola cuenta."
+        },
+        "signage": {
+          "title": "Pantalla del vestíbulo",
+          "description": "Una pantalla en la pared muestra a quién se atiende y quién sigue, así nadie tiene que preguntar."
+        }
+      },
+      "vignettes": {
+        "tracker": {
+          "label": "Tu lugar"
+        },
+        "kiosk": {
+          "ticket": "Turno",
+          "takeTicket": "Tomar turno",
+          "bookOnline": "Reservar en línea"
+        },
+        "checkIn": {
+          "label": "Código de confirmación",
+          "button": "Registrarme"
+        },
+        "staff": {
+          "served": "Atendido",
+          "noShow": "No se presentó"
+        },
+        "virtual": {
+          "joined": "Se unió desde casa",
+          "arrive": "Regístrate al llegar"
+        },
+        "analytics": {
+          "label": "Espera media, últimos 7 días",
+          "locations": "{{n}} sedes",
+          "dayLabels": "L,M,X,J,V,S,D"
+        }
+      }
+    },
+    "trust": {
+      "title": "Datos de la plataforma",
+      "rls": "Seguridad a nivel de fila en Postgres",
+      "encrypted": "Cifrado en tránsito y en reposo",
+      "pwa": "PWA instalable: funciona en cualquier dispositivo",
+      "languages": "Cuatro idiomas para clientes: EN, ES, PT, HT"
+    },
+    "pricingTeaser": {
+      "eyebrow": "Precios",
+      "title": "Planes para un mostrador o muchos",
+      "subtitle": "Empieza con una sola sede y crece hacia la analítica multisede y requisitos a medida.",
+      "link": "Ver precios"
+    },
+    "footer": {
+      "tagline": "Gestión de filas y citas para mostradores con mucho movimiento.",
+      "forCustomers": "Para clientes",
+      "forLobbies": "Para vestíbulos",
+      "company": "Producto",
+      "pricing": "Precios",
+      "staffSignIn": "Acceso del personal"
+    },
+    "preview": {
+      "ariaLabel": "Panel de personal de ejemplo con las cifras de hoy, la fila y el turno que se atiende ahora",
+      "timestamp": "Martes 10:24",
+      "stats": {
+        "waiting": "En espera",
+        "beingServed": "Atendiendo",
+        "avgWait": "Espera media",
+        "servedToday": "Atendidos hoy"
+      },
+      "queue": "Fila",
+      "wait": "Espera",
+      "services": {
+        "account": "Apertura de cuenta",
+        "renewal": "Renovación de documento",
+        "enquiry": "Consulta general",
+        "payment": "Pago",
+        "consultation": "Asesoría"
+      },
+      "nextUp": "Siguiente {{ticket}}",
+      "callNext": "Llamar siguiente",
+      "caption": "Atendiendo ahora {{ticket}}",
+      "ticketAria": "Turno de cliente de ejemplo con la posición en la fila y la espera estimada",
+      "yourTicket": "Tu turno · {{ticket}}",
+      "position": "Eres el #{{position}} en la fila",
+      "eta": "Faltan unos {{minutes}} min",
+      "progressLabel": "Avance en la fila",
+      "ahead": "{{n}} personas delante de ti",
+      "callNextHint": "Solo es un ejemplo: avanza el tablero de demostración"
+    },
+    "fit": {
+      "eyebrow": "Hecho para mostradores con mucho movimiento",
+      "clinics": "Clínicas",
+      "government": "Oficinas públicas",
+      "banks": "Bancos y cooperativas",
+      "serviceCentres": "Centros de servicio",
+      "campuses": "Campus",
+      "repairShops": "Talleres",
+      "marqueeLabel": "Tipos de mostrador para los que está hecho QueueFlow"
     }
   }
 }

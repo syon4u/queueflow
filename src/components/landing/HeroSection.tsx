@@ -1,153 +1,129 @@
-
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Shield } from 'lucide-react';
+import React, { useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import * as m from 'motion/react-m';
+import { ArrowRight, Languages, ListOrdered, Smartphone } from 'lucide-react';
+import ProductPreview from '@/components/landing/ProductPreview';
+import LedBoard from '@/components/landing/LedBoard';
+import { CalledWords, Grain } from '@/components/landing/fx';
+import { COUNTER, servingTicket, ticketLabel, useCallHeartbeat } from '@/components/landing/useCallHeartbeat';
 
-interface HeroSectionProps {
-  onShowGuide?: () => void;
-}
+/** Three true product facts shown under the hero buttons, as ticket stubs. */
+const FACTS = [
+  { key: 'oneLine', icon: ListOrdered },
+  { key: 'livePosition', icon: Smartphone },
+  { key: 'languages', icon: Languages },
+] as const;
 
-const HeroSection: React.FC<HeroSectionProps> = ({ onShowGuide }) => {
+const EASE_OUT_QUART = [0.25, 1, 0.5, 1] as const;
+
+/** Index of the headline word that carries the translated accent word (e.g. "Calmer"). */
+const accentIndex = (headline: string, accent: string) => {
+  const norm = (s: string) => s.toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+  const target = norm(accent);
+  if (!target) return -1;
+  return headline
+    .split(/\s+/)
+    .filter(Boolean)
+    .findIndex((w) => norm(w) === target);
+};
+
+/**
+ * The lobby. A full-width LED wall board reads NOW SERVING; the headline is
+ * called onto the page word by word; the staff dashboard hangs in front of
+ * the board with the customer's phone ticket overlapping it. Board, mock and
+ * ticket share one heartbeat (`useCallHeartbeat`), so every "Call next" —
+ * the 4 s interval or the visitor's own press — advances all three at once.
+ */
+const HeroSection: React.FC = () => {
+  const { t } = useTranslation();
+  const { head, callNext, announcedHead, reduced } = useCallHeartbeat();
+  const hintId = useId();
+
+  const headline = t('public.hero.headline');
+  const accent = accentIndex(headline, t('public.hero.headlineAccent'));
+
   return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-white to-gray-100 py-20 overflow-hidden w-full">
-      {/* Background Animation */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-slate-300 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl animate-float" style={{ animationDelay: '4s' }}></div>
-      </div>
+    <section
+      aria-labelledby="landing-hero-title"
+      className="on-ink relative isolate overflow-hidden border-t border-white/[0.12] bg-[--ink] text-white"
+    >
+      <div className="mx-auto w-full max-w-6xl px-5 pb-16 pt-6 sm:px-6 sm:pt-8 lg:pb-32">
+        <LedBoard head={head} reduced={reduced} className="relative z-0" />
 
-      {/* Tech Background with Movement Animation */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-20">
-        <div className="relative w-full h-full overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop&crop=center" 
-            alt="Technology circuit board background" 
-            className="w-full h-full object-cover animate-slow-pan"
-          />
-          
-          {/* Digital Data Flow Animation Overlay */}
-          <div className="absolute inset-0">
-            {/* Moving dots representing data flow */}
-            <div className="absolute top-1/4 left-0 w-2 h-2 bg-blue-500 rounded-full animate-queue-flow"></div>
-            <div className="absolute top-1/3 left-0 w-2 h-2 bg-slate-500 rounded-full animate-queue-flow" style={{ animationDelay: '1s' }}></div>
-            <div className="absolute top-2/5 left-0 w-2 h-2 bg-gray-500 rounded-full animate-queue-flow" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute top-1/2 left-0 w-2 h-2 bg-blue-600 rounded-full animate-queue-flow" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute top-3/5 left-0 w-2 h-2 bg-slate-600 rounded-full animate-queue-flow" style={{ animationDelay: '4s' }}></div>
-            
-            {/* Flowing lines representing data streams */}
-            <div className="absolute top-1/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-flow-line"></div>
-            <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-slate-400 to-transparent animate-flow-line" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute top-3/4 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-gray-400 to-transparent animate-flow-line" style={{ animationDelay: '4s' }}></div>
+        <div className="mt-10 grid items-start gap-14 sm:mt-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-6 lg:pt-4">
+            <m.p
+              className="qf-eyebrow"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+            >
+              {t('public.hero.eyebrow')}
+            </m.p>
+            <CalledWords
+              as="h1"
+              id="landing-hero-title"
+              text={headline}
+              startOnView={false}
+              accent={accent >= 0 ? [accent] : []}
+              accentClassName="qf-accent text-[--led]"
+              className="qf-h1 mt-5 max-w-[16ch] text-white"
+            />
+            <m.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.48, delay: 0.6, ease: EASE_OUT_QUART }}
+            >
+              <p className="mt-6 max-w-[56ch] text-[17px] leading-[1.6] text-[--on-ink-2] sm:text-lg">
+                {t('public.hero.subline')}
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link to="/pricing" className="qf-btn qf-btn-brand">
+                  {t('public.hero.seePricing')}
+                  <ArrowRight aria-hidden="true" className="size-4" />
+                </Link>
+                <Link to="/customer" className="qf-btn qf-btn-outline-ink">
+                  {t('public.hero.tryDemo')}
+                </Link>
+              </div>
+            </m.div>
+
+            <m.ul
+              className="mt-10 grid gap-3 sm:grid-cols-3"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.48, delay: 0.75, ease: EASE_OUT_QUART }}
+            >
+              {FACTS.map(({ key, icon: Icon }, i) => (
+                <li key={key} className="qf-stub-shadow flex">
+                  <div className="qf-stub qf-perf-top flex w-full items-center gap-3 rounded-xl px-3.5 pb-3.5 pt-4 sm:flex-col sm:items-stretch sm:gap-2">
+                    <span className="flex items-center gap-2.5 text-[--stamp] sm:justify-between">
+                      <span className="qf-stub-num text-[14px]">0{i + 1}</span>
+                      <Icon aria-hidden="true" className="size-4" />
+                    </span>
+                    <span className="text-[14px] font-medium leading-snug text-[--text-1]">{t(`public.hero.facts.${key}`)}</span>
+                  </div>
+                </li>
+              ))}
+            </m.ul>
+          </div>
+
+          <div className="relative z-10 lg:col-span-6 lg:-mt-24">
+            <ProductPreview head={head} onCallNext={callNext} hintId={hintId} />
+            <p id={hintId} className="sr-only">
+              {t('public.preview.callNextHint')}
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="w-full px-4 text-center relative z-10">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-semibold text-gray-900 mb-6 animate-fade-in-up relative font-sans tracking-tight">
-            Skip the Line,
-            <span className="block text-slate-700">Not Your Day.</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in-up font-sans font-normal leading-relaxed" style={{ animationDelay: '0.2s' }}>
-            Book, track, and check in from any device. Queue management that actually works.
-          </p>
-          
-          {/* Primary CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <Button size="lg" className="w-full sm:w-auto bg-slate-700 hover:bg-slate-800 text-white px-8 font-medium" asChild>
-              <Link to="/customer">
-                Book Appointment
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button 
-              size="lg" 
-              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 shadow-sm hover:shadow-md px-8 font-medium" 
-              asChild
-            >
-              <Link to="/status">Check Status</Link>
-            </Button>
-            <Button 
-              size="lg" 
-              className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 px-8 font-medium" 
-              asChild
-            >
-              <Link to="/check-in">I'm Here, Check In</Link>
-            </Button>
-          </div>
-
-          {/* Trust Badge */}
-          <div className="flex items-center justify-center text-sm text-gray-500 animate-fade-in-up font-sans" style={{ animationDelay: '0.6s' }}>
-            <Shield className="h-4 w-4 text-slate-600 mr-1" />
-            <span>Encrypted &amp; access-controlled</span>
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes slow-pan {
-          0% { transform: scale(1) translateX(0); }
-          50% { transform: scale(1.05) translateX(-10px); }
-          100% { transform: scale(1) translateX(0); }
-        }
-        
-        @keyframes queue-flow {
-          0% { 
-            transform: translateX(-20px); 
-            opacity: 0; 
-          }
-          10% { 
-            opacity: 1; 
-          }
-          90% { 
-            opacity: 1; 
-          }
-          100% { 
-            transform: translateX(calc(100vw + 20px)); 
-            opacity: 0; 
-          }
-        }
-        
-        @keyframes flow-line {
-          0% { 
-            transform: translateX(-100%); 
-            opacity: 0; 
-          }
-          10% { 
-            opacity: 0.6; 
-          }
-          90% { 
-            opacity: 0.6; 
-          }
-          100% { 
-            transform: translateX(100%); 
-            opacity: 0; 
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        .animate-slow-pan {
-          animation: slow-pan 20s ease-in-out infinite;
-        }
-        
-        .animate-queue-flow {
-          animation: queue-flow 8s linear infinite;
-        }
-        
-        .animate-flow-line {
-          animation: flow-line 6s ease-in-out infinite;
-        }
-        
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-      `}</style>
+      <p aria-live="polite" className="sr-only">
+        {announcedHead === null
+          ? ''
+          : t('public.board.ariaLive', { ticket: ticketLabel(servingTicket(announcedHead)), number: COUNTER })}
+      </p>
+      <Grain opacity={0.06} />
     </section>
   );
 };

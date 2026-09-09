@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import CTASection from '@/components/landing/CTASection';
 import Navigation from '@/components/landing/Navigation';
+import LandingNav from '@/components/landing/LandingNav';
 import { renderWithProviders } from './test-utils';
 import StatusPage from '@/pages/StatusPage';
 
@@ -49,28 +50,27 @@ describe('Landing Page Navigation', () => {
   });
 
   describe('CTASection', () => {
-    it('renders Check Status button with correct link', () => {
+    it('renders the Talk to us button as a mailto link with the QueueFlow subject', () => {
       const { getByRole } = renderWithRouter(<CTASection />);
-      
-      const checkStatusButton = getByRole('link', { name: /check status/i });
-      expect(checkStatusButton).toBeInTheDocument();
-      expect(checkStatusButton).toHaveAttribute('href', '/status');
+
+      const talkButton = getByRole('link', { name: /talk to us/i });
+      expect(talkButton).toBeInTheDocument();
+      expect(talkButton).toHaveAttribute('href', 'mailto:info@garrickinternational.com?subject=QueueFlow');
     });
 
-    it('renders Check In Now button with correct link', () => {
+    it('renders the live demo button pointing at the booking flow', () => {
       const { getByRole } = renderWithRouter(<CTASection />);
-      
-      const checkInButton = getByRole('link', { name: /check in now/i });
-      expect(checkInButton).toBeInTheDocument();
-      expect(checkInButton).toHaveAttribute('href', '/check-in');
+
+      const demoButton = getByRole('link', { name: /try the live demo/i });
+      expect(demoButton).toBeInTheDocument();
+      expect(demoButton).toHaveAttribute('href', '/customer');
     });
 
-    it('renders Book Appointment button with correct link', () => {
-      const { getByRole } = renderWithRouter(<CTASection />);
-      
-      const bookButton = getByRole('link', { name: /book appointment/i });
-      expect(bookButton).toBeInTheDocument();
-      expect(bookButton).toHaveAttribute('href', '/customer');
+    it('does not offer customer tasks (check in / status) in the buyer CTA', () => {
+      const { queryByRole } = renderWithRouter(<CTASection />);
+
+      expect(queryByRole('link', { name: /check in now/i })).not.toBeInTheDocument();
+      expect(queryByRole('link', { name: /check status/i })).not.toBeInTheDocument();
     });
   });
 
@@ -103,6 +103,32 @@ describe('Landing Page Navigation', () => {
       // Mobile menu duplicates the public links
       const statusLinks = getAllByRole('link').filter((a) => a.getAttribute('href') === '/status');
       expect(statusLinks.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  describe('LandingNav', () => {
+    it('links to the page sections, pricing and sign-in', () => {
+      const { getAllByRole } = renderWithRouter(<LandingNav />);
+      const hrefs = getAllByRole('link').map((a) => a.getAttribute('href'));
+      expect(hrefs).toContain('#how-it-works');
+      expect(hrefs).toContain('#capabilities');
+      expect(hrefs).toContain('#visitors');
+      expect(hrefs).toContain('/pricing');
+      expect(hrefs).toContain('/auth');
+    });
+
+    it('toggles the mobile menu with an accessible button', async () => {
+      const user = userEvent.setup();
+      const { getByRole, getAllByRole } = renderWithRouter(<LandingNav />);
+
+      const menuButton = getByRole('button', { name: /open menu/i });
+      expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+      await user.click(menuButton);
+      expect(getByRole('button', { name: /close menu/i })).toHaveAttribute('aria-expanded', 'true');
+
+      // The sheet duplicates the section links
+      const capLinks = getAllByRole('link').filter((a) => a.getAttribute('href') === '#capabilities');
+      expect(capLinks.length).toBeGreaterThanOrEqual(2);
     });
   });
 

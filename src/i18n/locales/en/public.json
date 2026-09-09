@@ -18,7 +18,7 @@
       "contactInfo": "Contact Information",
       "email": "Email:",
       "supportHours": "Support hours: Mon–Fri, 8am–6pm ET",
-      "rights": "© {{year}} Queue Flow. All rights reserved.",
+      "rights": "© {{year}} QueueFlow. All rights reserved.",
       "motto": "Revolutionizing customer service management"
     }
   },
@@ -38,7 +38,12 @@
     "signIn": "Sign In",
     "employeeLogin": "Employee Login",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "landingLabel": "Landing page",
+    "landingHowItWorks": "How it works",
+    "landingCapabilities": "Capabilities",
+    "landingPricing": "Pricing",
+    "landingVisitors": "For visitors"
   },
   "hero": {
     "titleLine1": "Smart Queue Management",
@@ -56,7 +61,22 @@
     "statLanguagesDescription": "Languages for customers",
     "statPwa": "PWA",
     "statPwaDescription": "Installable, works on any device",
-    "videoUnsupported": "Your browser does not support the video tag."
+    "videoUnsupported": "Your browser does not support the video tag.",
+    "eyebrow": "Queue and appointment management",
+    "headline": "Shorter lines. Calmer lobbies.",
+    "subline": "QueueFlow lets customers book online or take a ticket at the kiosk, check in with a code, and follow their place in line from their phone or the lobby screen — while your staff call the next person from one dashboard.",
+    "seePricing": "See pricing",
+    "tryDemo": "Try the live demo",
+    "customerPrompt": "Here for an appointment?",
+    "customerBook": "Book",
+    "customerCheckIn": "Check in",
+    "customerStatus": "Check status",
+    "facts": {
+      "oneLine": "Walk-ins and bookings in one line",
+      "livePosition": "Live position on any phone",
+      "languages": "EN · ES · PT · HT"
+    },
+    "headlineAccent": "Calmer"
   },
   "serviceCards": {
     "title": "How Can We Help You Today?",
@@ -141,7 +161,11 @@
     "subtitle": "Give your customers a queue they can wait in from anywhere",
     "bookAppointment": "Book Appointment",
     "checkStatus": "Check Status",
-    "checkInNow": "Check In Now"
+    "checkInNow": "Check In Now",
+    "talkToUs": "Talk to us",
+    "tryDemo": "Try the live demo",
+    "headline": "Ready to run a calmer lobby?",
+    "yourTurn": "Your turn."
   },
   "pricing": {
     "badge": "Simple, transparent pricing",
@@ -657,5 +681,188 @@
       "cannotCheckIn": "This appointment is {{status}} and cannot be checked in",
       "cannotCancel": "This appointment is {{status}} and cannot be cancelled"
     }
+  },
+  "howItWorks": {
+    "eyebrow": "How it works",
+    "title": "One queue, three steps",
+    "subtitle": "Appointments and walk-ins land in the same line, so nobody is served out of turn.",
+    "stepLabel": "Step {{number}}:",
+    "steps": {
+      "book": {
+        "title": "Customers book online or walk up to the kiosk",
+        "description": "Online bookings get a confirmation code. Walk-ins take a printed or on-screen ticket with a QR code at the self-service kiosk."
+      },
+      "call": {
+        "title": "Staff call the next person from one dashboard",
+        "description": "Call next, mark served or no-show, and undo a slip — every action updates the line for everyone at once."
+      },
+      "see": {
+        "title": "Everyone sees their place in line",
+        "description": "Customers follow their position and estimated wait on their phone; the lobby screen shows who is being served and who is next."
+      }
+    }
+  },
+  "board": {
+    "ariaLabel": "Example lobby board showing the ticket now being served, the next three tickets and the average wait",
+    "location": "Main Street Branch",
+    "caption": "Lobby board",
+    "example": "Example",
+    "nowServing": "Now serving",
+    "counter": "Counter {{number}}",
+    "upNext": "Up next",
+    "averageWait": "Average wait",
+    "waitMinutes": "{{minutes}} min",
+    "ariaLive": "Now serving {{ticket}} at counter {{number}}"
+  },
+  "quickActions": {
+    "eyebrow": "For visitors",
+    "title": "Here for your appointment?",
+    "subtitle": "Pick what you need. No sign-in required.",
+    "book": {
+      "title": "Book an appointment",
+      "description": "Choose a service, location and time that works for you.",
+      "action": "Book now"
+    },
+    "checkIn": {
+      "title": "Check in",
+      "description": "Arrived? Enter your confirmation code to join the line.",
+      "action": "I'm here"
+    },
+    "status": {
+      "title": "Check status",
+      "description": "See your position in line and the estimated wait.",
+      "action": "View status"
+    },
+    "find": {
+      "title": "Find my appointment",
+      "description": "Look up or cancel an existing booking.",
+      "action": "Find appointment"
+    },
+    "lobbiesLabel": "For lobbies:",
+    "kiosk": "Kiosk",
+    "signage": "Signage",
+    "virtualQueue": "Virtual queue"
+  },
+  "capabilities": {
+    "eyebrow": "Capabilities",
+    "title": "Everything a front desk needs to run the line",
+    "subtitle": "Built for busy service counters — clinics, agencies, service centres — that take both appointments and walk-ins.",
+    "items": {
+      "kiosk": {
+        "title": "Walk-in kiosk and online booking",
+        "description": "Customers book ahead on any device or take a ticket at the self-service kiosk. Both go into the same queue."
+      },
+      "checkIn": {
+        "title": "Check-in by code",
+        "description": "Arrivals check in with their confirmation code, or by name and phone, and get their place in line right away."
+      },
+      "live": {
+        "title": "Live position and wait estimate",
+        "description": "Every ticket shows its position and an estimated wait, refreshed as the line moves — on the mobile tracker and the lobby signage board."
+      },
+      "virtual": {
+        "title": "Virtual queue",
+        "description": "Customers join the line before they arrive and check in when they get there, so the waiting room stays calm."
+      },
+      "staff": {
+        "title": "Staff dashboard",
+        "description": "Call next, mark served or no-show, and undo a mistake from one screen, with separate staff and admin roles."
+      },
+      "analytics": {
+        "title": "Admin analytics and multi-location",
+        "description": "Wait times, volumes and service mix per location, with several sites managed from one account."
+      },
+      "signage": {
+        "title": "Lobby signage",
+        "description": "A wall screen shows who is being served and who is next, so nobody has to ask."
+      }
+    },
+    "vignettes": {
+      "tracker": {
+        "label": "Your place"
+      },
+      "kiosk": {
+        "ticket": "Ticket",
+        "takeTicket": "Take a ticket",
+        "bookOnline": "Book online"
+      },
+      "checkIn": {
+        "label": "Confirmation code",
+        "button": "Check in"
+      },
+      "staff": {
+        "served": "Served",
+        "noShow": "No-show"
+      },
+      "virtual": {
+        "joined": "Joined from home",
+        "arrive": "Check in when you arrive"
+      },
+      "analytics": {
+        "label": "Avg wait, last 7 days",
+        "locations": "{{n}} locations",
+        "dayLabels": "M,T,W,T,F,S,S"
+      }
+    }
+  },
+  "trust": {
+    "title": "Platform facts",
+    "rls": "Postgres row-level security",
+    "encrypted": "Encrypted in transit and at rest",
+    "pwa": "Installable PWA — works on any device",
+    "languages": "Four customer languages: EN, ES, PT, HT"
+  },
+  "pricingTeaser": {
+    "eyebrow": "Pricing",
+    "title": "Plans for one desk or many",
+    "subtitle": "Start with a single location and grow into multi-site analytics and custom requirements.",
+    "link": "See pricing"
+  },
+  "footer": {
+    "tagline": "Queue and appointment management for busy front desks.",
+    "forCustomers": "For customers",
+    "forLobbies": "For lobbies",
+    "company": "Product",
+    "pricing": "Pricing",
+    "staffSignIn": "Staff sign in"
+  },
+  "preview": {
+    "ariaLabel": "Example staff dashboard showing today's numbers, the queue and the ticket now being served",
+    "timestamp": "Tuesday 10:24",
+    "stats": {
+      "waiting": "Waiting",
+      "beingServed": "Being served",
+      "avgWait": "Avg wait",
+      "servedToday": "Served today"
+    },
+    "queue": "Queue",
+    "wait": "Wait",
+    "services": {
+      "account": "Account opening",
+      "renewal": "Document renewal",
+      "enquiry": "General enquiry",
+      "payment": "Payment",
+      "consultation": "Consultation"
+    },
+    "nextUp": "Next up {{ticket}}",
+    "callNext": "Call next",
+    "caption": "Now serving {{ticket}}",
+    "ticketAria": "Example customer ticket showing position in line and estimated wait",
+    "yourTicket": "Your ticket · {{ticket}}",
+    "position": "You're #{{position}} in line",
+    "eta": "About {{minutes}} min to go",
+    "progressLabel": "Progress in line",
+    "ahead": "{{n}} people ahead of you",
+    "callNextHint": "Example only — advances the demo board"
+  },
+  "fit": {
+    "eyebrow": "Built for busy front desks",
+    "clinics": "Clinics",
+    "government": "Government offices",
+    "banks": "Banks & credit unions",
+    "serviceCentres": "Service centres",
+    "campuses": "Campuses",
+    "repairShops": "Repair shops",
+    "marqueeLabel": "Kinds of front desk QueueFlow is built for"
   }
 }

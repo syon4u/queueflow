@@ -1,144 +1,79 @@
-
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Calendar, Search, Clock, MapPin, User, Smartphone, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { ArrowRight, CalendarDays, LogIn, Search, Timer } from 'lucide-react';
+import { LandingSection, SectionHeading } from '@/components/landing/LandingSection';
 
-const ServiceCardsGrid = () => {
+/** Customer quick actions: the four things a visitor actually comes here to do. */
+const ACTIONS = [
+  { key: 'book', icon: CalendarDays, to: '/customer' },
+  { key: 'checkIn', icon: LogIn, to: '/check-in' },
+  { key: 'status', icon: Timer, to: '/status' },
+  { key: 'find', icon: Search, to: '/appointment-lookup' },
+] as const;
+
+const LOBBY_LINKS = [
+  { key: 'kiosk', to: '/kiosk' },
+  { key: 'signage', to: '/digital-signage' },
+  { key: 'virtualQueue', to: '/virtual-queue' },
+] as const;
+
+/**
+ * The customer block, on the lobby wall (ink + grain) so it reads as a
+ * different audience from the buyer sections around it. Cards are paper
+ * tickets with a torn top edge; the link box stays unmasked so the focus
+ * ring is never clipped.
+ */
+const ServiceCardsGrid: React.FC = () => {
   const { t } = useTranslation();
 
-  const services = [
-    {
-      icon: Calendar,
-      title: t('public.serviceCards.schedule.title'),
-      description: t('public.serviceCards.schedule.description'),
-      buttonText: t('public.serviceCards.schedule.button'),
-      link: '/customer',
-      gradient: 'from-blue-500 to-blue-600',
-      featured: true
-    },
-    {
-      icon: Search,
-      title: t('public.serviceCards.find.title'),
-      description: t('public.serviceCards.find.description'),
-      buttonText: t('public.serviceCards.find.button'),
-      link: '/appointment-lookup',
-      gradient: 'from-purple-500 to-purple-600'
-    },
-    {
-      icon: Clock,
-      title: t('public.serviceCards.checkIn.title'),
-      description: t('public.serviceCards.checkIn.description'),
-      buttonText: t('public.serviceCards.checkIn.button'),
-      link: '/check-in',
-      gradient: 'from-green-500 to-green-600'
-    },
-    {
-      icon: MapPin,
-      title: t('public.serviceCards.status.title'),
-      description: t('public.serviceCards.status.description'),
-      buttonText: t('public.serviceCards.status.button'),
-      link: '/status',
-      gradient: 'from-orange-500 to-orange-600'
-    },
-    {
-      icon: Smartphone,
-      title: t('public.serviceCards.mobile.title'),
-      description: t('public.serviceCards.mobile.description'),
-      buttonText: t('public.serviceCards.mobile.button'),
-      link: '/mobile-queue',
-      gradient: 'from-pink-500 to-pink-600'
-    },
-    {
-      icon: User,
-      title: t('public.serviceCards.kiosk.title'),
-      description: t('public.serviceCards.kiosk.description'),
-      buttonText: t('public.serviceCards.kiosk.button'),
-      link: '/kiosk',
-      gradient: 'from-indigo-500 to-indigo-600'
-    }
-  ];
-
   return (
-    <section className="py-20 bg-white relative">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="grid grid-cols-8 h-full">
-          {Array.from({ length: 64 }).map((_, i) => (
-            <div key={i} className="border border-gray-200"></div>
-          ))}
-        </div>
-      </div>
+    <LandingSection id="visitors" tone="ink" grain={0.06} labelledBy="landing-actions-title">
+      <SectionHeading
+        id="landing-actions-title"
+        eyebrow={t('public.quickActions.eyebrow')}
+        title={t('public.quickActions.title')}
+        description={t('public.quickActions.subtitle')}
+        onInk
+      />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            {t('public.serviceCards.title')}
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            {t('public.serviceCards.subtitle')}
-          </p>
-        </div>
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {ACTIONS.map(({ key, icon: Icon, to }) => (
+          <li key={key} className="reveal flex">
+            <Link to={to} className="qf-card-hover group flex w-full rounded-2xl hover:shadow-[0_24px_48px_-16px_rgba(0,0,0,.6)]">
+              <span className="qf-stub-paper qf-perf-top flex w-full flex-col rounded-2xl p-6 pt-7">
+                <span className="mb-5 inline-flex size-11 items-center justify-center rounded-xl bg-[--brand] text-white shadow-[var(--shadow-card)]">
+                  <Icon aria-hidden="true" className="size-5" />
+                </span>
+                <span className="qf-h3 text-[19px] text-[--text-1]">{t(`public.quickActions.${key}.title`)}</span>
+                <span className="mt-1.5 flex-1 text-[15px] leading-relaxed text-[--text-2]">
+                  {t(`public.quickActions.${key}.description`)}
+                </span>
+                <span className="mt-5 inline-flex items-center gap-1 text-[15px] font-semibold text-[--brand-deep]">
+                  {t(`public.quickActions.${key}.action`)}
+                  <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {services.map((service, index) => (
-            <Card 
-              key={index} 
-              className={`group hover:shadow-2xl transition-all duration-300 border-0 shadow-lg hover:-translate-y-2 ${
-                service.featured ? 'lg:col-span-1 lg:row-span-1' : ''
-              }`}
+      <p className="reveal mt-8 flex flex-wrap items-center justify-center gap-x-2 text-[15px] text-[--on-ink-2]">
+        <span>{t('public.quickActions.lobbiesLabel')}</span>
+        {LOBBY_LINKS.map(({ key, to }, index) => (
+          <span key={key} className="contents">
+            {index > 0 && <span aria-hidden="true">·</span>}
+            <Link
+              to={to}
+              className="inline-flex min-h-11 items-center rounded-md px-1 font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white"
             >
-              <CardHeader className="text-center pb-4 relative overflow-hidden">
-                {/* Gradient Background */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                
-                {/* Icon */}
-                <div className={`mx-auto mb-4 p-4 rounded-2xl bg-gradient-to-br ${service.gradient} w-fit group-hover:scale-110 transition-transform duration-300`}>
-                  <service.icon className="h-8 w-8 text-white" />
-                </div>
-                
-                <CardTitle className="text-xl mb-3 group-hover:text-gray-900 transition-colors">
-                  {service.title}
-                </CardTitle>
-                <CardDescription className="text-gray-600 text-base leading-relaxed">
-                  {service.description}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <Link to={service.link} className="block">
-                  <Button 
-                    className={`w-full bg-gradient-to-r ${service.gradient} hover:shadow-lg text-white border-0 group-hover:scale-105 transition-all duration-300`}
-                    size="lg"
-                  >
-                    {service.buttonText}
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Quick Links */}
-        <div className="mt-16 text-center">
-          <div className="flex flex-wrap justify-center gap-6">
-            <Link to="/virtual-queue">
-              <Button variant="ghost" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-6 py-3">
-                {t('public.serviceCards.virtualQueue')}
-              </Button>
+              {t(`public.quickActions.${key}`)}
             </Link>
-            <Link to="/digital-signage">
-              <Button variant="ghost" className="text-purple-600 hover:text-purple-800 hover:bg-purple-50 px-6 py-3">
-                {t('public.serviceCards.digitalSignage')}
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
+          </span>
+        ))}
+      </p>
+    </LandingSection>
   );
 };
 

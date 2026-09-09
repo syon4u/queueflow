@@ -1,0 +1,449 @@
+/*
+ * Public landing page design system — "NOW SERVING" (docs/landing-art-direction.md).
+ * Everything is scoped to `.landing` so the app's global design-system.css
+ * (serif headings, near-black colour) does not leak in, and nothing here
+ * leaks out.
+ *
+ * `:where()` keeps element overrides at zero specificity, so Tailwind
+ * utilities on the same element still win.
+ */
+
+.landing {
+  /* Grounds */
+  --ink: #0b1220;
+  --ink-2: #111a2e;
+  --board: #07090f;
+  --paper: #ffffff;
+  --cream: #f7f3ea;
+  --hairline: #e7e2d6;
+  /* LED amber — only ever on --ink / --board */
+  --led: #ffb020;
+  --led-hot: #ffc957;
+  /* Amber-deep for small text on cream (4.5:1) */
+  --stamp: #b45309;
+  /* Accent */
+  --brand: #2563eb;
+  --brand-deep: #1d4ed8;
+  --sky: #38bdf8;
+  /* Text */
+  --text-1: #0f172a;
+  --text-2: #475569;
+  --on-ink-1: #ffffff;
+  --on-ink-2: #b7bfcf;
+  /* Depth */
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 12px 32px -12px rgba(15, 23, 42, 0.18);
+  --shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 30px 80px -20px rgba(56, 189, 248, 0.35);
+  /* Motion vocabulary (three curves, no others) */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-roll: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--text-1);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+ * Type roles. Bricolage Grotesque is one variable file with optical-size and
+ * width axes; each role dials its own "personality" (signage at opsz 96 /
+ * wdth 80–90, friendly grotesque at opsz 12–20). Tailwind v3 has no utility
+ * for these axes, so they live here.
+ * ------------------------------------------------------------------------- */
+
+/* (0,1,0) beats the global serif rule (0,0,1) whichever stylesheet loads
+   first; colour, size and tracking come from the role classes below. */
+.landing :where(h1, h2, h3, h4, h5, h6) {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  margin: 0;
+  text-wrap: balance;
+}
+
+:where(.landing) p {
+  margin: 0;
+}
+
+/* Display face for numerals and the wordmark. Defined here as well as in
+   tailwind.config.js because the repo's tailwind.config.js shadows the .ts
+   config; keeping the class name means no markup churn. */
+.landing .font-display,
+.landing .qf-signage {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+}
+
+.landing .qf-wordmark {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 32, 'wdth' 85;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.landing .qf-h1 {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 96, 'wdth' 90;
+  font-weight: 700;
+  font-size: clamp(44px, 7vw, 84px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.landing .qf-h2 {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 72, 'wdth' 92;
+  font-weight: 600;
+  font-size: clamp(32px, 4.5vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.landing .qf-h3 {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 20, 'wdth' 100;
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* The one serif word per heading: the human counter-note to the board. */
+.landing .qf-accent {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.08em;
+  letter-spacing: -0.01em;
+  font-variation-settings: normal;
+}
+
+/* Board digits — A-042 on the LED wall board. */
+.landing .qf-board-digits {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 96, 'wdth' 80;
+  font-weight: 700;
+  font-size: clamp(72px, 16vw, 200px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Board label — NOW SERVING. */
+.landing .qf-board-label {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 12, 'wdth' 100;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--led);
+}
+@media (min-width: 640px) {
+  .landing .qf-board-label {
+    font-size: 16px;
+  }
+}
+
+/* Ticket-stub numerals (facts, steps, phone ticket). */
+.landing .qf-stub-num {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 32, 'wdth' 85;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Section eyebrow: --stamp on cream/paper, --led on ink. */
+.landing .qf-eyebrow {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 12, 'wdth' 100;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--stamp);
+}
+.landing .on-ink .qf-eyebrow {
+  color: var(--led);
+}
+
+/* Focus rings: brand on light grounds, sky on ink. */
+:where(.landing) :is(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+:where(.landing .on-ink) :is(a, button, [tabindex]):focus-visible {
+  outline-color: var(--sky);
+}
+
+/* ---------------------------------------------------------------------------
+ * Buttons
+ * ------------------------------------------------------------------------- */
+.landing .qf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.landing .qf-btn:focus-visible {
+  border-radius: 999px;
+}
+.landing .qf-btn-sm {
+  min-height: 44px;
+  padding: 0 1.125rem;
+  font-size: 0.9375rem;
+}
+.landing .qf-btn-brand {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: var(--shadow-card);
+}
+.landing .qf-btn-brand:hover {
+  background: var(--brand-deep);
+  transform: translateY(-1px);
+}
+.landing .qf-btn-outline-ink {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  background: transparent;
+}
+.landing .qf-btn-outline-ink:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+.landing .qf-btn-ghost {
+  color: var(--text-1);
+  background: transparent;
+}
+.landing .qf-btn-ghost:hover {
+  background: var(--cream);
+}
+
+/* ---------------------------------------------------------------------------
+ * Cards
+ * ------------------------------------------------------------------------- */
+.landing .qf-card {
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+}
+.landing .qf-card-hover {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.landing .qf-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------------------------------------------------------------------------
+ * Texture: LED board, dot-matrix digits, thermal-paper ticket stubs.
+ * ------------------------------------------------------------------------- */
+
+/* Static amber dot field: the board's own ground, also the Suspense and
+   reduced-motion fallback for the canvas FlickeringGrid. */
+.landing .qf-board {
+  background-color: var(--board);
+  background-image: radial-gradient(circle, rgba(255, 176, 32, 0.14) 1.2px, transparent 1.6px);
+  background-size: 8px 8px;
+  border: 1px solid rgba(255, 176, 32, 0.18);
+  border-radius: 24px;
+}
+
+/* Amber bloom behind the digits. */
+.landing .qf-led-glow {
+  background: radial-gradient(closest-side, rgba(255, 176, 32, 0.35), transparent);
+  filter: blur(60px);
+}
+
+/* Dot mask that turns any text into an LED sign. Purely visual; keep the
+   aria-label on the wrapper. */
+.landing .qf-led {
+  color: var(--led);
+  -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 60%);
+  mask-image: radial-gradient(circle, #000 55%, transparent 60%);
+  -webkit-mask-size: 8px 8px;
+  mask-size: 8px 8px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+}
+@media (max-width: 640px) {
+  .landing .qf-led {
+    -webkit-mask-size: 6px 6px;
+    mask-size: 6px 6px;
+  }
+}
+.landing .qf-led-sm {
+  -webkit-mask-size: 4px 4px;
+  mask-size: 4px 4px;
+}
+
+/* Ticket stub: thermal-paper cream with a perforated (torn) top edge. The
+   mask clips the element's own paint only, so put the element inside a plain
+   wrapper if it needs an outer shadow or a focus ring. */
+.landing .qf-perf-top {
+  -webkit-mask-image: radial-gradient(circle at 6px 0, transparent 4px, #000 4.5px);
+  mask-image: radial-gradient(circle at 6px 0, transparent 4px, #000 4.5px);
+  -webkit-mask-size: 12px 100%;
+  mask-size: 12px 100%;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+/* Perforated top and bottom (the trust row). */
+.landing .qf-perf-y {
+  -webkit-mask-image:
+    radial-gradient(circle at 6px 0, transparent 4px, #000 4.5px),
+    radial-gradient(circle at 6px 100%, transparent 4px, #000 4.5px);
+  mask-image:
+    radial-gradient(circle at 6px 0, transparent 4px, #000 4.5px),
+    radial-gradient(circle at 6px 100%, transparent 4px, #000 4.5px);
+  -webkit-mask-size: 12px 100%;
+  mask-size: 12px 100%;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.landing .qf-stub {
+  background: var(--cream);
+  color: var(--text-1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(15, 23, 42, 0.05);
+}
+.landing .qf-stub-paper {
+  background: var(--paper);
+  color: var(--text-1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(15, 23, 42, 0.05);
+}
+/* Drop shadow that follows the perforations (filter runs on the wrapper,
+   after the child's mask). */
+.landing .qf-stub-shadow {
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.08)) drop-shadow(0 20px 28px rgba(15, 23, 42, 0.35));
+}
+
+/* Dashed "tear line" connector. */
+.landing .qf-tear {
+  background-image: linear-gradient(to right, var(--hairline) 0 6px, transparent 6px 12px);
+  background-size: 12px 1px;
+  background-repeat: repeat-x;
+}
+
+/* Rubber stamp badge (pricing "Most popular"). */
+.landing .qf-stamp {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 12, 'wdth' 100;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--stamp);
+  background: var(--cream);
+  border: 2px solid var(--stamp);
+  border-radius: 6px;
+  padding: 5px 9px;
+  transform: rotate(-4deg);
+}
+
+/* "Now serving" chip inside vignettes (kept: #92400e on #fff3d6 = 6.4:1). */
+.landing .qf-chip-serving {
+  background: #fff3d6;
+  color: #92400e;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion
+ * ------------------------------------------------------------------------- */
+
+/* Scroll reveal. Hidden only once the hook confirms IntersectionObserver is
+   available (data-reveal="ready" on the page root); otherwise elements render
+   visible so a missing IO or blocked JS never blanks the page. */
+.landing[data-reveal='ready'] .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.56s var(--ease-out-quart),
+    transform 0.56s var(--ease-out-quart);
+  transition-delay: calc(var(--reveal-i, 0) * 60ms);
+}
+.landing[data-reveal='ready'] .reveal[data-visible] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Product mock: ticket crossfade and queue-row shift (one-shot, no loops). */
+@keyframes qf-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes qf-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.landing .qf-ticket-swap {
+  animation: qf-fade-in 0.45s var(--ease-out-quart) both;
+}
+.landing .qf-row-in {
+  animation: qf-row-in 0.45s var(--ease-out-quart) both;
+}
+
+/* The "Call next" press: 120 ms squeeze, nothing else. */
+.landing .qf-call-btn {
+  transition:
+    transform 0.12s var(--ease-out-quart),
+    background-color 0.2s ease;
+}
+.landing .qf-call-btn:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing[data-reveal='ready'] .reveal,
+  .landing[data-reveal='ready'] .reveal[data-visible] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .landing .qf-ticket-swap,
+  .landing .qf-row-in {
+    animation: none;
+  }
+  .landing .qf-btn,
+  .landing .qf-card-hover,
+  .landing .qf-call-btn {
+    transition: none;
+  }
+  .landing .qf-btn-brand:hover,
+  .landing .qf-card-hover:hover,
+  .landing .qf-call-btn:active {
+    transform: none;
+  }
+}
