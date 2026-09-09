@@ -22,6 +22,12 @@ const COMPANY_LINKS = [
   { key: 'staffSignIn', to: '/login' },
 ] as const;
 
+const LEGAL_LINKS = [
+  { key: 'privacy', to: '/privacy' },
+  { key: 'terms', to: '/terms' },
+  { key: 'accessibility', to: '/accessibility' },
+] as const;
+
 const linkClass =
   'inline-flex min-h-11 items-center rounded-md text-[15px] text-[--on-ink-2] transition-colors hover:text-white';
 const headingClass = 'text-[13px] font-semibold uppercase tracking-[0.1em] text-white';
@@ -89,9 +95,20 @@ const LandingFooter: React.FC = () => {
           </div>
         </div>
 
-        <p className="mt-12 border-t border-white/10 pt-6 text-[14px] text-[--on-ink-2]">
-          {t('public.layout.footer.rights', { year })}
-        </p>
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[14px] text-[--on-ink-2]">{t('public.layout.footer.rights', { year })}</p>
+          <nav aria-label={t('public.legal.navLabel')}>
+            <ul className="flex flex-wrap gap-x-5">
+              {LEGAL_LINKS.map(({ key, to }) => (
+                <li key={key}>
+                  <Link to={to} className={`${linkClass} text-[14px]`}>
+                    {t(`public.legal.${key}`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
       </div>
     </footer>
   );

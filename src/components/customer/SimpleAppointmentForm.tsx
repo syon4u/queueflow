@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, AlertCircle } from 'lucide-react';
@@ -224,6 +225,16 @@ const SimpleAppointmentForm = ({ onSubmit }: SimpleAppointmentFormProps) => {
             formData={formData}
             updateField={updateField}
           />
+
+          <p className="text-sm text-muted-foreground text-center">
+            <Trans
+              i18nKey="public.booking.agreement"
+              components={{
+                terms: <Link to="/terms" className="underline underline-offset-4 text-foreground hover:text-primary" />,
+                privacy: <Link to="/privacy" className="underline underline-offset-4 text-foreground hover:text-primary" />,
+              }}
+            />
+          </p>
 
           <Button 
             type="submit" 

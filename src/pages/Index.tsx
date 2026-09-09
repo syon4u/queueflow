@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import LandingNav from '@/components/landing/LandingNav';
 import HeroSection from '@/components/landing/HeroSection';
 import FitStrip from '@/components/landing/FitStrip';
@@ -22,7 +23,15 @@ import '@/styles/landing.css';
  */
 const Index: React.FC = () => {
   const root = useRef<HTMLDivElement>(null);
+  const { hash } = useLocation();
   useReveal(root);
+
+  // Arriving from another route (e.g. /privacy) via a "/#section" link:
+  // the browser only scrolls to hashes on full loads, so do it here.
+  useEffect(() => {
+    if (!hash) return;
+    document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [hash]);
 
   return (
     <MotionProvider>

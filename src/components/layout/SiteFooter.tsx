@@ -125,6 +125,20 @@ const SiteFooter: React.FC = () => {
         <div className="border-t border-white/30 mt-8 pt-6 text-center text-sm text-white/95">
           <p className="font-medium drop-shadow">{t('public.layout.footer.rights', { year: currentYear })}</p>
           <p className="mt-1 text-white/90 drop-shadow">{t('public.layout.footer.motto')}</p>
+          <nav aria-label={t('public.legal.navLabel')} className="mt-3">
+            <ul className="flex flex-wrap justify-center gap-x-5">
+              {(['privacy', 'terms', 'accessibility'] as const).map((key) => (
+                <li key={key}>
+                  <Link
+                    to={`/${key}`}
+                    className="inline-flex min-h-11 items-center text-white/95 underline underline-offset-4 transition-colors hover:text-white font-medium drop-shadow"
+                  >
+                    {t(`public.legal.${key}`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </div>
     </footer>

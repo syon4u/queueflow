@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import logoTile from '@/assets/logo-tile.svg';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -22,6 +22,7 @@ const SECTIONS = [
 const LandingNav: React.FC = () => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const onLanding = useLocation().pathname === '/';
 
   useEffect(() => {
     if (!open) return;
@@ -42,6 +43,18 @@ const LandingNav: React.FC = () => {
     setOpen(false);
   };
 
+  /** On the landing page: in-page anchor. Elsewhere (e.g. /privacy): route home with the hash. */
+  const sectionLink = (id: string, className: string, children: React.ReactNode) =>
+    onLanding ? (
+      <a href={`#${id}`} onClick={(e) => jump(e, id)} className={className}>
+        {children}
+      </a>
+    ) : (
+      <Link to={`/#${id}`} onClick={() => setOpen(false)} className={className}>
+        {children}
+      </Link>
+    );
+
   const anchorClass =
     'inline-flex min-h-11 items-center rounded-lg px-3 text-[15px] font-medium text-[--text-2] transition-colors hover:text-[--text-1]';
 
@@ -56,9 +69,7 @@ const LandingNav: React.FC = () => {
         <ul className="hidden items-center gap-1 lg:flex">
           {SECTIONS.map(({ id, key }) => (
             <li key={id}>
-              <a href={`#${id}`} onClick={(e) => jump(e, id)} className={anchorClass}>
-                {t(`public.nav.${key}`)}
-              </a>
+              {sectionLink(id, anchorClass, t(`public.nav.${key}`))}
             </li>
           ))}
         </ul>
@@ -92,14 +103,13 @@ const LandingNav: React.FC = () => {
       >
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-5 py-4 sm:px-6">
           {SECTIONS.map(({ id, key }) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              onClick={(e) => jump(e, id)}
-              className="inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-[--text-1] hover:bg-[--cream]"
-            >
-              {t(`public.nav.${key}`)}
-            </a>
+            <React.Fragment key={id}>
+              {sectionLink(
+                id,
+                'inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-[--text-1] hover:bg-[--cream]',
+                t(`public.nav.${key}`)
+              )}
+            </React.Fragment>
           ))}
           <div className="mt-3 flex flex-col gap-2 border-t border-[--hairline] pt-4">
             <div className="px-1">
