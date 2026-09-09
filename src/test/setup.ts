@@ -68,5 +68,7 @@ vi.mock('react-i18next', async () => {
         changeLanguage: vi.fn(),
       },
     }),
+    // Renders the English string with its <tag>…</tag> markers stripped.
+    Trans: ({ i18nKey }: { i18nKey: string }) => String(t(i18nKey)).replace(/<\/?\w+>/g, ''),
   };
 });
