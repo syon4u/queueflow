@@ -445,3 +445,105 @@
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Long-form documents (privacy, terms, accessibility). Plain reading column;
+ * body colour and links stay ≥ 4.5:1 on paper.
+ * ------------------------------------------------------------------------- */
+.landing .qf-doc {
+  font-size: 17px;
+  line-height: 1.65;
+}
+.landing .qf-doc-section {
+  margin-top: 2.75rem;
+  scroll-margin-top: 5.5rem;
+}
+.landing .qf-doc-section > h2 {
+  margin-bottom: 0.75rem;
+}
+.landing .qf-doc-section > h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 16, 'wdth' 100;
+  font-weight: 600;
+  font-size: 17px;
+}
+.landing .qf-doc-section > p + p,
+.landing .qf-doc-section > ul + p,
+.landing .qf-doc-section > p + ul {
+  margin-top: 0.85rem;
+}
+.landing .qf-doc-section ul {
+  list-style: disc;
+  padding-left: 1.4rem;
+}
+.landing .qf-doc-section li + li {
+  margin-top: 0.4rem;
+}
+.landing .qf-doc a:not(.qf-btn) {
+  color: var(--brand-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.landing .qf-doc a:not(.qf-btn):hover {
+  color: var(--text-1);
+}
+.landing .qf-doc-notice {
+  background: var(--cream);
+  border: 1px solid var(--hairline);
+  border-left: 4px solid var(--stamp);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 15px;
+  color: var(--text-1);
+}
+.landing .qf-doc-toc {
+  background: var(--cream);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+.landing .qf-doc-toc ol {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+@media (min-width: 640px) {
+  .landing .qf-doc-toc ol {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5rem;
+  }
+}
+.landing .qf-doc .qf-doc-toc a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-1);
+  text-decoration: none;
+}
+.landing .qf-doc .qf-doc-toc a:hover {
+  color: var(--brand-deep);
+}
+.landing .qf-doc-toc-num {
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  font-variation-settings: 'opsz' 12, 'wdth' 100;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--stamp);
+  font-variant-numeric: tabular-nums;
+}
+/* Placeholder the owner must fill in (governing law). */
+.landing .qf-doc-placeholder {
+  background: #fff3d6;
+  color: #92400e;
+  border-radius: 4px;
+  padding: 0 0.3em;
+  font-weight: 600;
+}

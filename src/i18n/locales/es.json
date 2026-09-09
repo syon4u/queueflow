@@ -483,7 +483,8 @@
         "codeLabel": "Código de Confirmación",
         "keepCode": "Conserva este código para registrarte y consultar tu estado. Úsalo para ver tu posición en la fila.",
         "gotIt": "Entendido"
-      }
+      },
+      "agreement": "Al reservar, aceptas nuestros <terms>Términos</terms> y nuestra <privacy>Política de Privacidad</privacy>."
     },
     "checkIn": {
       "pageTitle": "Ya Llegué",
@@ -1049,6 +1050,15 @@
       "campuses": "Campus",
       "repairShops": "Talleres",
       "marqueeLabel": "Tipos de mostrador para los que está hecho QueueFlow"
+    },
+    "legal": {
+      "navLabel": "Legal",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "accessibility": "Accesibilidad",
+      "englishOnly": "Esta página solo está disponible en inglés.",
+      "lastUpdated": "Última actualización: {{date}}",
+      "onThisPage": "En esta página"
     }
   }
 }

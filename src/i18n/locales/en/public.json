@@ -299,7 +299,8 @@
       "codeLabel": "Confirmation Code",
       "keepCode": "Keep this code for check-in and status updates. Use it to check your queue position.",
       "gotIt": "Got It"
-    }
+    },
+    "agreement": "By booking you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>."
   },
   "checkIn": {
     "pageTitle": "I'm Here",
@@ -865,5 +866,14 @@
     "campuses": "Campuses",
     "repairShops": "Repair shops",
     "marqueeLabel": "Kinds of front desk QueueFlow is built for"
+  },
+  "legal": {
+    "navLabel": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "accessibility": "Accessibility",
+    "englishOnly": "This page is available in English only.",
+    "lastUpdated": "Last updated: {{date}}",
+    "onThisPage": "On this page"
   }
 }

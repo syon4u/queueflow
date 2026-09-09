@@ -22,6 +22,9 @@ const MobileQueuePage = React.lazy(() => import('@/pages/MobileQueuePage'));
 const VirtualQueuePage = React.lazy(() => import('@/pages/VirtualQueuePage'));
 const StatusPage = React.lazy(() => import('@/pages/StatusPage'));
 const PricingPage = React.lazy(() => import('@/pages/PricingPage'));
+const PrivacyPage = React.lazy(() => import('@/pages/PrivacyPage'));
+const TermsPage = React.lazy(() => import('@/pages/TermsPage'));
+const AccessibilityPage = React.lazy(() => import('@/pages/AccessibilityPage'));
 const Unauthorized = React.lazy(() => import('@/pages/Unauthorized'));
 const NotFound = React.lazy(() => import('@/pages/NotFound'));
 
@@ -62,6 +65,9 @@ function App() {
                 <Route path="/check-in" element={<CheckInPage />} />
                 <Route path="/status" element={<StatusPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/accessibility" element={<AccessibilityPage />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 
                 {/* Kiosk and signage routes */}

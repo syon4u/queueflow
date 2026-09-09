@@ -483,7 +483,8 @@
         "codeLabel": "Código de Confirmação",
         "keepCode": "Guarde este código para o check-in e para consultar o status. Use-o para ver sua posição na fila.",
         "gotIt": "Entendi"
-      }
+      },
+      "agreement": "Ao agendar, você concorda com nossos <terms>Termos</terms> e nossa <privacy>Política de Privacidade</privacy>."
     },
     "checkIn": {
       "pageTitle": "Cheguei",
@@ -1049,6 +1050,15 @@
       "campuses": "Campi",
       "repairShops": "Oficinas",
       "marqueeLabel": "Tipos de balcão para os quais o QueueFlow foi feito"
+    },
+    "legal": {
+      "navLabel": "Legal",
+      "privacy": "Privacidade",
+      "terms": "Termos",
+      "accessibility": "Acessibilidade",
+      "englishOnly": "Esta página está disponível apenas em inglês.",
+      "lastUpdated": "Última atualização: {{date}}",
+      "onThisPage": "Nesta página"
     }
   }
 }
