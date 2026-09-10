@@ -54,10 +54,36 @@ export default defineConfig(({ mode }) => ({
         // Resolved against the worker scope, so it follows `base`.
         navigateFallback: 'index.html',
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
-        // Deliberately no runtimeCaching: only the precached build output is
-        // served by the worker. Cross-origin requests (Supabase REST, auth,
-        // realtime, storage on *.supabase.co) go straight to the network.
-        runtimeCaching: [],
+        // Precache = app shell + landing route + fonts + icons (icons come
+        // from `includeAssets`). The default `**/*.{js,css,html}` pulled every
+        // lazy route chunk (~130 entries, ~2.3 MB) through the network on the
+        // first visit, competing with the page itself. Chunk names come from
+        // the source file names, so the patterns below stay valid across
+        // rebuilds; `assets/index-*` also matches a handful of small shared
+        // `index.js` chunks from node_modules, which is fine.
+        globPatterns: [
+          'index.html',
+          '404.html',
+          'assets/index-*.{js,css}',
+          'assets/workbox-window*.js',
+          'assets/FlickeringGrid-*.js',
+          'fonts/*.woff2',
+        ],
+        // Everything else under /assets/ (route chunks, locale bundles) is
+        // cached the first time it is used, so a staff page visited once keeps
+        // working offline. Same-origin only: Supabase REST, auth, realtime and
+        // storage on *.supabase.co go straight to the network, always.
+        runtimeCaching: [
+          {
+            urlPattern: ({ sameOrigin, url }) => sameOrigin && /\/assets\/[^/]+\.(?:js|css)$/.test(url.pathname),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'qf-route-assets',
+              cacheableResponse: { statuses: [200] },
+              expiration: { maxEntries: 150, maxAgeSeconds: 30 * 24 * 60 * 60, purgeOnQuotaError: true },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'QueueFlow',
