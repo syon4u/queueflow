@@ -8,8 +8,11 @@ import { cn } from '@/lib/utils';
  * CSS-only digit spin, respects prefers-reduced-motion by default: digits
  * then swap instantly). Zero-padded to `digits`.
  *
- * `aria-label` exposes the whole ticket as one string; NumberFlow's own
- * live-region is disabled so the board does not chatter on every tick.
+ * The wrapper is `role="img"` with the whole ticket as its `aria-label`
+ * (a plain span may not carry aria-label), and the prefix and NumberFlow
+ * digits inside are hidden, so assistive tech reads one string. NumberFlow's
+ * own live region stays off so the board does not chatter on every tick;
+ * "The Call" is announced by the hero's polite live region instead.
  */
 interface TicketNumberProps {
   value: number;
@@ -29,7 +32,7 @@ export const TicketNumber: React.FC<TicketNumberProps> = ({
 }) => {
   const label = `${prefix}${String(value).padStart(digits, '0')}`;
   return (
-    <span aria-label={label} className={cn('inline-flex items-baseline tabular-nums', className)}>
+    <span role="img" aria-label={label} className={cn('inline-flex items-baseline tabular-nums', className)}>
       <span aria-hidden="true">{prefix}</span>
       <NumberFlow
         aria-hidden="true"
