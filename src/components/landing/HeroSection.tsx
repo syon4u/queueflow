@@ -70,9 +70,12 @@ const HeroSection: React.FC = () => {
               accentClassName="qf-accent text-[--led]"
               className="qf-h1 mt-5 max-w-[16ch] text-white"
             />
+            {/* The subline is the page's LCP element: it must be painted in
+                the first frame, so this block never starts at opacity 0 —
+                only `y` settles once the headline has been called. */}
             <m.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: 12 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.48, delay: 0.6, ease: EASE_OUT_QUART }}
             >
               <p className="mt-6 max-w-[56ch] text-[17px] leading-[1.6] text-[--on-ink-2] sm:text-lg">
