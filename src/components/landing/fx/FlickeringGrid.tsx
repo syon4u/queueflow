@@ -39,7 +39,6 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
   const memoizedColor = useMemo(() => {
     if (typeof document === 'undefined') return 'rgba(0, 0, 0,';
@@ -127,7 +126,8 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
     const updateCanvasSize = () => {
       const w = width || container.clientWidth;
       const h = height || container.clientHeight;
-      setCanvasSize({ width: w, height: h });
+      // setupCanvas sizes the element's CSS box directly; no React state
+      // (and no extra commit + layout) is needed for it.
       grid = setupCanvas(canvas, w, h);
       // Always paint one frame so the static (reduced-motion / off-screen) state is not blank.
       drawGrid(ctx, canvas.width, canvas.height, grid.cols, grid.rows, grid.squares, grid.dpr);
@@ -171,7 +171,7 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
 
   return (
     <div ref={containerRef} aria-hidden="true" className={cn('h-full w-full', className)} {...props}>
-      <canvas ref={canvasRef} className="pointer-events-none" style={{ width: canvasSize.width, height: canvasSize.height }} />
+      <canvas ref={canvasRef} className="pointer-events-none" />
     </div>
   );
 };

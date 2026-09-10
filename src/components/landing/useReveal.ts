@@ -9,8 +9,13 @@ import { useEffect, type RefObject } from 'react';
  * CSS) once IntersectionObserver is confirmed available and the user has not
  * asked for reduced motion, so without JS, without IO, or with reduced motion
  * everything simply renders visible.
+ *
+ * `revision` re-runs the scan: pass a value that changes when more `.reveal`
+ * elements have been mounted (Index mounts its sections progressively).
+ * Elements already revealed keep their `data-visible` attribute across a
+ * re-scan, so nothing hides again.
  */
-export function useReveal(root: RefObject<HTMLElement>) {
+export function useReveal(root: RefObject<HTMLElement>, revision?: unknown) {
   useEffect(() => {
     const el = root.current;
     if (!el || typeof IntersectionObserver === 'undefined') return;
@@ -49,5 +54,5 @@ export function useReveal(root: RefObject<HTMLElement>) {
       observer.disconnect();
       delete el.dataset.reveal;
     };
-  }, [root]);
+  }, [root, revision]);
 }

@@ -6,11 +6,9 @@ import { ProtectedRoute, AdminRoute, StaffRoute, PowerUserRoute } from '@/compon
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Everything the landing page does not need stays out of the main chunk:
-// react-query + the live queue (AppDataScope wraps every other route) and
-// the two toast hosts, which render nothing until a toast fires.
+// react-query, the live queue and the toast hosts live in AppDataScope,
+// which wraps every route except the landing page.
 const AppDataScope = React.lazy(() => import('@/context/AppDataScope'));
-const Toaster = React.lazy(() => import('@/components/ui/toaster').then((m) => ({ default: m.Toaster })));
-const Sonner = React.lazy(() => import('@/components/ui/sonner').then((m) => ({ default: m.Toaster })));
 
 // Public pages
 import Index from '@/pages/Index';
@@ -134,10 +132,6 @@ function App() {
           </Routes>
           </Suspense>
           </ErrorBoundary>
-          <Suspense fallback={null}>
-            <Toaster />
-            <Sonner />
-          </Suspense>
         </AuthProvider>
       </div>
     </Router>
