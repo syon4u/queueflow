@@ -4,9 +4,8 @@ import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
 import './index.css';
-import './i18n/i18n.ts';
 import { I18nextProvider } from 'react-i18next';
-import i18n from './i18n/i18n';
+import i18n, { i18nReady } from './i18n/i18n';
 import { MinimalAuthContext } from './context/AuthContext';
 
 // --- Service worker update strategy ----------------------------------------
@@ -86,17 +85,22 @@ if (!container) {
   throw new Error('Root element not found. Make sure there is a div with id "root" in your HTML.');
 }
 
-// Create root and render app
+// Create root and render app. Only English is bundled; when the detected
+// language is another one, wait for its chunk so the first frame is already
+// translated (for English `i18nReady` is resolved synchronously).
 const root = createRoot(container);
-root.render(
-  <React.StrictMode>
-    {/* AuthProvider lives in App.tsx (inside the Router). A second instance
-        here used to shadow it and double every auth/session request. */}
-    <MinimalAuthContext.Provider value={{ user: null, role: null }}>
-      <I18nextProvider i18n={i18n}>
-        <App />
-      </I18nextProvider>
-    </MinimalAuthContext.Provider>
-  </React.StrictMode>
-);
+// A locale chunk that fails to load must not blank the page: render in English.
+i18nReady.catch(() => undefined).then(() => {
+  root.render(
+    <React.StrictMode>
+      {/* AuthProvider lives in App.tsx (inside the Router). A second instance
+          here used to shadow it and double every auth/session request. */}
+      <MinimalAuthContext.Provider value={{ user: null, role: null }}>
+        <I18nextProvider i18n={i18n}>
+          <App />
+        </I18nextProvider>
+      </MinimalAuthContext.Provider>
+    </React.StrictMode>
+  );
+});
 
