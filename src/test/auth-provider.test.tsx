@@ -114,6 +114,9 @@ describe('AuthProvider', () => {
       </BrowserRouter>
     );
 
+    // The client is loaded on demand, so the listener is attached asynchronously.
+    await waitFor(() => expect(emit).toBeDefined());
+
     // A cold load fires the initial-session check plus a burst of listener events.
     reactTesting.act(() => {
       emit?.('INITIAL_SESSION', mockSession);

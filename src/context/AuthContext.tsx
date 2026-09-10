@@ -1,7 +1,5 @@
-
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import type { User, Session } from '@supabase/supabase-js';
 import { UserRoleType } from '@/types/auth';
 
 interface AuthContextType {
@@ -17,8 +15,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Consumers call this (via useAuth) to start the Supabase session check.
+ * Separate from AuthContext so the public context type is unchanged.
+ */
+const AuthStartContext = createContext<() => void>(() => {});
+
+// supabase-js (~85 kB gzip) is loaded on demand: the client module is
+// imported the first time something needs auth (a useAuth consumer mounts,
+// or sign-in/out is called) instead of being part of the main chunk. The
+// landing page has no auth consumer, so it never pays for it.
+type SupabaseClient = typeof import('@/integrations/supabase/client')['supabase'];
+let clientPromise: Promise<SupabaseClient> | null = null;
+const getSupabase = (): Promise<SupabaseClient> => {
+  clientPromise ??= import('@/integrations/supabase/client').then((m) => m.supabase);
+  return clientPromise;
+};
+
 const fetchUserRole = async (userId: string): Promise<UserRoleType> => {
   try {
+    const supabase = await getSupabase();
     const { data: roleData } = await supabase
       .from('user_roles')
       .select('role')
@@ -71,57 +87,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  useEffect(() => {
-    console.log('AuthProvider - Setting up auth state listener');
-    
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
+  // The session check starts when the first consumer mounts (see `start`),
+  // not when the provider does. `loading` stays true until it has resolved,
+  // so ProtectedRoute keeps waiting exactly as before; nothing on the landing
+  // page reads auth, so a visitor there never loads supabase-js.
+  const startedRef = useRef(false);
+  const stopRef = useRef<(() => void) | null>(null);
+
+  const start = useCallback(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    let active = true;
+    let subscription: { unsubscribe: () => void } | null = null;
+    stopRef.current = () => {
+      active = false;
+      subscription?.unsubscribe();
+    };
+
+    getSupabase().then((supabase) => {
+      if (!active) return;
+      console.log('AuthProvider - Setting up auth state listener');
+
+      // Set up auth state listener FIRST
+      ({ data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event, session) => {
+          console.log('Auth state changed:', event, session?.user?.id);
+          applySession(session);
+          
+          if (session?.user) {
+            // Use setTimeout to avoid recursion issues. IMPORTANT: keep
+            // `loading` true until the role has actually been resolved --
+            // otherwise ProtectedRoute evaluates access with role === null
+            // and bounces authenticated staff/admins off deep links.
+            const userId = session.user.id;
+            setTimeout(async () => {
+              const userRole = await resolveUserRole(userId);
+              setRole(userRole);
+              setLoading(false);
+            }, 0);
+          } else {
+            roleCacheRef.current = null;
+            setRole(null);
+            setLoading(false);
+          }
+        }
+      ));
+
+      // THEN check for existing session
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
+        console.log('Initial session check:', session?.user?.id);
         applySession(session);
         
         if (session?.user) {
-          // Use setTimeout to avoid recursion issues. IMPORTANT: keep
-          // `loading` true until the role has actually been resolved --
-          // otherwise ProtectedRoute evaluates access with role === null
-          // and bounces authenticated staff/admins off deep links.
-          const userId = session.user.id;
-          setTimeout(async () => {
-            const userRole = await resolveUserRole(userId);
-            setRole(userRole);
-            setLoading(false);
-          }, 0);
+          const userRole = await resolveUserRole(session.user.id);
+          setRole(userRole);
         } else {
-          roleCacheRef.current = null;
           setRole(null);
-          setLoading(false);
         }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.id);
-      applySession(session);
-      
-      if (session?.user) {
-        const userRole = await resolveUserRole(session.user.id);
-        setRole(userRole);
-      } else {
-        setRole(null);
-      }
-      
-      setLoading(false);
+        
+        setLoading(false);
+      });
     });
+  }, []);
 
+  useEffect(() => {
     return () => {
       console.log('AuthProvider - Cleaning up auth subscription');
-      subscription.unsubscribe();
+      stopRef.current?.();
+      stopRef.current = null;
+      startedRef.current = false;
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
+      const supabase = await getSupabase();
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -134,6 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData?: Record<string, unknown>) => {
     try {
+      const supabase = await getSupabase();
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -150,6 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
+      const supabase = await getSupabase();
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -165,6 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
+      const supabase = await getSupabase();
       await supabase.auth.signOut();
       roleCacheRef.current = null;
       setUser(null);
@@ -191,17 +234,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   console.log('AuthProvider render - user:', user?.id, 'role:', role, 'loading:', loading);
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+    <AuthStartContext.Provider value={start}>
+      <AuthContext.Provider value={value}>
+        {children}
+      </AuthContext.Provider>
+    </AuthStartContext.Provider>
   );
 };
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
+  const start = useContext(AuthStartContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+  // First consumer on the page kicks off the session check (idempotent).
+  useEffect(() => {
+    start();
+  }, [start]);
   return context;
 };
 
