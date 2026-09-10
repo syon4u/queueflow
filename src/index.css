@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..700&family=Instrument+Serif:ital@1&display=swap');
+/* Web fonts are loaded from index.html (non-blocking <link>), not @import. */
 
 /* Import the brand design system */
 @import './styles/design-system.css';
