@@ -21,24 +21,13 @@
     <link rel="apple-touch-icon" href="/pwa-192.png" />
     <meta name="theme-color" content="#2563eb" />
 
-    <!-- Web fonts (Google Fonts, display=swap). Loaded non-blocking: the
-         stylesheet applies once fetched instead of holding up first paint;
-         `media="print"` keeps it off the render path until `onload` flips it.
-         Weights are trimmed to what the app uses: Inter 400-700 (body/UI),
-         Merriweather 400/700 (app headings), Bricolage Grotesque with the
-         opsz/wdth axes the landing type roles dial, Instrument Serif italic
-         (landing accent). -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..700&family=Instrument+Serif:ital@1&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..700&family=Instrument+Serif:ital@1&display=swap" />
-    </noscript>
+    <!-- Web fonts are self-hosted (public/fonts, @font-face in
+         src/styles/fonts.css). The two faces that draw the first screen are
+         preloaded so they arrive with the entry bundle instead of after the
+         CSS has been parsed and the hero rendered. Vite rewrites the /fonts/
+         URLs for `base`. -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/inter-latin-400-700.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/bricolage-grotesque-latin-600-700.woff2" />
   </head>
 
   <body>

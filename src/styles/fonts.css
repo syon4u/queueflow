@@ -1,0 +1,65 @@
+/*
+ * Self-hosted web fonts (latin subsets only). Files live in public/fonts/ and
+ * are served from the same origin, so there is no third-party DNS/TLS on the
+ * critical path and the two above-the-fold faces can be <link rel="preload">ed
+ * from index.html. Every face is a single variable file; the unicode-range
+ * mirrors Google Fonts' "latin" block, so any character outside it (rare
+ * latin-ext accents, Cyrillic, Greek) falls through to the system stack
+ * exactly as the old Google Fonts subsetting did.
+ *
+ * `font-display: swap` everywhere: text is painted in the fallback face at
+ * first paint and re-rendered when the file lands. `optional` was rejected
+ * for Inter because on a cold cache over a slow link the browser would then
+ * commit to the system font for the whole session, which changes the
+ * landing's metrics (line wrapping, button widths) between visits.
+ *
+ * Inter and Bricolage Grotesque are the two preloaded files, so their
+ * variable axes are trimmed to the ranges the app dials (fontTools
+ * instancer, see public/fonts/LICENSE.md): 48 kB -> 36 kB and 131 kB -> 110 kB
+ * with no change to the rendered outlines inside those ranges.
+ *
+ * Sources and licence: public/fonts/LICENSE.md (all SIL OFL 1.1).
+ * URLs are absolute (`/fonts/...`); Vite rewrites them for `base`.
+ */
+
+/* Inter — body/UI. One variable file covers 400–700. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin-400-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Bricolage Grotesque — landing display face (opsz 12–96, wdth 80–100, wght 600–700). */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 600 700;
+  font-stretch: 80% 100%;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-latin-600-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Instrument Serif italic — the one accent word per landing heading. */
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-italic-latin-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Merriweather — app (non-landing) headings via --font-serif. One variable file covers 400–700. */
+@font-face {
+  font-family: 'Merriweather';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url('/fonts/merriweather-latin-400-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

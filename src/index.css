@@ -1,4 +1,5 @@
-/* Web fonts are loaded from index.html (non-blocking <link>), not @import. */
+/* Self-hosted web fonts (@font-face) — first, so the faces are declared before any rule uses them. */
+@import './styles/fonts.css';
 
 /* Import the brand design system */
 @import './styles/design-system.css';
